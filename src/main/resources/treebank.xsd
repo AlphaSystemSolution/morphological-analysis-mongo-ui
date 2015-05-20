@@ -1,0 +1,74 @@
+<xs:schema targetNamespace="http://www.alphasystem.com/morphologicalanalysis/treebank" elementFormDefault="unqualified"
+           attributeFormDefault="unqualified" xml:lang="en" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:tns="http://www.alphasystem.com/morphologicalanalysis/treebank">
+
+    <xs:element name="treeBankData" type="tns:TreeBankDataType"/>
+
+    <xs:complexType name="TreeBankMetaDataType">
+        <xs:sequence>
+        </xs:sequence>
+        <xs:attribute name="svgFileName" type="xs:string" use="optional"/>
+        <xs:attribute name="showGridLines" type="xs:boolean" use="required"/>
+        <xs:attribute name="showOutline" type="xs:boolean" use="required"/>
+        <xs:attribute name="debugMode" type="xs:boolean" use="required"/>
+        <xs:attribute name="width" type="xs:int" default="800"/>
+        <xs:attribute name="height" type="xs:int" default="800"/>
+    </xs:complexType>
+
+    <xs:complexType name="TreeBankDataType">
+        <xs:sequence>
+            <xs:element name="metaData" type="tns:TreeBankMetaDataType" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="text" type="tns:TextType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="relationship" type="tns:RelationshipType" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="PointType">
+        <xs:sequence>
+        </xs:sequence>
+        <xs:attribute name="x" type="xs:double" use="required"/>
+        <xs:attribute name="y" type="xs:double" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="LineType">
+        <xs:sequence>
+            <xs:element name="point1" type="tns:PointType" maxOccurs="1" minOccurs="1"/>
+            <xs:element name="point2" type="tns:PointType" maxOccurs="1" minOccurs="1"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:simpleType name="TextTypeType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="TOKEN"/>
+            <xs:enumeration value="PART_OF_SPEECH"/>
+            <xs:enumeration value="GRAMMATICAL_RELATIONSHIP"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="TextType">
+        <xs:sequence>
+            <xs:element name="type" type="tns:TextTypeType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="location" type="tns:PointType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="value" type="xs:string" minOccurs="1" maxOccurs="1"/>
+            <xs:choice>
+                <xs:element name="line" type="tns:LineType" minOccurs="0" maxOccurs="1"/>
+                <xs:element name="controlPoint" type="tns:PointType" minOccurs="0" maxOccurs="1"/>
+            </xs:choice>
+        </xs:sequence>
+        <xs:attribute name="id" type="xs:ID" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="RelationshipType">
+        <xs:sequence>
+            <xs:element name="text" type="tns:TextType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="startPoint" type="tns:PointType" maxOccurs="1" minOccurs="1"/>
+            <xs:element name="controlPoint1" type="tns:PointType" maxOccurs="1" minOccurs="1"/>
+            <xs:element name="controlPoint2" type="tns:PointType" maxOccurs="1" minOccurs="1"/>
+            <xs:element name="endPoint" type="tns:PointType" maxOccurs="1" minOccurs="1"/>
+        </xs:sequence>
+        <xs:attribute name="id" type="xs:ID" use="required"/>
+        <xs:attribute name="f1" type="xs:double" use="required"/>
+        <xs:attribute name="f2" type="xs:double" use="required"/>
+    </xs:complexType>
+
+</xs:schema>

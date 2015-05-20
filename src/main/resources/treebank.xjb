@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<jaxb:bindings version="2.0" xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+               xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+               xmlns:inheritance="http://jaxb2-commons.dev.java.net/basic/inheritance">
+    <jaxb:bindings schemaLocation="treebank.xsd">
+        <jaxb:schemaBindings>
+            <jaxb:package name="com.alphasystem.morphologicalanalysis.treebank.model"/>
+        </jaxb:schemaBindings>
+        <jaxb:bindings node="//xs:complexType[@name='TreeBankMetaDataType']">
+            <jaxb:class name="TreeBankMetaData"/>
+        </jaxb:bindings>
+        <jaxb:bindings node="//xs:complexType[@name='TreeBankDataType']">
+            <jaxb:class name="TreeBankData"/>
+        </jaxb:bindings>
+        <jaxb:bindings node="//xs:complexType[@name='PointType']">
+            <jaxb:class name="Point"/>
+        </jaxb:bindings>
+        <jaxb:bindings node="//xs:complexType[@name='LineType']">
+            <jaxb:class name="Line"/>
+        </jaxb:bindings>
+        <jaxb:bindings node="//xs:simpleType[@name='TextTypeType']">
+            <jaxb:typesafeEnumClass name="TextType"/>
+        </jaxb:bindings>
+        <jaxb:bindings node="//xs:complexType[@name='TextType']">
+            <jaxb:class name="Text"/>
+        </jaxb:bindings>
+        <jaxb:bindings node="//xs:complexType[@name='RelationshipType']">
+            <jaxb:class name="Relationship"/>
+        </jaxb:bindings>
+    </jaxb:bindings>
+</jaxb:bindings>
