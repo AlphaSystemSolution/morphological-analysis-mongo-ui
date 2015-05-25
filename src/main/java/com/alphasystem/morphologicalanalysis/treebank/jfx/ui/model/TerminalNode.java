@@ -13,22 +13,22 @@ public class TerminalNode extends GraphNode {
     /**
      * x1 location for line
      */
-    private final DoubleProperty x1;
+    protected final DoubleProperty x1;
 
     /**
      * y1 location for line
      */
-    private final DoubleProperty y1;
+    protected final DoubleProperty y1;
 
     /**
      * x2 location for line
      */
-    private final DoubleProperty x2;
+    protected final DoubleProperty x2;
 
     /**
      * y2 location for line
      */
-    private final DoubleProperty y2;
+    protected final DoubleProperty y2;
 
     /**
      * @param x1
@@ -37,7 +37,22 @@ public class TerminalNode extends GraphNode {
      * @param y2
      */
     public TerminalNode(String text, double x, double y, double x1, double y1, double x2, double y2) {
-        super(TERMINAL, text, x, y);
+        this(TERMINAL, text, x, y, x1, y1, x2, y2);
+    }
+
+    /**
+     * @param nodeType
+     * @param text
+     * @param x
+     * @param y
+     * @param x1
+     * @param y1
+     * @param x2
+     * @param y2
+     */
+    protected TerminalNode(NodeType nodeType, String text, double x, double y,
+                           double x1, double y1, double x2, double y2) {
+        super(nodeType, text, x, y);
         this.x1 = new SimpleDoubleProperty(x1);
         this.y1 = new SimpleDoubleProperty(y1);
         this.x2 = new SimpleDoubleProperty(x2);

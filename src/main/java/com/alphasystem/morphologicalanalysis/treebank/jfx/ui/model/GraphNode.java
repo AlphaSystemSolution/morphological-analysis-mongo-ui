@@ -26,10 +26,6 @@ public abstract class GraphNode {
         return nodeType.get();
     }
 
-    public void setNodeType(NodeType nodeType) {
-        this.nodeType.set(nodeType);
-    }
-
     public final ObjectProperty<NodeType> nodeTypeProperty() {
         return nodeType;
     }
