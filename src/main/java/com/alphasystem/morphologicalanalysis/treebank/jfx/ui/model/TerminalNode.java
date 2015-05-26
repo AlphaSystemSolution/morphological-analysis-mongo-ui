@@ -31,6 +31,13 @@ public class TerminalNode extends GraphNode {
     protected final DoubleProperty y2;
 
     /**
+     *
+     */
+    public TerminalNode() {
+        this(null, -1, -1, -1, -1, -1, -1);
+    }
+
+    /**
      * @param x1
      * @param y1
      * @param x2

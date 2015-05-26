@@ -1,7 +1,7 @@
 package com.alphasystem.morphologicalanalysis.treebank.jfx.ui.components;
 
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.CanvasMetaData;
-import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.util.TreeBankSVGTool;
+import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.util.DependencyGraphGraphicTool;
 import com.alphasystem.morphologicalanalysis.treebank.model.TreeBankData;
 import com.alphasystem.svg.jfx.SVGGraphicsContext;
 import javafx.scene.layout.Background;
@@ -16,13 +16,13 @@ import javafx.scene.paint.Color;
 public class CanvasPane extends Pane {
 
     private SVGGraphicsContext svgGraphicsContext;
+    private DependencyGraphGraphicTool tool = DependencyGraphGraphicTool.getInstance();
     private TreeBankData data;
     private CanvasMetaData metaData;
     private FlowPane canvasPane;
 
     public CanvasPane(TreeBankData data, CanvasMetaData metaData) {
         this.data = data;
-
         this.metaData = metaData;
         int width = metaData.getWidth();
         int height = metaData.getHeight();
@@ -70,7 +70,7 @@ public class CanvasPane extends Pane {
         int height = metaData.getHeight();
 
         if (showOutline || showGridLines) {
-            svgGraphicsContext.draw(TreeBankSVGTool.drawGridLines(showGridLines, width, height));
+            svgGraphicsContext.draw(tool.drawGridLines(showGridLines, width, height));
         }
 
         setPrefSize(width + 200, height + 200);

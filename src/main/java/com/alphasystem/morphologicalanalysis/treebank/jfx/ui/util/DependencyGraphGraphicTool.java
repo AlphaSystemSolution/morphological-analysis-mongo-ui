@@ -10,9 +10,21 @@ import javafx.scene.shape.PathElement;
 /**
  * @author sali
  */
-public final class TreeBankSVGTool {
+public final class DependencyGraphGraphicTool {
 
     private static final Color DARK_GRAY_CLOUD = Color.web("#B6B6B4");
+
+    private static DependencyGraphGraphicTool instance;
+
+    private DependencyGraphGraphicTool() {
+    }
+
+    public static synchronized DependencyGraphGraphicTool getInstance() {
+        if (instance == null) {
+            instance = new DependencyGraphGraphicTool();
+        }
+        return instance;
+    }
 
     /**
      * Draw grid lines with given <code>width</code>, <code>height</code> and default step of "20". This method will
@@ -23,7 +35,7 @@ public final class TreeBankSVGTool {
      * @param width         width of the canvas
      * @param height        height of the canvas
      */
-    public static Path drawGridLines(boolean showGridLines, int width, int height) {
+    public Path drawGridLines(boolean showGridLines, int width, int height) {
         return drawGridLines(showGridLines, width, height, 20);
     }
 
@@ -37,7 +49,7 @@ public final class TreeBankSVGTool {
      * @param height        height of the canvas
      * @param step          gap between lines
      */
-    public static Path drawGridLines(boolean showGridLines, int width, int height, int step) {
+    public Path drawGridLines(boolean showGridLines, int width, int height, int step) {
         Path gridLines = new Path();
         gridLines.setStroke(DARK_GRAY_CLOUD);
         gridLines.setStrokeWidth(0.5);

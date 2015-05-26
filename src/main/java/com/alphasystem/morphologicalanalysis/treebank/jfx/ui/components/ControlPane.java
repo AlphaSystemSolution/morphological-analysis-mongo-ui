@@ -1,10 +1,12 @@
 package com.alphasystem.morphologicalanalysis.treebank.jfx.ui.components;
 
+import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.CanvasData;
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.CanvasMetaData;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+
+import static javafx.geometry.Pos.CENTER;
 
 /**
  * @author sali
@@ -12,17 +14,19 @@ import javafx.scene.layout.VBox;
 public class ControlPane extends Pane {
 
     public ControlPane() {
-        this(null);
+        this(null, null);
     }
 
-    public ControlPane(CanvasMetaData metaData) {
+    public ControlPane(CanvasData canvasData, CanvasMetaData metaData) {
 
+        CanvasData _canvasData = (canvasData == null) ? new CanvasData() : canvasData;
         CanvasMetaData _metaData = (metaData == null) ? new CanvasMetaData() : metaData;
 
         VBox vBox = new VBox(10);
-        vBox.setAlignment(Pos.CENTER);
+        vBox.setAlignment(CENTER);
         vBox.setPadding(new Insets(5, 5, 5, 5));
-        vBox.getChildren().addAll(new PropertiesPane(_metaData), new DependencyGraphBuilderPane());
+        vBox.getChildren().addAll(new PropertiesPane(_metaData),
+                new DependencyGraphBuilderPane(canvasData.getNodes()));
 
         getChildren().add(vBox);
 

@@ -12,6 +12,8 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.alphasystem.svg.SVGTool.SVG_OBJECT_FACTORY;
 import static com.alphasystem.util.IdGenerator.nextId;
@@ -25,6 +27,7 @@ public final class SVGGraphicsContext {
 
     private final Pane layout;
     private final SVGTool svgTool;
+    private Map<String, Shape> shapeMap = new HashMap<>();
     private SvgType svgDocument;
     private GType currentGroup;
 
@@ -85,6 +88,10 @@ public final class SVGGraphicsContext {
         return this;
     }
 
+    public void reset() {
+        shapeMap.clear();
+    }
+
 
     public SvgType getSvgDocument() {
         return svgDocument;
@@ -102,7 +109,22 @@ public final class SVGGraphicsContext {
 
     public SVGGraphicsContext draw(Shape shape) {
         // TODO: save current path into SVG document
+        String id = shape.getId();
+        if (id == null) {
+            id = nextId();
+            shape.setId(id);
+        }
+        shapeMap.put(id, shape);
         layout.getChildren().add(shape);
+        return this;
+    }
+
+    public SVGGraphicsContext remove(Shape shape) {
+        boolean removed = layout.getChildren().removeAll(shape);
+        if (removed) {
+            layout.requestLayout();
+            shapeMap.remove(shape.getId());
+        }
         return this;
     }
 

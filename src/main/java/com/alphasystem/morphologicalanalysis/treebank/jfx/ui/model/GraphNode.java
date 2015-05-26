@@ -65,4 +65,9 @@ public abstract class GraphNode {
     public final DoubleProperty yPropertyProperty() {
         return yProperty;
     }
+
+    public String getDescription(){
+        return toString();
+    }
+
 }

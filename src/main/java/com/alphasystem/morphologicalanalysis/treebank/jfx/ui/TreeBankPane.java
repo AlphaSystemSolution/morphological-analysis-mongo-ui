@@ -2,6 +2,7 @@ package com.alphasystem.morphologicalanalysis.treebank.jfx.ui;
 
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.components.CanvasPane;
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.components.ControlPane;
+import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.CanvasData;
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.CanvasMetaData;
 import com.alphasystem.morphologicalanalysis.treebank.model.TreeBankData;
 import com.alphasystem.svg.SVGTool;
@@ -38,10 +39,13 @@ public class TreeBankPane extends BorderPane {
 
     private CanvasMetaData canvasMetaData;
 
+    private CanvasData canvasData;
+
     public TreeBankPane(TreeBankData treeBankData) {
         super();
 
         canvasMetaData = new CanvasMetaData();
+        canvasData = new CanvasData();
         setTop(createMenuBar());
         this.treeBankData = treeBankData == null ? SVGTool.getInstance().createTreeBankData() : treeBankData;
         initPane();
@@ -80,7 +84,7 @@ public class TreeBankPane extends BorderPane {
         scrollPane.setHbarPolicy(AS_NEEDED);
         scrollPane.setVbarPolicy(AS_NEEDED);
 
-        controlPane = new ControlPane(canvasMetaData);
+        controlPane = new ControlPane(canvasData, canvasMetaData);
 
         setCenter(scrollPane);
         setRight(controlPane);
