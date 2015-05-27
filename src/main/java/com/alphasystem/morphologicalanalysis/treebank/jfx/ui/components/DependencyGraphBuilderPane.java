@@ -6,7 +6,9 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.layout.*;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
 import java.util.List;
@@ -14,7 +16,6 @@ import java.util.ResourceBundle;
 
 import static java.lang.String.format;
 import static javafx.geometry.Pos.CENTER;
-import static javafx.scene.layout.BorderStrokeStyle.NONE;
 import static javafx.scene.text.Font.font;
 import static javafx.scene.text.FontPosture.REGULAR;
 import static javafx.scene.text.FontWeight.BOLD;
@@ -45,7 +46,7 @@ public class DependencyGraphBuilderPane extends Pane {
             graphNode = nodes.get(0);
         }
         initEditorPane(graphNode);
-        vBox.getChildren().addAll(initTreePane(), editorPane);
+        vBox.getChildren().addAll(initTreePane(), new Separator(), editorPane);
 
         getChildren().add(new TitledPane("Dependency Graph Builder", vBox));
 
@@ -59,10 +60,6 @@ public class DependencyGraphBuilderPane extends Pane {
 
         addTextControls(node);
 
-        BorderStroke borderStroke = new BorderStroke(Color.BLACK, null, null, null,
-                BorderStrokeStyle.SOLID, NONE, NONE, NONE, null,
-                BorderWidths.DEFAULT, new Insets(3, 3, 3, 3));
-        editorPane.setBorder(new Border(borderStroke));
         editorPane.requestLayout();
     }
 

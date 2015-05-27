@@ -18,7 +18,7 @@ public class VerseAdapter {
 
 	/**
 	 * @param chapterNumber
-	 * @param vserseNumber
+	 * @param verseNumber
 	 */
 	public VerseAdapter(int chapterNumber, int verseNumber) {
 		this.chapterNumber = chapterNumber;

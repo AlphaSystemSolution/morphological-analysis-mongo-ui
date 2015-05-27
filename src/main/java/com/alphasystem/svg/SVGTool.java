@@ -32,7 +32,7 @@ public final class SVGTool {
     }
 
     public Point createPoint(double x, double y) {
-        return TREE_BANK_OBJECT_FACTORY.createPoint().withX(x).withY(y);
+        return TREE_BANK_OBJECT_FACTORY.createPoint().withCx(x).withCy(y);
     }
 
     public Line createLine(double x1, double y1, double x2, double y2) {

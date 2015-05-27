@@ -33,16 +33,16 @@ public class CanvasPane extends Pane {
         svgGraphicsContext = new SVGGraphicsContext(canvasPane, width, height);
         initCanvas();
 
-        canvasPane.setMinSize(Pane.USE_PREF_SIZE, Pane.USE_PREF_SIZE);
-        canvasPane.setMaxSize(Pane.USE_PREF_SIZE, Pane.USE_PREF_SIZE);
+        canvasPane.setMinSize(USE_PREF_SIZE, USE_PREF_SIZE);
+        canvasPane.setMaxSize(USE_PREF_SIZE, USE_PREF_SIZE);
         canvasPane.setPrefSize(width, height);
         canvasPane.setBackground(new Background(new BackgroundFill(Color.BEIGE, null, null)));
 
         getChildren().add(canvasPane);
 
         //setBackground(new Background(new BackgroundFill(WHITE, null, null)));
-        setMinSize(Pane.USE_PREF_SIZE, Pane.USE_PREF_SIZE);
-        setMaxSize(Pane.USE_PREF_SIZE, Pane.USE_PREF_SIZE);
+        setMinSize(USE_PREF_SIZE, USE_PREF_SIZE);
+        setMaxSize(USE_PREF_SIZE, USE_PREF_SIZE);
         setPrefSize(width + 200, height + 200);
     }
 

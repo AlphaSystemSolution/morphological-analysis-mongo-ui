@@ -26,7 +26,7 @@ public class ControlPane extends Pane {
         vBox.setAlignment(CENTER);
         vBox.setPadding(new Insets(5, 5, 5, 5));
         vBox.getChildren().addAll(new PropertiesPane(_metaData),
-                new DependencyGraphBuilderPane(canvasData.getNodes()));
+                new DependencyGraphBuilderPane(_canvasData.getNodes()));
 
         getChildren().add(vBox);
 
