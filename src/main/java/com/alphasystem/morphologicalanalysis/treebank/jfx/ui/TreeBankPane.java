@@ -83,6 +83,8 @@ public class TreeBankPane extends BorderPane {
             Platform.runLater(() -> {
                 Optional<List<Token>> result = dialog.showAndWait();
                 result.ifPresent(selectedItems -> {
+                    canvasData = loadData(selectedItems);
+                    controlPane.canvasDataObjectProperty().setValue(canvasData);
                     Global.getInstance().getGlobalScene().setCursor(DEFAULT);
                 });
 

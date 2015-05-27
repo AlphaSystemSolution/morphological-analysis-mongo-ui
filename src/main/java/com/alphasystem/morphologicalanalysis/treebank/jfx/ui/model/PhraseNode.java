@@ -1,5 +1,6 @@
 package com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model;
 
+import com.alphasystem.morphologicalanalysis.model.support.GrammaticalRelationship;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 
@@ -40,9 +41,21 @@ public class PhraseNode extends GraphNode {
      */
     private final DoubleProperty cy;
 
-    public PhraseNode(String text, double x, double y, double x1, double y1, double x2,
-                      double y2, double cx, double cy) {
-        super(PHRASE, text, x, y);
+    /**
+     * @param grammaticalRelationship
+     * @param id
+     * @param x
+     * @param y
+     * @param x1
+     * @param y1
+     * @param x2
+     * @param y2
+     * @param cx
+     * @param cy
+     */
+    public PhraseNode(GrammaticalRelationship grammaticalRelationship, String id, double x, double y, double x1,
+                      double y1, double x2, double y2, double cx, double cy) {
+        super(PHRASE, grammaticalRelationship.getLabel().toUnicode(), id, x, y);
         this.x1 = new SimpleDoubleProperty(x1);
         this.y1 = new SimpleDoubleProperty(y1);
         this.x2 = new SimpleDoubleProperty(x2);

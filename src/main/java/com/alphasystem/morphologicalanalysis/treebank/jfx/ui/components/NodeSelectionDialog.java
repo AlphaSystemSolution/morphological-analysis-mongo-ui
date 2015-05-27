@@ -35,7 +35,7 @@ public class NodeSelectionDialog extends Dialog<List<Token>> {
 
     private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("resources");
     private static final String STYLE = format("-fx-font-family: %s;-fx-font-size: %s;-fx-font-weight:bold",
-            "\"Arabic Typesetting\"", 20);
+            "\"Arabic Typesetting\"", "20pt");
 
     // UI elements
     private ComboBox<ChapterAdapter> chapterNameComboBox;
@@ -116,7 +116,7 @@ public class NodeSelectionDialog extends Dialog<List<Token>> {
         ButtonType cancelButton = new ButtonType("Cancel", CANCEL_CLOSE);
         getDialogPane().getButtonTypes().addAll(okButton, cancelButton);
         getDialogPane().setContent(grid);
-        getDialogPane().setPrefWidth(300);
+        getDialogPane().setPrefWidth(400);
     }
 
     private void loadTokens() {

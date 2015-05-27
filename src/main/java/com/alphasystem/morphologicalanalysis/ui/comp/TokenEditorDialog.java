@@ -67,29 +67,15 @@ public class TokenEditorDialog extends BaseDialog {
 		tokenRepository = repositoryUtil.getTokenRepository();
 	}
 
-	private static String getString(Class<?> klass) {
-		return RESOURCE_BUNDLE.getString(format("%s.label",
-				klass.getSimpleName()));
-	}
-
 	private JComboBox locationComboBox;
-
 	private Token token;
-
 	private List<Location> locations;
-
 	private ArabicLetter[] letters;
-
 	private JPanel propertiesPanel;
-
 	private TokenWordPreviewPanel tokenWordPreviewPanel;
-
 	private ComboBoxHolder comboBoxHolder;
-
 	private RootWordSelectionPanel rootWordSelectionPanel;
-
 	private JButton saveButton;
-
 	private AbstractAction partOfSpeechAction = new AbstractAction() {
 
 		private static final long serialVersionUID = -2320436473203213310L;
@@ -109,6 +95,11 @@ public class TokenEditorDialog extends BaseDialog {
 		setLocationRelativeTo(parent);
 		pack();
 		setLocation(20, 20);
+	}
+
+	private static String getString(Class<?> klass) {
+		return RESOURCE_BUNDLE.getString(format("%s.label",
+				klass.getSimpleName()));
 	}
 
 	@Override
@@ -306,7 +297,7 @@ public class TokenEditorDialog extends BaseDialog {
 		innerPanel.add(comboBoxHolder.getNamedTagComboBox());
 		rows++;
 
-		// label = new JLabel(getString(GrammaticalTerm.class));
+		// label = new JLabel(getString(GrammaticalRelationship.class));
 		// innerPanel.add(label);
 		// innerPanel.add(createHorizontalStrut(HORIZONTAL_STRUT_WIDTH));
 		// rows++;

@@ -3,37 +3,15 @@
  */
 package com.alphasystem.morphologicalanalysis.ui.util;
 
-import static com.alphasystem.arabic.ui.util.ComboBoxHelper.getComboBox;
-import static com.alphasystem.arabic.ui.util.ComboBoxHelper.getComboBoxModel;
-import static com.alphasystem.arabic.ui.util.ComboBoxHelper.getSelectedValue;
-import static com.alphasystem.morphologicalanalysis.model.AbstractProperties.isNoun;
-import static com.alphasystem.morphologicalanalysis.model.AbstractProperties.isPronoun;
-import static com.alphasystem.morphologicalanalysis.model.AbstractProperties.isVerb;
+import com.alphasystem.arabic.model.NamedTemplate;
+import com.alphasystem.morphologicalanalysis.model.*;
+import com.alphasystem.morphologicalanalysis.model.support.*;
 
+import javax.swing.*;
 import java.awt.event.ActionListener;
 
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JComboBox;
-
-import com.alphasystem.arabic.model.NamedTemplate;
-import com.alphasystem.morphologicalanalysis.model.AbstractNounProperties;
-import com.alphasystem.morphologicalanalysis.model.AbstractProperties;
-import com.alphasystem.morphologicalanalysis.model.Location;
-import com.alphasystem.morphologicalanalysis.model.NounProperties;
-import com.alphasystem.morphologicalanalysis.model.ProNounProperties;
-import com.alphasystem.morphologicalanalysis.model.VerbProperties;
-import com.alphasystem.morphologicalanalysis.model.support.ConversationType;
-import com.alphasystem.morphologicalanalysis.model.support.GenderType;
-import com.alphasystem.morphologicalanalysis.model.support.GrammaticalTerm;
-import com.alphasystem.morphologicalanalysis.model.support.NamedTag;
-import com.alphasystem.morphologicalanalysis.model.support.NounKind;
-import com.alphasystem.morphologicalanalysis.model.support.NounStatus;
-import com.alphasystem.morphologicalanalysis.model.support.NounType;
-import com.alphasystem.morphologicalanalysis.model.support.NumberType;
-import com.alphasystem.morphologicalanalysis.model.support.PartOfSpeech;
-import com.alphasystem.morphologicalanalysis.model.support.ProNounType;
-import com.alphasystem.morphologicalanalysis.model.support.VerbMode;
-import com.alphasystem.morphologicalanalysis.model.support.VerbType;
+import static com.alphasystem.arabic.ui.util.ComboBoxHelper.*;
+import static com.alphasystem.morphologicalanalysis.model.AbstractProperties.*;
 
 /**
  * @author sali
@@ -42,43 +20,19 @@ import com.alphasystem.morphologicalanalysis.model.support.VerbType;
 public class ComboBoxHolder {
 
 	private static ComboBoxHolder instance;
-
-	/**
-	 * @return
-	 */
-	public synchronized static ComboBoxHolder getInstance() {
-		if (instance == null) {
-			instance = new ComboBoxHolder();
-		}
-		return instance;
-	}
-
 	private final JComboBox partOfSpeechComboBox;
-
 	private final JComboBox namedTagComboBox;
-
 	private final JComboBox grammaticalTermComboBox;
-
 	private final JComboBox nounStatusComboBox;
-
 	private final JComboBox numberTypeComboBox;
-
 	private final JComboBox genderTypeComboBox;
-
 	private final JComboBox nounKindComboBox;
-
 	private final JComboBox nounTypeComboBox;
-
 	private final JComboBox conversationTypeComboBox;
-
 	private final JComboBox proNounTypeComboBox;
-
 	private final JComboBox verbTypeComboBox;
-
 	private final JComboBox verbModeComboBox;
-
 	private final JComboBox formTemplateComboBox;
-
 	private Location selectedLocation;
 
 	/**
@@ -98,6 +52,16 @@ public class ComboBoxHolder {
 		verbTypeComboBox = getComboBox(getVerbTypeModel());
 		verbModeComboBox = getComboBox(getVerbModeModel());
 		formTemplateComboBox = getComboBox(getFormTemplateModel());
+	}
+
+	/**
+	 * @return
+	 */
+	public synchronized static ComboBoxHolder getInstance() {
+		if (instance == null) {
+			instance = new ComboBoxHolder();
+		}
+		return instance;
 	}
 
 	public JComboBox getConversationTypeComboBox() {
@@ -129,7 +93,7 @@ public class ComboBoxHolder {
 	}
 
 	private DefaultComboBoxModel getGrammaticalTermModel() {
-		return getComboBoxModel(GrammaticalTerm.values(), true);
+		return getComboBoxModel(GrammaticalRelationship.values(), true);
 	}
 
 	public JComboBox getNamedTagComboBox() {
@@ -206,12 +170,16 @@ public class ComboBoxHolder {
 		return getSelectedValue(GenderType.class, genderTypeComboBox);
 	}
 
-	public GrammaticalTerm getSelectedGrammaticalTerm() {
-		return getSelectedValue(GrammaticalTerm.class, grammaticalTermComboBox);
+	public GrammaticalRelationship getSelectedGrammaticalTerm() {
+		return getSelectedValue(GrammaticalRelationship.class, grammaticalTermComboBox);
 	}
 
 	public Location getSelectedLocation() {
 		return selectedLocation;
+	}
+
+	public void setSelectedLocation(Location selectedLocation) {
+		this.selectedLocation = selectedLocation;
 	}
 
 	public NamedTag getSelectedNamedTag() {
@@ -322,7 +290,7 @@ public class ComboBoxHolder {
 	 */
 	public void selectGrammaticalTerm() {
 		// int index = 0;
-		// GrammaticalTerm selectedGt = null;
+		// GrammaticalRelationship selectedGt = null;
 		// if (selectedLocation != null) {
 		// selectedGt = selectedLocation.getGrammaticalTerm();
 		// index = (selectedGt == null ? -1 : selectedGt.ordinal()) + 1;
@@ -426,10 +394,6 @@ public class ComboBoxHolder {
 			index = (verbType == null ? -1 : verbType.ordinal()) + 1;
 		}
 		verbTypeComboBox.setSelectedIndex(index);
-	}
-
-	public void setSelectedLocation(Location selectedLocation) {
-		this.selectedLocation = selectedLocation;
 	}
 
 	public PartOfSpeech updatePartOfSpeech() {

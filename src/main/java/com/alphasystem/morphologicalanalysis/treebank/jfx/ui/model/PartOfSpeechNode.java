@@ -1,5 +1,6 @@
 package com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model;
 
+import com.alphasystem.morphologicalanalysis.model.support.PartOfSpeech;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 
@@ -21,11 +22,16 @@ public class PartOfSpeechNode extends GraphNode {
     private final DoubleProperty cy;
 
     /**
+     *
+     * @param partOfSpeech
+     * @param id
+     * @param x
+     * @param y
      * @param cx
      * @param cy
      */
-    public PartOfSpeechNode(String text, double x, double y, double cx, double cy) {
-        super(PART_OF_SPEECH, text, x, y);
+    public PartOfSpeechNode(PartOfSpeech partOfSpeech, String id, double x, double y, double cx, double cy) {
+        super(PART_OF_SPEECH, partOfSpeech.getLabel().toUnicode(), id, x, y);
         this.cx = new SimpleDoubleProperty(cx);
         this.cy = new SimpleDoubleProperty(cy);
     }

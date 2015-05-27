@@ -1,5 +1,7 @@
 package com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model;
 
+import com.alphasystem.morphologicalanalysis.model.Token;
+
 import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.NodeType.REFERENCE;
 
 /**
@@ -8,7 +10,8 @@ import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.NodeTy
 public class ReferenceNode extends TerminalNode {
 
     /**
-     * @param text
+     * @param token
+     * @param id
      * @param x
      * @param y
      * @param x1
@@ -16,7 +19,7 @@ public class ReferenceNode extends TerminalNode {
      * @param x2
      * @param y2
      */
-    public ReferenceNode(String text, double x, double y, double x1, double y1, double x2, double y2) {
-        super(REFERENCE, text, x, y, x1, y1, x2, y2);
+    public ReferenceNode(Token token, String id, double x, double y, double x1, double y1, double x2, double y2) {
+        super(REFERENCE, token, id, x, y, x1, y1, x2, y2);
     }
 }

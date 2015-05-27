@@ -1,5 +1,6 @@
 package com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model;
 
+import com.alphasystem.morphologicalanalysis.model.Token;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 
@@ -34,7 +35,7 @@ public class TerminalNode extends GraphNode {
      *
      */
     public TerminalNode() {
-        this(null, -1, -1, -1, -1, -1, -1);
+        this(null, null, -1, -1, -1, -1, -1, -1);
     }
 
     /**
@@ -43,12 +44,29 @@ public class TerminalNode extends GraphNode {
      * @param x2
      * @param y2
      */
-    public TerminalNode(String text, double x, double y, double x1, double y1, double x2, double y2) {
-        this(TERMINAL, text, x, y, x1, y1, x2, y2);
+    public TerminalNode(Token token, String id, double x, double y, double x1, double y1, double x2, double y2) {
+        this(TERMINAL, token, id, x, y, x1, y1, x2, y2);
     }
 
     /**
      * @param nodeType
+     * @param token
+     * @param id
+     * @param x
+     * @param y
+     * @param x1
+     * @param y1
+     * @param x2
+     * @param y2
+     */
+    protected TerminalNode(NodeType nodeType, Token token, String id, double x, double y,
+                           double x1, double y1, double x2, double y2) {
+        this(TERMINAL, getTokenValue(token), id, x, y, x1, y1, x2, y2);
+    }
+
+    /**
+     * @param nodeType
+     * @param id
      * @param text
      * @param x
      * @param y
@@ -57,13 +75,17 @@ public class TerminalNode extends GraphNode {
      * @param x2
      * @param y2
      */
-    protected TerminalNode(NodeType nodeType, String text, double x, double y,
+    protected TerminalNode(NodeType nodeType, String id, String text, double x, double y,
                            double x1, double y1, double x2, double y2) {
-        super(nodeType, text, x, y);
+        super(nodeType, id, text, x, y);
         this.x1 = new SimpleDoubleProperty(x1);
         this.y1 = new SimpleDoubleProperty(y1);
         this.x2 = new SimpleDoubleProperty(x2);
         this.y2 = new SimpleDoubleProperty(y2);
+    }
+
+    private static String getTokenValue(Token token) {
+        return (token == null) ? null : token.getTokenWord().toUnicode();
     }
 
     public double getX1() {

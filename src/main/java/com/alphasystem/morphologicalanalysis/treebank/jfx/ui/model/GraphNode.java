@@ -7,6 +7,8 @@ import javafx.beans.property.*;
  */
 public abstract class GraphNode {
 
+    protected final StringProperty id;
+
     protected final ObjectProperty<NodeType> nodeType;
 
     protected final StringProperty textProperty;
@@ -15,11 +17,24 @@ public abstract class GraphNode {
 
     protected final DoubleProperty yProperty;
 
-    protected GraphNode(NodeType nodeType, String text, double x, double y) {
+    protected GraphNode(NodeType nodeType, String id, String text, double x, double y) {
+        this.id = new SimpleStringProperty(id);
         this.nodeType = new ReadOnlyObjectWrapper<>(nodeType);
         this.textProperty = new SimpleStringProperty(text);
         this.xProperty = new SimpleDoubleProperty(x);
         this.yProperty = new SimpleDoubleProperty(y);
+    }
+
+    public String getId() {
+        return id.get();
+    }
+
+    public void setId(String id) {
+        this.id.set(id);
+    }
+
+    public final StringProperty idProperty() {
+        return id;
     }
 
     public NodeType getNodeType() {
@@ -66,7 +81,7 @@ public abstract class GraphNode {
         return yProperty;
     }
 
-    public String getDescription(){
+    public String getDescription() {
         return toString();
     }
 
