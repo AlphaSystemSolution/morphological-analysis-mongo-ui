@@ -1,14 +1,22 @@
 package com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model;
 
-import java.util.ArrayList;
-import java.util.List;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.ObservableList;
+
+import static javafx.collections.FXCollections.observableArrayList;
 
 /**
  * @author sali
  */
 public class CanvasData {
 
-    private List<GraphNode> nodes = new ArrayList<>();
+    private final ObjectProperty<CanvasMetaData> canvasMetaDataObject;
+    private ObservableList<GraphNode> nodes = observableArrayList();
+
+    public CanvasData(CanvasMetaData canvasMetaData) {
+        this.canvasMetaDataObject = new SimpleObjectProperty<>(canvasMetaData);
+    }
 
     public boolean add(GraphNode graphNode) {
         return nodes.add(graphNode);
@@ -26,11 +34,23 @@ public class CanvasData {
         return nodes.remove(index);
     }
 
-    public List<GraphNode> getNodes() {
+    public ObservableList<GraphNode> getNodes() {
         return nodes;
     }
 
-    public void setNodes(List<GraphNode> nodes) {
+    public void setNodes(ObservableList<GraphNode> nodes) {
         this.nodes = nodes;
+    }
+
+    public CanvasMetaData getCanvasMetaData() {
+        return canvasMetaDataObject.get();
+    }
+
+    public void setCanvasMetaData(CanvasMetaData canvasMetaDataObject) {
+        this.canvasMetaDataObject.set(canvasMetaDataObject);
+    }
+
+    public final ObjectProperty<CanvasMetaData> canvasMetaDataObjectProperty() {
+        return canvasMetaDataObject;
     }
 }

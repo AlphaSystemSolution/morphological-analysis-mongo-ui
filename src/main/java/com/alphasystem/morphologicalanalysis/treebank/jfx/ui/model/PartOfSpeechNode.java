@@ -31,7 +31,7 @@ public class PartOfSpeechNode extends GraphNode {
      * @param cy
      */
     public PartOfSpeechNode(PartOfSpeech partOfSpeech, String id, double x, double y, double cx, double cy) {
-        super(PART_OF_SPEECH, partOfSpeech.getLabel().toUnicode(), id, x, y);
+        super(PART_OF_SPEECH, id, partOfSpeech.getLabel().toUnicode(), x, y);
         this.cx = new SimpleDoubleProperty(cx);
         this.cy = new SimpleDoubleProperty(cy);
     }

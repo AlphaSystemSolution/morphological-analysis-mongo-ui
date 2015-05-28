@@ -20,6 +20,6 @@ public class HiddenNode extends TerminalNode {
      * @param y2
      */
     public HiddenNode(ArabicWord arabicWord, String id, double x, double y, double x1, double y1, double x2, double y2) {
-        super(HIDDEN, arabicWord.toUnicode(), id, x, y, x1, y1, x2, y2);
+        super(HIDDEN, id, arabicWord.toUnicode(), x, y, x1, y1, x2, y2);
     }
 }

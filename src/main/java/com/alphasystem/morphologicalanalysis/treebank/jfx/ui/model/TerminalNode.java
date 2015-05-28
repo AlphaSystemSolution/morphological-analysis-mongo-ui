@@ -5,6 +5,7 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 
 import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.NodeType.TERMINAL;
+import static java.lang.String.format;
 
 /**
  * @author sali
@@ -61,7 +62,7 @@ public class TerminalNode extends GraphNode {
      */
     protected TerminalNode(NodeType nodeType, Token token, String id, double x, double y,
                            double x1, double y1, double x2, double y2) {
-        this(TERMINAL, getTokenValue(token), id, x, y, x1, y1, x2, y2);
+        this(TERMINAL, id, getTokenValue(token), x, y, x1, y1, x2, y2);
     }
 
     /**
@@ -134,5 +135,10 @@ public class TerminalNode extends GraphNode {
 
     public final DoubleProperty y2Property() {
         return y2;
+    }
+
+    @Override
+    public String toString() {
+        return format("%s @ (%s:%s)", getText(), getX(), getY());
     }
 }

@@ -51,6 +51,7 @@ public class GraphBuilder {
         for (Token token : tokens) {
             results.add(buildTerminalNode(token));
         }
+        System.out.println("results = " + results);
         return results;
     }
 

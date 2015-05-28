@@ -7,6 +7,7 @@ import javafx.scene.Scene;
  */
 public class Global {
 
+    public static final String TREE_BANK_STYLE_SHEET = Global.class.getResource("/treebank.css").toString();
     private static Global instance;
     private Scene globalScene;
 

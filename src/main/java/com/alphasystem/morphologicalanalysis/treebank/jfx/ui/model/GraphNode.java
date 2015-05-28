@@ -11,18 +11,37 @@ public abstract class GraphNode {
 
     protected final ObjectProperty<NodeType> nodeType;
 
-    protected final StringProperty textProperty;
+    protected final StringProperty text;
 
-    protected final DoubleProperty xProperty;
+    protected final DoubleProperty x;
 
-    protected final DoubleProperty yProperty;
+    protected final DoubleProperty y;
+
+    protected final BooleanProperty _transient;
 
     protected GraphNode(NodeType nodeType, String id, String text, double x, double y) {
         this.id = new SimpleStringProperty(id);
         this.nodeType = new ReadOnlyObjectWrapper<>(nodeType);
-        this.textProperty = new SimpleStringProperty(text);
-        this.xProperty = new SimpleDoubleProperty(x);
-        this.yProperty = new SimpleDoubleProperty(y);
+        this.text = new SimpleStringProperty(text);
+        this.x = new SimpleDoubleProperty(x);
+        this.y = new SimpleDoubleProperty(y);
+        _transient = new ReadOnlyBooleanWrapper(false);
+        this.x.addListener((observable, oldValue, newValue) -> {
+            double d = (Double) newValue;
+            _transient.setValue(d >= 0);
+        });
+        this.y.addListener((observable, oldValue, newValue) -> {
+            double d = (Double) newValue;
+            _transient.setValue(d >= 0);
+        });
+    }
+
+    public boolean getTransient() {
+        return _transient.get();
+    }
+
+    public final BooleanProperty transientProperty() {
+        return _transient;
     }
 
     public String getId() {
@@ -45,44 +64,40 @@ public abstract class GraphNode {
         return nodeType;
     }
 
-    public String getTextProperty() {
-        return textProperty.get();
+    public String getText() {
+        return text.get();
     }
 
-    public void setTextProperty(String textProperty) {
-        this.textProperty.set(textProperty);
+    public void setText(String text) {
+        this.text.set(text);
     }
 
-    public final StringProperty textPropertyProperty() {
-        return textProperty;
+    public final StringProperty textProperty() {
+        return text;
     }
 
-    public double getxProperty() {
-        return xProperty.get();
+    public double getX() {
+        return x.get();
     }
 
-    public void setxProperty(double xProperty) {
-        this.xProperty.set(xProperty);
+    public void setX(double x) {
+        this.x.set(x);
     }
 
-    public final DoubleProperty xPropertyProperty() {
-        return xProperty;
+    public final DoubleProperty xProperty() {
+        return x;
     }
 
-    public double getyProperty() {
-        return yProperty.get();
+    public double getY() {
+        return y.get();
     }
 
-    public void setyProperty(double yProperty) {
-        this.yProperty.set(yProperty);
+    public void setY(double y) {
+        this.y.set(y);
     }
 
-    public final DoubleProperty yPropertyProperty() {
-        return yProperty;
-    }
-
-    public String getDescription() {
-        return toString();
+    public final DoubleProperty yProperty() {
+        return y;
     }
 
 }

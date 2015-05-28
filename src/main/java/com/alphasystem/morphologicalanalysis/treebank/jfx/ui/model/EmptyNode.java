@@ -18,6 +18,6 @@ public class EmptyNode extends TerminalNode {
      * @param y2
      */
     public EmptyNode(String text, String id, double x, double y, double x1, double y1, double x2, double y2) {
-        super(EMPTY, text, id, x, y, x1, y1, x2, y2);
+        super(EMPTY, id, text, x, y, x1, y1, x2, y2);
     }
 }

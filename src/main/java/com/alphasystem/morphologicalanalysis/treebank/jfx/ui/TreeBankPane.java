@@ -6,9 +6,11 @@ import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.components.ControlP
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.components.NodeSelectionDialog;
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.CanvasData;
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.CanvasMetaData;
+import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.util.GraphBuilder;
 import com.alphasystem.morphologicalanalysis.treebank.model.TreeBankData;
 import com.alphasystem.svg.SVGTool;
 import javafx.application.Platform;
+import javafx.beans.property.ObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -43,20 +45,18 @@ public class TreeBankPane extends BorderPane {
 
     private ScrollPane scrollPane;
 
-    private TreeBankData treeBankData;
-
-    private CanvasMetaData canvasMetaData;
-
     private CanvasData canvasData;
 
+    private TreeBankData treeBankData;
+
     private NodeSelectionDialog dialog;
+
+    private GraphBuilder graphBuilder = GraphBuilder.getInstance();
 
     public TreeBankPane(TreeBankData treeBankData) {
         super();
 
         dialog = new NodeSelectionDialog();
-        canvasMetaData = new CanvasMetaData();
-        canvasData = new CanvasData();
         setTop(createMenuBar());
         this.treeBankData = treeBankData == null ? SVGTool.getInstance().createTreeBankData() : treeBankData;
         initPane();
@@ -83,8 +83,12 @@ public class TreeBankPane extends BorderPane {
             Platform.runLater(() -> {
                 Optional<List<Token>> result = dialog.showAndWait();
                 result.ifPresent(selectedItems -> {
-                    canvasData = loadData(selectedItems);
-                    controlPane.canvasDataObjectProperty().setValue(canvasData);
+                    ObjectProperty<CanvasData> canvasDataObjectProperty = controlPane.canvasDataObjectProperty();
+                    canvasData.setNodes(graphBuilder.toGraphNodes(selectedItems));
+                    // when we are not setting null we are not getting any updates
+                    // so set null first then set new value
+                    canvasDataObjectProperty.set(null);
+                    canvasDataObjectProperty.set(canvasData);
                     Global.getInstance().getGlobalScene().setCursor(DEFAULT);
                 });
 
@@ -108,23 +112,19 @@ public class TreeBankPane extends BorderPane {
     }
 
     private void initPane() {
-        canvasPane = new CanvasPane(this.treeBankData, canvasMetaData);
+        canvasData = new CanvasData(new CanvasMetaData());
+
+        canvasPane = new CanvasPane(canvasData);
         scrollPane = new ScrollPane(canvasPane);
         scrollPane.setHbarPolicy(AS_NEEDED);
         scrollPane.setVbarPolicy(AS_NEEDED);
 
-        controlPane = new ControlPane(canvasData, canvasMetaData);
+        controlPane = new ControlPane(canvasData);
+
+        canvasPane.canvasDataObjectProperty().bind(controlPane.canvasDataObjectProperty());
 
         setCenter(scrollPane);
         setRight(controlPane);
     }
 
-
-    // TODO: remove this
-    // Just for testing
-    private CanvasData loadData(List<Token> tokens) {
-        CanvasData canvasData = new CanvasData();
-
-        return canvasData;
-    }
 }

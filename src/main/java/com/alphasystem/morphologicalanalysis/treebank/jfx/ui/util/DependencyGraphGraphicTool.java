@@ -2,17 +2,14 @@ package com.alphasystem.morphologicalanalysis.treebank.jfx.ui.util;
 
 import javafx.collections.ObservableList;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.LineTo;
-import javafx.scene.shape.MoveTo;
-import javafx.scene.shape.Path;
-import javafx.scene.shape.PathElement;
+import javafx.scene.shape.*;
 
 /**
  * @author sali
  */
 public final class DependencyGraphGraphicTool {
 
-    private static final Color DARK_GRAY_CLOUD = Color.web("#B6B6B4");
+    public static final Color DARK_GRAY_CLOUD = Color.web("#B6B6B4");
 
     private static DependencyGraphGraphicTool instance;
 
@@ -51,6 +48,7 @@ public final class DependencyGraphGraphicTool {
      */
     public Path drawGridLines(boolean showGridLines, int width, int height, int step) {
         Path gridLines = new Path();
+        gridLines.setId("gridLines");
         gridLines.setStroke(DARK_GRAY_CLOUD);
         gridLines.setStrokeWidth(0.5);
 
@@ -110,5 +108,28 @@ public final class DependencyGraphGraphicTool {
         }
 
         return gridLines;
+    }
+
+    /**
+     * @param id
+     * @param x1
+     * @param y1
+     * @param x2
+     * @param y2
+     * @param strokeColor
+     * @param strokeWidth
+     * @return
+     */
+    public Line drawLine(String id, double x1, double y1, double x2, double y2,
+                         Color strokeColor, double strokeWidth) {
+        Line line = new Line();
+        line.setStartX(x1);
+        line.setStartY(y1);
+        line.setEndX(x2);
+        line.setEndY(y2);
+        line.setId(id);
+        line.setStroke(strokeColor);
+        line.setStrokeWidth(strokeWidth);
+        return line;
     }
 }

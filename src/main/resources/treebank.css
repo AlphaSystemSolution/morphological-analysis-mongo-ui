@@ -1,0 +1,10 @@
+.list-view .check-box-list-cell .text{
+    -fx-font-family: "Arabic Typesetting";
+    -fx-font-size: 20pt;
+    -fx-font-weight: bold;
+}
+
+.combo-box .text{
+    -fx-font-family: "Arabic Typesetting";
+    -fx-font-size: 20pt;
+}

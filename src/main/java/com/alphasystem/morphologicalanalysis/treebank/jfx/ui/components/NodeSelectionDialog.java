@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import static java.lang.String.format;
+import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.Global.TREE_BANK_STYLE_SHEET;
 import static javafx.scene.Cursor.*;
 import static javafx.scene.control.ButtonBar.ButtonData.CANCEL_CLOSE;
 import static javafx.scene.control.ButtonBar.ButtonData.OK_DONE;
@@ -34,8 +34,6 @@ import static javafx.scene.control.ButtonBar.ButtonData.OK_DONE;
 public class NodeSelectionDialog extends Dialog<List<Token>> {
 
     private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("resources");
-    private static final String STYLE = format("-fx-font-family: %s;-fx-font-size: %s;-fx-font-weight:bold",
-            "\"Arabic Typesetting\"", "20pt");
 
     // UI elements
     private ComboBox<ChapterAdapter> chapterNameComboBox;
@@ -69,7 +67,7 @@ public class NodeSelectionDialog extends Dialog<List<Token>> {
         grid.setPadding(new Insets(25, 25, 25, 25));
 
         verseAdapterComboBox = new ComboBox<>();
-        verseAdapterComboBox.setStyle(STYLE);
+        verseAdapterComboBox.getStylesheets().add(TREE_BANK_STYLE_SHEET);
         verseAdapterComboBox.setOnAction(event -> {
             selectedVerse = verseAdapterComboBox.getSelectionModel().getSelectedItem();
             if (selectedVerse == null) {
@@ -82,7 +80,7 @@ public class NodeSelectionDialog extends Dialog<List<Token>> {
         grid.add(label, 0, 0);
 
         chapterNameComboBox = new ComboBox();
-        chapterNameComboBox.setStyle(STYLE);
+        chapterNameComboBox.getStylesheets().add(TREE_BANK_STYLE_SHEET);
         chapterNameComboBox.getItems().addAll(chapters.toArray(new ChapterAdapter[chapters.size()]));
         chapterNameComboBox.getSelectionModel().select(0);
         selectedChapter = chapters.get(0);
@@ -101,7 +99,7 @@ public class NodeSelectionDialog extends Dialog<List<Token>> {
         grid.add(new Separator(), 0, 2, 2, 1);
 
         tokensList = new ListView<>();
-        tokensList.setStyle(STYLE);
+        tokensList.getStylesheets().add(TREE_BANK_STYLE_SHEET);
         BorderPane borderPane = new BorderPane();
         borderPane.setCenter(tokensList);
         grid.add(borderPane, 0, 3, 2, 1);

@@ -1,7 +1,6 @@
 package com.alphasystem.morphologicalanalysis.treebank.jfx.ui.components;
 
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.CanvasData;
-import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.CanvasMetaData;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Insets;
@@ -15,28 +14,24 @@ import static javafx.geometry.Pos.CENTER;
  */
 public class ControlPane extends Pane {
 
-    private final ObjectProperty<CanvasData> canvasDataObject = new SimpleObjectProperty<>();
+    private final ObjectProperty<CanvasData> canvasDataObject;
 
-    public ControlPane() {
-        this(null, null);
-    }
+    public ControlPane(CanvasData canvasData) {
 
-    public ControlPane(CanvasData canvasData, CanvasMetaData metaData) {
-
-        CanvasData _canvasData = (canvasData == null) ? new CanvasData() : canvasData;
-        CanvasMetaData _metaData = (metaData == null) ? new CanvasMetaData() : metaData;
+        canvasDataObject = new SimpleObjectProperty<>(canvasData);
 
         VBox vBox = new VBox(10);
         vBox.setAlignment(CENTER);
         vBox.setPadding(new Insets(5, 5, 5, 5));
-        vBox.getChildren().addAll(new PropertiesPane(_metaData),
-                new DependencyGraphBuilderPane(_canvasData.getNodes()));
+        vBox.getChildren().addAll(new PropertiesPane(canvasData.getCanvasMetaData()),
+                new DependencyGraphBuilderPane(canvasData.getNodes()));
 
         getChildren().add(vBox);
-
         canvasDataObject.addListener((observable, oldValue, newValue) -> {
-            System.out.println("New value arrived");
-            updateBuilderPane();
+            if (newValue != null) {
+                System.out.println("New value arrived " + newValue);
+                updateBuilderPane(newValue);
+            }
         });
 
         setMinSize(USE_PREF_SIZE, USE_PREF_SIZE);
@@ -47,7 +42,7 @@ public class ControlPane extends Pane {
         return canvasDataObject;
     }
 
-    private void updateBuilderPane() {
+    private void updateBuilderPane(CanvasData newValue) {
         VBox pane = (VBox) getChildren().get(0);
         DependencyGraphBuilderPane node = (DependencyGraphBuilderPane) pane.getChildren().get(1);
         System.out.println(node);

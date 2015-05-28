@@ -44,7 +44,7 @@ public class RelationshipNode extends GraphNode {
     public RelationshipNode(GrammaticalRelationship grammaticalRelationship, String id, double x, double y, double startX,
                             double startY, double controlX1, double controlY1, double controlX2, double controlY2,
                             double endX, double endY) {
-        super(RELATIONSHIP, grammaticalRelationship.getLabel().toUnicode(), id, x, y);
+        super(RELATIONSHIP, id, grammaticalRelationship.getLabel().toUnicode(), x, y);
         this.startX = new SimpleDoubleProperty(startX);
         this.startY = new SimpleDoubleProperty(startY);
         this.controlX1 = new SimpleDoubleProperty(controlX1);

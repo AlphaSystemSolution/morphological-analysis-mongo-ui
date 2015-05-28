@@ -55,7 +55,7 @@ public class PhraseNode extends GraphNode {
      */
     public PhraseNode(GrammaticalRelationship grammaticalRelationship, String id, double x, double y, double x1,
                       double y1, double x2, double y2, double cx, double cy) {
-        super(PHRASE, grammaticalRelationship.getLabel().toUnicode(), id, x, y);
+        super(PHRASE, id, grammaticalRelationship.getLabel().toUnicode(), x, y);
         this.x1 = new SimpleDoubleProperty(x1);
         this.y1 = new SimpleDoubleProperty(y1);
         this.x2 = new SimpleDoubleProperty(x2);
