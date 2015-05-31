@@ -2,6 +2,7 @@ package com.alphasystem.morphologicalanalysis.treebank.jfx.ui.components;
 
 import com.alphasystem.morphologicalanalysis.model.Location;
 import com.alphasystem.morphologicalanalysis.model.Token;
+import com.alphasystem.morphologicalanalysis.model.support.GrammaticalRelationship;
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.*;
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.util.DependencyGraphGraphicTool;
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.util.GraphBuilder;
@@ -13,7 +14,6 @@ import javafx.event.EventHandler;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
@@ -21,18 +21,16 @@ import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
-import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
 import java.util.List;
 import java.util.Optional;
 
-import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.Global.ARABIC_FONT_NAME;
+import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.Global.ARABIC_FONT_BIG;
+import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.Global.ARABIC_FONT_SMALL;
 import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.util.DependencyGraphGraphicTool.DARK_GRAY_CLOUD;
 import static java.lang.String.format;
-import static javafx.scene.control.Alert.AlertType.INFORMATION;
 import static javafx.scene.control.Alert.AlertType.WARNING;
-import static javafx.scene.control.ButtonBar.ButtonData.OK_DONE;
 import static javafx.scene.input.MouseEvent.MOUSE_CLICKED;
 import static javafx.scene.paint.Color.BLACK;
 import static javafx.scene.paint.Color.web;
@@ -48,9 +46,8 @@ public class CanvasPane extends Pane {
 
     public static final String TERMINAL_GROUP_ID = "terminalGroup";
     public static final String PART_OF_SPEECH_GROUP_ID = "partOfSpeechGroup";
-    private static final Font ARABIC_FONT_BIG = font(ARABIC_FONT_NAME, REGULAR, 48);
-    private static final Font ARABIC_FONT_SMALL = font(ARABIC_FONT_NAME, REGULAR, 24);
     private final ObjectProperty<CanvasData> canvasDataObject;
+    private RelationshipSelectionDialog relationshipSelectionDialog;
     private SVGGraphicsContext svgGraphicsContext;
     private DependencyGraphGraphicTool tool = DependencyGraphGraphicTool.getInstance();
     private GraphBuilder graphBuilder = GraphBuilder.getInstance();
@@ -66,6 +63,7 @@ public class CanvasPane extends Pane {
         int width = metaData.getWidth();
         int height = metaData.getHeight();
 
+        relationshipSelectionDialog = new RelationshipSelectionDialog();
         initListeners();
 
         canvasPane = new Pane();
@@ -178,9 +176,8 @@ public class CanvasPane extends Pane {
                     startPoint = new Point2D(node.getCx(), node.getCy());
                     bound = tool.drawBounds(arabicText);
                     canvasPane.getChildren().add(bound);
-                    showAlert(INFORMATION,
-                            format("Part of Speech (%s) selected.\nChoose other part of speech to connect.",
-                                    node.getText()), null);
+                    relationshipSelectionDialog.setFirstPartOfSpeech(node.getText());
+                    relationshipSelectionDialog.showAndWait();
                 } else {
                     if (endPoint == null) {
                         endPoint = new Point2D(node.getCx(), node.getCy());
@@ -188,26 +185,26 @@ public class CanvasPane extends Pane {
                             showAlert(WARNING, "You must select different part of speech.", null);
                             endPoint = null;
                         } else {
-                            Optional<ButtonType> result = showAlert(Alert.AlertType.CONFIRMATION,
-                                    format("Part of Speech (%s) selected." +
-                                                    "\nWould you like to connect these part of speeches",
-                                            node.getText()), null);
-                            result.ifPresent(buttonType -> {
-                                ButtonBar.ButtonData buttonData = buttonType.getButtonData();
-                                if (buttonData.equals(OK_DONE)) {
-                                    canvasPane.getChildren().remove(bound);
-                                    addRelationship();
+                            relationshipSelectionDialog.setSecondPartOfSpeech(node.getText());
+                            Optional<GrammaticalRelationship> result = relationshipSelectionDialog.showAndWait();
+                            result.ifPresent(gr -> {
+                                if (result.isPresent()) {
+                                    addRelationship(gr);
                                 }
                                 startPoint = null;
                                 endPoint = null;
+                                canvasPane.getChildren().remove(bound);
+                                relationshipSelectionDialog.reset();
                             });
                         }
                     } else {
+                        relationshipSelectionDialog.reset();
+                        canvasPane.getChildren().remove(bound);
                         startPoint = null;
                         endPoint = null;
                     }
-                }
-            }
+                } // end of else
+            } // end of handle
         });
 
         String id = format("circle_%s", node.getId());
@@ -223,10 +220,11 @@ public class CanvasPane extends Pane {
         canvasPane.getChildren().add(group);
     }
 
-    private void addRelationship() {
+    private void addRelationship(GrammaticalRelationship grammaticalRelationship) {
         // TODO: make a connection, update tree
         // Step 1: call GraphBuilder to create a relationship
-        RelationshipNode relationshipNode = graphBuilder.buildRelationshipNode(null, startPoint, endPoint);
+        RelationshipNode relationshipNode = graphBuilder.buildRelationshipNode(null, grammaticalRelationship,
+                startPoint, endPoint);
 
         // add this node into existing list of nodes and
         // update canvasDataObject for changes to take effect

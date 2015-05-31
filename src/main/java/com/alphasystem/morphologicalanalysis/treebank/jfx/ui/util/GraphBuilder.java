@@ -2,6 +2,7 @@ package com.alphasystem.morphologicalanalysis.treebank.jfx.ui.util;
 
 import com.alphasystem.morphologicalanalysis.model.Location;
 import com.alphasystem.morphologicalanalysis.model.Token;
+import com.alphasystem.morphologicalanalysis.model.support.GrammaticalRelationship;
 import com.alphasystem.morphologicalanalysis.model.support.PartOfSpeech;
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.GraphNode;
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.PartOfSpeechNode;
@@ -13,7 +14,6 @@ import javafx.geometry.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.alphasystem.morphologicalanalysis.model.support.GrammaticalRelationship.NONE;
 import static com.alphasystem.morphologicalanalysis.model.support.PartOfSpeech.DEFINITE_ARTICLE;
 import static java.lang.String.format;
 import static java.util.Collections.singletonList;
@@ -75,7 +75,16 @@ public class GraphBuilder {
         return results;
     }
 
-    public RelationshipNode buildRelationshipNode(String id, Point2D startPoint, Point2D endPoint) {
+    /**
+     *
+     * @param id
+     * @param grammaticalRelationship
+     * @param startPoint
+     * @param endPoint
+     * @return
+     */
+    public RelationshipNode buildRelationshipNode(String id, GrammaticalRelationship grammaticalRelationship,
+                                                  Point2D startPoint, Point2D endPoint) {
         double startX = startPoint.getX();
         double startY = startPoint.getY();
         double endX = endPoint.getX();
@@ -86,7 +95,7 @@ public class GraphBuilder {
         double controlY2 = endY + 100;
         double x = (controlX1 + controlX2) / 2;
         double y = (controlY1 + controlY2) / 2;
-        RelationshipNode relationshipNode = new RelationshipNode(NONE, id, x, y, startX, startY, controlX1,
+        RelationshipNode relationshipNode = new RelationshipNode(grammaticalRelationship, id, x, y, startX, startY, controlX1,
                 controlY1, controlX2, controlY2, endX, endY, 0.500, 0.550);
 
         return relationshipNode;

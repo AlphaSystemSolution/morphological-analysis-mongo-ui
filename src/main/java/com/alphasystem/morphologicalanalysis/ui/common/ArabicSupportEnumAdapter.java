@@ -13,6 +13,14 @@ public class ArabicSupportEnumAdapter<T extends ArabicSupportEnum> {
         this.value = value;
     }
 
+    public static <T extends ArabicSupportEnum> ArabicSupportEnumAdapter<T>[] populateValues(T[] values) {
+        ArabicSupportEnumAdapter<T>[] items = new ArabicSupportEnumAdapter[values.length];
+        for (int i = 0; i < values.length; i++) {
+            items[i] = new ArabicSupportEnumAdapter<>(values[i]);
+        }
+        return items;
+    }
+
     public T getValue() {
         return value;
     }
