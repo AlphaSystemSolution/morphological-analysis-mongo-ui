@@ -23,6 +23,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.CubicCurve;
 import javafx.scene.shape.Line;
+import javafx.scene.shape.Polyline;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
@@ -96,6 +97,9 @@ public class CanvasPane extends Pane {
             initCanvas();
         });
         metaData.showOutLinesProperty().addListener((observable, oldValue, newValue) -> {
+            initCanvas();
+        });
+        metaData.debugModeProperty().addListener((observable, oldValue, newValue) -> {
             initCanvas();
         });
         canvasDataObject.addListener((observable, oldValue, newData) -> {
@@ -256,9 +260,20 @@ public class CanvasPane extends Pane {
         arabicText.xProperty().bind(rn.xProperty());
         arabicText.yProperty().bind(rn.yProperty());
 
+        Polyline triangle = tool.drawTriangleOnCubicCurve(rn.getT1(), rn.getT2(), rn.getStartX(), rn.getStartY(),
+                rn.getControlX1(), rn.getControlY1(), rn.getControlX2(), rn.getControlY2(), rn.getEndX(),
+                rn.getEndY(), color);
+        // bind line co-ordinates
+        //TODO:
+
         Group group = new Group();
 
-        group.getChildren().addAll(cubicCurve, arabicText);
+        group.getChildren().addAll(cubicCurve, arabicText, triangle);
+
+        if (canvasDataObject.get().getCanvasMetaData().isDebugMode()) {
+            group.getChildren().add(tool.drawCubicCurveBounds(rn.getStartX(), rn.getStartY(), rn.getControlX1(),
+                    rn.getControlY1(), rn.getControlX2(), rn.getControlY2(), rn.getEndX(), rn.getEndY()));
+        }
         canvasPane.getChildren().add(group);
     }
 
@@ -308,5 +323,9 @@ public class CanvasPane extends Pane {
         }
         alert.setContentText(contentText);
         return alert.showAndWait();
+    }
+
+    public Pane getCanvasPane() {
+        return canvasPane;
     }
 }

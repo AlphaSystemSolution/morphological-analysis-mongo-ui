@@ -30,16 +30,16 @@ public class CanvasMetaData {
         this.debugMode = new SimpleBooleanProperty(debugMode);
     }
 
-    public boolean isDebugMode() {
+    public final boolean isDebugMode() {
         return debugMode.get();
+    }
+
+    public final void setDebugMode(boolean debugMode) {
+        this.debugMode.set(debugMode);
     }
 
     public final BooleanProperty debugModeProperty() {
         return debugMode;
-    }
-
-    public void isDebugMode(boolean debugMode) {
-        this.debugMode.set(debugMode);
     }
 
     public int getHeight() {

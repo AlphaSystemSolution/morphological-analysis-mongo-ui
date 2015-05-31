@@ -87,7 +87,7 @@ public class GraphBuilder {
         double x = (controlX1 + controlX2) / 2;
         double y = (controlY1 + controlY2) / 2;
         RelationshipNode relationshipNode = new RelationshipNode(NONE, id, x, y, startX, startY, controlX1,
-                controlY1, controlX2, controlY2, endX, endY);
+                controlY1, controlX2, controlY2, endX, endY, 0.500, 0.550);
 
         return relationshipNode;
     }

@@ -1,7 +1,10 @@
 package com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model;
 
 import com.alphasystem.morphologicalanalysis.model.support.GrammaticalRelationship;
-import javafx.beans.property.*;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.paint.Color;
 
 import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.NodeType.RELATIONSHIP;
@@ -28,6 +31,10 @@ public class RelationshipNode extends GraphNode {
 
     private final DoubleProperty endY;
 
+    private final DoubleProperty t1;
+
+    private final DoubleProperty t2;
+
     private final ObjectProperty<GrammaticalRelationship> grammaticalRelationship;
 
     private final ObjectProperty<Color> stroke;
@@ -48,7 +55,7 @@ public class RelationshipNode extends GraphNode {
      */
     public RelationshipNode(GrammaticalRelationship grammaticalRelationship, String id, Double x, Double y,
                             Double startX, Double startY, Double controlX1, Double controlY1, Double controlX2,
-                            Double controlY2, Double endX, Double endY) {
+                            Double controlY2, Double endX, Double endY, Double t1, Double t2) {
         super(RELATIONSHIP, id, grammaticalRelationship.getLabel().toUnicode(), x, y);
         this.grammaticalRelationship = new SimpleObjectProperty<>(grammaticalRelationship);
         this.stroke = new SimpleObjectProperty<>(web(grammaticalRelationship.getColorCode()));
@@ -60,6 +67,8 @@ public class RelationshipNode extends GraphNode {
         this.controlY2 = new SimpleDoubleProperty(controlY2);
         this.endX = new SimpleDoubleProperty(endX);
         this.endY = new SimpleDoubleProperty(endY);
+        this.t1 = new SimpleDoubleProperty(t1);
+        this.t2 = new SimpleDoubleProperty(t2);
         this.grammaticalRelationshipProperty().addListener((observable, oldValue, newValue) -> {
             this.stroke.setValue(web(newValue.getColorCode()));
         });
@@ -179,5 +188,29 @@ public class RelationshipNode extends GraphNode {
 
     public final DoubleProperty startYProperty() {
         return startY;
+    }
+
+    public final double getT1() {
+        return t1.get();
+    }
+
+    public final void setT1(double t1) {
+        this.t1.set(t1);
+    }
+
+    public final DoubleProperty t1Property() {
+        return t1;
+    }
+
+    public final double getT2() {
+        return t2.get();
+    }
+
+    public final void setT2(double t2) {
+        this.t2.set(t2);
+    }
+
+    public final DoubleProperty t2Property() {
+        return t2;
     }
 }

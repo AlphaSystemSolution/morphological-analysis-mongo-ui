@@ -2,7 +2,10 @@ package com.alphasystem.morphologicalanalysis.treebank.jfx.ui.components;
 
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.CanvasMetaData;
 import javafx.geometry.Insets;
-import javafx.scene.control.*;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.Spinner;
+import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 
@@ -93,6 +96,7 @@ public class PropertiesPane extends BorderPane {
 
         debugModeCheckBox = new CheckBox();
         debugModeCheckBox.setSelected(metaData.isDebugMode());
+        metaData.debugModeProperty().bind(debugModeCheckBox.selectedProperty());
         grid.add(debugModeCheckBox, 1, 4);
 
         return grid;

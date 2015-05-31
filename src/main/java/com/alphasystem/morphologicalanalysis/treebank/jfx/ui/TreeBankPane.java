@@ -12,20 +12,25 @@ import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.util.SerializationT
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.collections.ObservableList;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.Scene;
+import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.*;
+import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -64,6 +69,8 @@ public class TreeBankPane extends BorderPane {
 
     private FileChooser fileChooser = new FileChooser();
 
+    private FileChooser imageFileChooser = new FileChooser();
+
     private File currentFile;
 
     public TreeBankPane() {
@@ -76,6 +83,9 @@ public class TreeBankPane extends BorderPane {
         fileChooser.getExtensionFilters().addAll(
                 new ExtensionFilter(format("Morphology Dependency Graph file (%s)", MDG_EXTENSION_ALL),
                         MDG_EXTENSION_ALL));
+        imageFileChooser = new FileChooser();
+        imageFileChooser.setInitialDirectory(CURRENT_USER_DIR);
+        imageFileChooser.getExtensionFilters().addAll(new ExtensionFilter("PNG", "*.png"));
     }
 
     private MenuBar createMenuBar() {
@@ -144,6 +154,27 @@ public class TreeBankPane extends BorderPane {
         });
         items.add(menuItem);
 
+        menuItem = new MenuItem("Take Snapshot");
+        menuItem.setAccelerator(new KeyCodeCombination(S, CONTROL_DOWN, ALT_DOWN));
+        menuItem.setOnAction(event -> {
+            getScene().setCursor(WAIT);
+            Platform.runLater(() -> {
+                File file = imageFileChooser.showSaveDialog(getStage());
+                if (file != null) {
+                    WritableImage writableImage = canvasPane.getCanvasPane().snapshot(new SnapshotParameters(), null);
+                    try {
+                        ImageIO.write(SwingFXUtils.fromFXImage(writableImage, null), "png", file);
+                        Desktop.getDesktop().open(file);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                getScene().setCursor(DEFAULT);
+            });
+        });
+
+        items.add(menuItem);
+
         items.add(new SeparatorMenuItem());
 
         menuItem = new MenuItem("Exit");
@@ -184,7 +215,7 @@ public class TreeBankPane extends BorderPane {
         controlPane = new ControlPane(canvasData);
 
         // connection between Canvas pane and Control pane
-        // NOTE: control pane is dependent on canvas pane
+        // NOTE: binding is bidirectional
         controlPane.canvasDataObjectProperty().bindBidirectional(canvasPane.canvasDataObjectProperty());
 
         setCenter(scrollPane);
