@@ -1,6 +1,7 @@
 package com.alphasystem.morphologicalanalysis.treebank.jfx.ui.util;
 
 import com.alphasystem.ApplicationException;
+import com.alphasystem.morphologicalanalysis.model.support.GrammaticalRelationship;
 import com.alphasystem.morphologicalanalysis.model.support.PartOfSpeech;
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.*;
 import com.alphasystem.morphologicalanalysis.treebank.model.*;
@@ -32,10 +33,12 @@ public class SerializationTool {
     public static final ObjectFactory OBJECT_FACTORY = new ObjectFactory();
     public static final String MDG_EXTENSION = "mdg";
     public static final String MDG_EXTENSION_ALL = format("*.%s", MDG_EXTENSION);
-    private static final String XML_FILE_EXTENSION = ".xml";
     public static final String ZIP_ENTRY_NAME = "graphNode.xml";
-
+    private static final String XML_FILE_EXTENSION = ".xml";
     private static SerializationTool instance;
+
+    private SerializationTool() {
+    }
 
     public synchronized static SerializationTool getInstance() {
         if (instance == null) {
@@ -44,7 +47,61 @@ public class SerializationTool {
         return instance;
     }
 
-    private SerializationTool() {
+    private static <T extends Object> ConstructorArgument createConstructorArgument(Class<T> type, String value,
+                                                                                    String initMethod,
+                                                                                    String factoryMethod) {
+        ConstructorArgument constructorArgument = OBJECT_FACTORY.createConstructorArgument()
+                .withType(type.getName()).withValue(value);
+        if (!isBlank(initMethod)) {
+            constructorArgument.withInitMethod(initMethod);
+        }
+        if (!isBlank(factoryMethod)) {
+            constructorArgument.withFactoryMethod(factoryMethod);
+        }
+        return constructorArgument;
+    }
+
+    private static <T extends Object> ConstructorArgument createConstructorArgument(Class<T> type, T value,
+                                                                                    String initMethod,
+                                                                                    String factoryMethod) {
+        ConstructorArgument constructorArgument = OBJECT_FACTORY.createConstructorArgument()
+                .withType(type.getName()).withValue(valueOf(value));
+        if (!isBlank(initMethod)) {
+            constructorArgument.withInitMethod(initMethod);
+        }
+        if (!isBlank(factoryMethod)) {
+            constructorArgument.withFactoryMethod(factoryMethod);
+        }
+        return constructorArgument;
+    }
+
+    private static <T extends Object> ConstructorArgument createConstructorArgument(Class<T> type, T value,
+                                                                                    String factoryMethod) {
+        return createConstructorArgument(type, value, null, factoryMethod);
+    }
+
+    private static <T extends Object> ConstructorArgument createConstructorArgument(Class<T> type, T value) {
+        return createConstructorArgument(type, value, null);
+    }
+
+    private static ConstructorArgument createStringArgument(String value) {
+        return createConstructorArgument(String.class, value);
+    }
+
+    private static ConstructorArgument createIntegerArgument(Integer value) {
+        return createConstructorArgument(Integer.class, value, "parseInt");
+    }
+
+    private static ConstructorArgument createDoubleArgument(Double value) {
+        return createConstructorArgument(Double.class, value, "parseDouble");
+    }
+
+    private static ConstructorArgument createBooleanArgument(Boolean value) {
+        return createConstructorArgument(Boolean.class, value, "parseBoolean");
+    }
+
+    private static <T extends Enum<?>> ConstructorArgument createEnumArgument(Class<T> enumClass, T enumType) {
+        return createConstructorArgument(enumClass, (enumType == null ? null : enumType.name()), null, "valueOf");
     }
 
     public void save(File file, String svgFileName, CanvasData canvasData) {
@@ -119,6 +176,9 @@ public class SerializationTool {
                     case PART_OF_SPEECH:
                         objectType = serializePartOfSpeechNode((PartOfSpeechNode) node);
                         break;
+                    case RELATIONSHIP:
+                        objectType = serializeRelationshipNode((RelationshipNode) node);
+                        break;
                 }
                 objectTypes[i] = objectType;
             }
@@ -137,17 +197,17 @@ public class SerializationTool {
         ObjectType objectType = OBJECT_FACTORY.createObjectType().withType(node.getClass().getName());
         List<ConstructorArgument> constructorArgs = objectType.getConstructorArgs();
 
-        constructorArgs.add(createConstructorArgument(RepositoryTool.class.getName(), node.getToken().getId(),
+        constructorArgs.add(createConstructorArgument(RepositoryTool.class, node.getToken().getId(),
                 "getInstance", "getToken"));
-        constructorArgs.add(createConstructorArgument(String.class.getName(), node.getId()));
-        constructorArgs.add(createConstructorArgument(Double.class.getName(), node.getX()));
-        constructorArgs.add(createConstructorArgument(Double.class.getName(), node.getY()));
-        constructorArgs.add(createConstructorArgument(Double.class.getName(), node.getX1()));
-        constructorArgs.add(createConstructorArgument(Double.class.getName(), node.getY1()));
-        constructorArgs.add(createConstructorArgument(Double.class.getName(), node.getX2()));
-        constructorArgs.add(createConstructorArgument(Double.class.getName(), node.getY2()));
-        constructorArgs.add(createConstructorArgument(Double.class.getName(), node.getX3()));
-        constructorArgs.add(createConstructorArgument(Double.class.getName(), node.getY3()));
+        constructorArgs.add(createStringArgument(node.getId()));
+        constructorArgs.add(createDoubleArgument(node.getX()));
+        constructorArgs.add(createDoubleArgument(node.getY()));
+        constructorArgs.add(createDoubleArgument(node.getX1()));
+        constructorArgs.add(createDoubleArgument(node.getY1()));
+        constructorArgs.add(createDoubleArgument(node.getX2()));
+        constructorArgs.add(createDoubleArgument(node.getY2()));
+        constructorArgs.add(createDoubleArgument(node.getX3()));
+        constructorArgs.add(createDoubleArgument(node.getY3()));
 
         return objectType;
     }
@@ -156,16 +216,38 @@ public class SerializationTool {
         ObjectType objectType = OBJECT_FACTORY.createObjectType().withType(node.getClass().getName());
         List<ConstructorArgument> constructorArgs = objectType.getConstructorArgs();
 
-        constructorArgs.add(createConstructorArgument(PartOfSpeech.class.getName(), node.getPartOfSpeech().name(),
+        constructorArgs.add(createConstructorArgument(PartOfSpeech.class, node.getPartOfSpeech().name(),
                 null, "valueOf"));
-        constructorArgs.add(createConstructorArgument(RepositoryTool.class.getName(), node.getLocation().getId(),
+        constructorArgs.add(createConstructorArgument(RepositoryTool.class, node.getLocation().getId(),
                 "getInstance", "getLocation"));
-        constructorArgs.add(createConstructorArgument(String.class.getName(), node.getId()));
-        constructorArgs.add(createConstructorArgument(Double.class.getName(), node.getX()));
-        constructorArgs.add(createConstructorArgument(Double.class.getName(), node.getY()));
-        constructorArgs.add(createConstructorArgument(Double.class.getName(), node.getCx()));
-        constructorArgs.add(createConstructorArgument(Double.class.getName(), node.getCy()));
-        constructorArgs.add(createConstructorArgument(Boolean.class.getName(), node.isExcluded()));
+        constructorArgs.add(createStringArgument(node.getId()));
+        constructorArgs.add(createDoubleArgument(node.getX()));
+        constructorArgs.add(createDoubleArgument(node.getY()));
+        constructorArgs.add(createDoubleArgument(node.getCx()));
+        constructorArgs.add(createDoubleArgument(node.getCy()));
+        constructorArgs.add(createBooleanArgument(node.isExcluded()));
+
+        return objectType;
+    }
+
+    private ObjectType serializeRelationshipNode(RelationshipNode node) {
+        ObjectType objectType = OBJECT_FACTORY.createObjectType().withType(node.getClass().getName());
+        List<ConstructorArgument> constructorArgs = objectType.getConstructorArgs();
+
+        constructorArgs.add(createEnumArgument(GrammaticalRelationship.class, node.getGrammaticalRelationship()));
+        constructorArgs.add(createStringArgument(node.getId()));
+        constructorArgs.add(createDoubleArgument(node.getX()));
+        constructorArgs.add(createDoubleArgument(node.getY()));
+        constructorArgs.add(createDoubleArgument(node.getStartX()));
+        constructorArgs.add(createDoubleArgument(node.getStartY()));
+        constructorArgs.add(createDoubleArgument(node.getControlX1()));
+        constructorArgs.add(createDoubleArgument(node.getControlY1()));
+        constructorArgs.add(createDoubleArgument(node.getControlX2()));
+        constructorArgs.add(createDoubleArgument(node.getControlY2()));
+        constructorArgs.add(createDoubleArgument(node.getEndX()));
+        constructorArgs.add(createDoubleArgument(node.getEndY()));
+        constructorArgs.add(createDoubleArgument(node.getT1()));
+        constructorArgs.add(createDoubleArgument(node.getT2()));
 
         return objectType;
     }
@@ -223,22 +305,5 @@ public class SerializationTool {
             object = constructor.newInstance(arg.getValue());
         }
         return object;
-    }
-
-    private <T extends Object> ConstructorArgument createConstructorArgument(String type, T value, String initMethod,
-                                                                             String factoryMethod) {
-        ConstructorArgument constructorArgument = OBJECT_FACTORY.createConstructorArgument()
-                .withType(type).withValue(valueOf(value));
-        if (!isBlank(initMethod)) {
-            constructorArgument.withInitMethod(initMethod);
-        }
-        if (!isBlank(factoryMethod)) {
-            constructorArgument.withFactoryMethod(factoryMethod);
-        }
-        return constructorArgument;
-    }
-
-    private <T extends Object> ConstructorArgument createConstructorArgument(String type, T value) {
-        return createConstructorArgument(type, value, null, null);
     }
 }
