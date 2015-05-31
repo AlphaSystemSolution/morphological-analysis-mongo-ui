@@ -2,12 +2,16 @@ package com.alphasystem.morphologicalanalysis.treebank.jfx.ui;
 
 import javafx.scene.Scene;
 
+import java.util.ResourceBundle;
+
 /**
  * @author sali
  */
 public class Global {
 
-    public static final String TREE_BANK_STYLE_SHEET = Global.class.getResource("/treebank.css").toString();
+    public static final String TREE_BANK_STYLE_SHEET = Global.class.getResource("/treebank.css").toExternalForm();
+    public static final String ARABIC_FONT_NAME = System.getProperty("arabic-font-name", "Traditional Arabic");
+    public static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("resources");
     private static Global instance;
     private Scene globalScene;
 
