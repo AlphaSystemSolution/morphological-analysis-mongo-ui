@@ -20,13 +20,11 @@ import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.CubicCurve;
-import javafx.scene.shape.Line;
-import javafx.scene.shape.Polyline;
+import javafx.scene.shape.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
+import java.util.List;
 import java.util.Optional;
 
 import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.Global.ARABIC_FONT_NAME;
@@ -59,6 +57,7 @@ public class CanvasPane extends Pane {
     private Pane canvasPane;
     private Point2D startPoint;
     private Point2D endPoint;
+    private Rectangle bound;
 
     public CanvasPane(CanvasData data) {
         this.canvasDataObject = new SimpleObjectProperty<>(data);
@@ -177,6 +176,8 @@ public class CanvasPane extends Pane {
             public void handle(MouseEvent event) {
                 if (startPoint == null) {
                     startPoint = new Point2D(node.getCx(), node.getCy());
+                    bound = tool.drawBounds(arabicText);
+                    canvasPane.getChildren().add(bound);
                     showAlert(INFORMATION,
                             format("Part of Speech (%s) selected.\nChoose other part of speech to connect.",
                                     node.getText()), null);
@@ -194,11 +195,11 @@ public class CanvasPane extends Pane {
                             result.ifPresent(buttonType -> {
                                 ButtonBar.ButtonData buttonData = buttonType.getButtonData();
                                 if (buttonData.equals(OK_DONE)) {
+                                    canvasPane.getChildren().remove(bound);
                                     addRelationship();
-                                } else {
-                                    startPoint = null;
-                                    endPoint = null;
                                 }
+                                startPoint = null;
+                                endPoint = null;
                             });
                         }
                     } else {
@@ -235,7 +236,7 @@ public class CanvasPane extends Pane {
         canvasDataObject.setValue(canvasData);
     }
 
-    private void buildRelationshipNode(RelationshipNode rn){
+    private void buildRelationshipNode(RelationshipNode rn) {
         Color color = web(rn.getGrammaticalRelationship().getColorCode());
         CubicCurve cubicCurve = tool.drawCubicCurve(rn.getId(), rn.getStartX(), rn.getStartY(), rn.getControlX1(),
                 rn.getControlY1(), rn.getControlX2(), rn.getControlY2(), rn.getEndX(), rn.getEndY(),
@@ -260,6 +261,7 @@ public class CanvasPane extends Pane {
         arabicText.xProperty().bind(rn.xProperty());
         arabicText.yProperty().bind(rn.yProperty());
 
+        // small arrow poiting towards the relationship direction
         Polyline triangle = tool.drawTriangleOnCubicCurve(rn.getT1(), rn.getT2(), rn.getStartX(), rn.getStartY(),
                 rn.getControlX1(), rn.getControlY1(), rn.getControlX2(), rn.getControlY2(), rn.getEndX(),
                 rn.getEndY(), color);
@@ -290,10 +292,12 @@ public class CanvasPane extends Pane {
         //svgGraphicsContext.draw(line);
         Token token = tn.getToken();
         Color color = BLACK;
+        List<Location> locations = token.getLocations();
         if (token.getLocationCount() == 1) {
-            Location location = token.getLocations().get(0);
+            Location location = locations.get(0);
             color = web(location.getPartOfSpeech().getColorCode());
         }
+
         Text arabicText = tool.drawText(tn.getId(), tn.getText(), RIGHT,
                 color, tn.getX(), tn.getY(), ARABIC_FONT_BIG);
 
@@ -301,7 +305,6 @@ public class CanvasPane extends Pane {
         arabicText.textProperty().bind(tn.textProperty());
         arabicText.xProperty().bind(tn.xProperty());
         arabicText.yProperty().bind(tn.yProperty());
-        //svgGraphicsContext.draw(text);
 
         String id = format("trans_%s", tn.getId());
         Text englishText = tool.drawText(id, token.getTranslation(), CENTER, BLACK,

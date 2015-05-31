@@ -1,6 +1,7 @@
 package com.alphasystem.morphologicalanalysis.treebank.jfx.ui.util;
 
 import javafx.collections.ObservableList;
+import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
@@ -216,8 +217,12 @@ public final class DependencyGraphGraphicTool {
         text.setText(value);
         text.setTextAlignment(alignment);
         text.setFill(fillColor);
-        text.setX(x);
-        text.setY(y);
+        if (x > 0) {
+            text.setX(x);
+        }
+        if (y > 0) {
+            text.setY(y);
+        }
         text.setFont(font);
         return text;
     }
@@ -321,5 +326,20 @@ public final class DependencyGraphGraphicTool {
         path.getStrokeDashArray().add(2d);
 
         return path;
+    }
+
+    /**
+     * @param shape
+     * @return
+     */
+    public Rectangle drawBounds(Shape shape) {
+        Bounds bounds = shape.getBoundsInLocal();
+        Rectangle rectangle = new Rectangle(bounds.getMinX(), bounds.getMinY(),
+                bounds.getWidth(), bounds.getHeight());
+        rectangle.setFill(TRANSPARENT);
+        rectangle.setStroke(RED);
+        rectangle.setStrokeWidth(0.5);
+        rectangle.getStrokeDashArray().add(2d);
+        return rectangle;
     }
 }
