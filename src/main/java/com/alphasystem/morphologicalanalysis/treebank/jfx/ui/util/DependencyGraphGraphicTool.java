@@ -3,6 +3,11 @@ package com.alphasystem.morphologicalanalysis.treebank.jfx.ui.util;
 import javafx.collections.ObservableList;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
+
+import static javafx.scene.paint.Color.TRANSPARENT;
 
 /**
  * @author sali
@@ -132,4 +137,88 @@ public final class DependencyGraphGraphicTool {
         line.setStrokeWidth(strokeWidth);
         return line;
     }
+
+    /**
+     *
+     * @param id
+     * @param x1
+     * @param y1
+     * @param x2
+     * @param y2
+     * @param strokeColor
+     * @param strokeWidth
+     * @return
+     */
+    public Line drawDashedLine(String id, double x1, double y1, double x2, double y2,
+                         Color strokeColor, double strokeWidth) {
+        Line line = new Line();
+        line.getStrokeDashArray().add(2d);
+        line.setStartX(x1);
+        line.setStartY(y1);
+        line.setEndX(x2);
+        line.setEndY(y2);
+        line.setId(id);
+        line.setStroke(strokeColor);
+        line.setStrokeWidth(strokeWidth);
+        line.setFill(strokeColor);
+        return line;
+    }
+
+    /**
+     *
+     * @param id
+     * @param value
+     * @param alignment
+     * @param fillColor
+     * @param x
+     * @param y
+     * @param font
+     * @return
+     */
+    public Text drawText(String id, String value, TextAlignment alignment, Color fillColor,
+                         double x, double y, Font font){
+        Text text = new Text();
+        text.setId(id);
+        text.setText(value);
+        text.setTextAlignment(alignment);
+        text.setFill(fillColor);
+        text.setX(x);
+        text.setY(y);
+        text.setFont(font);
+        return text;
+    }
+
+    /**
+     *
+     * @param id
+     * @param color
+     * @param cx
+     * @param cy
+     * @param r
+     * @return
+     */
+    public Circle drawCircle(String id, Color color, double cx, double cy, double r){
+        Circle circle = new Circle();
+        circle.setId(id);
+        circle.setStroke(color);
+        circle.setFill(color);
+        circle.setCenterX(cx);
+        circle.setCenterY(cy);
+        circle.setRadius(r);
+        return circle;
+    }
+
+    public CubicCurve drawCubicCurve(String id, double startX, double startY, double controlX1,
+                                     double controlY1, double controlX2, double controlY2,
+                                     double endX, double endY, Color color){
+        CubicCurve cubicCurve = new CubicCurve(startX, startY, controlX1, controlY1,
+                controlX2, controlY2, endX, endY);
+        cubicCurve.setId(id);
+        cubicCurve.setStroke(color);
+        cubicCurve.setStrokeWidth(1.0);
+        cubicCurve.setFill(TRANSPARENT);
+        return cubicCurve;
+    }
+
+
 }

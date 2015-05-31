@@ -6,21 +6,32 @@ import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.components.ControlP
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.components.NodeSelectionDialog;
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.CanvasData;
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.CanvasMetaData;
+import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.GraphNode;
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.util.GraphBuilder;
-import com.alphasystem.morphologicalanalysis.treebank.model.TreeBankData;
-import com.alphasystem.svg.SVGTool;
+import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.util.SerializationTool;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.layout.BorderPane;
+import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 
+import java.awt.*;
+import java.io.File;
 import java.util.List;
 import java.util.Optional;
 
+import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.util.SerializationTool.MDG_EXTENSION_ALL;
+import static com.alphasystem.util.AppUtil.CURRENT_USER_DIR;
+import static java.lang.String.format;
 import static javafx.scene.Cursor.DEFAULT;
 import static javafx.scene.Cursor.WAIT;
 import static javafx.scene.control.ScrollPane.ScrollBarPolicy.AS_NEEDED;
@@ -45,25 +56,26 @@ public class TreeBankPane extends BorderPane {
 
     private ScrollPane scrollPane;
 
-    private CanvasData canvasData;
-
-    private TreeBankData treeBankData;
-
     private NodeSelectionDialog dialog;
 
     private GraphBuilder graphBuilder = GraphBuilder.getInstance();
 
-    public TreeBankPane(TreeBankData treeBankData) {
+    private SerializationTool serializationTool = SerializationTool.getInstance();
+
+    private FileChooser fileChooser = new FileChooser();
+
+    private File currentFile;
+
+    public TreeBankPane() {
         super();
 
         dialog = new NodeSelectionDialog();
         setTop(createMenuBar());
-        this.treeBankData = treeBankData == null ? SVGTool.getInstance().createTreeBankData() : treeBankData;
-        initPane();
-    }
-
-    public TreeBankPane() {
-        this(null);
+        initPane(null);
+        fileChooser.setInitialDirectory(CURRENT_USER_DIR);
+        fileChooser.getExtensionFilters().addAll(
+                new ExtensionFilter(format("Morphology Dependency Graph file (%s)", MDG_EXTENSION_ALL),
+                        MDG_EXTENSION_ALL));
     }
 
     private MenuBar createMenuBar() {
@@ -74,22 +86,58 @@ public class TreeBankPane extends BorderPane {
         Menu menu = new Menu("File");
         menu.setAccelerator(new KeyCodeCombination(F));
 
+        MenuItem menuItem = null;
+
         ObservableList<MenuItem> items = menu.getItems();
 
-        MenuItem menuItem = new MenuItem("Import Tokens");
+        menuItem = new MenuItem("Open ...");
+        menuItem.setAccelerator(new KeyCodeCombination(O, CONTROL_DOWN));
+        menuItem.setOnAction(event -> {
+            Global.getInstance().getGlobalScene().setCursor(WAIT);
+            File file = fileChooser.showOpenDialog(getStage());
+            if (file != null) {
+                fileChooser.setInitialDirectory(file.getParentFile());
+                CanvasData savedCanvasData = serializationTool.open(file);
+                getChildren().removeAll(scrollPane, controlPane);
+                initPane(savedCanvasData);
+                requestLayout();
+                Global.getInstance().getGlobalScene().setCursor(DEFAULT);
+            } else {
+                Global.getInstance().getGlobalScene().setCursor(DEFAULT);
+            }
+
+        });
+        items.add(menuItem);
+
+        menuItem = new MenuItem("Save ...");
+        menuItem.setAccelerator(new KeyCodeCombination(S, CONTROL_DOWN));
+        menuItem.setOnAction(event -> {
+            Global.getInstance().getGlobalScene().setCursor(WAIT);
+            if (currentFile == null) {
+                currentFile = fileChooser.showSaveDialog(getStage());
+            }
+            if (currentFile != null) {
+                EventQueue.invokeLater(() -> {
+                    serializationTool.save(currentFile, null, canvasPane.canvasDataObjectProperty().get());
+                    fileChooser.setInitialDirectory(currentFile.getParentFile());
+                    Global.getInstance().getGlobalScene().setCursor(DEFAULT);
+                });
+            } else {
+                Global.getInstance().getGlobalScene().setCursor(DEFAULT);
+            }
+        });
+        items.add(menuItem);
+
+        items.add(new SeparatorMenuItem());
+
+        menuItem = new MenuItem("Import Tokens");
         menuItem.setAccelerator(new KeyCodeCombination(I, CONTROL_DOWN));
         menuItem.setOnAction(event -> {
             Global.getInstance().getGlobalScene().setCursor(WAIT);
             Platform.runLater(() -> {
                 Optional<List<Token>> result = dialog.showAndWait();
                 result.ifPresent(selectedItems -> {
-                    ObjectProperty<CanvasData> canvasDataObjectProperty = controlPane.canvasDataObjectProperty();
-                    canvasData.setNodes(graphBuilder.toGraphNodes(selectedItems));
-                    // when we are not setting null we are not getting any updates
-                    // so set null first then set new value
-                    canvasDataObjectProperty.set(null);
-                    canvasDataObjectProperty.set(canvasData);
-                    Global.getInstance().getGlobalScene().setCursor(DEFAULT);
+                    updateCanvas(graphBuilder.toGraphNodes(selectedItems));
                 });
 
             });
@@ -101,9 +149,7 @@ public class TreeBankPane extends BorderPane {
         menuItem = new MenuItem("Exit");
         menuItem.setAccelerator(new KeyCodeCombination(F4, ALT_DOWN));
         menuItem.setOnAction(event -> {
-            Scene scene = getScene();
-            Stage stage = (Stage) scene.getWindow();
-            stage.close();
+            getStage().close();
         });
         items.add(menuItem);
 
@@ -111,8 +157,24 @@ public class TreeBankPane extends BorderPane {
         return menuBar;
     }
 
-    private void initPane() {
-        canvasData = new CanvasData(new CanvasMetaData());
+    private Stage getStage() {
+        Scene scene = getScene();
+        return (Stage) scene.getWindow();
+    }
+
+    private void updateCanvas(ObservableList<GraphNode> nodes) {
+        ObjectProperty<CanvasData> canvasDataObjectProperty = canvasPane.canvasDataObjectProperty();
+        CanvasData canvasData = canvasDataObjectProperty.get();
+        canvasData.setNodes(nodes);
+        // when we are not setting null we are not getting any updates
+        // so set null first then set new value
+        canvasDataObjectProperty.set(null);
+        canvasDataObjectProperty.set(canvasData);
+        Global.getInstance().getGlobalScene().setCursor(DEFAULT);
+    }
+
+    private void initPane(CanvasData cd) {
+        CanvasData canvasData = cd == null ? new CanvasData(new CanvasMetaData()) : cd;
 
         canvasPane = new CanvasPane(canvasData);
         scrollPane = new ScrollPane(canvasPane);
@@ -121,7 +183,9 @@ public class TreeBankPane extends BorderPane {
 
         controlPane = new ControlPane(canvasData);
 
-        canvasPane.canvasDataObjectProperty().bind(controlPane.canvasDataObjectProperty());
+        // connection between Canvas pane and Control pane
+        // NOTE: control pane is dependent on canvas pane
+        controlPane.canvasDataObjectProperty().bindBidirectional(canvasPane.canvasDataObjectProperty());
 
         setCenter(scrollPane);
         setRight(controlPane);

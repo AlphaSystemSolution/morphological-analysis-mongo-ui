@@ -1,7 +1,9 @@
 package com.alphasystem.morphologicalanalysis.treebank.jfx.ui.util;
 
 import com.alphasystem.morphologicalanalysis.model.Chapter;
+import com.alphasystem.morphologicalanalysis.model.Location;
 import com.alphasystem.morphologicalanalysis.model.Token;
+import com.alphasystem.morphologicalanalysis.repository.LocationRepository;
 import com.alphasystem.morphologicalanalysis.repository.TokenRepository;
 import com.alphasystem.morphologicalanalysis.ui.util.ChapterAdapter;
 import com.alphasystem.morphologicalanalysis.util.MorphologicalAnalysisRepositoryUtil;
@@ -21,6 +23,7 @@ public class RepositoryTool {
 
     private MorphologicalAnalysisRepositoryUtil repositoryUtil;
     private TokenRepository tokenRepository;
+    private LocationRepository locationRepository;
 
     /**
      * do not let anyone instantiate this class
@@ -29,6 +32,7 @@ public class RepositoryTool {
         repositoryUtil = ApplicationContextProvider
                 .getInstance().getBean(MorphologicalAnalysisRepositoryUtil.class);
         tokenRepository = repositoryUtil.getTokenRepository();
+        locationRepository = repositoryUtil.getLocationRepository();
 
     }
 
@@ -73,6 +77,14 @@ public class RepositoryTool {
                 }; // end of "new task"
             } // end of createTask
         }; // end of "new Service"
+    }
+
+    public Token getToken(String id) {
+        return tokenRepository.findOne(id);
+    }
+
+    public Location getLocation(String id){
+        return locationRepository.findOne(id);
     }
 
 }

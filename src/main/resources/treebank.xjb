@@ -1,31 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<jaxb:bindings version="2.0" xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
-               xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc" xmlns:xs="http://www.w3.org/2001/XMLSchema"
-               xmlns:inheritance="http://jaxb2-commons.dev.java.net/basic/inheritance">
+<jaxb:bindings xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+               version="2.0">
     <jaxb:bindings schemaLocation="treebank.xsd">
         <jaxb:schemaBindings>
             <jaxb:package name="com.alphasystem.morphologicalanalysis.treebank.model"/>
         </jaxb:schemaBindings>
-        <jaxb:bindings node="//xs:complexType[@name='TreeBankMetaDataType']">
-            <jaxb:class name="TreeBankMetaData"/>
+        <jaxb:bindings node="//xs:complexType[@name='MetaDataType']">
+            <jaxb:class name="MetaData"/>
         </jaxb:bindings>
-        <jaxb:bindings node="//xs:complexType[@name='TreeBankDataType']">
-            <jaxb:class name="TreeBankData"/>
+        <jaxb:bindings node="//xs:complexType[@name='ConstructorArgumentType']">
+            <jaxb:class name="ConstructorArgument"/>
         </jaxb:bindings>
-        <jaxb:bindings node="//xs:complexType[@name='PointType']">
-            <jaxb:class name="Point"/>
-        </jaxb:bindings>
-        <jaxb:bindings node="//xs:complexType[@name='LineType']">
-            <jaxb:class name="Line"/>
-        </jaxb:bindings>
-        <jaxb:bindings node="//xs:simpleType[@name='TextTypeType']">
-            <jaxb:typesafeEnumClass name="TextType"/>
-        </jaxb:bindings>
-        <jaxb:bindings node="//xs:complexType[@name='TextType']">
-            <jaxb:class name="Text"/>
-        </jaxb:bindings>
-        <jaxb:bindings node="//xs:complexType[@name='RelationshipType']">
-            <jaxb:class name="Relationship"/>
+        <jaxb:bindings node="//xs:complexType[@name='GraphDataType']">
+            <jaxb:class name="GraphData"/>
         </jaxb:bindings>
     </jaxb:bindings>
 </jaxb:bindings>

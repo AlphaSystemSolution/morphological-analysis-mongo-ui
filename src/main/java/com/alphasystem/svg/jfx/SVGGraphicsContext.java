@@ -2,6 +2,8 @@ package com.alphasystem.svg.jfx;
 
 import com.alphasystem.svg.SVGTool;
 import com.alphasystem.util.IdGenerator;
+import javafx.collections.ObservableList;
+import javafx.scene.Node;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Shape;
 import org.apache.commons.lang3.StringUtils;
@@ -13,7 +15,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import static com.alphasystem.svg.SVGTool.SVG_OBJECT_FACTORY;
 import static com.alphasystem.util.IdGenerator.nextId;
@@ -125,6 +129,26 @@ public final class SVGGraphicsContext {
             layout.requestLayout();
             shapeMap.remove(shape.getId());
         }
+        return this;
+    }
+
+    public SVGGraphicsContext removeAll(boolean removeGridLines) {
+        ObservableList<Node> children = layout.getChildren();
+        Set<Map.Entry<String, Shape>> entries = shapeMap.entrySet();
+        Iterator<Map.Entry<String, Shape>> iterator = entries.iterator();
+        while (iterator.hasNext()){
+            Map.Entry<String, Shape> entry = iterator.next();
+            String id = entry.getKey();
+            Shape shape = entry.getValue();
+            if(id.equals("gridLines") && !removeGridLines){
+                continue;
+            }
+            boolean removed = children.remove(shape);
+            if(removed){
+                iterator.remove();
+            }
+        }
+        layout.requestLayout();
         return this;
     }
 

@@ -2,97 +2,89 @@ package com.alphasystem.morphologicalanalysis.treebank.jfx.ui.components;
 
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.GraphNode;
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.TerminalNode;
-import javafx.collections.ObservableList;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.geometry.Insets;
-import javafx.scene.Node;
-import javafx.scene.control.*;
-import javafx.scene.layout.GridPane;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TitledPane;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 
 import java.util.List;
-import java.util.ResourceBundle;
 
-import static java.lang.String.format;
 import static javafx.geometry.Pos.CENTER;
-import static javafx.scene.text.Font.font;
-import static javafx.scene.text.FontPosture.REGULAR;
-import static javafx.scene.text.FontWeight.BOLD;
-import static javafx.scene.text.FontWeight.NORMAL;
+import static javafx.scene.control.ScrollPane.ScrollBarPolicy.AS_NEEDED;
 
 /**
  * @author sali
  */
+@Deprecated
 public class DependencyGraphBuilderPane extends Pane {
 
-    private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("resources");
-
-    private GridPane editorPane;
+    private final DoubleProperty canvasWidth = new SimpleDoubleProperty(800);
+    private final DoubleProperty canvasHeight = new SimpleDoubleProperty(400);
+    private DependencyGraphTreeView tree;
+    private DependencyGraphBuilderEditorPane editorPane;
 
     public DependencyGraphBuilderPane(List<GraphNode> nodes) {
         VBox vBox = new VBox(10);
         vBox.setAlignment(CENTER);
         vBox.setPadding(new Insets(5, 5, 5, 5));
 
-        editorPane = new GridPane();
-        editorPane.setAlignment(CENTER);
-        editorPane.setHgap(10);
-        editorPane.setVgap(10);
-        editorPane.setPadding(new Insets(25, 25, 25, 25));
+        tree = new DependencyGraphTreeView(nodes);
 
         GraphNode graphNode = new TerminalNode();
         if (!nodes.isEmpty()) {
             graphNode = nodes.get(0);
         }
-        initEditorPane(graphNode);
-        vBox.getChildren().addAll(initTreePane(), new Separator(), editorPane);
 
-        getChildren().add(new TitledPane("Dependency Graph Builder", vBox));
+        editorPane = new DependencyGraphBuilderEditorPane(graphNode);
+        canvasWidthProperty().addListener((observable1, oldWidth, newWidth) -> {
+            if(oldWidth != newWidth){
+                editorPane.updateWidth((Double) newWidth);
+            }
+        });
+        canvasHeightProperty().addListener((observable1, oldHeight, newHeight) -> {
+            if(oldHeight != newHeight){
+                editorPane.updateHeight((Double) newHeight);
+            }
+        });
+
+        tree.selectedNodeProperty().addListener((observable, oldValue, newValue) -> {
+            editorPane.initPane(newValue);
+        });
+
+        vBox.getChildren().addAll(new TitledPane("Dependency Graph Tree", initTreePane()),
+                new TitledPane("Dependency Graph Controls", editorPane));
+
+        getChildren().add(vBox);
 
         setMinSize(USE_PREF_SIZE, USE_PREF_SIZE);
         setMaxSize(USE_PREF_SIZE, USE_PREF_SIZE);
+        //setPrefSize(300, 600);
     }
 
-    private void initEditorPane(GraphNode node) {
-        ObservableList<Node> children = editorPane.getChildren();
-        children.remove(0, children.size());
-
-        addTextControls(node);
-
-        editorPane.requestLayout();
+    public DoubleProperty canvasHeightProperty() {
+        return canvasHeight;
     }
 
-    private void addTextControls(GraphNode node) {
-        Label label = new Label(getPaneTitle(node));
-        label.setFont(font("Georgia", BOLD, REGULAR, 16));
-        label.setUnderline(true);
-        label.setTextFill(Color.BLUE);
-        editorPane.add(label, 0, 0, 2, 1);
-
-        label = new Label(RESOURCE_BUNDLE.getString("text.label"));
-        editorPane.add(label, 0, 1);
-        TextField textField = new TextField();
-        textField.setFont(font("Arabic Typesetting", NORMAL, REGULAR, 20));
-        label.setLabelFor(textField);
-        editorPane.add(textField, 1, 1);
-
-
-    }
-
-    private Spinner<Double> getSpinner(double min, double max, double initialValue, double amountToStepBy) {
-        Spinner<Double> spinner = new Spinner<>();
-        spinner.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(min, max,
-                initialValue, amountToStepBy));
-        return spinner;
-    }
-
-    private String getPaneTitle(GraphNode node) {
-        return RESOURCE_BUNDLE.getString(format("%s_node.label", node.getNodeType().name()));
+    public DoubleProperty canvasWidthProperty() {
+        return canvasWidth;
     }
 
     private Pane initTreePane() {
+        BorderPane borderPane = new BorderPane();
+        ScrollPane scrollPane = new ScrollPane();
+        scrollPane.setHbarPolicy(AS_NEEDED);
+        scrollPane.setVbarPolicy(AS_NEEDED);
+        scrollPane.setContent(tree);
+        borderPane.setCenter(scrollPane);
+        return borderPane;
+    }
 
-        return new Pane();
+    public void updatePane(List<GraphNode> nodes) {
+        tree.initChildren(nodes);
+        requestLayout();
     }
 }

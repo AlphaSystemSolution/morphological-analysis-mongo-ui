@@ -5,7 +5,6 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 
 import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.NodeType.TERMINAL;
-import static java.lang.String.format;
 
 /**
  * @author sali
@@ -33,10 +32,22 @@ public class TerminalNode extends GraphNode {
     protected final DoubleProperty y2;
 
     /**
+     * x location for translation
+     */
+    protected final DoubleProperty x3;
+
+    /**
+     * y location for translation
+     */
+    protected final DoubleProperty y3;
+
+    protected Token token;
+
+    /**
      *
      */
     public TerminalNode() {
-        this(null, null, -1, -1, -1, -1, -1, -1);
+        this(null, null, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0);
     }
 
     /**
@@ -44,9 +55,12 @@ public class TerminalNode extends GraphNode {
      * @param y1
      * @param x2
      * @param y2
+     * @param x3
+     * @param y3
      */
-    public TerminalNode(Token token, String id, double x, double y, double x1, double y1, double x2, double y2) {
-        this(TERMINAL, token, id, x, y, x1, y1, x2, y2);
+    public TerminalNode(Token token, String id, Double x, Double y, Double x1, Double y1, Double x2,
+                        Double y2, Double x3, Double y3) {
+        this(TERMINAL, token, id, x, y, x1, y1, x2, y2, x3, y3);
     }
 
     /**
@@ -59,10 +73,13 @@ public class TerminalNode extends GraphNode {
      * @param y1
      * @param x2
      * @param y2
+     * @param x3
+     * @param y3
      */
-    protected TerminalNode(NodeType nodeType, Token token, String id, double x, double y,
-                           double x1, double y1, double x2, double y2) {
-        this(TERMINAL, id, getTokenValue(token), x, y, x1, y1, x2, y2);
+    protected TerminalNode(NodeType nodeType, Token token, String id, Double x, Double y,
+                           Double x1, Double y1, Double x2, Double y2, Double x3, Double y3) {
+        this(nodeType, id, getTokenValue(token), x, y, x1, y1, x2, y2, x3, y3);
+        this.token = token;
     }
 
     /**
@@ -75,14 +92,18 @@ public class TerminalNode extends GraphNode {
      * @param y1
      * @param x2
      * @param y2
+     * @param x3
+     * @param y3
      */
-    protected TerminalNode(NodeType nodeType, String id, String text, double x, double y,
-                           double x1, double y1, double x2, double y2) {
+    protected TerminalNode(NodeType nodeType, String id, String text, Double x, Double y,
+                           Double x1, Double y1, Double x2, Double y2, Double x3, Double y3) {
         super(nodeType, id, text, x, y);
         this.x1 = new SimpleDoubleProperty(x1);
         this.y1 = new SimpleDoubleProperty(y1);
         this.x2 = new SimpleDoubleProperty(x2);
         this.y2 = new SimpleDoubleProperty(y2);
+        this.x3 = new SimpleDoubleProperty(x3);
+        this.y3 = new SimpleDoubleProperty(y3);
     }
 
     private static String getTokenValue(Token token) {
@@ -137,8 +158,32 @@ public class TerminalNode extends GraphNode {
         return y2;
     }
 
-    @Override
-    public String toString() {
-        return format("%s @ (%s:%s)", getText(), getX(), getY());
+    public final double getX3() {
+        return x3.get();
     }
+
+    public final DoubleProperty x3Property() {
+        return x3;
+    }
+
+    public final void setX3(double x3) {
+        this.x3.set(x3);
+    }
+
+    public final double getY3() {
+        return y3.get();
+    }
+
+    public final DoubleProperty y3Property() {
+        return y3;
+    }
+
+    public final void setY3(double y3) {
+        this.y3.set(y3);
+    }
+
+    public Token getToken() {
+        return token;
+    }
+
 }

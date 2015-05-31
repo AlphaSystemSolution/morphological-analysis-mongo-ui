@@ -19,7 +19,7 @@ public abstract class GraphNode {
 
     protected final BooleanProperty _transient;
 
-    protected GraphNode(NodeType nodeType, String id, String text, double x, double y) {
+    protected GraphNode(NodeType nodeType, String id, String text, Double x, Double y) {
         this.id = new SimpleStringProperty(id);
         this.nodeType = new ReadOnlyObjectWrapper<>(nodeType);
         this.text = new SimpleStringProperty(text);
@@ -100,4 +100,8 @@ public abstract class GraphNode {
         return y;
     }
 
+    @Override
+    public String toString() {
+        return getText();
+    }
 }

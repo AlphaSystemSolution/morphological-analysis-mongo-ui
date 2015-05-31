@@ -1,10 +1,11 @@
 package com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model;
 
 import com.alphasystem.morphologicalanalysis.model.support.GrammaticalRelationship;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.*;
+import javafx.scene.paint.Color;
 
 import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.NodeType.RELATIONSHIP;
+import static javafx.scene.paint.Color.web;
 
 /**
  * @author sali
@@ -27,6 +28,10 @@ public class RelationshipNode extends GraphNode {
 
     private final DoubleProperty endY;
 
+    private final ObjectProperty<GrammaticalRelationship> grammaticalRelationship;
+
+    private final ObjectProperty<Color> stroke;
+
     /**
      * @param grammaticalRelationship
      * @param id
@@ -41,10 +46,12 @@ public class RelationshipNode extends GraphNode {
      * @param endX
      * @param endY
      */
-    public RelationshipNode(GrammaticalRelationship grammaticalRelationship, String id, double x, double y, double startX,
-                            double startY, double controlX1, double controlY1, double controlX2, double controlY2,
-                            double endX, double endY) {
+    public RelationshipNode(GrammaticalRelationship grammaticalRelationship, String id, Double x, Double y,
+                            Double startX, Double startY, Double controlX1, Double controlY1, Double controlX2,
+                            Double controlY2, Double endX, Double endY) {
         super(RELATIONSHIP, id, grammaticalRelationship.getLabel().toUnicode(), x, y);
+        this.grammaticalRelationship = new SimpleObjectProperty<>(grammaticalRelationship);
+        this.stroke = new SimpleObjectProperty<>(web(grammaticalRelationship.getColorCode()));
         this.startX = new SimpleDoubleProperty(startX);
         this.startY = new SimpleDoubleProperty(startY);
         this.controlX1 = new SimpleDoubleProperty(controlX1);
@@ -53,6 +60,29 @@ public class RelationshipNode extends GraphNode {
         this.controlY2 = new SimpleDoubleProperty(controlY2);
         this.endX = new SimpleDoubleProperty(endX);
         this.endY = new SimpleDoubleProperty(endY);
+        this.grammaticalRelationshipProperty().addListener((observable, oldValue, newValue) -> {
+            this.stroke.setValue(web(newValue.getColorCode()));
+        });
+    }
+
+    public Color getStroke() {
+        return stroke.get();
+    }
+
+    public ObjectProperty<Color> strokeProperty() {
+        return stroke;
+    }
+
+    public final GrammaticalRelationship getGrammaticalRelationship() {
+        return grammaticalRelationship.get();
+    }
+
+    public final void setGrammaticalRelationship(GrammaticalRelationship grammaticalRelationship) {
+        this.grammaticalRelationship.set(grammaticalRelationship);
+    }
+
+    public final ObjectProperty<GrammaticalRelationship> grammaticalRelationshipProperty() {
+        return grammaticalRelationship;
     }
 
     public double getControlX1() {

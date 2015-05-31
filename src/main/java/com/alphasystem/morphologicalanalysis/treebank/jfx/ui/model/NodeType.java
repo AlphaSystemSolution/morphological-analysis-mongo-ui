@@ -38,5 +38,10 @@ public enum NodeType {
     /**
      * Hidden node without any Arabic text and only part of speech to fill grammatical meaning / relationship.
      */
-    EMPTY
+    EMPTY,
+
+    /**
+     * Represents the root of each of above category in the tree. This is not used in actual graph.
+     */
+    ROOT;
 }

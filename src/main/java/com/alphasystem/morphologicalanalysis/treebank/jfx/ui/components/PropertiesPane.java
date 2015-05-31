@@ -3,18 +3,17 @@ package com.alphasystem.morphologicalanalysis.treebank.jfx.ui.components;
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.CanvasMetaData;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Pane;
 
 import java.util.ResourceBundle;
 
 import static javafx.geometry.Pos.CENTER;
-import static javafx.scene.control.Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL;
 
 /**
  * @author sali
  */
-public class PropertiesPane extends Pane {
+public class PropertiesPane extends BorderPane {
 
     private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("resources");
 
@@ -26,15 +25,11 @@ public class PropertiesPane extends Pane {
 
     private CanvasMetaData metaData;
 
-    public PropertiesPane() {
-        this(null);
-    }
-
     public PropertiesPane(CanvasMetaData metaData) {
 
         this.metaData = metaData;
 
-        getChildren().add(new TitledPane("Properties", initMetaProperties()));
+        setCenter(initMetaProperties());
 
         setMinSize(USE_PREF_SIZE, USE_PREF_SIZE);
         setMaxSize(USE_PREF_SIZE, USE_PREF_SIZE);
@@ -56,7 +51,6 @@ public class PropertiesPane extends Pane {
 
         widthField = new Spinner<>();
         widthField.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(20, 1000, width, 20));
-        widthField.getStyleClass().add(STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
         metaData.widthProperty().bind(widthField.valueProperty());
         grid.add(widthField, 1, 0);
 
@@ -66,7 +60,6 @@ public class PropertiesPane extends Pane {
 
         heightField = new Spinner<>();
         heightField.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(20, 1000, height, 20));
-        heightField.getStyleClass().add(STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
         metaData.heightProperty().bind(heightField.valueProperty());
         grid.add(heightField, 1, 1);
 

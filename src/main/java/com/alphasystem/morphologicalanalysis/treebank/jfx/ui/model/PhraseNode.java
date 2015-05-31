@@ -53,8 +53,8 @@ public class PhraseNode extends GraphNode {
      * @param cx
      * @param cy
      */
-    public PhraseNode(GrammaticalRelationship grammaticalRelationship, String id, double x, double y, double x1,
-                      double y1, double x2, double y2, double cx, double cy) {
+    public PhraseNode(GrammaticalRelationship grammaticalRelationship, String id, Double x, Double y, Double x1,
+                      Double y1, Double x2, Double y2, Double cx, Double cy) {
         super(PHRASE, id, grammaticalRelationship.getLabel().toUnicode(), x, y);
         this.x1 = new SimpleDoubleProperty(x1);
         this.y1 = new SimpleDoubleProperty(y1);

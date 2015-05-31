@@ -46,6 +46,7 @@ public class NodeSelectionDialog extends Dialog<List<Token>> {
     private ChapterAdapter selectedChapter;
     private VerseAdapter selectedVerse;
     private List<Token> selectedItems = new ArrayList<>();
+    private List<TokenListCell> selectedCells = new ArrayList<>();
 
     public NodeSelectionDialog() {
         setTitle("Import Tokens");
@@ -106,10 +107,16 @@ public class NodeSelectionDialog extends Dialog<List<Token>> {
 
         ButtonType okButton = new ButtonType("OK", OK_DONE);
         setResultConverter(dialogButton -> {
+            List<Token> results = new ArrayList<Token>();
             if (dialogButton == okButton) {
-                return selectedItems;
+                results.addAll(selectedItems);
             }
-            return new ArrayList<Token>();
+            selectedItems.clear();
+            for (TokenListCell selectedCell : selectedCells) {
+                selectedCell.selectedProperty().setValue(false);
+            }
+            selectedCells.clear();
+            return results;
         });
         ButtonType cancelButton = new ButtonType("Cancel", CANCEL_CLOSE);
         getDialogPane().getButtonTypes().addAll(okButton, cancelButton);
@@ -154,7 +161,6 @@ public class NodeSelectionDialog extends Dialog<List<Token>> {
     }
 
     private void initTokenList(List<Token> tokens) {
-        selectedItems.clear();
         ObservableList<TokenListCell> items = tokensList.getItems();
         items.remove(0, items.size());
         ObservableList<TokenListCell> listItems = FXCollections.observableArrayList();
@@ -163,6 +169,10 @@ public class NodeSelectionDialog extends Dialog<List<Token>> {
             cell.selectedProperty().addListener((observable, oldValue, newValue) -> {
                 if (newValue) {
                     selectedItems.add(cell.getToken());
+                    selectedCells.add(cell);
+                } else {
+                    selectedItems.remove(cell.getToken());
+                    selectedItems.remove(cell);
                 }
             });
             listItems.add(cell);

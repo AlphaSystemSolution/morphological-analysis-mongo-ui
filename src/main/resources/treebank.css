@@ -8,3 +8,8 @@
     -fx-font-family: "Arabic Typesetting";
     -fx-font-size: 20pt;
 }
+
+.tree-view .tree-cell .text {
+    -fx-font-family: "Arabic Typesetting";
+    -fx-font-size: 20pt;
+}

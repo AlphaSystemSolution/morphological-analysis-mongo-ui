@@ -1,7 +1,13 @@
 package com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model;
 
+import com.alphasystem.arabic.model.ArabicLetters;
+import com.alphasystem.morphologicalanalysis.model.AbstractProperties;
+import com.alphasystem.morphologicalanalysis.model.Location;
+import com.alphasystem.morphologicalanalysis.model.NounProperties;
 import com.alphasystem.morphologicalanalysis.model.support.PartOfSpeech;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 
 import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.NodeType.PART_OF_SPEECH;
@@ -21,26 +27,64 @@ public class PartOfSpeechNode extends GraphNode {
      */
     private final DoubleProperty cy;
 
+    private final BooleanProperty excluded;
+
+    private final PartOfSpeech partOfSpeech;
+
+    private final Location location;
+
+    private final AbstractProperties properties;
+
     /**
-     *
      * @param partOfSpeech
+     * @param location
      * @param id
      * @param x
      * @param y
      * @param cx
      * @param cy
+     * @param excluded
      */
-    public PartOfSpeechNode(PartOfSpeech partOfSpeech, String id, double x, double y, double cx, double cy) {
-        super(PART_OF_SPEECH, id, partOfSpeech.getLabel().toUnicode(), x, y);
+    public PartOfSpeechNode(PartOfSpeech partOfSpeech, Location location, String id, Double x, Double y,
+                            Double cx, Double cy, Boolean excluded) {
+        super(PART_OF_SPEECH, id, getText(partOfSpeech, location.getProperties()), x, y);
+        this.partOfSpeech = partOfSpeech;
+        this.location = location;
+        this.properties = location.getProperties();
+        this.excluded = new SimpleBooleanProperty(excluded);
         this.cx = new SimpleDoubleProperty(cx);
         this.cy = new SimpleDoubleProperty(cy);
     }
 
-    public double getCx() {
+    private static String getText(PartOfSpeech partOfSpeech, AbstractProperties properties) {
+        StringBuilder builder = new StringBuilder(partOfSpeech.getLabel().toUnicode());
+        switch (partOfSpeech) {
+            case NOUN:
+                NounProperties np = (NounProperties) properties;
+                builder.append(ArabicLetters.WORD_SPACE.toUnicode()).
+                        append(np.getStatus().getLabel().toUnicode());
+                break;
+        }
+        return builder.toString();
+    }
+
+    public PartOfSpeech getPartOfSpeech() {
+        return partOfSpeech;
+    }
+
+    public AbstractProperties getProperties() {
+        return properties;
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+
+    public final double getCx() {
         return cx.get();
     }
 
-    public void setCx(double cx) {
+    public final void setCx(double cx) {
         this.cx.set(cx);
     }
 
@@ -48,11 +92,11 @@ public class PartOfSpeechNode extends GraphNode {
         return cx;
     }
 
-    public double getCy() {
+    public final double getCy() {
         return cy.get();
     }
 
-    public void setCy(double cy) {
+    public final void setCy(double cy) {
         this.cy.set(cy);
     }
 
@@ -60,5 +104,20 @@ public class PartOfSpeechNode extends GraphNode {
         return cy;
     }
 
+    public final boolean isExcluded() {
+        return excluded.get();
+    }
 
+    public final void setExcluded(boolean excluded) {
+        this.excluded.set(excluded);
+    }
+
+    public final BooleanProperty excludedProperty() {
+        return excluded;
+    }
+
+    @Override
+    public String toString() {
+        return getText(partOfSpeech, properties);
+    }
 }
