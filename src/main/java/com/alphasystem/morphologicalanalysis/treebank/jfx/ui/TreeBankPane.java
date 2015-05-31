@@ -103,7 +103,7 @@ public class TreeBankPane extends BorderPane {
         menuItem = new MenuItem("Open ...");
         menuItem.setAccelerator(new KeyCodeCombination(O, CONTROL_DOWN));
         menuItem.setOnAction(event -> {
-            Global.getInstance().getGlobalScene().setCursor(WAIT);
+            getScene().setCursor(WAIT);
             File file = fileChooser.showOpenDialog(getStage());
             if (file != null) {
                 fileChooser.setInitialDirectory(file.getParentFile());
@@ -111,9 +111,9 @@ public class TreeBankPane extends BorderPane {
                 getChildren().removeAll(scrollPane, controlPane);
                 initPane(savedCanvasData);
                 requestLayout();
-                Global.getInstance().getGlobalScene().setCursor(DEFAULT);
+                getScene().setCursor(DEFAULT);
             } else {
-                Global.getInstance().getGlobalScene().setCursor(DEFAULT);
+                getScene().setCursor(DEFAULT);
             }
 
         });
@@ -122,7 +122,7 @@ public class TreeBankPane extends BorderPane {
         menuItem = new MenuItem("Save ...");
         menuItem.setAccelerator(new KeyCodeCombination(S, CONTROL_DOWN));
         menuItem.setOnAction(event -> {
-            Global.getInstance().getGlobalScene().setCursor(WAIT);
+            getScene().setCursor(WAIT);
             if (currentFile == null) {
                 currentFile = fileChooser.showSaveDialog(getStage());
             }
@@ -130,10 +130,10 @@ public class TreeBankPane extends BorderPane {
                 EventQueue.invokeLater(() -> {
                     serializationTool.save(currentFile, null, canvasPane.canvasDataObjectProperty().get());
                     fileChooser.setInitialDirectory(currentFile.getParentFile());
-                    Global.getInstance().getGlobalScene().setCursor(DEFAULT);
+                    getScene().setCursor(DEFAULT);
                 });
             } else {
-                Global.getInstance().getGlobalScene().setCursor(DEFAULT);
+                getScene().setCursor(DEFAULT);
             }
         });
         items.add(menuItem);
@@ -143,7 +143,7 @@ public class TreeBankPane extends BorderPane {
         menuItem = new MenuItem("Import Tokens");
         menuItem.setAccelerator(new KeyCodeCombination(I, CONTROL_DOWN));
         menuItem.setOnAction(event -> {
-            Global.getInstance().getGlobalScene().setCursor(WAIT);
+            getScene().setCursor(WAIT);
             Platform.runLater(() -> {
                 Optional<List<Token>> result = dialog.showAndWait();
                 result.ifPresent(selectedItems -> {
@@ -154,7 +154,7 @@ public class TreeBankPane extends BorderPane {
         });
         items.add(menuItem);
 
-        menuItem = new MenuItem("Take Snapshot");
+        menuItem = new MenuItem("Take Snapshot ...");
         menuItem.setAccelerator(new KeyCodeCombination(S, CONTROL_DOWN, ALT_DOWN));
         menuItem.setOnAction(event -> {
             getScene().setCursor(WAIT);
@@ -201,7 +201,7 @@ public class TreeBankPane extends BorderPane {
         // so set null first then set new value
         canvasDataObjectProperty.set(null);
         canvasDataObjectProperty.set(canvasData);
-        Global.getInstance().getGlobalScene().setCursor(DEFAULT);
+        getScene().setCursor(DEFAULT);
     }
 
     private void initPane(CanvasData cd) {

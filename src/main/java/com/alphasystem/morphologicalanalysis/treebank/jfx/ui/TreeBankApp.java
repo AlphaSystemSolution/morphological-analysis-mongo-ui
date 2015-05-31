@@ -32,7 +32,6 @@ public class TreeBankApp extends Application {
         primaryStage.setHeight(bounds.getHeight());
 
         Scene scene = new Scene(new TreeBankPane());
-        Global.getInstance().setGlobalScene(scene);
         primaryStage.setScene(scene);
         primaryStage.show();
     }

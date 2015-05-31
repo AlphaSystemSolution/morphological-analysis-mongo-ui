@@ -2,7 +2,6 @@ package com.alphasystem.morphologicalanalysis.treebank.jfx.ui.components;
 
 import com.alphasystem.morphologicalanalysis.model.Chapter;
 import com.alphasystem.morphologicalanalysis.model.Token;
-import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.Global;
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.TokenListCell;
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.util.RepositoryTool;
 import com.alphasystem.morphologicalanalysis.ui.util.ChapterAdapter;
@@ -24,7 +23,6 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.Global.TREE_BANK_STYLE_SHEET;
-import static javafx.scene.Cursor.*;
 import static javafx.scene.control.ButtonBar.ButtonData.CANCEL_CLOSE;
 import static javafx.scene.control.ButtonBar.ButtonData.OK_DONE;
 
@@ -57,7 +55,6 @@ public class NodeSelectionDialog extends Dialog<List<Token>> {
         service.setOnSucceeded(event -> {
             chapters = (List<ChapterAdapter>) event.getSource().getValue();
             initDialog();
-            Global.getInstance().getGlobalScene().setCursor(DEFAULT);
         });
     }
 
@@ -128,13 +125,11 @@ public class NodeSelectionDialog extends Dialog<List<Token>> {
         if (selectedChapter == null && selectedVerse == null) {
             return;
         }
-        Global.getInstance().getGlobalScene().setCursor(WAIT);
         Service<List<Token>> service = repositoryTool.getTokens(selectedVerse.getChapterNumber(), selectedVerse.getVerseNumber());
         service.start();
         service.setOnSucceeded(event1 -> {
             List<Token> tokens = (List<Token>) event1.getSource().getValue();
             initTokenList(tokens);
-            Global.getInstance().getGlobalScene().setCursor(HAND);
         });
     }
 

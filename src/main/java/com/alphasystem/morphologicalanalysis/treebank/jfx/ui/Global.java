@@ -24,12 +24,4 @@ public class Global {
         }
         return instance;
     }
-
-    public Scene getGlobalScene() {
-        return globalScene;
-    }
-
-    public void setGlobalScene(Scene globalScene) {
-        this.globalScene = globalScene;
-    }
 }
