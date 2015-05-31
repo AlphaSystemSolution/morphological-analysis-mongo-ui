@@ -1,4 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
@@ -56,7 +56,11 @@
 			<artifactId>logback-classic</artifactId>
 			<version>1.1.2</version>
 		</dependency>
-
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.4</version>
+		</dependency>
 		<!-- Batik dependencies -->
 		<dependency>
 			<groupId>org.apache.xmlgraphics</groupId>
@@ -88,9 +92,15 @@
 			<artifactId>batik-swing</artifactId>
 			<version>${batik.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.alphasystem.svg</groupId>
+			<artifactId>svg-model</artifactId>
+			<version>${svg-model.version}</version>
+		</dependency>
 	</dependencies>
 	<properties>
 		<batik.version>1.7</batik.version>
+		<svg-model.version>${project.version}</svg-model.version>
 		<ma-repository.version>${project.version}</ma-repository.version>
 		<commons-ui.version>${project.version}</commons-ui.version>
 		<keyboard-ui.version>${project.version}</keyboard-ui.version>
