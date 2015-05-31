@@ -176,8 +176,22 @@ public class SerializationTool {
                     case PART_OF_SPEECH:
                         objectType = serializePartOfSpeechNode((PartOfSpeechNode) node);
                         break;
+                    case PHRASE:
+                        objectType = serializePhraseNode((PhraseNode) node);
+                        break;
                     case RELATIONSHIP:
                         objectType = serializeRelationshipNode((RelationshipNode) node);
+                        break;
+                    case REFERENCE:
+                        objectType = serializeReferenceNode((ReferenceNode) node);
+                        break;
+                    case HIDDEN:
+                        objectType = serializeHiddenNode((HiddenNode) node);
+                        break;
+                    case EMPTY:
+                        objectType = serializeEmptyNode((EmptyNode) node);
+                        break;
+                    case ROOT:
                         break;
                 }
                 objectTypes[i] = objectType;
@@ -248,6 +262,34 @@ public class SerializationTool {
         constructorArgs.add(createDoubleArgument(node.getEndY()));
         constructorArgs.add(createDoubleArgument(node.getT1()));
         constructorArgs.add(createDoubleArgument(node.getT2()));
+
+        return objectType;
+    }
+
+    private ObjectType serializePhraseNode(PhraseNode node) {
+        ObjectType objectType = OBJECT_FACTORY.createObjectType().withType(node.getClass().getName());
+        List<ConstructorArgument> constructorArgs = objectType.getConstructorArgs();
+
+        return objectType;
+    }
+
+    private ObjectType serializeEmptyNode(EmptyNode node) {
+        ObjectType objectType = OBJECT_FACTORY.createObjectType().withType(node.getClass().getName());
+        List<ConstructorArgument> constructorArgs = objectType.getConstructorArgs();
+
+        return objectType;
+    }
+
+    private ObjectType serializeHiddenNode(HiddenNode node) {
+        ObjectType objectType = OBJECT_FACTORY.createObjectType().withType(node.getClass().getName());
+        List<ConstructorArgument> constructorArgs = objectType.getConstructorArgs();
+
+        return objectType;
+    }
+
+    private ObjectType serializeReferenceNode(ReferenceNode node) {
+        ObjectType objectType = OBJECT_FACTORY.createObjectType().withType(node.getClass().getName());
+        List<ConstructorArgument> constructorArgs = objectType.getConstructorArgs();
 
         return objectType;
     }
