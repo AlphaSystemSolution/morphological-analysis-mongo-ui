@@ -13,6 +13,7 @@ import javafx.scene.layout.GridPane;
 
 import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.Global.ARABIC_FONT_NAME;
 import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.Global.RESOURCE_BUNDLE;
+import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.util.DecimalFormatStringConverter.THREE_DECIMAL_PLACE_CONVERTER;
 import static java.lang.String.format;
 import static javafx.geometry.Pos.CENTER;
 import static javafx.scene.paint.Color.BLUE;
@@ -271,7 +272,7 @@ public class DependencyGraphBuilderEditorPane extends GridPane {
         row++; //9
         label = new Label(getString(node, "t1"));
         add(label, 0, row);
-        spinner = getSpinner(0, 1.000, node.getT1(), 0.005);
+        spinner = getSpinnerThreeDecimalPlace(0, 1.000, node.getT1(), 0.005);
         label.setLabelFor(spinner);
         spinner.setOnMouseClicked(event -> {
             Spinner source = (Spinner) event.getSource();
@@ -280,9 +281,9 @@ public class DependencyGraphBuilderEditorPane extends GridPane {
         add(spinner, 1, row);
 
         row++; //10
-        label = new Label(getString(node, "t1"));
+        label = new Label(getString(node, "t2"));
         add(label, 0, row);
-        spinner = getSpinner(0, 1.000, node.getT2(), 0.005);
+        spinner = getSpinnerThreeDecimalPlace(0, 1.000, node.getT2(), 0.005);
         label.setLabelFor(spinner);
         spinner.setOnMouseClicked(event -> {
             Spinner source = (Spinner) event.getSource();
@@ -293,7 +294,16 @@ public class DependencyGraphBuilderEditorPane extends GridPane {
 
     private Spinner<Double> getSpinner(double min, double max, double initialValue, double amountToStepBy) {
         Spinner<Double> spinner = new Spinner<>();
-        DoubleSpinnerValueFactory valueFactory = new DoubleSpinnerValueFactory(min, max, initialValue, amountToStepBy);
+        spinner.setValueFactory(new DoubleSpinnerValueFactory(min, max, initialValue, amountToStepBy));
+        return spinner;
+    }
+
+    private Spinner<Double> getSpinnerThreeDecimalPlace(double min, double max,
+                                                        double initialValue, double amountToStepBy) {
+        Spinner<Double> spinner = new Spinner<>();
+        DoubleSpinnerValueFactory valueFactory = new DoubleSpinnerValueFactory(min, max,
+                initialValue, amountToStepBy);
+        valueFactory.setConverter(THREE_DECIMAL_PLACE_CONVERTER);
         spinner.setValueFactory(valueFactory);
         return spinner;
     }

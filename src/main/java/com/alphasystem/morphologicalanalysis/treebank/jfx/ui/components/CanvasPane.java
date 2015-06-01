@@ -30,10 +30,10 @@ import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.Global.ARABI
 import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.Global.ARABIC_FONT_SMALL;
 import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.util.DependencyGraphGraphicTool.DARK_GRAY_CLOUD;
 import static java.lang.String.format;
+import static javafx.application.Platform.runLater;
 import static javafx.scene.control.Alert.AlertType.WARNING;
 import static javafx.scene.input.MouseEvent.MOUSE_CLICKED;
-import static javafx.scene.paint.Color.BLACK;
-import static javafx.scene.paint.Color.web;
+import static javafx.scene.paint.Color.*;
 import static javafx.scene.text.Font.font;
 import static javafx.scene.text.FontPosture.REGULAR;
 import static javafx.scene.text.TextAlignment.CENTER;
@@ -73,7 +73,7 @@ public class CanvasPane extends Pane {
         canvasPane.setMinSize(USE_PREF_SIZE, USE_PREF_SIZE);
         canvasPane.setMaxSize(USE_PREF_SIZE, USE_PREF_SIZE);
         canvasPane.setPrefSize(width, height);
-        canvasPane.setBackground(new Background(new BackgroundFill(Color.BEIGE, null, null)));
+        canvasPane.setBackground(new Background(new BackgroundFill(BEIGE, null, null)));
 
         getChildren().add(canvasPane);
 
@@ -134,15 +134,11 @@ public class CanvasPane extends Pane {
         }
 
         if (showOutline || showGridLines) {
-            svgGraphicsContext.draw(tool.drawGridLines(showGridLines, width, height));
+            canvasPane.getChildren().add(tool.drawGridLines(showGridLines, width, height));
         }
 
         setPrefSize(width + 200, height + 200);
         requestLayout();
-    }
-
-    private void drawNodes() {
-        drawNodes(canvasDataObject.get().getNodes(), false);
     }
 
     private void drawNodes(ObservableList<GraphNode> nodes, boolean removeGridLines) {
@@ -178,8 +174,7 @@ public class CanvasPane extends Pane {
             public void handle(MouseEvent event) {
                 if (startPoint == null) {
                     startPoint = new Point2D(node.getCx(), node.getCy());
-                    bound = tool.drawBounds(arabicText);
-                    canvasPane.getChildren().add(bound);
+                    updateSelectedShape(arabicText);
                     relationshipSelectionDialog.setFirstPartOfSpeech(node.getText());
                     relationshipSelectionDialog.showAndWait();
                 } else {
@@ -192,18 +187,18 @@ public class CanvasPane extends Pane {
                             relationshipSelectionDialog.setSecondPartOfSpeech(node.getText());
                             Optional<GrammaticalRelationship> result = relationshipSelectionDialog.showAndWait();
                             result.ifPresent(gr -> {
-                                if (result.isPresent()) {
+                                if (result.isPresent() && !gr.equals(GrammaticalRelationship.NONE)) {
                                     addRelationship(gr);
                                 }
                                 startPoint = null;
                                 endPoint = null;
-                                canvasPane.getChildren().remove(bound);
+                                updateSelectedShape(null);
                                 relationshipSelectionDialog.reset();
                             });
                         }
                     } else {
                         relationshipSelectionDialog.reset();
-                        canvasPane.getChildren().remove(bound);
+                        updateSelectedShape(null);
                         startPoint = null;
                         endPoint = null;
                     }
@@ -225,7 +220,6 @@ public class CanvasPane extends Pane {
     }
 
     private void addRelationship(GrammaticalRelationship grammaticalRelationship) {
-        // TODO: make a connection, update tree
         // Step 1: call GraphBuilder to create a relationship
         RelationshipNode relationshipNode = graphBuilder.buildRelationshipNode(null, grammaticalRelationship,
                 startPoint, endPoint);
@@ -245,6 +239,7 @@ public class CanvasPane extends Pane {
                 color);
 
         // bind line co-ordinates
+        //TODO: bind start and end properties with the circle of part of speech
         cubicCurve.startYProperty().bind(rn.startXProperty());
         cubicCurve.startYProperty().bind(rn.startYProperty());
         cubicCurve.controlX1Property().bind(rn.controlX1Property());
@@ -267,17 +262,17 @@ public class CanvasPane extends Pane {
         Polyline triangle = tool.drawPolyline(rn.getCurvePointX(), rn.getCurvePointY(), rn.getArrowPointX1(),
                 rn.getArrowPointY1(), rn.getArrowPointX2(), rn.getArrowPointY2(), color);
         // bind line co-ordinates
-        //TODO:
-        rn.controlX1Property().addListener((observable, oldValue, newValue) -> {
-            System.out.println("LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL");
-            ObservableList<Double> points = triangle.getPoints();
-            points.remove(0, points.size());
-            points.addAll(rn.getCurvePointX(), rn.getCurvePointY(), rn.getArrowPointX1(),
-                    rn.getArrowPointY1(), rn.getArrowPointX2(), rn.getArrowPointY2(),
-                    rn.getCurvePointX(), rn.getCurvePointY());
-            requestLayout();
+        //TODO: need to figure out how to bind polyline
+        rn.t1Property().addListener((observable, oldValue, newValue) -> {
+            runLater(() -> {
+                initCanvas();
+            });
         });
-
+        rn.t2Property().addListener((observable, oldValue, newValue) -> {
+            runLater(() -> {
+                initCanvas();
+            });
+        });
 
         Group group = new Group();
 
@@ -338,6 +333,16 @@ public class CanvasPane extends Pane {
         }
         alert.setContentText(contentText);
         return alert.showAndWait();
+    }
+
+    private void updateSelectedShape(Shape shape) {
+        if (bound != null) {
+            canvasPane.getChildren().remove(bound);
+        }
+        if (shape != null) {
+            bound = tool.drawBounds(shape);
+            canvasPane.getChildren().add(bound);
+        }
     }
 
     public Pane getCanvasPane() {

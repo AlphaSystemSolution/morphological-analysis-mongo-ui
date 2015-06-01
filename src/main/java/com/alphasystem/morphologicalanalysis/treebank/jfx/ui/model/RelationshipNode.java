@@ -108,7 +108,9 @@ public class RelationshipNode extends GraphNode {
             }
         });
         controlX1Property().addListener((observable, oldValue, newValue) -> {
-            updateArrow();
+            if (newValue != null && newValue != oldValue) {
+                updateArrow();
+            }
         });
         controlY1Property().addListener((observable, oldValue, newValue) -> {
             if (newValue != null && newValue != oldValue) {
@@ -131,6 +133,16 @@ public class RelationshipNode extends GraphNode {
             }
         });
         endYProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null && newValue != oldValue) {
+                updateArrow();
+            }
+        });
+        t1Property().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null && newValue != oldValue) {
+                updateArrow();
+            }
+        });
+        t2Property().addListener((observable, oldValue, newValue) -> {
             if (newValue != null && newValue != oldValue) {
                 updateArrow();
             }
