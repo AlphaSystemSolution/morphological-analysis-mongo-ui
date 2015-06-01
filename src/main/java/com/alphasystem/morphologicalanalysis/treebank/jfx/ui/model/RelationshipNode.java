@@ -5,9 +5,11 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
 
 import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.NodeType.RELATIONSHIP;
+import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.util.CubicCurveHelper.calculateCurvePoint;
 import static javafx.scene.paint.Color.web;
 
 /**
@@ -34,6 +36,18 @@ public class RelationshipNode extends GraphNode {
     private final DoubleProperty t1;
 
     private final DoubleProperty t2;
+
+    private final DoubleProperty arrowPointX1;
+
+    private final DoubleProperty arrowPointY1;
+
+    private final DoubleProperty arrowPointX2;
+
+    private final DoubleProperty arrowPointY2;
+
+    private final DoubleProperty curvePointX;
+
+    private final DoubleProperty curvePointY;
 
     private final ObjectProperty<GrammaticalRelationship> grammaticalRelationship;
 
@@ -69,9 +83,73 @@ public class RelationshipNode extends GraphNode {
         this.endY = new SimpleDoubleProperty(endY);
         this.t1 = new SimpleDoubleProperty(t1);
         this.t2 = new SimpleDoubleProperty(t2);
-        this.grammaticalRelationshipProperty().addListener((observable, oldValue, newValue) -> {
+        this.arrowPointX1 = new SimpleDoubleProperty();
+        this.arrowPointY1 = new SimpleDoubleProperty();
+        this.arrowPointX2 = new SimpleDoubleProperty();
+        this.arrowPointY2 = new SimpleDoubleProperty();
+        this.curvePointX = new SimpleDoubleProperty();
+        this.curvePointY = new SimpleDoubleProperty();
+        updateArrow();
+        initListeners();
+    }
+
+    private void initListeners() {
+        grammaticalRelationshipProperty().addListener((observable, oldValue, newValue) -> {
             this.stroke.setValue(web(newValue.getColorCode()));
         });
+        startXProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null && newValue != oldValue) {
+                updateArrow();
+            }
+        });
+        startYProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null && newValue != oldValue) {
+                updateArrow();
+            }
+        });
+        controlX1Property().addListener((observable, oldValue, newValue) -> {
+            updateArrow();
+        });
+        controlY1Property().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null && newValue != oldValue) {
+                updateArrow();
+            }
+        });
+        controlX2Property().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null && newValue != oldValue) {
+                updateArrow();
+            }
+        });
+        controlY2Property().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null && newValue != oldValue) {
+                updateArrow();
+            }
+        });
+        endXProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null && newValue != oldValue) {
+                updateArrow();
+            }
+        });
+        endYProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null && newValue != oldValue) {
+                updateArrow();
+            }
+        });
+    }
+
+    private void updateArrow() {
+        Point2D point = calculateCurvePoint(getT1(), getStartX(), getStartY(), getControlX1(), getControlY1(),
+                getControlX2(), getControlY2(), getEndX(), getEndY());
+        arrowPointX1.setValue(point.getX());
+        arrowPointY1.setValue(point.getY() + 5);
+
+        arrowPointX2.setValue(point.getX());
+        arrowPointY2.setValue(point.getY() - 5);
+
+        point = calculateCurvePoint(getT2(), getStartX(), getStartY(), getControlX1(), getControlY1(),
+                getControlX2(), getControlY2(), getEndX(), getEndY());
+        curvePointX.setValue(point.getX());
+        curvePointY.setValue(point.getY());
     }
 
     public Color getStroke() {
@@ -213,4 +291,29 @@ public class RelationshipNode extends GraphNode {
     public final DoubleProperty t2Property() {
         return t2;
     }
+
+    public double getArrowPointX1() {
+        return arrowPointX1.get();
+    }
+
+    public double getArrowPointY1() {
+        return arrowPointY1.get();
+    }
+
+    public double getArrowPointX2() {
+        return arrowPointX2.get();
+    }
+
+    public double getArrowPointY2() {
+        return arrowPointY2.get();
+    }
+
+    public double getCurvePointX() {
+        return curvePointX.get();
+    }
+
+    public double getCurvePointY() {
+        return curvePointY.get();
+    }
+
 }

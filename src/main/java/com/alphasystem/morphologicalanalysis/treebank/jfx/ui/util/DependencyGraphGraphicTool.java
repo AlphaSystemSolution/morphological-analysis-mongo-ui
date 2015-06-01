@@ -2,15 +2,14 @@ package com.alphasystem.morphologicalanalysis.treebank.jfx.ui.util;
 
 import javafx.collections.ObservableList;
 import javafx.geometry.Bounds;
-import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 
-import static java.lang.Math.pow;
-import static javafx.scene.paint.Color.*;
+import static javafx.scene.paint.Color.RED;
+import static javafx.scene.paint.Color.TRANSPARENT;
 
 /**
  * @author sali
@@ -31,37 +30,7 @@ public final class DependencyGraphGraphicTool {
         return instance;
     }
 
-    private static double calculateC(double x0, double x1) {
-        return 3 * (x1 - x0);
-    }
 
-    private static double calculateB(double x1, double x2, double c) {
-        return (3 * (x2 - x1)) - c;
-    }
-
-    private static double calculateA(double x0, double x3, double b, double c) {
-        return x3 - x0 - c - b;
-    }
-
-    private static double calculateCoordinate(double t, double x, double a, double b, double c) {
-        return (a * pow(t, 3)) + (b * pow(t, 2)) + (c * t) + x;
-    }
-
-    private static Point2D calculateCurvePoint(double t, double startX, double startY, double controlX1,
-                                               double controlY1, double controlX2, double controlY2,
-                                               double endX, double endY) {
-        double cx = calculateC(startX, controlX1);
-        double bx = calculateB(controlX1, controlX2, cx);
-        double ax = calculateA(startX, endX, bx, cx);
-
-        double cy = calculateC(startY, controlY1);
-        double by = calculateB(controlY1, controlY2, cy);
-        double ay = calculateA(startY, endY, by, cy);
-
-        double x = calculateCoordinate(t, startX, ax, bx, cx);
-        double y = calculateCoordinate(t, startY, ay, by, cy);
-        return new Point2D(x, y);
-    }
 
     /**
      * Draw grid lines with given <code>width</code>, <code>height</code> and default step of "20". This method will
@@ -274,32 +243,18 @@ public final class DependencyGraphGraphicTool {
 
     /**
      *
-     * @param t1
-     * @param t2
-     * @param startX
-     * @param startY
-     * @param controlX1
-     * @param controlY1
-     * @param controlX2
-     * @param controlY2
-     * @param endX
-     * @param endY
+     * @param x0
+     * @param y0
+     * @param x1
+     * @param y1
+     * @param x2
+     * @param y2
      * @param color
      * @return
      */
-    public Polyline drawTriangleOnCubicCurve(double t1, double t2, double startX, double startY, double controlX1,
-                                             double controlY1, double controlX2, double controlY2, double endX,
-                                             double endY, Color color) {
-        Point2D curvePoint1 = calculateCurvePoint(t1, startX, startY, controlX1, controlY1, controlX2,
-                controlY2, endX, endY);
-        Point2D curvePoint2 = calculateCurvePoint(t2, startX, startY, controlX1, controlY1, controlX2,
-                controlY2, endX, endY);
-        Point2D point1 = new Point2D(curvePoint1.getX(), curvePoint1.getY() + 5);
-        Point2D point2 = new Point2D(curvePoint1.getX(), curvePoint1.getY() - 5);
-
-        Polyline polyline = new Polyline(curvePoint2.getX(), curvePoint2.getY(), point1.getX(), point1.getY(),
-                point2.getX(), point2.getY(), curvePoint2.getX(), curvePoint2.getY());
-        polyline.setStroke(BLACK);
+    public Polyline drawPolyline(double x0, double y0, double x1, double y1, double x2, double y2, Color color) {
+        Polyline polyline = new Polyline(x0, y0, x1, y1, x2, y2, x0, y0);
+        polyline.setStroke(color);
         polyline.setStrokeWidth(1.0);
         polyline.setFill(color);
 

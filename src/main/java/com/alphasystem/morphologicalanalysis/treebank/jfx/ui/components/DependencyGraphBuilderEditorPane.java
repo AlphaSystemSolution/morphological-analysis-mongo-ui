@@ -1,9 +1,6 @@
 package com.alphasystem.morphologicalanalysis.treebank.jfx.ui.components;
 
-import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.GraphNode;
-import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.NodeType;
-import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.PartOfSpeechNode;
-import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.TerminalNode;
+import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.*;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
@@ -47,6 +44,15 @@ public class DependencyGraphBuilderEditorPane extends GridPane {
         initPane(this.graphNode);
     }
 
+    private static String getPaneTitle(GraphNode node) {
+        return RESOURCE_BUNDLE.getString(format("%s_node.label", node.getNodeType().name()));
+    }
+
+    private static String getString(GraphNode node, String key) {
+        return RESOURCE_BUNDLE.getString(format("%s.%s.%s.label", DependencyGraphBuilderEditorPane.class.getSimpleName(),
+                node.getClass().getSimpleName(), key));
+    }
+
     void updateWidth(double width) {
         this.canvasWidth = width;
         initPane(graphNode);
@@ -71,7 +77,7 @@ public class DependencyGraphBuilderEditorPane extends GridPane {
                 addPartOfSpeechProperties((PartOfSpeechNode) graphNode);
                 break;
             case RELATIONSHIP:
-                System.out.println("///////////////////////////////////");
+                addRelationshipNodeProperties((RelationshipNode) graphNode);
                 break;
             default:
                 break;
@@ -213,13 +219,82 @@ public class DependencyGraphBuilderEditorPane extends GridPane {
         add(spinner, 1, row);
     }
 
-    private Spinner<Double> getSpinner(double min, double max, double initialValue, double amountToStepBy) {
-        Spinner<Double> spinner = new Spinner<>();
-        spinner.setValueFactory(new DoubleSpinnerValueFactory(min, max, initialValue, amountToStepBy));
-        return spinner;
+    private void addRelationshipNodeProperties(RelationshipNode node) {
+        int row = 5;
+
+        Label label = null;
+        Spinner<Double> spinner = null;
+
+        label = new Label(getString(node, "controlX1"));
+        add(label, 0, row);
+        spinner = getSpinner(0, canvasWidth, node.getControlX1(), DEFAULT_AMOUNT_TO_STEP_BY);
+        label.setLabelFor(spinner);
+        spinner.setOnMouseClicked(event -> {
+            Spinner source = (Spinner) event.getSource();
+            node.setControlX1((Double) source.getValue());
+        });
+        add(spinner, 1, row);
+
+        row++; //6
+        label = new Label(getString(node, "controlY1"));
+        add(label, 0, row);
+        spinner = getSpinner(0, canvasHeight, node.getControlY1(), DEFAULT_AMOUNT_TO_STEP_BY);
+        label.setLabelFor(spinner);
+        spinner.setOnMouseClicked(event -> {
+            Spinner source = (Spinner) event.getSource();
+            node.setControlY1((Double) source.getValue());
+        });
+        add(spinner, 1, row);
+
+        row++; //7
+        label = new Label(getString(node, "controlX2"));
+        add(label, 0, row);
+        spinner = getSpinner(0, canvasWidth, node.getControlX2(), DEFAULT_AMOUNT_TO_STEP_BY);
+        label.setLabelFor(spinner);
+        spinner.setOnMouseClicked(event -> {
+            Spinner source = (Spinner) event.getSource();
+            node.setControlX2((Double) source.getValue());
+        });
+        add(spinner, 1, row);
+
+        row++; //8
+        label = new Label(getString(node, "controlY2"));
+        add(label, 0, row);
+        spinner = getSpinner(0, canvasHeight, node.getControlY2(), DEFAULT_AMOUNT_TO_STEP_BY);
+        label.setLabelFor(spinner);
+        spinner.setOnMouseClicked(event -> {
+            Spinner source = (Spinner) event.getSource();
+            node.setControlY2((Double) source.getValue());
+        });
+        add(spinner, 1, row);
+
+        row++; //9
+        label = new Label(getString(node, "t1"));
+        add(label, 0, row);
+        spinner = getSpinner(0, 1.000, node.getT1(), 0.005);
+        label.setLabelFor(spinner);
+        spinner.setOnMouseClicked(event -> {
+            Spinner source = (Spinner) event.getSource();
+            node.setT1((Double) source.getValue());
+        });
+        add(spinner, 1, row);
+
+        row++; //10
+        label = new Label(getString(node, "t1"));
+        add(label, 0, row);
+        spinner = getSpinner(0, 1.000, node.getT2(), 0.005);
+        label.setLabelFor(spinner);
+        spinner.setOnMouseClicked(event -> {
+            Spinner source = (Spinner) event.getSource();
+            node.setT2((Double) source.getValue());
+        });
+        add(spinner, 1, row);
     }
 
-    private String getPaneTitle(GraphNode node) {
-        return RESOURCE_BUNDLE.getString(format("%s_node.label", node.getNodeType().name()));
+    private Spinner<Double> getSpinner(double min, double max, double initialValue, double amountToStepBy) {
+        Spinner<Double> spinner = new Spinner<>();
+        DoubleSpinnerValueFactory valueFactory = new DoubleSpinnerValueFactory(min, max, initialValue, amountToStepBy);
+        spinner.setValueFactory(valueFactory);
+        return spinner;
     }
 }

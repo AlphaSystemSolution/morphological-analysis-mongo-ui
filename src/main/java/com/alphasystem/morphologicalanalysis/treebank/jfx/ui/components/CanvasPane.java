@@ -141,6 +141,10 @@ public class CanvasPane extends Pane {
         requestLayout();
     }
 
+    private void drawNodes() {
+        drawNodes(canvasDataObject.get().getNodes(), false);
+    }
+
     private void drawNodes(ObservableList<GraphNode> nodes, boolean removeGridLines) {
         svgGraphicsContext.removeAll(removeGridLines);
         for (GraphNode node : nodes) {
@@ -259,20 +263,30 @@ public class CanvasPane extends Pane {
         arabicText.xProperty().bind(rn.xProperty());
         arabicText.yProperty().bind(rn.yProperty());
 
-        // small arrow poiting towards the relationship direction
-        Polyline triangle = tool.drawTriangleOnCubicCurve(rn.getT1(), rn.getT2(), rn.getStartX(), rn.getStartY(),
-                rn.getControlX1(), rn.getControlY1(), rn.getControlX2(), rn.getControlY2(), rn.getEndX(),
-                rn.getEndY(), color);
+        // small arrow pointing towards the relationship direction
+        Polyline triangle = tool.drawPolyline(rn.getCurvePointX(), rn.getCurvePointY(), rn.getArrowPointX1(),
+                rn.getArrowPointY1(), rn.getArrowPointX2(), rn.getArrowPointY2(), color);
         // bind line co-ordinates
         //TODO:
+        rn.controlX1Property().addListener((observable, oldValue, newValue) -> {
+            System.out.println("LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL");
+            ObservableList<Double> points = triangle.getPoints();
+            points.remove(0, points.size());
+            points.addAll(rn.getCurvePointX(), rn.getCurvePointY(), rn.getArrowPointX1(),
+                    rn.getArrowPointY1(), rn.getArrowPointX2(), rn.getArrowPointY2(),
+                    rn.getCurvePointX(), rn.getCurvePointY());
+            requestLayout();
+        });
+
 
         Group group = new Group();
 
         group.getChildren().addAll(cubicCurve, arabicText, triangle);
 
         if (canvasDataObject.get().getCanvasMetaData().isDebugMode()) {
-            group.getChildren().add(tool.drawCubicCurveBounds(rn.getStartX(), rn.getStartY(), rn.getControlX1(),
-                    rn.getControlY1(), rn.getControlX2(), rn.getControlY2(), rn.getEndX(), rn.getEndY()));
+            Path path = tool.drawCubicCurveBounds(rn.getStartX(), rn.getStartY(), rn.getControlX1(),
+                    rn.getControlY1(), rn.getControlX2(), rn.getControlY2(), rn.getEndX(), rn.getEndY());
+            group.getChildren().add(path);
         }
         canvasPane.getChildren().add(group);
     }
