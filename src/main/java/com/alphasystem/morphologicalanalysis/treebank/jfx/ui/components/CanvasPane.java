@@ -337,12 +337,13 @@ public class CanvasPane extends Pane {
                 rn.getArrowPointY1(), rn.getArrowPointX2(), rn.getArrowPointY2(), color);
         // bind line co-ordinates
         //TODO: need to figure out how to bind polyline
-        rn.t1Property().addListener((observable, oldValue, newValue) -> {
-            runLater(this::initCanvas);
-        });
-        rn.t2Property().addListener((observable, oldValue, newValue) -> {
-            runLater(this::initCanvas);
-        });
+        // commented following code as it csuses application to crashed
+//        rn.t1Property().addListener((observable, oldValue, newValue) -> {
+//            runLater(this::initCanvas);
+//        });
+//        rn.t2Property().addListener((observable, oldValue, newValue) -> {
+//            runLater(this::initCanvas);
+//        });
 
         Group group = new Group();
 
