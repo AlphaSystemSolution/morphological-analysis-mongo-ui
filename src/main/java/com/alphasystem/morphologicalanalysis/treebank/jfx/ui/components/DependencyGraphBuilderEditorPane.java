@@ -80,6 +80,9 @@ public class DependencyGraphBuilderEditorPane extends GridPane {
             case RELATIONSHIP:
                 addRelationshipNodeProperties((RelationshipNode) graphNode);
                 break;
+            case PHRASE:
+                addPhraseNode((PhraseNode) graphNode);
+                break;
             default:
                 break;
         }
@@ -134,65 +137,68 @@ public class DependencyGraphBuilderEditorPane extends GridPane {
         add(new Separator(), 0, row, 2, 1);
     }
 
-    private void addTerminalNodeProperties(TerminalNode terminalNode) {
+    private void addTerminalNodeProperties(TerminalNode node) {
         int row = 5;
 
-        Label label = new Label(RESOURCE_BUNDLE.getString("startXIndex.label"));
+        Label label;
+        Spinner<Double> spinner;
+
+        label = new Label(RESOURCE_BUNDLE.getString("startXIndex.label"));
         add(label, 0, row);
-        Spinner<Double> spinner = getSpinner(0, canvasWidth, terminalNode.getX1(), DEFAULT_AMOUNT_TO_STEP_BY);
+        spinner = getSpinner(0, canvasWidth, node.getX1(), DEFAULT_AMOUNT_TO_STEP_BY);
         spinner.setOnMouseClicked(event -> {
             Spinner source = (Spinner) event.getSource();
-            terminalNode.setX1((Double) source.getValue());
+            node.setX1((Double) source.getValue());
         });
         add(spinner, 1, row);
 
         row++; //6
         label = new Label(RESOURCE_BUNDLE.getString("startYIndex.label"));
         add(label, 0, row);
-        spinner = getSpinner(0, canvasHeight, terminalNode.getY1(), DEFAULT_AMOUNT_TO_STEP_BY);
+        spinner = getSpinner(0, canvasHeight, node.getY1(), DEFAULT_AMOUNT_TO_STEP_BY);
         spinner.setOnMouseClicked(event -> {
             Spinner source = (Spinner) event.getSource();
-            terminalNode.setY1((Double) source.getValue());
+            node.setY1((Double) source.getValue());
         });
         add(spinner, 1, row);
 
         row++; //7
         label = new Label(RESOURCE_BUNDLE.getString("endXIndex.label"));
         add(label, 0, row);
-        spinner = getSpinner(0, canvasWidth, terminalNode.getX2(), DEFAULT_AMOUNT_TO_STEP_BY);
+        spinner = getSpinner(0, canvasWidth, node.getX2(), DEFAULT_AMOUNT_TO_STEP_BY);
         spinner.setOnMouseClicked(event -> {
             Spinner source = (Spinner) event.getSource();
-            terminalNode.setX2((Double) source.getValue());
+            node.setX2((Double) source.getValue());
         });
         add(spinner, 1, row);
 
         row++; //8
         label = new Label(RESOURCE_BUNDLE.getString("endYIndex.label"));
         add(label, 0, row);
-        spinner = getSpinner(0, canvasHeight, terminalNode.getY2(), DEFAULT_AMOUNT_TO_STEP_BY);
+        spinner = getSpinner(0, canvasHeight, node.getY2(), DEFAULT_AMOUNT_TO_STEP_BY);
         spinner.setOnMouseClicked(event -> {
             Spinner source = (Spinner) event.getSource();
-            terminalNode.setY2((Double) source.getValue());
+            node.setY2((Double) source.getValue());
         });
         add(spinner, 1, row);
 
         row++; //9
         label = new Label(RESOURCE_BUNDLE.getString("tanslationXIndex.label"));
         add(label, 0, row);
-        spinner = getSpinner(0, canvasWidth, terminalNode.getX3(), DEFAULT_AMOUNT_TO_STEP_BY);
+        spinner = getSpinner(0, canvasWidth, node.getX3(), DEFAULT_AMOUNT_TO_STEP_BY);
         spinner.setOnMouseClicked(event -> {
             Spinner source = (Spinner) event.getSource();
-            terminalNode.setX3((Double) source.getValue());
+            node.setX3((Double) source.getValue());
         });
         add(spinner, 1, row);
 
         row++; //10
         label = new Label(RESOURCE_BUNDLE.getString("tanslationYIndex.label"));
         add(label, 0, row);
-        spinner = getSpinner(0, canvasHeight, terminalNode.getY3(), DEFAULT_AMOUNT_TO_STEP_BY);
+        spinner = getSpinner(0, canvasHeight, node.getY3(), DEFAULT_AMOUNT_TO_STEP_BY);
         spinner.setOnMouseClicked(event -> {
             Spinner source = (Spinner) event.getSource();
-            terminalNode.setY3((Double) source.getValue());
+            node.setY3((Double) source.getValue());
         });
         add(spinner, 1, row);
     }
@@ -223,8 +229,8 @@ public class DependencyGraphBuilderEditorPane extends GridPane {
     private void addRelationshipNodeProperties(RelationshipNode node) {
         int row = 5;
 
-        Label label = null;
-        Spinner<Double> spinner = null;
+        Label label;
+        Spinner<Double> spinner;
 
         label = new Label(getString(node, "controlX1"));
         add(label, 0, row);
@@ -288,6 +294,72 @@ public class DependencyGraphBuilderEditorPane extends GridPane {
         spinner.setOnMouseClicked(event -> {
             Spinner source = (Spinner) event.getSource();
             node.setT2((Double) source.getValue());
+        });
+        add(spinner, 1, row);
+    }
+
+    private void addPhraseNode(PhraseNode node) {
+        int row = 5;
+
+        Label label;
+        Spinner<Double> spinner;
+
+        label = new Label(RESOURCE_BUNDLE.getString("startXIndex.label"));
+        add(label, 0, row);
+        spinner = getSpinner(0, canvasWidth, node.getX1(), DEFAULT_AMOUNT_TO_STEP_BY);
+        spinner.setOnMouseClicked(event -> {
+            Spinner source = (Spinner) event.getSource();
+            node.setX1((Double) source.getValue());
+        });
+        add(spinner, 1, row);
+
+        row++; //6
+        label = new Label(RESOURCE_BUNDLE.getString("startYIndex.label"));
+        add(label, 0, row);
+        spinner = getSpinner(0, canvasHeight, node.getY1(), DEFAULT_AMOUNT_TO_STEP_BY);
+        spinner.setOnMouseClicked(event -> {
+            Spinner source = (Spinner) event.getSource();
+            node.setY1((Double) source.getValue());
+        });
+        add(spinner, 1, row);
+
+        row++; //7
+        label = new Label(RESOURCE_BUNDLE.getString("endXIndex.label"));
+        add(label, 0, row);
+        spinner = getSpinner(0, canvasWidth, node.getX2(), DEFAULT_AMOUNT_TO_STEP_BY);
+        spinner.setOnMouseClicked(event -> {
+            Spinner source = (Spinner) event.getSource();
+            node.setX2((Double) source.getValue());
+        });
+        add(spinner, 1, row);
+
+        row++; //8
+        label = new Label(RESOURCE_BUNDLE.getString("endYIndex.label"));
+        add(label, 0, row);
+        spinner = getSpinner(0, canvasHeight, node.getY2(), DEFAULT_AMOUNT_TO_STEP_BY);
+        spinner.setOnMouseClicked(event -> {
+            Spinner source = (Spinner) event.getSource();
+            node.setY2((Double) source.getValue());
+        });
+        add(spinner, 1, row);
+
+        row++; //9
+        label = new Label(RESOURCE_BUNDLE.getString("posCx.label"));
+        add(label, 0, row);
+        spinner = getSpinner(0, canvasWidth, node.getCx(), DEFAULT_AMOUNT_TO_STEP_BY);
+        spinner.setOnMouseClicked(event -> {
+            Spinner source = (Spinner) event.getSource();
+            node.setCx((Double) source.getValue());
+        });
+        add(spinner, 1, row);
+
+        row++; //10
+        label = new Label(RESOURCE_BUNDLE.getString("posCy.label"));
+        add(label, 0, row);
+        spinner = getSpinner(0, canvasHeight, node.getCy(), DEFAULT_AMOUNT_TO_STEP_BY);
+        spinner.setOnMouseClicked(event -> {
+            Spinner source = (Spinner) event.getSource();
+            node.setCy((Double) source.getValue());
         });
         add(spinner, 1, row);
     }

@@ -4,10 +4,7 @@ import com.alphasystem.morphologicalanalysis.model.Location;
 import com.alphasystem.morphologicalanalysis.model.Token;
 import com.alphasystem.morphologicalanalysis.model.support.GrammaticalRelationship;
 import com.alphasystem.morphologicalanalysis.model.support.PartOfSpeech;
-import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.GraphNode;
-import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.PartOfSpeechNode;
-import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.RelationshipNode;
-import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.TerminalNode;
+import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.*;
 import javafx.collections.ObservableList;
 import javafx.geometry.Point2D;
 
@@ -76,7 +73,6 @@ public class GraphBuilder {
     }
 
     /**
-     *
      * @param id
      * @param grammaticalRelationship
      * @param startPoint
@@ -101,6 +97,47 @@ public class GraphBuilder {
         return relationshipNode;
     }
 
+    public PhraseNode buildPhraseNode(String id, PhraseSelectionModel model) {
+        TerminalNode firstNode = model.getFirstNode();
+        TerminalNode lastNode = model.getLastNode();
+        double yOffset = 150.0;
+        Double x1 = firstNode.getX1();
+        Double y1 = firstNode.getY1() + yOffset;
+        Double x2 = firstNode.getX2();
+        Double y2 = firstNode.getY2() + yOffset;
+        if (lastNode != null) {
+            x2 = lastNode.getX2();
+            y2 = lastNode.getY2();
+        }
+        Double x = (x1 + x2) / 2;
+        Double y = (y1 + y2) / 2;
+        Double cx = x + 15;
+        Double cy = y + 15;
+
+        return new PhraseNode(model.getRelationship(), id, x, y, x1, y1, x2, y2, cx, cy);
+    }
+
+
+    /**
+     * @param token
+     * @return
+     */
+    private TerminalNode buildTerminalNode(Token token) {
+        TerminalNode terminalNode = new TerminalNode(token, token.getDisplayName(), textX, textY, x1, y1, x2,
+                y2, x3, y3);
+        // update counters
+        rectX = x2 + GAP_BETWEEN_TOKENS;
+        textX = rectX + 30;
+        x1 = rectX;
+        x2 = RECTANGLE_WIDTH + rectX;
+        x3 = rectX + 30;
+        return terminalNode;
+    }
+
+    /**
+     * @param terminalNode
+     * @return
+     */
     private List<PartOfSpeechNode> buildPartOfSpeechNode(TerminalNode terminalNode) {
         Token token = terminalNode.getToken();
         List<Location> locations = token.getLocations();
@@ -126,18 +163,6 @@ public class GraphBuilder {
         }
 
         return list;
-    }
-
-    private TerminalNode buildTerminalNode(Token token) {
-        TerminalNode terminalNode = new TerminalNode(token, token.getDisplayName(), textX, textY, x1, y1, x2,
-                y2, x3, y3);
-        // update counters
-        rectX = x2 + GAP_BETWEEN_TOKENS;
-        textX = rectX + 30;
-        x1 = rectX;
-        x2 = RECTANGLE_WIDTH + rectX;
-        x3 = rectX + 30;
-        return terminalNode;
     }
 
     private void reset() {

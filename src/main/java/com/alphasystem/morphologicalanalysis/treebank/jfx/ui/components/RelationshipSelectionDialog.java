@@ -14,19 +14,14 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
 
-import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.Global.ARABIC_FONT_SMALL;
+import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.Global.*;
 import static javafx.scene.control.ButtonType.CANCEL;
 import static javafx.scene.control.ButtonType.OK;
-import static javafx.scene.text.Font.font;
-import static javafx.scene.text.FontPosture.REGULAR;
 
 /**
  * @author sali
  */
 public class RelationshipSelectionDialog extends Dialog<GrammaticalRelationship> {
-
-    private static final String NONE_SELECTED = "None selected";
-    private static final Font ENGLISH_FONT = font("Candara", REGULAR, 14);
 
     private final StringProperty firstPartOfSpeech = new SimpleStringProperty();
     private final StringProperty secondPartOfSpeech = new SimpleStringProperty();

@@ -13,13 +13,11 @@ import static com.alphasystem.morphologicalanalysis.ui.common.ArabicSupportEnumA
 public class ComboBoxFactory {
 
     private static ComboBoxFactory instance;
-    private ComboBox<ArabicSupportEnumAdapter<GrammaticalRelationship>> grammaticalRelationshipComboBox;
 
     /**
      * Do not let any one instantiate this class.
      */
     private ComboBoxFactory() {
-        grammaticalRelationshipComboBox = createComboBox(GrammaticalRelationship.values());
     }
 
     public synchronized static ComboBoxFactory getInstance() {
@@ -40,6 +38,6 @@ public class ComboBoxFactory {
      * @return
      */
     public ComboBox<ArabicSupportEnumAdapter<GrammaticalRelationship>> getGrammaticalRelationshipComboBox() {
-        return grammaticalRelationshipComboBox;
+        return createComboBox(GrammaticalRelationship.values());
     }
 }

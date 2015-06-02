@@ -270,6 +270,17 @@ public class SerializationTool {
         ObjectType objectType = OBJECT_FACTORY.createObjectType().withType(node.getClass().getName());
         List<ConstructorArgument> constructorArgs = objectType.getConstructorArgs();
 
+        constructorArgs.add(createEnumArgument(GrammaticalRelationship.class, node.getGrammaticalRelationship()));
+        constructorArgs.add(createStringArgument(node.getId()));
+        constructorArgs.add(createDoubleArgument(node.getX()));
+        constructorArgs.add(createDoubleArgument(node.getY()));
+        constructorArgs.add(createDoubleArgument(node.getX1()));
+        constructorArgs.add(createDoubleArgument(node.getY1()));
+        constructorArgs.add(createDoubleArgument(node.getX2()));
+        constructorArgs.add(createDoubleArgument(node.getY2()));
+        constructorArgs.add(createDoubleArgument(node.getCx()));
+        constructorArgs.add(createDoubleArgument(node.getCy()));
+
         return objectType;
     }
 

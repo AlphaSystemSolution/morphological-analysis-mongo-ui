@@ -2,34 +2,16 @@ package com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model;
 
 import com.alphasystem.morphologicalanalysis.model.support.GrammaticalRelationship;
 import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleObjectProperty;
 
 import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.NodeType.PHRASE;
 
 /**
  * @author sali
  */
-public class PhraseNode extends GraphNode {
-
-    /**
-     * x1 location for line
-     */
-    private final DoubleProperty x1;
-
-    /**
-     * y1 location for line
-     */
-    private final DoubleProperty y1;
-
-    /**
-     * x2 location for line
-     */
-    private final DoubleProperty x2;
-
-    /**
-     * y2 location for line
-     */
-    private final DoubleProperty y2;
+public class PhraseNode extends LineSupport {
 
     /**
      * x location for circle.
@@ -40,6 +22,8 @@ public class PhraseNode extends GraphNode {
      * y location for circle
      */
     private final DoubleProperty cy;
+
+    private final ObjectProperty<GrammaticalRelationship> grammaticalRelationship;
 
     /**
      * @param grammaticalRelationship
@@ -55,13 +39,22 @@ public class PhraseNode extends GraphNode {
      */
     public PhraseNode(GrammaticalRelationship grammaticalRelationship, String id, Double x, Double y, Double x1,
                       Double y1, Double x2, Double y2, Double cx, Double cy) {
-        super(PHRASE, id, grammaticalRelationship.getLabel().toUnicode(), x, y);
-        this.x1 = new SimpleDoubleProperty(x1);
-        this.y1 = new SimpleDoubleProperty(y1);
-        this.x2 = new SimpleDoubleProperty(x2);
-        this.y2 = new SimpleDoubleProperty(y2);
+        super(PHRASE, id, grammaticalRelationship.getLabel().toUnicode(), x, y, x1, y1, x2, y2);
+        this.grammaticalRelationship = new SimpleObjectProperty<>(grammaticalRelationship);
         this.cx = new SimpleDoubleProperty(cx);
         this.cy = new SimpleDoubleProperty(cy);
+    }
+
+    public final GrammaticalRelationship getGrammaticalRelationship() {
+        return grammaticalRelationship.get();
+    }
+
+    public final void setGrammaticalRelationship(GrammaticalRelationship grammaticalRelationship) {
+        this.grammaticalRelationship.set(grammaticalRelationship);
+    }
+
+    public final ObjectProperty<GrammaticalRelationship> grammaticalRelationshipProperty() {
+        return grammaticalRelationship;
     }
 
     public double getCx() {
@@ -88,51 +81,4 @@ public class PhraseNode extends GraphNode {
         return cy;
     }
 
-    public double getX1() {
-        return x1.get();
-    }
-
-    public void setX1(double x1) {
-        this.x1.set(x1);
-    }
-
-    public final DoubleProperty x1Property() {
-        return x1;
-    }
-
-    public double getX2() {
-        return x2.get();
-    }
-
-    public void setX2(double x2) {
-        this.x2.set(x2);
-    }
-
-    public final DoubleProperty x2Property() {
-        return x2;
-    }
-
-    public double getY1() {
-        return y1.get();
-    }
-
-    public void setY1(double y1) {
-        this.y1.set(y1);
-    }
-
-    public final DoubleProperty y1Property() {
-        return y1;
-    }
-
-    public double getY2() {
-        return y2.get();
-    }
-
-    public void setY2(double y2) {
-        this.y2.set(y2);
-    }
-
-    public final DoubleProperty y2Property() {
-        return y2;
-    }
 }
