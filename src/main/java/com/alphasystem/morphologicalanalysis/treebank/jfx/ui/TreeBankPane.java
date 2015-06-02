@@ -106,6 +106,7 @@ public class TreeBankPane extends BorderPane {
             getScene().setCursor(WAIT);
             File file = fileChooser.showOpenDialog(getStage());
             if (file != null) {
+                currentFile = file;
                 fileChooser.setInitialDirectory(file.getParentFile());
                 CanvasData savedCanvasData = serializationTool.open(file);
                 getChildren().removeAll(scrollPane, controlPane);
@@ -140,7 +141,9 @@ public class TreeBankPane extends BorderPane {
 
         items.add(new SeparatorMenuItem());
 
-        menuItem = new MenuItem("Import Tokens");
+        Menu subMenu = new Menu("Operations");
+
+        menuItem = new MenuItem("Import Tokens ...");
         menuItem.setAccelerator(new KeyCodeCombination(I, CONTROL_DOWN));
         menuItem.setOnAction(event -> {
             getScene().setCursor(WAIT);
@@ -152,9 +155,12 @@ public class TreeBankPane extends BorderPane {
 
             });
         });
-        items.add(menuItem);
+        subMenu.getItems().add(menuItem);
+        items.add(subMenu);
 
-        menuItem = new MenuItem("Take Snapshot ...");
+        subMenu = new Menu("Export");
+
+        menuItem = new MenuItem("PNG ...");
         menuItem.setAccelerator(new KeyCodeCombination(S, CONTROL_DOWN, ALT_DOWN));
         menuItem.setOnAction(event -> {
             getScene().setCursor(WAIT);
@@ -172,8 +178,10 @@ public class TreeBankPane extends BorderPane {
                 getScene().setCursor(DEFAULT);
             });
         });
+        subMenu.getItems().add(menuItem);
+        items.add(subMenu);
 
-        items.add(menuItem);
+
 
         items.add(new SeparatorMenuItem());
 
@@ -216,7 +224,7 @@ public class TreeBankPane extends BorderPane {
 
         // connection between Canvas pane and Control pane
         // NOTE: binding is bidirectional
-        controlPane.canvasDataObjectProperty().bindBidirectional(canvasPane.canvasDataObjectProperty());
+        controlPane.canvasDataObjectProperty().bind(canvasPane.canvasDataObjectProperty());
 
         setCenter(scrollPane);
         setRight(controlPane);

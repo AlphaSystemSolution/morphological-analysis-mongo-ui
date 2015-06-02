@@ -106,6 +106,7 @@ public class PhraseSelectionDialog extends Dialog<PhraseSelectionModel> {
         return ((text == null) || NONE_SELECTED.equals(text)) ? ENGLISH_FONT : ARABIC_FONT_MEDIUM;
     }
 
+    @SuppressWarnings({"unused"})
     public ObjectProperty<TerminalNode> terminalNodeProperty() {
         return terminalNode;
     }
