@@ -23,7 +23,7 @@
             <xs:documentation>Represents "type" of object (fully qualified java class name) and "value" of this type</xs:documentation>
         </xs:annotation>
         <xs:attribute name="type" type="xs:string" use="required"/>
-        <xs:attribute name="value" type="xs:string" use="required"/>
+        <xs:attribute name="value" type="xs:string" use="optional"/>
     </xs:attributeGroup>
 
     <xs:complexType name="GraphDataType">
@@ -35,14 +35,17 @@
 
     <xs:complexType name="ObjectType">
         <xs:sequence>
-            <xs:element ref="tns:constructor-args" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element ref="tns:argument" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
         <xs:attribute name="type" type="xs:string" use="required"/>
     </xs:complexType>
 
-    <xs:element name="constructor-args" type="tns:ConstructorArgumentType"/>
+    <xs:element name="argument" type="tns:ConstructorArgumentType"/>
 
     <xs:complexType name="ConstructorArgumentType">
+        <xs:sequence>
+            <xs:element name="values" type="tns:ObjectType" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
         <xs:attributeGroup ref="tns:TypeValuePair"/>
         <xs:attribute name="init-method" type="xs:string" use="optional"/>
         <xs:attribute name="factory-method" type="xs:string" use="optional"/>

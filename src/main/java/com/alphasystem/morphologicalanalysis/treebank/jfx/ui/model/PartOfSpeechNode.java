@@ -36,6 +36,13 @@ public class PartOfSpeechNode extends GraphNode {
     private final AbstractProperties properties;
 
     /**
+     *
+     */
+    public PartOfSpeechNode() {
+        this(null, null, null, 0d, 0d, 0d, 0d, false);
+    }
+
+    /**
      * @param partOfSpeech
      * @param location
      * @param id

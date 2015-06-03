@@ -1,11 +1,15 @@
 package com.alphasystem.morphologicalanalysis.treebank.jfx.ui;
 
+import com.alphasystem.morphologicalanalysis.model.support.PartOfSpeech;
 import javafx.scene.Scene;
 import javafx.scene.text.Font;
 
+import java.util.List;
 import java.util.ResourceBundle;
 
+import static com.alphasystem.morphologicalanalysis.model.support.PartOfSpeech.DEFINITE_ARTICLE;
 import static java.lang.String.format;
+import static java.util.Collections.singletonList;
 import static javafx.scene.text.Font.font;
 import static javafx.scene.text.FontPosture.REGULAR;
 
@@ -14,6 +18,7 @@ import static javafx.scene.text.FontPosture.REGULAR;
  */
 public class Global {
 
+    public static final List<PartOfSpeech> PART_OF_SPEECH_EXCLUDE_LIST = singletonList(DEFINITE_ARTICLE);
     public static final String TREE_BANK_STYLE_SHEET = Global.class.getResource("/treebank.css").toExternalForm();
     public static final String ARABIC_FONT_NAME = System.getProperty("arabic-font-name", "Traditional Arabic");
     public static final Font ARABIC_FONT_BIG = font(ARABIC_FONT_NAME, REGULAR, 48);

@@ -9,7 +9,6 @@ import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.CanvasMetaDat
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.GraphNode;
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.util.GraphBuilder;
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.util.SerializationTool;
-import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
@@ -37,6 +36,7 @@ import java.util.Optional;
 import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.util.SerializationTool.MDG_EXTENSION_ALL;
 import static com.alphasystem.util.AppUtil.CURRENT_USER_DIR;
 import static java.lang.String.format;
+import static javafx.application.Platform.runLater;
 import static javafx.scene.Cursor.DEFAULT;
 import static javafx.scene.Cursor.WAIT;
 import static javafx.scene.control.ScrollPane.ScrollBarPolicy.AS_NEEDED;
@@ -123,18 +123,30 @@ public class TreeBankPane extends BorderPane {
         menuItem = new MenuItem("Save ...");
         menuItem.setAccelerator(new KeyCodeCombination(S, CONTROL_DOWN));
         menuItem.setOnAction(event -> {
-            getScene().setCursor(WAIT);
+            setCursor(WAIT);
             if (currentFile == null) {
                 currentFile = fileChooser.showSaveDialog(getStage());
             }
             if (currentFile != null) {
-                EventQueue.invokeLater(() -> {
-                    serializationTool.save(currentFile, null, canvasPane.canvasDataObjectProperty().get());
-                    fileChooser.setInitialDirectory(currentFile.getParentFile());
-                    getScene().setCursor(DEFAULT);
+                runLater(() -> {
+                    saveFile();
                 });
             } else {
-                getScene().setCursor(DEFAULT);
+                setCursor(DEFAULT);
+            }
+        });
+        items.add(menuItem);
+
+        menuItem = new MenuItem("Save As ...");
+        menuItem.setAccelerator(new KeyCodeCombination(S, CONTROL_DOWN, ALT_DOWN));
+        menuItem.setOnAction(event -> {
+            setCursor(WAIT);
+            File file = fileChooser.showSaveDialog(getStage());
+            if (file != null) {
+                currentFile = file;
+                saveFile();
+            } else {
+                setCursor(DEFAULT);
             }
         });
         items.add(menuItem);
@@ -147,7 +159,7 @@ public class TreeBankPane extends BorderPane {
         menuItem.setAccelerator(new KeyCodeCombination(I, CONTROL_DOWN));
         menuItem.setOnAction(event -> {
             getScene().setCursor(WAIT);
-            Platform.runLater(() -> {
+            runLater(() -> {
                 Optional<List<Token>> result = dialog.showAndWait();
                 result.ifPresent(selectedItems -> {
                     updateCanvas(graphBuilder.toGraphNodes(selectedItems));
@@ -161,10 +173,10 @@ public class TreeBankPane extends BorderPane {
         subMenu = new Menu("Export");
 
         menuItem = new MenuItem("PNG ...");
-        menuItem.setAccelerator(new KeyCodeCombination(S, CONTROL_DOWN, ALT_DOWN));
+        menuItem.setAccelerator(new KeyCodeCombination(P, CONTROL_DOWN, ALT_DOWN));
         menuItem.setOnAction(event -> {
             getScene().setCursor(WAIT);
-            Platform.runLater(() -> {
+            runLater(() -> {
                 File file = imageFileChooser.showSaveDialog(getStage());
                 if (file != null) {
                     WritableImage writableImage = canvasPane.getCanvasPane().snapshot(new SnapshotParameters(), null);
@@ -182,7 +194,6 @@ public class TreeBankPane extends BorderPane {
         items.add(subMenu);
 
 
-
         items.add(new SeparatorMenuItem());
 
         menuItem = new MenuItem("Exit");
@@ -194,6 +205,12 @@ public class TreeBankPane extends BorderPane {
 
         menus.add(menu);
         return menuBar;
+    }
+
+    private void saveFile() {
+        serializationTool.save(currentFile, null, canvasPane.canvasDataObjectProperty().get());
+        fileChooser.setInitialDirectory(currentFile.getParentFile());
+        setCursor(DEFAULT);
     }
 
     private Stage getStage() {

@@ -43,5 +43,10 @@ public enum NodeType {
     /**
      * Represents the root of each of above category in the tree. This is not used in actual graph.
      */
-    ROOT;
+    ROOT,
+
+    /**
+     * Represents the group of nodes.
+     */
+    GROUP
 }

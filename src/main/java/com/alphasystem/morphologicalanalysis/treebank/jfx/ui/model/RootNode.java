@@ -14,7 +14,7 @@ public class RootNode extends GraphNode {
      * @param childType
      */
     public RootNode(NodeType childType) {
-        super(ROOT, "dummy", childType.name(), -1.0, -1.0);
+        super(ROOT, "dummy", childType.name(), -1.0, -1.0, 0.0, 0.0);
         this.childType = childType;
 
     }

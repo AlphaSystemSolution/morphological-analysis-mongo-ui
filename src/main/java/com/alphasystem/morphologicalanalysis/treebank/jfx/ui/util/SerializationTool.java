@@ -10,6 +10,7 @@ import javafx.collections.ObservableList;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
+import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -209,7 +210,7 @@ public class SerializationTool {
 
     private ObjectType serializeTerminalNode(TerminalNode node) {
         ObjectType objectType = OBJECT_FACTORY.createObjectType().withType(node.getClass().getName());
-        List<ConstructorArgument> constructorArgs = objectType.getConstructorArgs();
+        List<ConstructorArgument> constructorArgs = objectType.getArgument();
 
         constructorArgs.add(createConstructorArgument(RepositoryTool.class, node.getToken().getId(),
                 "getInstance", "getToken"));
@@ -222,13 +223,24 @@ public class SerializationTool {
         constructorArgs.add(createDoubleArgument(node.getY2()));
         constructorArgs.add(createDoubleArgument(node.getX3()));
         constructorArgs.add(createDoubleArgument(node.getY3()));
+        constructorArgs.add(createDoubleArgument(node.getTranslateX()));
+        constructorArgs.add(createDoubleArgument(node.getTranslateY()));
+        ConstructorArgument constructorArgument = OBJECT_FACTORY.createConstructorArgument()
+                .withType(PartOfSpeechNode[].class.getName());
+        constructorArgs.add(constructorArgument);
+
+        ObservableList<PartOfSpeechNode> partOfSpeeches = node.getPartOfSpeeches();
+        for (PartOfSpeechNode partOfSpeech : partOfSpeeches) {
+            constructorArgument.getValues().add(serializePartOfSpeechNode(partOfSpeech));
+        }
+
 
         return objectType;
     }
 
     private ObjectType serializePartOfSpeechNode(PartOfSpeechNode node) {
         ObjectType objectType = OBJECT_FACTORY.createObjectType().withType(node.getClass().getName());
-        List<ConstructorArgument> constructorArgs = objectType.getConstructorArgs();
+        List<ConstructorArgument> constructorArgs = objectType.getArgument();
 
         constructorArgs.add(createConstructorArgument(PartOfSpeech.class, node.getPartOfSpeech().name(),
                 null, "valueOf"));
@@ -246,7 +258,7 @@ public class SerializationTool {
 
     private ObjectType serializeRelationshipNode(RelationshipNode node) {
         ObjectType objectType = OBJECT_FACTORY.createObjectType().withType(node.getClass().getName());
-        List<ConstructorArgument> constructorArgs = objectType.getConstructorArgs();
+        List<ConstructorArgument> constructorArgs = objectType.getArgument();
 
         constructorArgs.add(createEnumArgument(GrammaticalRelationship.class, node.getGrammaticalRelationship()));
         constructorArgs.add(createStringArgument(node.getId()));
@@ -268,7 +280,7 @@ public class SerializationTool {
 
     private ObjectType serializePhraseNode(PhraseNode node) {
         ObjectType objectType = OBJECT_FACTORY.createObjectType().withType(node.getClass().getName());
-        List<ConstructorArgument> constructorArgs = objectType.getConstructorArgs();
+        List<ConstructorArgument> constructorArgs = objectType.getArgument();
 
         constructorArgs.add(createEnumArgument(GrammaticalRelationship.class, node.getGrammaticalRelationship()));
         constructorArgs.add(createStringArgument(node.getId()));
@@ -286,21 +298,21 @@ public class SerializationTool {
 
     private ObjectType serializeEmptyNode(EmptyNode node) {
         ObjectType objectType = OBJECT_FACTORY.createObjectType().withType(node.getClass().getName());
-        List<ConstructorArgument> constructorArgs = objectType.getConstructorArgs();
+        List<ConstructorArgument> constructorArgs = objectType.getArgument();
 
         return objectType;
     }
 
     private ObjectType serializeHiddenNode(HiddenNode node) {
         ObjectType objectType = OBJECT_FACTORY.createObjectType().withType(node.getClass().getName());
-        List<ConstructorArgument> constructorArgs = objectType.getConstructorArgs();
+        List<ConstructorArgument> constructorArgs = objectType.getArgument();
 
         return objectType;
     }
 
     private ObjectType serializeReferenceNode(ReferenceNode node) {
         ObjectType objectType = OBJECT_FACTORY.createObjectType().withType(node.getClass().getName());
-        List<ConstructorArgument> constructorArgs = objectType.getConstructorArgs();
+        List<ConstructorArgument> constructorArgs = objectType.getArgument();
 
         return objectType;
     }
@@ -309,15 +321,17 @@ public class SerializationTool {
         GraphNode graphNode = null;
         try {
             Class<?> nodeClass = Class.forName(objectType.getType());
-            List<ConstructorArgument> constructorArgs = objectType.getConstructorArgs();
+            List<ConstructorArgument> constructorArgs = objectType.getArgument();
             Object[] constructorObjects = new Object[constructorArgs.size()];
             Class<?>[] constructorClasses = new Class<?>[constructorArgs.size()];
             for (int i = 0; i < constructorArgs.size(); i++) {
                 ConstructorArgument arg = constructorArgs.get(i);
                 try {
                     Object object = getConstructorArgument(arg);
-                    constructorObjects[i] = object;
-                    constructorClasses[i] = object.getClass();
+                    if (object != null) {
+                        constructorObjects[i] = object;
+                        constructorClasses[i] = object.getClass();
+                    }
                 } catch (IllegalAccessException | InvocationTargetException
                         | NoSuchMethodException | InstantiationException e) {
                     e.printStackTrace();
@@ -338,7 +352,7 @@ public class SerializationTool {
 
     private Object getConstructorArgument(ConstructorArgument arg) throws ClassNotFoundException,
             IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
-        Object object;
+        Object object = null;
         Class<?> typeClass = Class.forName(arg.getType());
         String factoryMethodName = arg.getFactoryMethod();
         if (!isBlank(factoryMethodName)) {
@@ -353,9 +367,17 @@ public class SerializationTool {
                 factoryMethod = typeClass.getMethod(factoryMethodName, String.class);
             }
             object = factoryMethod.invoke(factory, arg.getValue());
-        } else {
+        } else if (typeClass.getName().equals(String.class.getName())) {
             Constructor<?> constructor = typeClass.getConstructor(String.class);
             object = constructor.newInstance(arg.getValue());
+        } else if (typeClass.isArray()) {
+            List<ObjectType> values = arg.getValues();
+            object = Array.newInstance(typeClass.getComponentType(), values.size());
+            for (int j = 0; j < values.size(); j++) {
+                Array.set(object, j, deserialize(values.get(j)));
+            }
+        } else {
+            throw new IllegalStateException(format("Unhandled type: %s", typeClass.getName()));
         }
         return object;
     }

@@ -6,6 +6,7 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
+import static com.alphasystem.morphologicalanalysis.model.support.GrammaticalRelationship.NONE;
 import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.NodeType.PHRASE;
 
 /**
@@ -26,6 +27,13 @@ public class PhraseNode extends LineSupport {
     private final ObjectProperty<GrammaticalRelationship> grammaticalRelationship;
 
     /**
+     *
+     */
+    public PhraseNode() {
+        this(NONE, null, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d);
+    }
+
+    /**
      * @param grammaticalRelationship
      * @param id
      * @param x
@@ -39,7 +47,7 @@ public class PhraseNode extends LineSupport {
      */
     public PhraseNode(GrammaticalRelationship grammaticalRelationship, String id, Double x, Double y, Double x1,
                       Double y1, Double x2, Double y2, Double cx, Double cy) {
-        super(PHRASE, id, grammaticalRelationship.getLabel().toUnicode(), x, y, x1, y1, x2, y2);
+        super(PHRASE, id, grammaticalRelationship.getLabel().toUnicode(), x, y, x1, y1, x2, y2, 0.0, 0.0);
         this.grammaticalRelationship = new SimpleObjectProperty<>(grammaticalRelationship);
         this.cx = new SimpleDoubleProperty(cx);
         this.cy = new SimpleDoubleProperty(cy);

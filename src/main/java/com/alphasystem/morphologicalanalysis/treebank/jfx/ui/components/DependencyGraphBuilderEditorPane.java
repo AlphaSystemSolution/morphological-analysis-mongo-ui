@@ -14,6 +14,7 @@ import javafx.scene.layout.GridPane;
 import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.Global.ARABIC_FONT_NAME;
 import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.Global.RESOURCE_BUNDLE;
 import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.util.DecimalFormatStringConverter.THREE_DECIMAL_PLACE_CONVERTER;
+import static java.lang.Double.parseDouble;
 import static java.lang.String.format;
 import static javafx.geometry.Pos.CENTER;
 import static javafx.scene.paint.Color.BLUE;
@@ -142,6 +143,7 @@ public class DependencyGraphBuilderEditorPane extends GridPane {
 
         Label label;
         Spinner<Double> spinner;
+        TextField textField;
 
         label = new Label(RESOURCE_BUNDLE.getString("startXIndex.label"));
         add(label, 0, row);
@@ -199,6 +201,36 @@ public class DependencyGraphBuilderEditorPane extends GridPane {
         spinner.setOnMouseClicked(event -> {
             Spinner source = (Spinner) event.getSource();
             node.setY3((Double) source.getValue());
+        });
+        add(spinner, 1, row);
+
+        row++; //11
+        add(new Separator(), 0, row, 2, 1);
+
+        row++; //12
+        label = new Label(RESOURCE_BUNDLE.getString("groupTranslate.label"));
+        label.setFont(font("Georgia", BOLD, REGULAR, 12));
+        label.setUnderline(true);
+        label.setTextFill(BLUE);
+        add(label, 0, row, 2, 1);
+
+        row++; //13
+        label = new Label(RESOURCE_BUNDLE.getString("groupTranslateX.label"));
+        add(label, 0, row);
+        textField = new DoubleTextField(String.valueOf(node.getTranslateX()));
+        textField.setOnAction(event -> {
+            TextField source = (TextField) event.getSource();
+            node.setTranslateX(parseDouble(source.getText()));
+        });
+        add(textField, 1, row);
+
+        row++; //14
+        label = new Label(RESOURCE_BUNDLE.getString("groupTranslateY.label"));
+        add(label, 0, row);
+        spinner = getSpinner(0, canvasHeight, node.getTranslateY(), DEFAULT_AMOUNT_TO_STEP_BY);
+        spinner.setOnMouseClicked(event -> {
+            Spinner source = (Spinner) event.getSource();
+            node.setTranslateY((Double) source.getValue());
         });
         add(spinner, 1, row);
     }

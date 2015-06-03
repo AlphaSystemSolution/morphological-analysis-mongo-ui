@@ -38,10 +38,7 @@ public class PhraseSelectionDialog extends Dialog<PhraseSelectionModel> {
             if (buttonData.isCancelButton()) {
                 reset();
                 result = null;
-            } else if (buttonData.name().equals(OK.getButtonData().name())) {
-                result = null;
             }
-
             return result;
         });
     }

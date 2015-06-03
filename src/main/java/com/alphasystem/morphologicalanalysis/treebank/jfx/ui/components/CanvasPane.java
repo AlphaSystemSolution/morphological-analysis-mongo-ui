@@ -30,7 +30,6 @@ import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.Global.ARABI
 import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.Global.ARABIC_FONT_SMALL;
 import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.util.DependencyGraphGraphicTool.DARK_GRAY_CLOUD;
 import static java.lang.String.format;
-import static javafx.application.Platform.runLater;
 import static javafx.scene.control.Alert.AlertType.WARNING;
 import static javafx.scene.paint.Color.*;
 import static javafx.scene.text.Font.font;
@@ -43,8 +42,8 @@ import static javafx.scene.text.TextAlignment.RIGHT;
  */
 public class CanvasPane extends Pane {
 
-    public static final String TERMINAL_GROUP_ID = "terminalGroup";
-    public static final String PART_OF_SPEECH_GROUP_ID = "partOfSpeechGroup";
+    public static final String TERMINAL_GROUP_ID_PREFIX = "terminal";
+    private static final double RADIUS = 2.0;
     private final ObjectProperty<CanvasData> canvasDataObject;
     private RelationshipSelectionDialog relationshipSelectionDialog;
     private PhraseSelectionDialog phraseSelectionDialog;
@@ -153,9 +152,6 @@ public class CanvasPane extends Pane {
                 case TERMINAL:
                     buildTerminalNode((TerminalNode) node);
                     break;
-                case PART_OF_SPEECH:
-                    buildPartOfSpeechNode((PartOfSpeechNode) node);
-                    break;
                 case RELATIONSHIP:
                     buildRelationshipNode((RelationshipNode) node);
                     break;
@@ -232,17 +228,29 @@ public class CanvasPane extends Pane {
 
         Text arabicText = drawText(tn, color, ARABIC_FONT_BIG);
 
+        double translateX = tn.getTranslateX();
+        double translateY = tn.getTranslateY();
         arabicText.setOnMouseClicked(event -> {
             Text text = (Text) event.getSource();
             TerminalNode userData = (TerminalNode) text.getUserData();
-            runLater(() -> updateSelectedShape(text));
+            updateSelectedShape(text, translateX, translateY);
 
-            phraseSelectionDialog.getPhraseSelectionModel().setFirstNode(userData);
+            PhraseSelectionModel phraseSelectionModel = phraseSelectionDialog.getPhraseSelectionModel();
+            if (phraseSelectionModel.getFirstNode() == null) {
+                phraseSelectionModel.setFirstNode(userData);
+            } else {
+                phraseSelectionModel.setLastNode(userData);
+            }
+
             Optional<PhraseSelectionModel> result = phraseSelectionDialog.showAndWait();
             result.ifPresent(psm -> {
+                GrammaticalRelationship relationship = psm.getRelationship();
+                if (relationship == null || relationship.equals(GrammaticalRelationship.NONE)) {
+                    return;
+                }
                 addPhrase(psm);
                 phraseSelectionDialog.reset();
-                updateSelectedShape(null);
+                updateSelectedShape(null, translateX, translateY);
             });
         });
 
@@ -254,38 +262,54 @@ public class CanvasPane extends Pane {
         englishText.yProperty().bind(tn.y3Property());
 
         Group group = new Group();
-        group.setId(TERMINAL_GROUP_ID);
+        group.setId(format("%s_%s", TERMINAL_GROUP_ID_PREFIX, tn.getToken().getDisplayName()));
         group.getChildren().addAll(englishText, arabicText, line);
+
+        ObservableList<PartOfSpeechNode> partOfSpeeches = tn.getPartOfSpeeches();
+        for (PartOfSpeechNode pn : partOfSpeeches) {
+            color = web(pn.getPartOfSpeech().getColorCode());
+            arabicText = drawText(pn, color, ARABIC_FONT_SMALL);
+            arabicText.setOnMouseClicked(event -> selectRelationship(pn.getText(),
+                    pn.getCx(), pn.getCy(), translateX, translateY,
+                    (Text) event.getSource()));
+
+            id = format("c_%s", pn.getId());
+            Circle circle = tool.drawCircle(id, color, pn.getCx(), pn.getCy(), RADIUS);
+            // bind coordinates
+            circle.centerXProperty().bind(pn.cxProperty());
+            circle.centerYProperty().bind(pn.cyProperty());
+
+            group.getChildren().addAll(arabicText, circle);
+        }
+
+        group.setTranslateX(translateX);
+        group.setTranslateY(translateY);
+
+        tn.translateXProperty().addListener((observable, oldValue, newValue) -> {
+            System.out.println("X: " + tn.getId() + " : " + newValue + group);
+            group.setTranslateX((Double) newValue);
+        });
+        tn.translateYProperty().addListener((observable, oldValue, newValue) -> {
+            System.out.println("Y: " + tn.getId() + " : " + newValue);
+        });
+
         canvasPane.getChildren().add(group);
     }
 
-    private void buildPartOfSpeechNode(PartOfSpeechNode pn) {
-        Color color = web(pn.getPartOfSpeech().getColorCode());
-        Text arabicText = drawText(pn, color, ARABIC_FONT_SMALL);
-        arabicText.setOnMouseClicked(event -> selectRelationship(pn.getText(),
-                pn.getCx(), pn.getCy(), (Text) event.getSource()));
-
-        String id = format("circle_%s", pn.getId());
-        Circle circle = tool.drawCircle(id, color, pn.getCx(), pn.getCy(), 2.0);
-        // bind coordinates
-        circle.centerXProperty().bind(pn.cxProperty());
-        circle.centerYProperty().bind(pn.cyProperty());
-
-        Group group = new Group();
-        group.setId(PART_OF_SPEECH_GROUP_ID);
-        group.getChildren().addAll(arabicText, circle);
-        canvasPane.getChildren().add(group);
-    }
-
-    private void selectRelationship(String text, double cx, double cy, Text arabicText) {
+    private void selectRelationship(String text, double cx, double cy, double translateX, double translateY,
+                                    Text arabicText) {
         if (startPoint == null) {
-            startPoint = new Point2D(cx, cy);
-            updateSelectedShape(arabicText);
-            relationshipSelectionDialog.setFirstPartOfSpeech(text);
-            relationshipSelectionDialog.showAndWait();
+            Optional<GrammaticalRelationship> result = relationshipSelectionDialog.showAndWait();
+            result.ifPresent(gr -> {
+                if (result.isPresent()) {
+                    startPoint = new Point2D(cx + translateX, cy + translateY);
+                    updateSelectedShape(arabicText, translateX, translateY);
+                    relationshipSelectionDialog.setFirstPartOfSpeech(text);
+                }
+            });
         } else {
             if (endPoint == null) {
-                endPoint = new Point2D(cx, cy);
+                endPoint = new Point2D(cx + translateX, cy + translateY);
                 if (endPoint.equals(startPoint)) {
                     showAlert(WARNING, "You must select different part of speech.", null);
                     endPoint = null;
@@ -295,16 +319,16 @@ public class CanvasPane extends Pane {
                     result.ifPresent(gr -> {
                         if (result.isPresent() && !gr.equals(GrammaticalRelationship.NONE)) {
                             addRelationship(gr);
+                            updateSelectedShape(null, translateX, translateY);
                         }
                         startPoint = null;
                         endPoint = null;
-                        updateSelectedShape(null);
                         relationshipSelectionDialog.reset();
                     });
                 }
             } else {
                 relationshipSelectionDialog.reset();
-                updateSelectedShape(null);
+                updateSelectedShape(null, translateX, translateY);
                 startPoint = null;
                 endPoint = null;
             }
@@ -337,7 +361,7 @@ public class CanvasPane extends Pane {
                 rn.getArrowPointY1(), rn.getArrowPointX2(), rn.getArrowPointY2(), color);
         // bind line co-ordinates
         //TODO: need to figure out how to bind polyline
-        // commented following code as it csuses application to crashed
+        // commented following code as it causes application to crashed
 //        rn.t1Property().addListener((observable, oldValue, newValue) -> {
 //            runLater(this::initCanvas);
 //        });
@@ -363,8 +387,8 @@ public class CanvasPane extends Pane {
         Line line = drawLine(pn);
         Text arabicText = drawText(pn, color, ARABIC_FONT_SMALL);
         arabicText.setOnMouseClicked(event -> selectRelationship(pn.getText(),
-                pn.getCx(), pn.getCy(), (Text) event.getSource()));
-        Circle circle = tool.drawCircle(null, color, pn.getCx(), pn.getCy(), 2.0);
+                pn.getCx(), pn.getCy(), 0d, 0d, (Text) event.getSource()));
+        Circle circle = tool.drawCircle(null, color, pn.getCx(), pn.getCy(), RADIUS);
         // bind coordinates
         circle.centerXProperty().bind(pn.cxProperty());
         circle.centerYProperty().bind(pn.cyProperty());
@@ -383,7 +407,7 @@ public class CanvasPane extends Pane {
         return alert.showAndWait();
     }
 
-    private void updateSelectedShape(Shape shape) {
+    private void updateSelectedShape(Shape shape, double translateX, double translateY) {
         if (shape == null) {
             canvasPane.getChildren().remove(bound);
         } else {
@@ -392,8 +416,8 @@ public class CanvasPane extends Pane {
                 canvasPane.getChildren().add(bound);
             } else {
                 Bounds boundsInLocal = shape.getBoundsInLocal();
-                bound.setX(boundsInLocal.getMinX());
-                bound.setY(boundsInLocal.getMinY());
+                bound.setX(boundsInLocal.getMinX() + translateX);
+                bound.setY(boundsInLocal.getMinY() + translateY);
                 bound.setWidth(boundsInLocal.getWidth());
                 bound.setHeight(boundsInLocal.getHeight());
             }

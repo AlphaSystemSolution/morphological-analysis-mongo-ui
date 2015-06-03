@@ -7,10 +7,7 @@ import com.alphasystem.morphologicalanalysis.ui.common.ComboBoxFactory;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.geometry.Insets;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
 
@@ -73,14 +70,14 @@ public class RelationshipSelectionDialog extends Dialog<GrammaticalRelationship>
         });
 
         setResultConverter(param -> {
-            return comboBox.getSelectionModel().getSelectedItem().getValue();
+            ButtonBar.ButtonData buttonData = param.getButtonData();
+            return buttonData.isCancelButton() ? GrammaticalRelationship.NONE :
+                    comboBox.getSelectionModel().getSelectedItem().getValue();
         });
         getDialogPane().getButtonTypes().addAll(OK, CANCEL);
         Button okButton = (Button) getDialogPane().lookupButton(OK);
         okButton.disableProperty().bind(secondPartOfSpeech.isNotEqualTo(NONE_SELECTED)
                 .and(comboBox.getSelectionModel().selectedIndexProperty().isEqualTo(0)));
-        Button cancelButton = (Button) getDialogPane().lookupButton(CANCEL);
-        cancelButton.disableProperty().bind(secondPartOfSpeech.isEqualTo(NONE_SELECTED));
         getDialogPane().setContent(gridPane);
         getDialogPane().setPrefWidth(400);
     }

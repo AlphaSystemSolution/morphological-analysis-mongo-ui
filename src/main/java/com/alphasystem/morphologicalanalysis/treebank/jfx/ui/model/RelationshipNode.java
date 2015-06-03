@@ -8,6 +8,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
 
+import static com.alphasystem.morphologicalanalysis.model.support.GrammaticalRelationship.NONE;
 import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.NodeType.RELATIONSHIP;
 import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.util.CubicCurveHelper.calculateCurvePoint;
 import static javafx.scene.paint.Color.web;
@@ -52,6 +53,13 @@ public class RelationshipNode extends GraphNode {
     private final ObjectProperty<GrammaticalRelationship> grammaticalRelationship;
 
     private final ObjectProperty<Color> stroke;
+
+    /**
+     *
+     */
+    public RelationshipNode() {
+        this(NONE, null, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0.5, 0.55);
+    }
 
     /**
      * @param grammaticalRelationship

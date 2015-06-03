@@ -17,14 +17,41 @@ public abstract class GraphNode {
 
     protected final DoubleProperty y;
 
+    protected final DoubleProperty translateX;
+
+    protected final DoubleProperty translateY;
+
     protected final BooleanProperty _transient;
 
+    /**
+     * @param nodeType
+     * @param id
+     * @param text
+     * @param x
+     * @param y
+     */
     protected GraphNode(NodeType nodeType, String id, String text, Double x, Double y) {
+        this(nodeType, id, text, x, y, 0.0, 0.0);
+    }
+
+    /**
+     * @param nodeType
+     * @param id
+     * @param text
+     * @param x
+     * @param y
+     * @param translateX
+     * @param translateY
+     */
+    protected GraphNode(NodeType nodeType, String id, String text, Double x, Double y,
+                        Double translateX, Double translateY) {
         this.id = new SimpleStringProperty(id);
         this.nodeType = new ReadOnlyObjectWrapper<>(nodeType);
         this.text = new SimpleStringProperty(text);
         this.x = new SimpleDoubleProperty(x);
         this.y = new SimpleDoubleProperty(y);
+        this.translateX = new SimpleDoubleProperty(translateX);
+        this.translateY = new SimpleDoubleProperty(translateY);
         _transient = new ReadOnlyBooleanWrapper(false);
         this.x.addListener((observable, oldValue, newValue) -> {
             double d = (Double) newValue;
@@ -34,6 +61,31 @@ public abstract class GraphNode {
             double d = (Double) newValue;
             _transient.setValue(d >= 0);
         });
+    }
+
+
+    public final double getTranslateX() {
+        return translateX.get();
+    }
+
+    public final void setTranslateX(double translateX) {
+        this.translateX.set(translateX);
+    }
+
+    public final DoubleProperty translateXProperty() {
+        return translateX;
+    }
+
+    public final double getTranslateY() {
+        return translateY.get();
+    }
+
+    public final void setTranslateY(double translateY) {
+        this.translateY.set(translateY);
+    }
+
+    public final DoubleProperty translateYProperty() {
+        return translateY;
     }
 
     public boolean getTransient() {

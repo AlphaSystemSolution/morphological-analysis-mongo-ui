@@ -28,10 +28,22 @@ public abstract class LineSupport extends GraphNode {
      */
     protected final DoubleProperty y2;
 
-
+    /**
+     * @param nodeType
+     * @param id
+     * @param text
+     * @param x
+     * @param y
+     * @param x1
+     * @param y1
+     * @param x2
+     * @param y2
+     * @param translateX
+     * @param translateY
+     */
     protected LineSupport(NodeType nodeType, String id, String text, Double x, Double y, Double x1,
-                          Double y1, Double x2, Double y2) {
-        super(nodeType, id, text, x, y);
+                          Double y1, Double x2, Double y2, Double translateX, Double translateY) {
+        super(nodeType, id, text, x, y, translateX, translateY);
         this.x1 = new SimpleDoubleProperty(x1);
         this.y1 = new SimpleDoubleProperty(y1);
         this.x2 = new SimpleDoubleProperty(x2);
