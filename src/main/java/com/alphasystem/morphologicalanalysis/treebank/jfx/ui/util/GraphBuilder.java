@@ -115,7 +115,7 @@ public class GraphBuilder {
         return new PhraseNode(model.getRelationship(), id, x, y, x1, y1, x2, y2, cx, cy);
     }
 
-    public EmptyNode buildEmptyNode(Line referenceLine, boolean rightOfNode) {
+    public EmptyNode buildEmptyNode(Line referenceLine) {
         reset();
         rectX = referenceLine.getEndX() + GAP_BETWEEN_TOKENS;
         textX = rectX + 30;

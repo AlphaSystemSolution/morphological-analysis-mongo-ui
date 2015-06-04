@@ -14,7 +14,10 @@ import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.Node;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Pane;
@@ -98,22 +101,14 @@ public class CanvasPane extends Pane {
         });
         contextMenu.getItems().add(menuItem);
 
-        Menu menu = new Menu("Add Empty Node");
-        menuItem = new MenuItem("Right of this node");
+        menuItem = new MenuItem("Add Empty Node");
         menuItem.setOnAction(event -> {
-            addEmptyNode(true);
+            addEmptyNode();
         });
-        menu.getItems().add(menuItem);
-        menuItem = new MenuItem("Left of this node");
-        menuItem.setOnAction(event -> {
-            addEmptyNode(false);
-        });
-        menu.getItems().add(menuItem);
-
-        contextMenu.getItems().add(menu);
+        contextMenu.getItems().add(menuItem);
     }
 
-    private void addEmptyNode(boolean rightOfNode) {
+    private void addEmptyNode() {
         Group parent = (Group) selectedArabicText.getParent();
         ObservableList<Node> children = parent.getChildren();
         Line line = null;
@@ -127,7 +122,7 @@ public class CanvasPane extends Pane {
             showAlert(INFORMATION, "No line found.", null);
             return;
         }
-        addEmptyNode(line, rightOfNode);
+        addEmptyNode(line);
     }
 
     private void initListeners() {
@@ -224,9 +219,9 @@ public class CanvasPane extends Pane {
         }
     }
 
-    private void addEmptyNode(Line referenceLine, boolean rightOfNode) {
+    private void addEmptyNode(Line referenceLine) {
         // Step 1: call GraphBuilder to create an empty node
-        EmptyNode emptyNode = graphBuilder.buildEmptyNode(referenceLine, rightOfNode);
+        EmptyNode emptyNode = graphBuilder.buildEmptyNode(referenceLine);
 
         // add this node into existing list of nodes and
         // update canvasDataObject for changes to take effect
