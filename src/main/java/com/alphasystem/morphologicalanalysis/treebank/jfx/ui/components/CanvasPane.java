@@ -13,6 +13,7 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -27,8 +28,12 @@ import java.util.Optional;
 
 import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.Global.ARABIC_FONT_BIG;
 import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.Global.ARABIC_FONT_SMALL;
+import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.NodeType.EMPTY;
+import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.NodeType.HIDDEN;
 import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.util.DependencyGraphGraphicTool.DARK_GRAY_CLOUD;
+import static com.alphasystem.util.AppUtil.isGivenType;
 import static java.lang.String.format;
+import static javafx.scene.control.Alert.AlertType.INFORMATION;
 import static javafx.scene.control.Alert.AlertType.WARNING;
 import static javafx.scene.paint.Color.*;
 import static javafx.scene.text.Font.font;
@@ -96,16 +101,33 @@ public class CanvasPane extends Pane {
         Menu menu = new Menu("Add Empty Node");
         menuItem = new MenuItem("Right of this node");
         menuItem.setOnAction(event -> {
-            System.out.println("Right");
+            addEmptyNode(true);
         });
         menu.getItems().add(menuItem);
         menuItem = new MenuItem("Left of this node");
         menuItem.setOnAction(event -> {
-            System.out.println("Left");
+            addEmptyNode(false);
         });
         menu.getItems().add(menuItem);
 
         contextMenu.getItems().add(menu);
+    }
+
+    private void addEmptyNode(boolean rightOfNode) {
+        Group parent = (Group) selectedArabicText.getParent();
+        ObservableList<Node> children = parent.getChildren();
+        Line line = null;
+        for (Node child : children) {
+            if (isGivenType(Line.class, child)) {
+                line = (Line) child;
+                break;
+            }
+        }
+        if (line == null) {
+            showAlert(INFORMATION, "No line found.", null);
+            return;
+        }
+        addEmptyNode(line, rightOfNode);
     }
 
     private void initListeners() {
@@ -187,6 +209,7 @@ public class CanvasPane extends Pane {
             NodeType nodeType = node.getNodeType();
             switch (nodeType) {
                 case TERMINAL:
+                case EMPTY:
                     buildTerminalNode((TerminalNode) node);
                     break;
                 case RELATIONSHIP:
@@ -199,6 +222,18 @@ public class CanvasPane extends Pane {
                     break;
             }
         }
+    }
+
+    private void addEmptyNode(Line referenceLine, boolean rightOfNode) {
+        // Step 1: call GraphBuilder to create an empty node
+        EmptyNode emptyNode = graphBuilder.buildEmptyNode(referenceLine, rightOfNode);
+
+        // add this node into existing list of nodes and
+        // update canvasDataObject for changes to take effect
+        CanvasData canvasData = canvasDataObject.get();
+        canvasData.getNodes().add(emptyNode);
+        canvasDataObject.setValue(null);
+        canvasDataObject.setValue(canvasData);
     }
 
     private void addRelationship(GrammaticalRelationship grammaticalRelationship) {
@@ -255,13 +290,24 @@ public class CanvasPane extends Pane {
     private void buildTerminalNode(TerminalNode tn) {
         Line line = drawLine(tn);
 
+        NodeType nodeType = tn.getNodeType();
+        boolean hiddenOrEmptyNode = nodeType.equals(EMPTY) || nodeType.equals(HIDDEN);
+        Color hiddenOrEmptyNodeColor = LIGHTGRAY.darker();
+        Color color = hiddenOrEmptyNode ? hiddenOrEmptyNodeColor : BLACK;
+
+        String tokenId = "";
+        String trans = "";
         Token token = tn.getToken();
-        Color color = BLACK;
-        List<Location> locations = token.getLocations();
-        if (token.getLocationCount() == 1) {
-            Location location = locations.get(0);
-            color = web(location.getPartOfSpeech().getColorCode());
+        if (token != null) {
+            tokenId = token.getDisplayName();
+            trans = token.getTranslation();
+            List<Location> locations = token.getLocations();
+            if (token.getLocationCount() == 1) {
+                Location location = locations.get(0);
+                color = web(location.getPartOfSpeech().getColorCode());
+            }
         }
+
 
         Text arabicText = drawText(tn, color, ARABIC_FONT_BIG);
 
@@ -275,19 +321,20 @@ public class CanvasPane extends Pane {
         });
 
         String id = format("trans_%s", tn.getId());
-        Text englishText = tool.drawText(id, token.getTranslation(), CENTER, BLACK,
+        Text englishText = tool.drawText(id, trans, CENTER, BLACK,
                 tn.getX3(), tn.getY3(), font("Candara", REGULAR, 16));
         // bind text x and y locations
         englishText.xProperty().bind(tn.x3Property());
         englishText.yProperty().bind(tn.y3Property());
 
         Group group = new Group();
-        group.setId(format("%s_%s", TERMINAL_GROUP_ID_PREFIX, tn.getToken().getDisplayName()));
+
+        group.setId(format("%s_%s", TERMINAL_GROUP_ID_PREFIX, tokenId));
         group.getChildren().addAll(englishText, arabicText, line);
 
         ObservableList<PartOfSpeechNode> partOfSpeeches = tn.getPartOfSpeeches();
         for (PartOfSpeechNode pn : partOfSpeeches) {
-            color = web(pn.getPartOfSpeech().getColorCode());
+            color = hiddenOrEmptyNode ? hiddenOrEmptyNodeColor : web(pn.getPartOfSpeech().getColorCode());
             arabicText = drawText(pn, color, ARABIC_FONT_SMALL);
             arabicText.setOnMouseClicked(event -> selectRelationship(pn.getText(),
                     pn.getCx(), pn.getCy(), translateX, translateY,

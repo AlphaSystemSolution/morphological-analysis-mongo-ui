@@ -1,13 +1,17 @@
 package com.alphasystem.morphologicalanalysis.treebank.jfx.ui.util;
 
+import com.alphasystem.morphologicalanalysis.model.Location;
 import com.alphasystem.morphologicalanalysis.model.Token;
 import com.alphasystem.morphologicalanalysis.model.support.GrammaticalRelationship;
+import com.alphasystem.morphologicalanalysis.model.support.PartOfSpeech;
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.*;
 import javafx.collections.ObservableList;
 import javafx.geometry.Point2D;
+import javafx.scene.shape.Line;
 
 import java.util.List;
 
+import static com.alphasystem.morphologicalanalysis.model.support.PartOfSpeech.NOUN;
 import static javafx.collections.FXCollections.observableArrayList;
 import static javafx.collections.FXCollections.reverse;
 
@@ -109,6 +113,27 @@ public class GraphBuilder {
         Double cy = y + 15;
 
         return new PhraseNode(model.getRelationship(), id, x, y, x1, y1, x2, y2, cx, cy);
+    }
+
+    public EmptyNode buildEmptyNode(Line referenceLine, boolean rightOfNode) {
+        reset();
+        rectX = referenceLine.getEndX() + GAP_BETWEEN_TOKENS;
+        textX = rectX + 30;
+        x1 = rectX;
+        x2 = RECTANGLE_WIDTH + rectX;
+        x3 = rectX + 30;
+
+        PartOfSpeech partOfSpeech = NOUN;
+        Location location = new Location();
+        location.setPartOfSpeech(partOfSpeech);
+        PartOfSpeechNode partOfSpeechNode = new PartOfSpeechNode(partOfSpeech, location, null, 0d, 0d, 0d, 0d, false);
+        EmptyNode emptyNode = new EmptyNode(null, textX, textY, x1, y1, x2, y2, x3, y3, partOfSpeechNode);
+
+        reset();
+        textY = 160;
+        double posX = emptyNode.getX1();
+        updatePartOfSpeechNode(emptyNode.getPartOfSpeeches().get(0), posX);
+        return emptyNode;
     }
 
 

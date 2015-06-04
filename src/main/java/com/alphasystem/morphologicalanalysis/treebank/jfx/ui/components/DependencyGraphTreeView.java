@@ -10,8 +10,7 @@ import javafx.scene.control.TreeView;
 import java.util.List;
 
 import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.Global.TREE_BANK_STYLE_SHEET;
-import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.NodeType.ROOT;
-import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.NodeType.TERMINAL;
+import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.NodeType.*;
 import static javafx.scene.control.SelectionMode.SINGLE;
 
 /**
@@ -47,6 +46,9 @@ public class DependencyGraphTreeView extends TreeView<GraphNode> {
 
     static void initPartOfSpeechItems(TreeItem<GraphNode> parent, TerminalNode node) {
         ObservableList<PartOfSpeechNode> partOfSpeeches = node.getPartOfSpeeches();
+        if (partOfSpeeches == null || partOfSpeeches.isEmpty()) {
+            return;
+        }
         for (PartOfSpeechNode posNode : partOfSpeeches) {
             TreeItem<GraphNode> newItem = new TreeItem<>(posNode);
             parent.getChildren().add(newItem);
@@ -54,6 +56,7 @@ public class DependencyGraphTreeView extends TreeView<GraphNode> {
         parent.setExpanded(true);
     }
 
+    @SuppressWarnings({"unused"})
     public GraphNode getSelectedNode() {
         return selectedNode.get();
     }
@@ -88,7 +91,8 @@ public class DependencyGraphTreeView extends TreeView<GraphNode> {
                     parent.setExpanded(true);
                     rootItem.getChildren().add(parent);
                 }
-                if (currentNodeType.equals(TERMINAL)) {
+                if (currentNodeType.equals(TERMINAL) || currentNodeType.equals(EMPTY)
+                        || currentNodeType.equals(HIDDEN)) {
                     initPartOfSpeechItems(newItem, (TerminalNode) node);
                 }
                 parent.getChildren().add(newItem);

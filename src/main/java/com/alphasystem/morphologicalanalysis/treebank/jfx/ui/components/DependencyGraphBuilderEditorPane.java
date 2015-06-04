@@ -80,6 +80,7 @@ public class DependencyGraphBuilderEditorPane extends BorderPane {
         NodeType nodeType = graphNode.getNodeType();
         switch (nodeType) {
             case TERMINAL:
+            case EMPTY:
                 addTerminalNodeProperties((TerminalNode) graphNode);
                 break;
             case PART_OF_SPEECH:
