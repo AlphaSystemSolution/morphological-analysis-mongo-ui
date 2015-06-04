@@ -4,19 +4,18 @@ import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.*;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
-import javafx.scene.control.Label;
-import javafx.scene.control.Separator;
-import javafx.scene.control.Spinner;
+import javafx.scene.control.*;
 import javafx.scene.control.SpinnerValueFactory.DoubleSpinnerValueFactory;
-import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 
 import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.Global.ARABIC_FONT_NAME;
 import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.Global.RESOURCE_BUNDLE;
 import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.util.DecimalFormatStringConverter.THREE_DECIMAL_PLACE_CONVERTER;
-import static java.lang.Double.parseDouble;
 import static java.lang.String.format;
 import static javafx.geometry.Pos.CENTER;
+import static javafx.scene.control.ScrollPane.ScrollBarPolicy.ALWAYS;
+import static javafx.scene.control.ScrollPane.ScrollBarPolicy.AS_NEEDED;
 import static javafx.scene.paint.Color.BLUE;
 import static javafx.scene.text.Font.font;
 import static javafx.scene.text.FontPosture.REGULAR;
@@ -26,33 +25,40 @@ import static javafx.scene.text.FontWeight.NORMAL;
 /**
  * @author sali
  */
-public class DependencyGraphBuilderEditorPane extends GridPane {
+public class DependencyGraphBuilderEditorPane extends BorderPane {
 
-    private static final double DEFAULT_AMOUNT_TO_STEP_BY = 0.5;
     private double canvasWidth;
     private double canvasHeight;
     private GraphNode graphNode;
+    private GridPane gridPane;
+    private int row = 0;
 
     public DependencyGraphBuilderEditorPane(GraphNode graphNode) {
-        setAlignment(CENTER);
-        setHgap(10);
-        setVgap(10);
-        setPadding(new Insets(25, 25, 25, 25));
-
         this.graphNode = graphNode;
         canvasWidth = 800;
         canvasHeight = 400;
 
+        gridPane = new GridPane();
+        gridPane.setAlignment(CENTER);
+        gridPane.setHgap(10);
+        gridPane.setVgap(10);
+        gridPane.setPadding(new Insets(5, 5, 5, 5));
+
         initPane(this.graphNode);
+
+        ScrollPane scrollPane = new ScrollPane();
+        scrollPane.setVbarPolicy(ALWAYS);
+        scrollPane.setHbarPolicy(AS_NEEDED);
+        scrollPane.setContent(gridPane);
+        setCenter(scrollPane);
+
+        setMinSize(USE_PREF_SIZE, USE_PREF_SIZE);
+        setMaxSize(USE_PREF_SIZE, USE_PREF_SIZE);
+        setPrefHeight(650);
     }
 
     private static String getPaneTitle(GraphNode node) {
         return RESOURCE_BUNDLE.getString(format("%s_node.label", node.getNodeType().name()));
-    }
-
-    private static String getString(GraphNode node, String key) {
-        return RESOURCE_BUNDLE.getString(format("%s.%s.%s.label", DependencyGraphBuilderEditorPane.class.getSimpleName(),
-                node.getClass().getSimpleName(), key));
     }
 
     void updateWidth(double width) {
@@ -66,7 +72,8 @@ public class DependencyGraphBuilderEditorPane extends GridPane {
     }
 
     void initPane(GraphNode graphNode) {
-        ObservableList<Node> children = getChildren();
+        row = 0;
+        ObservableList<Node> children = gridPane.getChildren();
         children.remove(0, children.size());
 
         addTextControls(graphNode);
@@ -88,21 +95,19 @@ public class DependencyGraphBuilderEditorPane extends GridPane {
                 break;
         }
 
-        requestLayout();
+        gridPane.requestLayout();
     }
 
     private void addTextControls(GraphNode node) {
-        int row = 0;
-
         Label label = new Label(getPaneTitle(node));
         label.setFont(font("Georgia", BOLD, REGULAR, 16));
         label.setUnderline(true);
         label.setTextFill(BLUE);
-        add(label, 0, row, 2, 1);
+        gridPane.add(label, 0, row, 2, 1);
 
         row++; // 1
         label = new Label(RESOURCE_BUNDLE.getString("text.label"));
-        add(label, 0, row);
+        gridPane.add(label, 0, row);
         String value = node.getText();
         value = value == null ? "" : value;
         TextField textField = new TextField(value);
@@ -112,293 +117,97 @@ public class DependencyGraphBuilderEditorPane extends GridPane {
         });
         textField.setFont(font(ARABIC_FONT_NAME, NORMAL, REGULAR, 20));
         label.setLabelFor(textField);
-        add(textField, 1, row);
-
-        row++; //2
-        label = new Label(RESOURCE_BUNDLE.getString("xIndex.label"));
-        add(label, 0, row);
-        Spinner<Double> spinner = getSpinner(0, canvasWidth, node.getX(), 0.5);
-        spinner.setOnMouseClicked(event -> {
-            Spinner source = (Spinner) event.getSource();
-            node.setX((Double) source.getValue());
-        });
-        add(spinner, 1, row);
-
-        row++; //3
-        label = new Label(RESOURCE_BUNDLE.getString("yIndex.label"));
-        add(label, 0, row);
-        spinner = getSpinner(0, canvasHeight, node.getY(), DEFAULT_AMOUNT_TO_STEP_BY);
-        spinner.setOnMouseClicked(event -> {
-            Spinner source = (Spinner) event.getSource();
-            node.setY((Double) source.getValue());
-        });
-        add(spinner, 1, row);
+        gridPane.add(textField, 1, row);
 
         row++;
-        add(new Separator(), 0, row, 2, 1);
+
+        addFields("xIndex.label", GraphNode::getX, GraphNode::setX, node, canvasWidth);
+        addFields("yIndex.label", GraphNode::getY, GraphNode::setY, node, canvasHeight);
+        gridPane.add(new Separator(), 0, row, 2, 1);
     }
 
     private void addTerminalNodeProperties(TerminalNode node) {
-        int row = 5;
+        row++;
+        addFields("startXIndex.label", TerminalNode::getX1, TerminalNode::setX1, node, canvasWidth);
+        addFields("startYIndex.label", TerminalNode::getY1, TerminalNode::setY1, node, canvasHeight);
+        addFields("endXIndex.label", TerminalNode::getX2, TerminalNode::setX2, node, canvasWidth);
+        addFields("endYIndex.label", TerminalNode::getY2, TerminalNode::setY2, node, canvasHeight);
+        addFields("tanslationXIndex.label", TerminalNode::getX3, TerminalNode::setX3, node, canvasWidth);
+        addFields("tanslationYIndex.label", TerminalNode::getY3, TerminalNode::setY3, node, canvasHeight);
+        gridPane.add(new Separator(), 0, row, 2, 1);
 
-        Label label;
-        Spinner<Double> spinner;
-        TextField textField;
-
-        label = new Label(RESOURCE_BUNDLE.getString("startXIndex.label"));
-        add(label, 0, row);
-        spinner = getSpinner(0, canvasWidth, node.getX1(), DEFAULT_AMOUNT_TO_STEP_BY);
-        spinner.setOnMouseClicked(event -> {
-            Spinner source = (Spinner) event.getSource();
-            node.setX1((Double) source.getValue());
-        });
-        add(spinner, 1, row);
-
-        row++; //6
-        label = new Label(RESOURCE_BUNDLE.getString("startYIndex.label"));
-        add(label, 0, row);
-        spinner = getSpinner(0, canvasHeight, node.getY1(), DEFAULT_AMOUNT_TO_STEP_BY);
-        spinner.setOnMouseClicked(event -> {
-            Spinner source = (Spinner) event.getSource();
-            node.setY1((Double) source.getValue());
-        });
-        add(spinner, 1, row);
-
-        row++; //7
-        label = new Label(RESOURCE_BUNDLE.getString("endXIndex.label"));
-        add(label, 0, row);
-        spinner = getSpinner(0, canvasWidth, node.getX2(), DEFAULT_AMOUNT_TO_STEP_BY);
-        spinner.setOnMouseClicked(event -> {
-            Spinner source = (Spinner) event.getSource();
-            node.setX2((Double) source.getValue());
-        });
-        add(spinner, 1, row);
-
-        row++; //8
-        label = new Label(RESOURCE_BUNDLE.getString("endYIndex.label"));
-        add(label, 0, row);
-        spinner = getSpinner(0, canvasHeight, node.getY2(), DEFAULT_AMOUNT_TO_STEP_BY);
-        spinner.setOnMouseClicked(event -> {
-            Spinner source = (Spinner) event.getSource();
-            node.setY2((Double) source.getValue());
-        });
-        add(spinner, 1, row);
-
-        row++; //9
-        label = new Label(RESOURCE_BUNDLE.getString("tanslationXIndex.label"));
-        add(label, 0, row);
-        spinner = getSpinner(0, canvasWidth, node.getX3(), DEFAULT_AMOUNT_TO_STEP_BY);
-        spinner.setOnMouseClicked(event -> {
-            Spinner source = (Spinner) event.getSource();
-            node.setX3((Double) source.getValue());
-        });
-        add(spinner, 1, row);
-
-        row++; //10
-        label = new Label(RESOURCE_BUNDLE.getString("tanslationYIndex.label"));
-        add(label, 0, row);
-        spinner = getSpinner(0, canvasHeight, node.getY3(), DEFAULT_AMOUNT_TO_STEP_BY);
-        spinner.setOnMouseClicked(event -> {
-            Spinner source = (Spinner) event.getSource();
-            node.setY3((Double) source.getValue());
-        });
-        add(spinner, 1, row);
-
-        row++; //11
-        add(new Separator(), 0, row, 2, 1);
-
-        row++; //12
-        label = new Label(RESOURCE_BUNDLE.getString("groupTranslate.label"));
+        row++;
+        Label label = new Label(RESOURCE_BUNDLE.getString("groupTranslate.label"));
         label.setFont(font("Georgia", BOLD, REGULAR, 12));
         label.setUnderline(true);
         label.setTextFill(BLUE);
-        add(label, 0, row, 2, 1);
+        gridPane.add(label, 0, row, 2, 1);
 
-        row++; //13
-        label = new Label(RESOURCE_BUNDLE.getString("groupTranslateX.label"));
-        add(label, 0, row);
-        textField = new DoubleTextField(String.valueOf(node.getTranslateX()));
-        textField.setOnAction(event -> {
-            TextField source = (TextField) event.getSource();
-            node.setTranslateX(parseDouble(source.getText()));
-        });
-        add(textField, 1, row);
-
-        row++; //14
-        label = new Label(RESOURCE_BUNDLE.getString("groupTranslateY.label"));
-        add(label, 0, row);
-        spinner = getSpinner(0, canvasHeight, node.getTranslateY(), DEFAULT_AMOUNT_TO_STEP_BY);
-        spinner.setOnMouseClicked(event -> {
-            Spinner source = (Spinner) event.getSource();
-            node.setTranslateY((Double) source.getValue());
-        });
-        add(spinner, 1, row);
+        row++;
+        addFields("groupTranslateX.label", TerminalNode::getTranslateX, TerminalNode::setTranslateX,
+                node, canvasWidth);
+        addFields("groupTranslateY.label", TerminalNode::getTranslateY, TerminalNode::setTranslateY,
+                node, canvasHeight);
     }
 
     private void addPartOfSpeechProperties(PartOfSpeechNode node) {
-        int row = 5;
-
-        Label label = new Label(RESOURCE_BUNDLE.getString("posCx.label"));
-        add(label, 0, row);
-        Spinner<Double> spinner = getSpinner(0, canvasWidth, node.getCx(), DEFAULT_AMOUNT_TO_STEP_BY);
-        spinner.setOnMouseClicked(event -> {
-            Spinner source = (Spinner) event.getSource();
-            node.setCx((Double) source.getValue());
-        });
-        add(spinner, 1, row);
-
-        row++; //6
-        label = new Label(RESOURCE_BUNDLE.getString("posCy.label"));
-        add(label, 0, row);
-        spinner = getSpinner(0, canvasHeight, node.getCy(), DEFAULT_AMOUNT_TO_STEP_BY);
-        spinner.setOnMouseClicked(event -> {
-            Spinner source = (Spinner) event.getSource();
-            node.setCy((Double) source.getValue());
-        });
-        add(spinner, 1, row);
+        row++;
+        addFields("posCx.label", PartOfSpeechNode::getCx, PartOfSpeechNode::setCx, node, canvasWidth);
+        addFields("posCy.label", PartOfSpeechNode::getCy, PartOfSpeechNode::setCy, node, canvasHeight);
     }
 
     private void addRelationshipNodeProperties(RelationshipNode node) {
-        int row = 5;
+        row++;
+
+        // addFields("startX.label", RelationshipNode::getStartX, RelationshipNode::setStartX, node, canvasWidth);
+        // addFields("startY.label", RelationshipNode::getStartY, RelationshipNode::setStartY, node, canvasHeight);
+        addFields("controlX1.label", RelationshipNode::getControlX1, RelationshipNode::setControlX1,
+                node, canvasWidth);
+        addFields("controlY1.label", RelationshipNode::getControlY1, RelationshipNode::setControlY1,
+                node, canvasHeight);
+        addFields("controlX2.label", RelationshipNode::getControlX2, RelationshipNode::setControlX2,
+                node, canvasWidth);
+        addFields("controlY2.label", RelationshipNode::getControlY2, RelationshipNode::setControlY2,
+                node, canvasHeight);
 
         Label label;
         Spinner<Double> spinner;
 
-        label = new Label(getString(node, "controlX1"));
-        add(label, 0, row);
-        spinner = getSpinner(0, canvasWidth, node.getControlX1(), DEFAULT_AMOUNT_TO_STEP_BY);
-        label.setLabelFor(spinner);
-        spinner.setOnMouseClicked(event -> {
-            Spinner source = (Spinner) event.getSource();
-            node.setControlX1((Double) source.getValue());
-        });
-        add(spinner, 1, row);
-
-        row++; //6
-        label = new Label(getString(node, "controlY1"));
-        add(label, 0, row);
-        spinner = getSpinner(0, canvasHeight, node.getControlY1(), DEFAULT_AMOUNT_TO_STEP_BY);
-        label.setLabelFor(spinner);
-        spinner.setOnMouseClicked(event -> {
-            Spinner source = (Spinner) event.getSource();
-            node.setControlY1((Double) source.getValue());
-        });
-        add(spinner, 1, row);
-
-        row++; //7
-        label = new Label(getString(node, "controlX2"));
-        add(label, 0, row);
-        spinner = getSpinner(0, canvasWidth, node.getControlX2(), DEFAULT_AMOUNT_TO_STEP_BY);
-        label.setLabelFor(spinner);
-        spinner.setOnMouseClicked(event -> {
-            Spinner source = (Spinner) event.getSource();
-            node.setControlX2((Double) source.getValue());
-        });
-        add(spinner, 1, row);
-
-        row++; //8
-        label = new Label(getString(node, "controlY2"));
-        add(label, 0, row);
-        spinner = getSpinner(0, canvasHeight, node.getControlY2(), DEFAULT_AMOUNT_TO_STEP_BY);
-        label.setLabelFor(spinner);
-        spinner.setOnMouseClicked(event -> {
-            Spinner source = (Spinner) event.getSource();
-            node.setControlY2((Double) source.getValue());
-        });
-        add(spinner, 1, row);
-
-        row++; //9
-        label = new Label(getString(node, "t1"));
-        add(label, 0, row);
+        label = new Label(RESOURCE_BUNDLE.getString("t1.label"));
+        gridPane.add(label, 0, row);
         spinner = getSpinnerThreeDecimalPlace(0, 1.000, node.getT1(), 0.005);
         label.setLabelFor(spinner);
         spinner.setOnMouseClicked(event -> {
             Spinner source = (Spinner) event.getSource();
             node.setT1((Double) source.getValue());
         });
-        add(spinner, 1, row);
+        gridPane.add(spinner, 1, row);
 
-        row++; //10
-        label = new Label(getString(node, "t2"));
-        add(label, 0, row);
+        row++;
+        label = new Label(RESOURCE_BUNDLE.getString("t2.label"));
+        gridPane.add(label, 0, row);
         spinner = getSpinnerThreeDecimalPlace(0, 1.000, node.getT2(), 0.005);
         label.setLabelFor(spinner);
         spinner.setOnMouseClicked(event -> {
             Spinner source = (Spinner) event.getSource();
             node.setT2((Double) source.getValue());
         });
-        add(spinner, 1, row);
+        gridPane.add(spinner, 1, row);
     }
 
     private void addPhraseNode(PhraseNode node) {
-        int row = 5;
-
-        Label label;
-        Spinner<Double> spinner;
-
-        label = new Label(RESOURCE_BUNDLE.getString("startXIndex.label"));
-        add(label, 0, row);
-        spinner = getSpinner(0, canvasWidth, node.getX1(), DEFAULT_AMOUNT_TO_STEP_BY);
-        spinner.setOnMouseClicked(event -> {
-            Spinner source = (Spinner) event.getSource();
-            node.setX1((Double) source.getValue());
-        });
-        add(spinner, 1, row);
-
-        row++; //6
-        label = new Label(RESOURCE_BUNDLE.getString("startYIndex.label"));
-        add(label, 0, row);
-        spinner = getSpinner(0, canvasHeight, node.getY1(), DEFAULT_AMOUNT_TO_STEP_BY);
-        spinner.setOnMouseClicked(event -> {
-            Spinner source = (Spinner) event.getSource();
-            node.setY1((Double) source.getValue());
-        });
-        add(spinner, 1, row);
-
-        row++; //7
-        label = new Label(RESOURCE_BUNDLE.getString("endXIndex.label"));
-        add(label, 0, row);
-        spinner = getSpinner(0, canvasWidth, node.getX2(), DEFAULT_AMOUNT_TO_STEP_BY);
-        spinner.setOnMouseClicked(event -> {
-            Spinner source = (Spinner) event.getSource();
-            node.setX2((Double) source.getValue());
-        });
-        add(spinner, 1, row);
-
-        row++; //8
-        label = new Label(RESOURCE_BUNDLE.getString("endYIndex.label"));
-        add(label, 0, row);
-        spinner = getSpinner(0, canvasHeight, node.getY2(), DEFAULT_AMOUNT_TO_STEP_BY);
-        spinner.setOnMouseClicked(event -> {
-            Spinner source = (Spinner) event.getSource();
-            node.setY2((Double) source.getValue());
-        });
-        add(spinner, 1, row);
-
-        row++; //9
-        label = new Label(RESOURCE_BUNDLE.getString("posCx.label"));
-        add(label, 0, row);
-        spinner = getSpinner(0, canvasWidth, node.getCx(), DEFAULT_AMOUNT_TO_STEP_BY);
-        spinner.setOnMouseClicked(event -> {
-            Spinner source = (Spinner) event.getSource();
-            node.setCx((Double) source.getValue());
-        });
-        add(spinner, 1, row);
-
-        row++; //10
-        label = new Label(RESOURCE_BUNDLE.getString("posCy.label"));
-        add(label, 0, row);
-        spinner = getSpinner(0, canvasHeight, node.getCy(), DEFAULT_AMOUNT_TO_STEP_BY);
-        spinner.setOnMouseClicked(event -> {
-            Spinner source = (Spinner) event.getSource();
-            node.setCy((Double) source.getValue());
-        });
-        add(spinner, 1, row);
+        row++;
+        addFields("startXIndex.label", PhraseNode::getX1, PhraseNode::setX1, node, canvasWidth);
+        addFields("startYIndex.label", PhraseNode::getY1, PhraseNode::setY1, node, canvasHeight);
+        addFields("endXIndex.label", PhraseNode::getX2, PhraseNode::setX2, node, canvasWidth);
+        addFields("endYIndex.label", PhraseNode::getY2, PhraseNode::setY2, node, canvasHeight);
+        addFields("posCx.label", PhraseNode::getCx, PhraseNode::setCx, node, canvasWidth);
+        addFields("posCy.label", PhraseNode::getCy, PhraseNode::setCy, node, canvasHeight);
     }
 
-    private Spinner<Double> getSpinner(double min, double max, double initialValue, double amountToStepBy) {
+    private Spinner<Double> getSpinner(double min, double max, double initialValue) {
         Spinner<Double> spinner = new Spinner<>();
-        spinner.setValueFactory(new DoubleSpinnerValueFactory(min, max, initialValue, amountToStepBy));
+        spinner.setValueFactory(new DoubleSpinnerValueFactory(min, max, initialValue, 0.5));
         return spinner;
     }
 
@@ -410,5 +219,52 @@ public class DependencyGraphBuilderEditorPane extends GridPane {
         valueFactory.setConverter(THREE_DECIMAL_PLACE_CONVERTER);
         spinner.setValueFactory(valueFactory);
         return spinner;
+    }
+
+    private Slider createSlider(double min, double max, double value) {
+        Slider slider = new Slider();
+        slider.setMin(min);
+        slider.setMax(max);
+        slider.setValue(value);
+        slider.setShowTickLabels(true);
+        slider.setShowTickMarks(true);
+        slider.setMajorTickUnit(100);
+        slider.setMinorTickCount(20);
+        slider.setBlockIncrement(20);
+        return slider;
+    }
+
+    private <T extends GraphNode, G extends GetterAdapter<T>, S extends SetterAdapter<T>> void addFields(
+            String key, G g, S s, T node, double max) {
+        Label label = new Label(RESOURCE_BUNDLE.getString(key));
+        gridPane.add(label, 0, row);
+
+        Double initialValue = g.get(node);
+        Spinner<Double> spinner = getSpinner(0, max, initialValue);
+        spinner.setOnMouseClicked(event -> s.set(node, spinner.getValue()));
+        gridPane.add(spinner, 1, row);
+
+        row++;
+        Slider slider = createSlider(0, max, initialValue);
+        slider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            Double d = (Double) newValue;
+            spinner.getValueFactory().setValue(d);
+            s.set(node, d);
+        });
+        spinner.valueProperty().addListener((observable, oldValue, newValue) -> {
+            slider.setValue(newValue);
+        });
+        gridPane.add(slider, 1, row);
+
+        row++;
+    }
+
+
+    private interface GetterAdapter<T extends GraphNode> {
+        Double get(T node);
+    }
+
+    private interface SetterAdapter<T extends GraphNode> {
+        void set(T node, Double value);
     }
 }

@@ -50,11 +50,11 @@ public abstract class LineSupport extends GraphNode {
         this.y2 = new SimpleDoubleProperty(y2);
     }
 
-    public final double getX1() {
+    public final Double getX1() {
         return x1.get();
     }
 
-    public final void setX1(double x1) {
+    public final void setX1(Double x1) {
         this.x1.set(x1);
     }
 
@@ -62,11 +62,11 @@ public abstract class LineSupport extends GraphNode {
         return x1;
     }
 
-    public final double getY1() {
+    public final Double getY1() {
         return y1.get();
     }
 
-    public final void setY1(double y1) {
+    public final void setY1(Double y1) {
         this.y1.set(y1);
     }
 
@@ -74,11 +74,11 @@ public abstract class LineSupport extends GraphNode {
         return y1;
     }
 
-    public final double getX2() {
+    public final Double getX2() {
         return x2.get();
     }
 
-    public final void setX2(double x2) {
+    public final void setX2(Double x2) {
         this.x2.set(x2);
     }
 
@@ -86,11 +86,11 @@ public abstract class LineSupport extends GraphNode {
         return x2;
     }
 
-    public final double getY2() {
+    public final Double getY2() {
         return y2.get();
     }
 
-    public final void setY2(double y2) {
+    public final void setY2(Double y2) {
         this.y2.set(y2);
     }
 

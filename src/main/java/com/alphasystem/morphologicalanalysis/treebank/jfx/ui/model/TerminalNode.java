@@ -153,11 +153,11 @@ public class TerminalNode extends LineSupport {
         this.partOfSpeeches = partOfSpeeches;
     }
 
-    public final double getX3() {
+    public final Double getX3() {
         return x3.get();
     }
 
-    public final void setX3(double x3) {
+    public final void setX3(Double x3) {
         this.x3.set(x3);
     }
 
@@ -165,11 +165,11 @@ public class TerminalNode extends LineSupport {
         return x3;
     }
 
-    public final double getY3() {
+    public final Double getY3() {
         return y3.get();
     }
 
-    public final void setY3(double y3) {
+    public final void setY3(Double y3) {
         this.y3.set(y3);
     }
 

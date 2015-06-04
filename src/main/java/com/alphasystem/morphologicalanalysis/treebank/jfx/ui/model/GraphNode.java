@@ -132,7 +132,7 @@ public abstract class GraphNode {
         return x.get();
     }
 
-    public void setX(double x) {
+    public void setX(Double x) {
         this.x.set(x);
     }
 
@@ -144,13 +144,14 @@ public abstract class GraphNode {
         return y.get();
     }
 
-    public void setY(double y) {
+    public void setY(Double y) {
         this.y.set(y);
     }
 
     public final DoubleProperty yProperty() {
         return y;
     }
+
 
     @Override
     public String toString() {

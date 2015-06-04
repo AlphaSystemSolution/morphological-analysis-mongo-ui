@@ -5,6 +5,7 @@ import javafx.scene.control.TextField;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static java.lang.Double.parseDouble;
 import static java.util.regex.Pattern.compile;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
@@ -16,11 +17,11 @@ public class DoubleTextField extends TextField {
     private static final Pattern PATTERN = compile("[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?");
 
     public DoubleTextField() {
-        super();
+        this(null);
     }
 
-    public DoubleTextField(String text) {
-        super(text);
+    public DoubleTextField(Double value) {
+        super(value == null ? "" : value.toString());
     }
 
     @Override
@@ -48,4 +49,14 @@ public class DoubleTextField extends TextField {
             super.replaceSelection(s);
         }
     }
+
+    public Double getValue() {
+        String text = getText();
+        return isBlank(text) ? 0 : parseDouble(text);
+    }
+
+    public void setValue(Double value) {
+        setText(value == null ? "" : value.toString());
+    }
+
 }
