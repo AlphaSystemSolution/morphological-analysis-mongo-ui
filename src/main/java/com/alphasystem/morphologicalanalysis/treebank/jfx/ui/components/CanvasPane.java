@@ -31,8 +31,8 @@ import java.util.Optional;
 
 import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.Global.ARABIC_FONT_BIG;
 import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.Global.ARABIC_FONT_SMALL;
-import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.NodeType.EMPTY;
-import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.NodeType.HIDDEN;
+import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.DependencyGraphNodeType.EMPTY;
+import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.DependencyGraphNodeType.HIDDEN;
 import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.util.DependencyGraphGraphicTool.DARK_GRAY_CLOUD;
 import static com.alphasystem.util.AppUtil.isGivenType;
 import static java.lang.String.format;
@@ -201,7 +201,7 @@ public class CanvasPane extends Pane {
     private void drawNodes(ObservableList<GraphNode> nodes, boolean removeGridLines) {
         svgGraphicsContext.removeAll(removeGridLines);
         for (GraphNode node : nodes) {
-            NodeType nodeType = node.getNodeType();
+            DependencyGraphNodeType nodeType = node.getNodeType();
             switch (nodeType) {
                 case TERMINAL:
                 case EMPTY:
@@ -285,7 +285,7 @@ public class CanvasPane extends Pane {
     private void buildTerminalNode(TerminalNode tn) {
         Line line = drawLine(tn);
 
-        NodeType nodeType = tn.getNodeType();
+        DependencyGraphNodeType nodeType = tn.getNodeType();
         boolean hiddenOrEmptyNode = nodeType.equals(EMPTY) || nodeType.equals(HIDDEN);
         Color hiddenOrEmptyNodeColor = LIGHTGRAY.darker();
         Color color = hiddenOrEmptyNode ? hiddenOrEmptyNodeColor : BLACK;

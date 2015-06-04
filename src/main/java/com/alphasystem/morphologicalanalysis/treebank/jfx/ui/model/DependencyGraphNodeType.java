@@ -3,7 +3,7 @@ package com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model;
 /**
  * @author sali
  */
-public enum NodeType {
+public enum DependencyGraphNodeType {
 
     /**
      * A node that will always has part of speech tag.

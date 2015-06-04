@@ -1,25 +1,25 @@
 package com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model;
 
-import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.NodeType.ROOT;
+import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.DependencyGraphNodeType.ROOT;
 
 /**
  * @author sali
  */
 public class RootNode extends GraphNode {
 
-    private final NodeType childType;
+    private final DependencyGraphNodeType childType;
 
     /**
      *
      * @param childType
      */
-    public RootNode(NodeType childType) {
+    public RootNode(DependencyGraphNodeType childType) {
         super(ROOT, "dummy", childType.name(), -1.0, -1.0, 0.0, 0.0);
         this.childType = childType;
 
     }
 
-    public NodeType getChildType() {
+    public DependencyGraphNodeType getChildType() {
         return childType;
     }
 

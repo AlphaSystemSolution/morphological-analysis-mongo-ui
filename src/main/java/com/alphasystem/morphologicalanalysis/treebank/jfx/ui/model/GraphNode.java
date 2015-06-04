@@ -9,7 +9,7 @@ public abstract class GraphNode {
 
     protected final StringProperty id;
 
-    protected final ObjectProperty<NodeType> nodeType;
+    protected final ObjectProperty<DependencyGraphNodeType> nodeType;
 
     protected final StringProperty text;
 
@@ -30,7 +30,7 @@ public abstract class GraphNode {
      * @param x
      * @param y
      */
-    protected GraphNode(NodeType nodeType, String id, String text, Double x, Double y) {
+    protected GraphNode(DependencyGraphNodeType nodeType, String id, String text, Double x, Double y) {
         this(nodeType, id, text, x, y, 0.0, 0.0);
     }
 
@@ -43,7 +43,7 @@ public abstract class GraphNode {
      * @param translateX
      * @param translateY
      */
-    protected GraphNode(NodeType nodeType, String id, String text, Double x, Double y,
+    protected GraphNode(DependencyGraphNodeType nodeType, String id, String text, Double x, Double y,
                         Double translateX, Double translateY) {
         this.id = new SimpleStringProperty(id);
         this.nodeType = new ReadOnlyObjectWrapper<>(nodeType);
@@ -108,11 +108,11 @@ public abstract class GraphNode {
         return id;
     }
 
-    public NodeType getNodeType() {
+    public DependencyGraphNodeType getNodeType() {
         return nodeType.get();
     }
 
-    public final ObjectProperty<NodeType> nodeTypeProperty() {
+    public final ObjectProperty<DependencyGraphNodeType> nodeTypeProperty() {
         return nodeType;
     }
 

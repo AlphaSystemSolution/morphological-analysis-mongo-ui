@@ -77,7 +77,7 @@ public class DependencyGraphBuilderEditorPane extends BorderPane {
         children.remove(0, children.size());
 
         addTextControls(graphNode);
-        NodeType nodeType = graphNode.getNodeType();
+        DependencyGraphNodeType nodeType = graphNode.getNodeType();
         switch (nodeType) {
             case TERMINAL:
             case EMPTY:
