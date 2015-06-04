@@ -13,8 +13,7 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
+import javafx.scene.control.*;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Pane;
@@ -45,6 +44,7 @@ public class CanvasPane extends Pane {
     public static final String TERMINAL_GROUP_ID_PREFIX = "terminal";
     private static final double RADIUS = 2.0;
     private final ObjectProperty<CanvasData> canvasDataObject;
+    private final ContextMenu contextMenu;
     private RelationshipSelectionDialog relationshipSelectionDialog;
     private PhraseSelectionDialog phraseSelectionDialog;
     private SVGGraphicsContext svgGraphicsContext;
@@ -54,7 +54,7 @@ public class CanvasPane extends Pane {
     private Point2D startPoint;
     private Point2D endPoint;
     private Rectangle bound;
-
+    private Text selectedArabicText;
 
     public CanvasPane(CanvasData data) {
         this.canvasDataObject = new SimpleObjectProperty<>(data);
@@ -62,7 +62,8 @@ public class CanvasPane extends Pane {
         CanvasMetaData metaData = data.getCanvasMetaData();
         int width = metaData.getWidth();
         int height = metaData.getHeight();
-
+        contextMenu = new ContextMenu();
+        initContextMenu();
         relationshipSelectionDialog = new RelationshipSelectionDialog();
         phraseSelectionDialog = new PhraseSelectionDialog();
         initListeners();
@@ -81,6 +82,30 @@ public class CanvasPane extends Pane {
         setMinSize(USE_PREF_SIZE, USE_PREF_SIZE);
         setMaxSize(USE_PREF_SIZE, USE_PREF_SIZE);
         setPrefSize(width + 200, height + 200);
+    }
+
+    private void initContextMenu() {
+        MenuItem menuItem = new MenuItem("Select Phrase");
+        menuItem.setOnAction(event -> {
+            if (selectedArabicText != null) {
+                selectPhrase(selectedArabicText);
+            }
+        });
+        contextMenu.getItems().add(menuItem);
+
+        Menu menu = new Menu("Add Empty Node");
+        menuItem = new MenuItem("Right of this node");
+        menuItem.setOnAction(event -> {
+            System.out.println("Right");
+        });
+        menu.getItems().add(menuItem);
+        menuItem = new MenuItem("Left of this node");
+        menuItem.setOnAction(event -> {
+            System.out.println("Left");
+        });
+        menu.getItems().add(menuItem);
+
+        contextMenu.getItems().add(menu);
     }
 
     private void initListeners() {
@@ -243,8 +268,10 @@ public class CanvasPane extends Pane {
         double translateX = tn.getTranslateX();
         double translateY = tn.getTranslateY();
         arabicText.setOnMouseClicked(event -> {
-            Text text = (Text) event.getSource();
-            selectPhrase(translateX, translateY, text);
+            selectedArabicText = (Text) event.getSource();
+            if (event.isPopupTrigger()) {
+                contextMenu.show(selectedArabicText, event.getScreenX(), event.getScreenY());
+            }
         });
 
         String id = format("trans_%s", tn.getId());
@@ -288,9 +315,10 @@ public class CanvasPane extends Pane {
         canvasPane.getChildren().add(group);
     }
 
-    private void selectPhrase(double translateX, double translateY, Text text) {
+    private void selectPhrase(Text text) {
         TerminalNode userData = (TerminalNode) text.getUserData();
-
+        double translateX = userData.getTranslateX();
+        double translateY = userData.getTranslateY();
         updateSelectedShape(text, translateX, translateY);
 
         PhraseSelectionModel phraseSelectionModel = phraseSelectionDialog.getPhraseSelectionModel();
