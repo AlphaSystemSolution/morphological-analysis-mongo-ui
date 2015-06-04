@@ -45,8 +45,4 @@ public enum NodeType {
      */
     ROOT,
 
-    /**
-     * Represents the group of nodes.
-     */
-    GROUP
 }

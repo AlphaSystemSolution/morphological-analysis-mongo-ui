@@ -3,19 +3,16 @@
  */
 package com.alphasystem.morphologicalanalysis.ui.util;
 
+import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
+
+import javax.swing.*;
+import javax.swing.table.TableCellRenderer;
+import java.awt.*;
+
 import static com.alphasystem.arabic.model.ArabicWord.getArabicNumber;
 import static com.alphasystem.arabic.ui.util.Constants.ARABIC_FONT_BOLD_20;
 import static com.alphasystem.arabic.ui.util.Constants.ARABIC_FONT_NAME;
 import static java.lang.String.format;
-
-import java.awt.Component;
-import java.awt.Dimension;
-
-import javax.swing.JLabel;
-import javax.swing.JTable;
-import javax.swing.table.TableCellRenderer;
-
-import com.alphasystem.morphologicalanalysis.model.Token;
 
 /**
  * @author sali

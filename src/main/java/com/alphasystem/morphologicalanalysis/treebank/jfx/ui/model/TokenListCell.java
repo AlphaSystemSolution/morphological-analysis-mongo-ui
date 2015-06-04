@@ -1,6 +1,6 @@
 package com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model;
 
-import com.alphasystem.morphologicalanalysis.model.Token;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;

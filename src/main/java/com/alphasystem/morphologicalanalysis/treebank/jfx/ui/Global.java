@@ -1,13 +1,13 @@
 package com.alphasystem.morphologicalanalysis.treebank.jfx.ui;
 
-import com.alphasystem.morphologicalanalysis.model.support.PartOfSpeech;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech;
 import javafx.scene.Scene;
 import javafx.scene.text.Font;
 
 import java.util.List;
 import java.util.ResourceBundle;
 
-import static com.alphasystem.morphologicalanalysis.model.support.PartOfSpeech.DEFINITE_ARTICLE;
+import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.DEFINITE_ARTICLE;
 import static java.lang.String.format;
 import static java.util.Collections.singletonList;
 import static javafx.scene.text.Font.font;

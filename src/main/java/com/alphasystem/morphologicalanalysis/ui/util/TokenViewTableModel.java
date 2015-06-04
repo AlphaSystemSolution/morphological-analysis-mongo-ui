@@ -3,9 +3,9 @@
  */
 package com.alphasystem.morphologicalanalysis.ui.util;
 
-import com.alphasystem.morphologicalanalysis.model.Token;
-import com.alphasystem.morphologicalanalysis.model.Verse;
 import com.alphasystem.morphologicalanalysis.util.TokenComparator;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.Verse;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
@@ -20,16 +20,11 @@ import static java.util.Collections.sort;
  */
 public class TokenViewTableModel extends AbstractTableModel {
 
-	private static final long serialVersionUID = -8064277892076927818L;
-
 	public static final int MORPHOLOGICAL_DESCRIPTION_COLUMN_INDEX = 0;
-
 	public static final int TOKEN_COLUMN_INDEX = 1;
-
 	public static final int TOKEN_NUMBER_COLUMN_INDEX = 2;
-
 	public static final int CHECK_BOX_COLUMN_INDEX = 3;
-
+	private static final long serialVersionUID = -8064277892076927818L;
 	private List<Token> tokens;
 
 	private Boolean[] selected;

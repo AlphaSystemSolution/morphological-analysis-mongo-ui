@@ -1,12 +1,12 @@
 package com.alphasystem.morphologicalanalysis.treebank.jfx.ui.util;
 
-import com.alphasystem.morphologicalanalysis.model.Chapter;
-import com.alphasystem.morphologicalanalysis.model.Location;
-import com.alphasystem.morphologicalanalysis.model.Token;
 import com.alphasystem.morphologicalanalysis.repository.LocationRepository;
 import com.alphasystem.morphologicalanalysis.repository.TokenRepository;
 import com.alphasystem.morphologicalanalysis.ui.util.ChapterAdapter;
 import com.alphasystem.morphologicalanalysis.util.MorphologicalAnalysisRepositoryUtil;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.Chapter;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
 import com.alphasystem.persistence.mongo.spring.support.ApplicationContextProvider;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;

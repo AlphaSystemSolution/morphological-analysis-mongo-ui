@@ -3,6 +3,19 @@
  */
 package com.alphasystem.morphologicalanalysis.ui.comp;
 
+import com.alphasystem.arabic.model.ArabicLetterType;
+import com.alphasystem.arabic.model.DiacriticType;
+import com.alphasystem.arabickeyboard.ui.ArabicJideKeyboardPanel;
+import com.alphasystem.arabickeyboard.ui.KeyboardButtonHelper;
+import com.alphasystem.arabickeyboard.ui.KeyboardTarget;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.support.RootWord;
+import com.alphasystem.ui.AbstractComponentAction;
+import com.jidesoft.popup.JidePopup;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+
 import static com.alphasystem.arabic.model.ArabicLetterType.getByUnicode;
 import static com.alphasystem.morphologicalanalysis.ui.comp.RootWordLabel.DEFAULT_BORDER;
 import static com.alphasystem.morphologicalanalysis.ui.comp.RootWordLabel.SELECTED_BORDER;
@@ -10,62 +23,21 @@ import static com.alphasystem.ui.util.SpringUtilities.makeCompactGrid;
 import static com.alphasystem.util.AppUtil.getIcon;
 import static java.awt.BorderLayout.CENTER;
 
-import java.awt.BorderLayout;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.JButton;
-import javax.swing.JPanel;
-import javax.swing.SpringLayout;
-
-import com.alphasystem.arabic.model.ArabicLetterType;
-import com.alphasystem.arabic.model.DiacriticType;
-import com.alphasystem.arabickeyboard.ui.ArabicJideKeyboardPanel;
-import com.alphasystem.arabickeyboard.ui.KeyboardButtonHelper;
-import com.alphasystem.arabickeyboard.ui.KeyboardTarget;
-import com.alphasystem.morphologicalanalysis.model.support.RootWord;
-import com.alphasystem.ui.AbstractComponentAction;
-import com.jidesoft.popup.JidePopup;
-
 /**
  * @author sali
  * 
  */
 public class RootWordSelectionPanel extends JPanel implements KeyboardTarget {
 
-	private class ButtonSelectionListener extends AbstractAction {
-
-		private static final long serialVersionUID = -2646737387313771740L;
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			highlightLabel(selectedLabel, false);
-			selectedLabel = (RootWordLabel) e.getSource();
-			highlightLabel(selectedLabel, true);
-		}
-
-	}
-
 	private static final long serialVersionUID = -6322605817072284660L;
-
 	private static final int HEIGHT = 40;
-
 	private JidePopup keyboardPopup;
-
 	private JButton keyboardButton;
-
 	private RootWordLabel firstRadicalLabel;
-
 	private RootWordLabel secondRadicalLabel;
-
 	private RootWordLabel thirdRadicalLabel;
-
 	private RootWordLabel fourthRadicalLabel;
-
 	private RootWordLabel selectedLabel;
-
 	private RootWord rootWord;
 
 	public RootWordSelectionPanel(RootWord rootWord) {
@@ -229,5 +201,18 @@ public class RootWordSelectionPanel extends JPanel implements KeyboardTarget {
 		fourthRadicalLabel.setRootWord(al);
 
 		firstRadicalLabel.doClick();
+	}
+
+	private class ButtonSelectionListener extends AbstractAction {
+
+		private static final long serialVersionUID = -2646737387313771740L;
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			highlightLabel(selectedLabel, false);
+			selectedLabel = (RootWordLabel) e.getSource();
+			highlightLabel(selectedLabel, true);
+		}
+
 	}
 }

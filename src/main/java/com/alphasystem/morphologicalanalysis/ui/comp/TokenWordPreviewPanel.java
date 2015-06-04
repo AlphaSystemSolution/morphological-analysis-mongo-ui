@@ -3,32 +3,22 @@
  */
 package com.alphasystem.morphologicalanalysis.ui.comp;
 
+import com.alphasystem.arabic.model.ArabicLetter;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
+import com.jidesoft.swing.JideToggleButton;
+
+import javax.swing.*;
+import javax.swing.border.Border;
+import java.awt.*;
+
 import static com.alphasystem.arabic.ui.util.Constants.ARABIC_FONT_PLAIN_28;
 import static com.alphasystem.ui.util.SpringUtilities.makeCompactGrid;
 import static java.awt.BorderLayout.CENTER;
 import static java.awt.BorderLayout.SOUTH;
 import static java.awt.Color.BLACK;
 import static java.awt.Font.PLAIN;
-import static javax.swing.BorderFactory.createCompoundBorder;
-import static javax.swing.BorderFactory.createEmptyBorder;
-import static javax.swing.BorderFactory.createEtchedBorder;
-import static javax.swing.BorderFactory.createLineBorder;
-import static javax.swing.BorderFactory.createTitledBorder;
+import static javax.swing.BorderFactory.*;
 import static org.apache.commons.lang3.StringUtils.isBlank;
-
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.Font;
-
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.SpringLayout;
-import javax.swing.border.Border;
-
-import com.alphasystem.arabic.model.ArabicLetter;
-import com.alphasystem.morphologicalanalysis.model.Location;
-import com.jidesoft.swing.JideToggleButton;
 
 /**
  * @author sali

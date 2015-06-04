@@ -1,17 +1,17 @@
 package com.alphasystem.morphologicalanalysis.treebank.jfx.ui.util;
 
-import com.alphasystem.morphologicalanalysis.model.Location;
-import com.alphasystem.morphologicalanalysis.model.Token;
-import com.alphasystem.morphologicalanalysis.model.support.GrammaticalRelationship;
-import com.alphasystem.morphologicalanalysis.model.support.PartOfSpeech;
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.*;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.support.GrammaticalRelationship;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech;
 import javafx.collections.ObservableList;
 import javafx.geometry.Point2D;
 import javafx.scene.shape.Line;
 
 import java.util.List;
 
-import static com.alphasystem.morphologicalanalysis.model.support.PartOfSpeech.NOUN;
+import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.NOUN;
 import static javafx.collections.FXCollections.observableArrayList;
 import static javafx.collections.FXCollections.reverse;
 

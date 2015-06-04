@@ -1,7 +1,7 @@
 package com.alphasystem.morphologicalanalysis.ui.common;
 
 import com.alphasystem.arabic.model.ArabicSupportEnum;
-import com.alphasystem.morphologicalanalysis.model.support.GrammaticalRelationship;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.support.GrammaticalRelationship;
 import javafx.scene.control.ComboBox;
 
 import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.Global.TREE_BANK_STYLE_SHEET;

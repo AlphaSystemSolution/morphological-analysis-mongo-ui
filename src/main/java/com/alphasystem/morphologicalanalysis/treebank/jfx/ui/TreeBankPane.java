@@ -1,6 +1,5 @@
 package com.alphasystem.morphologicalanalysis.treebank.jfx.ui;
 
-import com.alphasystem.morphologicalanalysis.model.Token;
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.components.CanvasPane;
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.components.ControlPane;
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.components.NodeSelectionDialog;
@@ -9,6 +8,7 @@ import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.CanvasMetaDat
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.GraphNode;
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.util.GraphBuilder;
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.util.SerializationTool;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
 import javafx.beans.property.ObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
@@ -177,6 +177,7 @@ public class TreeBankPane extends BorderPane {
         menuItem.setOnAction(event -> {
             getScene().setCursor(WAIT);
             runLater(() -> {
+                imageFileChooser.setInitialDirectory(fileChooser.getInitialDirectory());
                 File file = imageFileChooser.showSaveDialog(getStage());
                 if (file != null) {
                     WritableImage writableImage = canvasPane.getCanvasPane().snapshot(new SnapshotParameters(), null);

@@ -1,9 +1,9 @@
 package com.alphasystem.morphologicalanalysis.ui.util;
 
+import com.alphasystem.morphologicalanalysis.wordbyword.model.Chapter;
+
 import static com.alphasystem.arabic.model.ArabicWord.getArabicNumber;
 import static java.lang.String.format;
-
-import com.alphasystem.morphologicalanalysis.model.Chapter;
 
 /**
  * @author sali

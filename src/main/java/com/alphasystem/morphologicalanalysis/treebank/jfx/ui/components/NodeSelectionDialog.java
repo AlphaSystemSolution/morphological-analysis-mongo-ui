@@ -1,11 +1,11 @@
 package com.alphasystem.morphologicalanalysis.treebank.jfx.ui.components;
 
-import com.alphasystem.morphologicalanalysis.model.Chapter;
-import com.alphasystem.morphologicalanalysis.model.Token;
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.TokenListCell;
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.util.RepositoryTool;
 import com.alphasystem.morphologicalanalysis.ui.util.ChapterAdapter;
 import com.alphasystem.morphologicalanalysis.ui.util.VerseAdapter;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.Chapter;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;

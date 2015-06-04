@@ -3,11 +3,11 @@
  */
 package com.alphasystem.morphologicalanalysis.ui.util;
 
+import com.alphasystem.arabic.model.ArabicWord;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
+
 import static com.alphasystem.arabic.model.ArabicWord.getArabicNumber;
 import static java.lang.String.format;
-
-import com.alphasystem.arabic.model.ArabicWord;
-import com.alphasystem.morphologicalanalysis.model.Location;
 
 /**
  * @author sali

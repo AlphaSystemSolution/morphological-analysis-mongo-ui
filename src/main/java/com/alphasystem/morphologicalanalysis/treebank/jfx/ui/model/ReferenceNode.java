@@ -1,6 +1,6 @@
 package com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model;
 
-import com.alphasystem.morphologicalanalysis.model.Token;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
 
 import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.NodeType.REFERENCE;
 

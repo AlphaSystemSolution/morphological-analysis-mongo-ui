@@ -4,14 +4,14 @@
 package com.alphasystem.morphologicalanalysis.ui.util;
 
 import com.alphasystem.arabic.model.NamedTemplate;
-import com.alphasystem.morphologicalanalysis.model.*;
-import com.alphasystem.morphologicalanalysis.model.support.*;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.*;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.support.*;
 
 import javax.swing.*;
 import java.awt.event.ActionListener;
 
 import static com.alphasystem.arabic.ui.util.ComboBoxHelper.*;
-import static com.alphasystem.morphologicalanalysis.model.AbstractProperties.*;
+import static com.alphasystem.morphologicalanalysis.wordbyword.model.AbstractProperties.*;
 
 /**
  * @author sali

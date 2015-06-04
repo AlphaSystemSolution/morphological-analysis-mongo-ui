@@ -1,8 +1,8 @@
 package com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model;
 
-import com.alphasystem.morphologicalanalysis.model.Location;
-import com.alphasystem.morphologicalanalysis.model.Token;
-import com.alphasystem.morphologicalanalysis.model.support.PartOfSpeech;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.ObservableList;

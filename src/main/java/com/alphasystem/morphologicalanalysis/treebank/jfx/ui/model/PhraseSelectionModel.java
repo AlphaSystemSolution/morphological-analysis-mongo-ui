@@ -1,14 +1,14 @@
 package com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model;
 
-import com.alphasystem.morphologicalanalysis.model.support.GrammaticalRelationship;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.support.GrammaticalRelationship;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.SimpleObjectProperty;
 
-import static com.alphasystem.morphologicalanalysis.model.support.GrammaticalRelationship.NONE;
 import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.Global.NONE_SELECTED;
+import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.GrammaticalRelationship.NONE;
 
 /**
  * @author sali

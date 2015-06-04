@@ -1,10 +1,10 @@
 package com.alphasystem.morphologicalanalysis.treebank.jfx.ui.util;
 
 import com.alphasystem.ApplicationException;
-import com.alphasystem.morphologicalanalysis.model.support.GrammaticalRelationship;
-import com.alphasystem.morphologicalanalysis.model.support.PartOfSpeech;
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.*;
 import com.alphasystem.morphologicalanalysis.treebank.model.*;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.support.GrammaticalRelationship;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech;
 import com.alphasystem.util.ZipFileEntry;
 import javafx.collections.ObservableList;
 import org.apache.commons.io.FilenameUtils;
@@ -234,7 +234,6 @@ public class SerializationTool {
             constructorArgument.getValues().add(serializePartOfSpeechNode(partOfSpeech));
         }
 
-
         return objectType;
     }
 
@@ -299,6 +298,20 @@ public class SerializationTool {
     private ObjectType serializeEmptyNode(EmptyNode node) {
         ObjectType objectType = OBJECT_FACTORY.createObjectType().withType(node.getClass().getName());
         List<ConstructorArgument> constructorArgs = objectType.getArgument();
+
+        constructorArgs.add(createStringArgument(node.getId()));
+        constructorArgs.add(createDoubleArgument(node.getX()));
+        constructorArgs.add(createDoubleArgument(node.getY()));
+        constructorArgs.add(createDoubleArgument(node.getX1()));
+        constructorArgs.add(createDoubleArgument(node.getY1()));
+        constructorArgs.add(createDoubleArgument(node.getX2()));
+        constructorArgs.add(createDoubleArgument(node.getY2()));
+        constructorArgs.add(createDoubleArgument(node.getX3()));
+        constructorArgs.add(createDoubleArgument(node.getY3()));
+        ConstructorArgument constructorArgument = OBJECT_FACTORY.createConstructorArgument()
+                .withType(PartOfSpeechNode.class.getName());
+        constructorArgument.getValues().add(serializePartOfSpeechNode(node.getPartOfSpeeches().get(0)));
+        constructorArgs.add(constructorArgument);
 
         return objectType;
     }

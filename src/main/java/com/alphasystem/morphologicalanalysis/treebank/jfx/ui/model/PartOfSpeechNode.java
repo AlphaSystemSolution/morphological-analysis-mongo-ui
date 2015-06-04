@@ -1,10 +1,10 @@
 package com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model;
 
 import com.alphasystem.arabic.model.ArabicLetters;
-import com.alphasystem.morphologicalanalysis.model.AbstractProperties;
-import com.alphasystem.morphologicalanalysis.model.Location;
-import com.alphasystem.morphologicalanalysis.model.NounProperties;
-import com.alphasystem.morphologicalanalysis.model.support.PartOfSpeech;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.AbstractProperties;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.NounProperties;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;

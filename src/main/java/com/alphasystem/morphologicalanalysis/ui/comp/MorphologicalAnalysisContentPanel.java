@@ -3,13 +3,13 @@
  */
 package com.alphasystem.morphologicalanalysis.ui.comp;
 
-import com.alphasystem.morphologicalanalysis.model.Token;
-import com.alphasystem.morphologicalanalysis.model.Verse;
 import com.alphasystem.morphologicalanalysis.ui.MorphologicalAnalysisFrame;
 import com.alphasystem.morphologicalanalysis.ui.comp.action.ExitAction;
 import com.alphasystem.morphologicalanalysis.ui.comp.action.ExportTokenAction;
 import com.alphasystem.morphologicalanalysis.ui.util.TokenViewTableCellRendrer;
 import com.alphasystem.morphologicalanalysis.ui.util.TokenViewTableModel;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.Verse;
 
 import javax.swing.*;
 import javax.swing.table.TableCellRenderer;
