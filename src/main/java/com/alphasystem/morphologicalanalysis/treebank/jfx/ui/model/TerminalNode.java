@@ -1,5 +1,6 @@
 package com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model;
 
+import com.alphasystem.morphologicalanalysis.graph.model.support.DependencyGraphNodeType;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech;
@@ -9,8 +10,8 @@ import javafx.collections.ObservableList;
 
 import java.util.List;
 
+import static com.alphasystem.morphologicalanalysis.graph.model.support.DependencyGraphNodeType.TERMINAL;
 import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.Global.PART_OF_SPEECH_EXCLUDE_LIST;
-import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.DependencyGraphNodeType.TERMINAL;
 import static javafx.collections.FXCollections.observableArrayList;
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 

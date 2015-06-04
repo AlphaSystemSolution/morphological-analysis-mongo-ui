@@ -8,7 +8,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
 
-import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.DependencyGraphNodeType.RELATIONSHIP;
+import static com.alphasystem.morphologicalanalysis.graph.model.support.DependencyGraphNodeType.RELATIONSHIP;
 import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.util.CubicCurveHelper.calculateCurvePoint;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.GrammaticalRelationship.NONE;
 import static javafx.scene.paint.Color.web;

@@ -3,7 +3,7 @@ package com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model;
 import com.alphasystem.arabic.model.ArabicWord;
 
 import static com.alphasystem.arabic.model.ArabicLetters.WORD_SPACE;
-import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.DependencyGraphNodeType.HIDDEN;
+import static com.alphasystem.morphologicalanalysis.graph.model.support.DependencyGraphNodeType.HIDDEN;
 
 /**
  * @author sali

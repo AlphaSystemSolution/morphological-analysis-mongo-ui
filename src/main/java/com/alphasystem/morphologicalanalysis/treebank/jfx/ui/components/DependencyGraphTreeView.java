@@ -1,6 +1,10 @@
 package com.alphasystem.morphologicalanalysis.treebank.jfx.ui.components;
 
-import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.*;
+import com.alphasystem.morphologicalanalysis.graph.model.support.DependencyGraphNodeType;
+import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.GraphNode;
+import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.PartOfSpeechNode;
+import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.RootNode;
+import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.TerminalNode;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
@@ -9,8 +13,8 @@ import javafx.scene.control.TreeView;
 
 import java.util.List;
 
+import static com.alphasystem.morphologicalanalysis.graph.model.support.DependencyGraphNodeType.*;
 import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.Global.TREE_BANK_STYLE_SHEET;
-import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.DependencyGraphNodeType.*;
 import static javafx.scene.control.SelectionMode.SINGLE;
 
 /**

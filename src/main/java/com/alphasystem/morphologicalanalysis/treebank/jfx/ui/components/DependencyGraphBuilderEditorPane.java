@@ -1,5 +1,6 @@
 package com.alphasystem.morphologicalanalysis.treebank.jfx.ui.components;
 
+import com.alphasystem.morphologicalanalysis.graph.model.support.DependencyGraphNodeType;
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.*;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;

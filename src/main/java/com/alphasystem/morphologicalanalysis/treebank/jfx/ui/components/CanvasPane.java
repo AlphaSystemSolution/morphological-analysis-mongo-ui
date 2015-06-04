@@ -1,5 +1,6 @@
 package com.alphasystem.morphologicalanalysis.treebank.jfx.ui.components;
 
+import com.alphasystem.morphologicalanalysis.graph.model.support.DependencyGraphNodeType;
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.*;
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.util.DependencyGraphGraphicTool;
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.util.GraphBuilder;
@@ -29,10 +30,10 @@ import javafx.scene.text.Text;
 import java.util.List;
 import java.util.Optional;
 
+import static com.alphasystem.morphologicalanalysis.graph.model.support.DependencyGraphNodeType.EMPTY;
+import static com.alphasystem.morphologicalanalysis.graph.model.support.DependencyGraphNodeType.HIDDEN;
 import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.Global.ARABIC_FONT_BIG;
 import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.Global.ARABIC_FONT_SMALL;
-import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.DependencyGraphNodeType.EMPTY;
-import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.DependencyGraphNodeType.HIDDEN;
 import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.util.DependencyGraphGraphicTool.DARK_GRAY_CLOUD;
 import static com.alphasystem.util.AppUtil.isGivenType;
 import static java.lang.String.format;

@@ -1,6 +1,6 @@
 package com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model;
 
-import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.DependencyGraphNodeType.EMPTY;
+import static com.alphasystem.morphologicalanalysis.graph.model.support.DependencyGraphNodeType.EMPTY;
 
 /**
  * @author sali
