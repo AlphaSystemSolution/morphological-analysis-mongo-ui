@@ -259,7 +259,6 @@ public class DependencyGraphBuilderEditorPane extends BorderPane {
         row++;
     }
 
-
     private interface GetterAdapter<T extends GraphNode> {
         Double get(T node);
     }

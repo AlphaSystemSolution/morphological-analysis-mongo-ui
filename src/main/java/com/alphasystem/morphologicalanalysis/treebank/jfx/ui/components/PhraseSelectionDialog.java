@@ -36,8 +36,16 @@ public class PhraseSelectionDialog extends Dialog<PhraseSelectionModel> {
             ButtonBar.ButtonData buttonData = param.getButtonData();
             PhraseSelectionModel result = phraseSelectionModel;
             if (buttonData.isCancelButton()) {
-                reset();
-                result = null;
+                TerminalNode firstNode = phraseSelectionModel.getFirstNode();
+                TerminalNode lastNode = phraseSelectionModel.getLastNode();
+                if (firstNode != null && lastNode != null) {
+                    reset();
+                    result = null;
+                } else if (lastNode != null) {
+                    phraseSelectionModel.setLastNode(null);
+                } else if (firstNode != null) {
+                    phraseSelectionModel.setFirstNode(null);
+                }
             }
             return result;
         });
@@ -89,11 +97,8 @@ public class PhraseSelectionDialog extends Dialog<PhraseSelectionModel> {
 
         getDialogPane().getButtonTypes().addAll(OK, FINISH, CANCEL);
 
-        Button cancelButton = (Button) getDialogPane().lookupButton(CANCEL);
-        cancelButton.disableProperty().bind(phraseSelectionModel.uninitialized());
         Button finishButton = (Button) getDialogPane().lookupButton(FINISH);
-        finishButton.disableProperty().bind(firstNodeLabel.textProperty().isNotEqualTo(NONE_SELECTED)
-                .and(comboBox.getSelectionModel().selectedIndexProperty().isEqualTo(0)));
+        finishButton.disableProperty().bind(comboBox.getSelectionModel().selectedIndexProperty().isNotEqualTo(0));
 
         getDialogPane().setContent(gridPane);
         getDialogPane().setPrefWidth(400);

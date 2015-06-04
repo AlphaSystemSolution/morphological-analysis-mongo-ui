@@ -168,6 +168,13 @@ public class TreeBankPane extends BorderPane {
             });
         });
         subMenu.getItems().add(menuItem);
+
+        menuItem = new MenuItem("Add Empty Node ...");
+        menuItem.setAccelerator(new KeyCodeCombination(E, CONTROL_DOWN));
+        menuItem.setOnAction(event -> {
+
+        });
+
         items.add(subMenu);
 
         subMenu = new Menu("Export");

@@ -105,6 +105,18 @@ public class CanvasPane extends Pane {
                 drawNodes(newData.getNodes(), false);
             }
         });
+        phraseSelectionDialog.getPhraseSelectionModel().firstNodeProperty()
+                .addListener((observable, oldValue, newValue) -> {
+                    if (oldValue != null && newValue == null) {
+                        removeSelectedShpae();
+                    }
+                });
+        phraseSelectionDialog.getPhraseSelectionModel().lastNodeProperty()
+                .addListener((observable, oldValue, newValue) -> {
+                    if (oldValue != null && newValue == null) {
+                        removeSelectedShpae();
+                    }
+                });
     }
 
     @SuppressWarnings({"unused"})
@@ -232,26 +244,7 @@ public class CanvasPane extends Pane {
         double translateY = tn.getTranslateY();
         arabicText.setOnMouseClicked(event -> {
             Text text = (Text) event.getSource();
-            TerminalNode userData = (TerminalNode) text.getUserData();
-            updateSelectedShape(text, translateX, translateY);
-
-            PhraseSelectionModel phraseSelectionModel = phraseSelectionDialog.getPhraseSelectionModel();
-            if (phraseSelectionModel.getFirstNode() == null) {
-                phraseSelectionModel.setFirstNode(userData);
-            } else {
-                phraseSelectionModel.setLastNode(userData);
-            }
-
-            Optional<PhraseSelectionModel> result = phraseSelectionDialog.showAndWait();
-            result.ifPresent(psm -> {
-                GrammaticalRelationship relationship = psm.getRelationship();
-                if (relationship == null || relationship.equals(GrammaticalRelationship.NONE)) {
-                    return;
-                }
-                addPhrase(psm);
-                phraseSelectionDialog.reset();
-                updateSelectedShape(null, translateX, translateY);
-            });
+            selectPhrase(translateX, translateY, text);
         });
 
         String id = format("trans_%s", tn.getId());
@@ -286,14 +279,37 @@ public class CanvasPane extends Pane {
         group.setTranslateY(translateY);
 
         tn.translateXProperty().addListener((observable, oldValue, newValue) -> {
-            System.out.println("X: " + tn.getId() + " : " + newValue + group);
             group.setTranslateX((Double) newValue);
         });
         tn.translateYProperty().addListener((observable, oldValue, newValue) -> {
-            System.out.println("Y: " + tn.getId() + " : " + newValue);
+            group.setTranslateY((Double) newValue);
         });
 
         canvasPane.getChildren().add(group);
+    }
+
+    private void selectPhrase(double translateX, double translateY, Text text) {
+        TerminalNode userData = (TerminalNode) text.getUserData();
+
+        updateSelectedShape(text, translateX, translateY);
+
+        PhraseSelectionModel phraseSelectionModel = phraseSelectionDialog.getPhraseSelectionModel();
+        if (phraseSelectionModel.getFirstNode() == null) {
+            phraseSelectionModel.setFirstNode(userData);
+        } else {
+            phraseSelectionModel.setLastNode(userData);
+        }
+
+        Optional<PhraseSelectionModel> result = phraseSelectionDialog.showAndWait();
+        result.ifPresent(psm -> {
+            GrammaticalRelationship relationship = psm.getRelationship();
+            if (relationship == null || relationship.equals(GrammaticalRelationship.NONE)) {
+                return;
+            }
+            addPhrase(psm);
+            phraseSelectionDialog.reset();
+            updateSelectedShape(null, translateX, translateY);
+        });
     }
 
     private void selectRelationship(String text, double cx, double cy, double translateX, double translateY,
@@ -405,6 +421,10 @@ public class CanvasPane extends Pane {
         }
         alert.setContentText(contentText);
         return alert.showAndWait();
+    }
+
+    private void removeSelectedShpae() {
+        updateSelectedShape(null, 0, 0);
     }
 
     private void updateSelectedShape(Shape shape, double translateX, double translateY) {
