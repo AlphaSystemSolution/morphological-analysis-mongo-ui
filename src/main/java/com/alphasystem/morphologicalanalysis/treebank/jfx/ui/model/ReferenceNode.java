@@ -2,7 +2,7 @@ package com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model;
 
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
 
-import static com.alphasystem.morphologicalanalysis.graph.model.support.DependencyGraphNodeType.REFERENCE;
+import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.REFERENCE;
 
 /**
  * @author sali

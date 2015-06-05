@@ -1,6 +1,6 @@
 package com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model;
 
-import com.alphasystem.morphologicalanalysis.graph.model.support.DependencyGraphNodeType;
+import com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech;
@@ -10,7 +10,7 @@ import javafx.collections.ObservableList;
 
 import java.util.List;
 
-import static com.alphasystem.morphologicalanalysis.graph.model.support.DependencyGraphNodeType.TERMINAL;
+import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.TERMINAL;
 import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.Global.PART_OF_SPEECH_EXCLUDE_LIST;
 import static javafx.collections.FXCollections.observableArrayList;
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
@@ -96,7 +96,7 @@ public class TerminalNode extends LineSupport {
      * @param translateX
      * @param translateY
      */
-    protected TerminalNode(DependencyGraphNodeType nodeType, Token token, String id, Double x, Double y,
+    protected TerminalNode(GraphNodeType nodeType, Token token, String id, Double x, Double y,
                            Double x1, Double y1, Double x2, Double y2, Double x3, Double y3,
                            Double translateX, Double translateY, PartOfSpeechNode... partOfSpeechNodes) {
         this(nodeType, id, getTokenValue(token), x, y, x1, y1, x2, y2, x3, y3, translateX, translateY);
@@ -133,7 +133,7 @@ public class TerminalNode extends LineSupport {
      * @param translateX
      * @param translateY
      */
-    protected TerminalNode(DependencyGraphNodeType nodeType, String id, String text, Double x, Double y,
+    protected TerminalNode(GraphNodeType nodeType, String id, String text, Double x, Double y,
                            Double x1, Double y1, Double x2, Double y2, Double x3, Double y3,
                            Double translateX, Double translateY) {
         super(nodeType, id, text, x, y, x1, y1, x2, y2, translateX, translateY);

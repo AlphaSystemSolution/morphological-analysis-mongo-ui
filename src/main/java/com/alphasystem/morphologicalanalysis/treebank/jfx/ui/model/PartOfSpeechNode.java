@@ -10,7 +10,7 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 
-import static com.alphasystem.morphologicalanalysis.graph.model.support.DependencyGraphNodeType.PART_OF_SPEECH;
+import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.PART_OF_SPEECH;
 
 /**
  * @author sali

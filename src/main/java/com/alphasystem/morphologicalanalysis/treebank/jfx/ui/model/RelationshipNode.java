@@ -1,6 +1,6 @@
 package com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model;
 
-import com.alphasystem.morphologicalanalysis.wordbyword.model.support.GrammaticalRelationship;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.support.RelationshipType;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -8,9 +8,9 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
 
-import static com.alphasystem.morphologicalanalysis.graph.model.support.DependencyGraphNodeType.RELATIONSHIP;
+import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.RELATIONSHIP;
 import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.util.CubicCurveHelper.calculateCurvePoint;
-import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.GrammaticalRelationship.NONE;
+import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.RelationshipType.NONE;
 import static javafx.scene.paint.Color.web;
 
 /**
@@ -50,7 +50,7 @@ public class RelationshipNode extends GraphNode {
 
     private final DoubleProperty curvePointY;
 
-    private final ObjectProperty<GrammaticalRelationship> grammaticalRelationship;
+    private final ObjectProperty<RelationshipType> grammaticalRelationship;
 
     private final ObjectProperty<Color> stroke;
 
@@ -62,7 +62,7 @@ public class RelationshipNode extends GraphNode {
     }
 
     /**
-     * @param grammaticalRelationship
+     * @param relationshipType
      * @param id
      * @param x
      * @param y
@@ -75,12 +75,12 @@ public class RelationshipNode extends GraphNode {
      * @param endX
      * @param endY
      */
-    public RelationshipNode(GrammaticalRelationship grammaticalRelationship, String id, Double x, Double y,
+    public RelationshipNode(RelationshipType relationshipType, String id, Double x, Double y,
                             Double startX, Double startY, Double controlX1, Double controlY1, Double controlX2,
                             Double controlY2, Double endX, Double endY, Double t1, Double t2) {
-        super(RELATIONSHIP, id, grammaticalRelationship.getLabel().toUnicode(), x, y);
-        this.grammaticalRelationship = new SimpleObjectProperty<>(grammaticalRelationship);
-        this.stroke = new SimpleObjectProperty<>(web(grammaticalRelationship.getColorCode()));
+        super(RELATIONSHIP, id, relationshipType.getLabel().toUnicode(), x, y);
+        this.grammaticalRelationship = new SimpleObjectProperty<>(relationshipType);
+        this.stroke = new SimpleObjectProperty<>(web(relationshipType.getColorCode()));
         this.startX = new SimpleDoubleProperty(startX);
         this.startY = new SimpleDoubleProperty(startY);
         this.controlX1 = new SimpleDoubleProperty(controlX1);
@@ -180,15 +180,15 @@ public class RelationshipNode extends GraphNode {
         return stroke;
     }
 
-    public final GrammaticalRelationship getGrammaticalRelationship() {
+    public final RelationshipType getGrammaticalRelationship() {
         return grammaticalRelationship.get();
     }
 
-    public final void setGrammaticalRelationship(GrammaticalRelationship grammaticalRelationship) {
-        this.grammaticalRelationship.set(grammaticalRelationship);
+    public final void setGrammaticalRelationship(RelationshipType relationshipType) {
+        this.grammaticalRelationship.set(relationshipType);
     }
 
-    public final ObjectProperty<GrammaticalRelationship> grammaticalRelationshipProperty() {
+    public final ObjectProperty<RelationshipType> grammaticalRelationshipProperty() {
         return grammaticalRelationship;
     }
 

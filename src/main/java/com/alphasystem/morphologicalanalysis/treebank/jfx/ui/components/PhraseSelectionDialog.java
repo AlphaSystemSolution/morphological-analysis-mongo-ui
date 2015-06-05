@@ -5,7 +5,7 @@ import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.PhraseSelecti
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.TerminalNode;
 import com.alphasystem.morphologicalanalysis.ui.common.ArabicSupportEnumAdapter;
 import com.alphasystem.morphologicalanalysis.ui.common.ComboBoxFactory;
-import com.alphasystem.morphologicalanalysis.wordbyword.model.support.GrammaticalRelationship;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.support.RelationshipType;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Insets;
@@ -21,7 +21,7 @@ import static javafx.scene.control.ButtonType.*;
  */
 public class PhraseSelectionDialog extends Dialog<PhraseSelectionModel> {
 
-    private final ComboBox<ArabicSupportEnumAdapter<GrammaticalRelationship>> comboBox;
+    private final ComboBox<ArabicSupportEnumAdapter<RelationshipType>> comboBox;
     private PhraseSelectionModel phraseSelectionModel = new PhraseSelectionModel();
     private ObjectProperty<TerminalNode> terminalNode = new SimpleObjectProperty<>();
 
@@ -90,7 +90,7 @@ public class PhraseSelectionDialog extends Dialog<PhraseSelectionModel> {
             phraseSelectionModel.setRelationship(newValue.getValue());
         });
         phraseSelectionModel.relationshipProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue != null && newValue.equals(GrammaticalRelationship.NONE)) {
+            if (newValue != null && newValue.equals(RelationshipType.NONE)) {
                 comboBox.getSelectionModel().select(0);
             }
         });

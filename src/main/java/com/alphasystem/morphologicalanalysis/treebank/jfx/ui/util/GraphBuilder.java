@@ -3,8 +3,8 @@ package com.alphasystem.morphologicalanalysis.treebank.jfx.ui.util;
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.*;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
-import com.alphasystem.morphologicalanalysis.wordbyword.model.support.GrammaticalRelationship;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.support.RelationshipType;
 import javafx.collections.ObservableList;
 import javafx.geometry.Point2D;
 import javafx.scene.shape.Line;
@@ -75,12 +75,12 @@ public class GraphBuilder {
 
     /**
      * @param id
-     * @param grammaticalRelationship
+     * @param relationshipType
      * @param startPoint
      * @param endPoint
      * @return
      */
-    public RelationshipNode buildRelationshipNode(String id, GrammaticalRelationship grammaticalRelationship,
+    public RelationshipNode buildRelationshipNode(String id, RelationshipType relationshipType,
                                                   Point2D startPoint, Point2D endPoint) {
         double startX = startPoint.getX();
         double startY = startPoint.getY();
@@ -91,7 +91,7 @@ public class GraphBuilder {
         double x = (startX + endX) / 2;
         double y = (controlY1 + controlY2) / 2;
 
-        return new RelationshipNode(grammaticalRelationship, id, x, y, startX, startY,
+        return new RelationshipNode(relationshipType, id, x, y, startX, startY,
                 startX, controlY1, endX, controlY2, endX, endY, 0.500, 0.550);
     }
 

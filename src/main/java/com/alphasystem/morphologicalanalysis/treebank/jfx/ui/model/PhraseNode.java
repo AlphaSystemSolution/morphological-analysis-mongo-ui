@@ -1,13 +1,13 @@
 package com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model;
 
-import com.alphasystem.morphologicalanalysis.wordbyword.model.support.GrammaticalRelationship;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.support.RelationshipType;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
-import static com.alphasystem.morphologicalanalysis.graph.model.support.DependencyGraphNodeType.PHRASE;
-import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.GrammaticalRelationship.NONE;
+import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.PHRASE;
+import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.RelationshipType.NONE;
 
 /**
  * @author sali
@@ -24,7 +24,7 @@ public class PhraseNode extends LineSupport {
      */
     private final DoubleProperty cy;
 
-    private final ObjectProperty<GrammaticalRelationship> grammaticalRelationship;
+    private final ObjectProperty<RelationshipType> grammaticalRelationship;
 
     /**
      *
@@ -34,7 +34,7 @@ public class PhraseNode extends LineSupport {
     }
 
     /**
-     * @param grammaticalRelationship
+     * @param relationshipType
      * @param id
      * @param x
      * @param y
@@ -45,23 +45,23 @@ public class PhraseNode extends LineSupport {
      * @param cx
      * @param cy
      */
-    public PhraseNode(GrammaticalRelationship grammaticalRelationship, String id, Double x, Double y, Double x1,
+    public PhraseNode(RelationshipType relationshipType, String id, Double x, Double y, Double x1,
                       Double y1, Double x2, Double y2, Double cx, Double cy) {
-        super(PHRASE, id, grammaticalRelationship.getLabel().toUnicode(), x, y, x1, y1, x2, y2, 0.0, 0.0);
-        this.grammaticalRelationship = new SimpleObjectProperty<>(grammaticalRelationship);
+        super(PHRASE, id, relationshipType.getLabel().toUnicode(), x, y, x1, y1, x2, y2, 0.0, 0.0);
+        this.grammaticalRelationship = new SimpleObjectProperty<>(relationshipType);
         this.cx = new SimpleDoubleProperty(cx);
         this.cy = new SimpleDoubleProperty(cy);
     }
 
-    public final GrammaticalRelationship getGrammaticalRelationship() {
+    public final RelationshipType getGrammaticalRelationship() {
         return grammaticalRelationship.get();
     }
 
-    public final void setGrammaticalRelationship(GrammaticalRelationship grammaticalRelationship) {
-        this.grammaticalRelationship.set(grammaticalRelationship);
+    public final void setGrammaticalRelationship(RelationshipType relationshipType) {
+        this.grammaticalRelationship.set(relationshipType);
     }
 
-    public final ObjectProperty<GrammaticalRelationship> grammaticalRelationshipProperty() {
+    public final ObjectProperty<RelationshipType> grammaticalRelationshipProperty() {
         return grammaticalRelationship;
     }
 

@@ -1,12 +1,12 @@
 package com.alphasystem.morphologicalanalysis.treebank.jfx.ui.components;
 
-import com.alphasystem.morphologicalanalysis.graph.model.support.DependencyGraphNodeType;
+import com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType;
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.*;
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.util.DependencyGraphGraphicTool;
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.util.GraphBuilder;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
-import com.alphasystem.morphologicalanalysis.wordbyword.model.support.GrammaticalRelationship;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.support.RelationshipType;
 import com.alphasystem.svg.jfx.SVGGraphicsContext;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -30,8 +30,8 @@ import javafx.scene.text.Text;
 import java.util.List;
 import java.util.Optional;
 
-import static com.alphasystem.morphologicalanalysis.graph.model.support.DependencyGraphNodeType.EMPTY;
-import static com.alphasystem.morphologicalanalysis.graph.model.support.DependencyGraphNodeType.HIDDEN;
+import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.EMPTY;
+import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.HIDDEN;
 import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.Global.ARABIC_FONT_BIG;
 import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.Global.ARABIC_FONT_SMALL;
 import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.util.DependencyGraphGraphicTool.DARK_GRAY_CLOUD;
@@ -202,7 +202,7 @@ public class CanvasPane extends Pane {
     private void drawNodes(ObservableList<GraphNode> nodes, boolean removeGridLines) {
         svgGraphicsContext.removeAll(removeGridLines);
         for (GraphNode node : nodes) {
-            DependencyGraphNodeType nodeType = node.getNodeType();
+            GraphNodeType nodeType = node.getNodeType();
             switch (nodeType) {
                 case TERMINAL:
                 case EMPTY:
@@ -232,9 +232,9 @@ public class CanvasPane extends Pane {
         canvasDataObject.setValue(canvasData);
     }
 
-    private void addRelationship(GrammaticalRelationship grammaticalRelationship) {
+    private void addRelationship(RelationshipType relationshipType) {
         // Step 1: call GraphBuilder to create a relationship
-        RelationshipNode relationshipNode = graphBuilder.buildRelationshipNode(null, grammaticalRelationship,
+        RelationshipNode relationshipNode = graphBuilder.buildRelationshipNode(null, relationshipType,
                 startPoint, endPoint);
 
         // add this node into existing list of nodes and
@@ -286,7 +286,7 @@ public class CanvasPane extends Pane {
     private void buildTerminalNode(TerminalNode tn) {
         Line line = drawLine(tn);
 
-        DependencyGraphNodeType nodeType = tn.getNodeType();
+        GraphNodeType nodeType = tn.getNodeType();
         boolean hiddenOrEmptyNode = nodeType.equals(EMPTY) || nodeType.equals(HIDDEN);
         Color hiddenOrEmptyNodeColor = LIGHTGRAY.darker();
         Color color = hiddenOrEmptyNode ? hiddenOrEmptyNodeColor : BLACK;
@@ -373,8 +373,8 @@ public class CanvasPane extends Pane {
 
         Optional<PhraseSelectionModel> result = phraseSelectionDialog.showAndWait();
         result.ifPresent(psm -> {
-            GrammaticalRelationship relationship = psm.getRelationship();
-            if (relationship == null || relationship.equals(GrammaticalRelationship.NONE)) {
+            RelationshipType relationship = psm.getRelationship();
+            if (relationship == null || relationship.equals(RelationshipType.NONE)) {
                 return;
             }
             addPhrase(psm);
@@ -386,7 +386,7 @@ public class CanvasPane extends Pane {
     private void selectRelationship(String text, double cx, double cy, double translateX, double translateY,
                                     Text arabicText) {
         if (startPoint == null) {
-            Optional<GrammaticalRelationship> result = relationshipSelectionDialog.showAndWait();
+            Optional<RelationshipType> result = relationshipSelectionDialog.showAndWait();
             result.ifPresent(gr -> {
                 if (result.isPresent()) {
                     startPoint = new Point2D(cx + translateX, cy + translateY);
@@ -402,9 +402,9 @@ public class CanvasPane extends Pane {
                     endPoint = null;
                 } else {
                     relationshipSelectionDialog.setSecondPartOfSpeech(text);
-                    Optional<GrammaticalRelationship> result = relationshipSelectionDialog.showAndWait();
+                    Optional<RelationshipType> result = relationshipSelectionDialog.showAndWait();
                     result.ifPresent(gr -> {
-                        if (result.isPresent() && !gr.equals(GrammaticalRelationship.NONE)) {
+                        if (result.isPresent() && !gr.equals(RelationshipType.NONE)) {
                             addRelationship(gr);
                             updateSelectedShape(null, translateX, translateY);
                         }

@@ -3,7 +3,7 @@ package com.alphasystem.morphologicalanalysis.treebank.jfx.ui.components;
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.Global;
 import com.alphasystem.morphologicalanalysis.ui.common.ArabicSupportEnumAdapter;
 import com.alphasystem.morphologicalanalysis.ui.common.ComboBoxFactory;
-import com.alphasystem.morphologicalanalysis.wordbyword.model.support.GrammaticalRelationship;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.support.RelationshipType;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.geometry.Insets;
@@ -18,11 +18,11 @@ import static javafx.scene.control.ButtonType.OK;
 /**
  * @author sali
  */
-public class RelationshipSelectionDialog extends Dialog<GrammaticalRelationship> {
+public class RelationshipSelectionDialog extends Dialog<RelationshipType> {
 
     private final StringProperty firstPartOfSpeech = new SimpleStringProperty();
     private final StringProperty secondPartOfSpeech = new SimpleStringProperty();
-    private final ComboBox<ArabicSupportEnumAdapter<GrammaticalRelationship>> comboBox;
+    private final ComboBox<ArabicSupportEnumAdapter<RelationshipType>> comboBox;
 
     public RelationshipSelectionDialog() {
         setTitle(getLabel("title"));
@@ -71,7 +71,7 @@ public class RelationshipSelectionDialog extends Dialog<GrammaticalRelationship>
 
         setResultConverter(param -> {
             ButtonBar.ButtonData buttonData = param.getButtonData();
-            return buttonData.isCancelButton() ? GrammaticalRelationship.NONE :
+            return buttonData.isCancelButton() ? RelationshipType.NONE :
                     comboBox.getSelectionModel().getSelectedItem().getValue();
         });
         getDialogPane().getButtonTypes().addAll(OK, CANCEL);

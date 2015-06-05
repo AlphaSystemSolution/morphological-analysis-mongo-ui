@@ -1,6 +1,6 @@
 package com.alphasystem.morphologicalanalysis.treebank.jfx.ui.components;
 
-import com.alphasystem.morphologicalanalysis.graph.model.support.DependencyGraphNodeType;
+import com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType;
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.*;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -78,7 +78,7 @@ public class DependencyGraphBuilderEditorPane extends BorderPane {
         children.remove(0, children.size());
 
         addTextControls(graphNode);
-        DependencyGraphNodeType nodeType = graphNode.getNodeType();
+        GraphNodeType nodeType = graphNode.getNodeType();
         switch (nodeType) {
             case TERMINAL:
             case EMPTY:

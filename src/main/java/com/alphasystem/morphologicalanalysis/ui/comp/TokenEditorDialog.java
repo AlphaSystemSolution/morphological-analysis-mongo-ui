@@ -297,7 +297,7 @@ public class TokenEditorDialog extends BaseDialog {
 		innerPanel.add(comboBoxHolder.getNamedTagComboBox());
 		rows++;
 
-		// label = new JLabel(getString(GrammaticalRelationship.class));
+		// label = new JLabel(getString(RelationshipType.class));
 		// innerPanel.add(label);
 		// innerPanel.add(createHorizontalStrut(HORIZONTAL_STRUT_WIDTH));
 		// rows++;

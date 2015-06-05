@@ -1,6 +1,6 @@
 package com.alphasystem.morphologicalanalysis.treebank.jfx.ui.components;
 
-import com.alphasystem.morphologicalanalysis.graph.model.support.DependencyGraphNodeType;
+import com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType;
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.GraphNode;
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.PartOfSpeechNode;
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.RootNode;
@@ -13,7 +13,7 @@ import javafx.scene.control.TreeView;
 
 import java.util.List;
 
-import static com.alphasystem.morphologicalanalysis.graph.model.support.DependencyGraphNodeType.*;
+import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.*;
 import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.Global.TREE_BANK_STYLE_SHEET;
 import static javafx.scene.control.SelectionMode.SINGLE;
 
@@ -39,7 +39,7 @@ public class DependencyGraphTreeView extends TreeView<GraphNode> {
                 return;
             }
             GraphNode graphNode = newItem.getValue();
-            DependencyGraphNodeType nodeType = graphNode.getNodeType();
+            GraphNodeType nodeType = graphNode.getNodeType();
             if (nodeType.equals(ROOT)) {
                 return;
             }
@@ -73,13 +73,13 @@ public class DependencyGraphTreeView extends TreeView<GraphNode> {
         rootItem.getChildren().remove(0, rootItem.getChildren().size());
         if (nodes != null && !nodes.isEmpty()) {
             for (GraphNode node : nodes) {
-                DependencyGraphNodeType currentNodeType = node.getNodeType();
+                GraphNodeType currentNodeType = node.getNodeType();
                 TreeItem<GraphNode> newItem = new TreeItem<>(node);
                 TreeItem<GraphNode> parent = null;
                 for (TreeItem<GraphNode> child : rootItem.getChildren()) {
                     GraphNode childValue = child.getValue();
                     // first check whether current item has node type "ROOT"
-                    DependencyGraphNodeType nodeType = childValue.getNodeType();
+                    GraphNodeType nodeType = childValue.getNodeType();
                     if (nodeType.equals(ROOT)) {
                         // if yes look for a node whose child node type is equal to node type of current item
                         RootNode rootNode = (RootNode) childValue;

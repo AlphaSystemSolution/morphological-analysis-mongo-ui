@@ -1,6 +1,6 @@
 package com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model;
 
-import com.alphasystem.morphologicalanalysis.graph.model.support.DependencyGraphNodeType;
+import com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType;
 import javafx.beans.property.*;
 
 /**
@@ -10,7 +10,7 @@ public abstract class GraphNode {
 
     protected final StringProperty id;
 
-    protected final ObjectProperty<DependencyGraphNodeType> nodeType;
+    protected final ObjectProperty<GraphNodeType> nodeType;
 
     protected final StringProperty text;
 
@@ -22,8 +22,6 @@ public abstract class GraphNode {
 
     protected final DoubleProperty translateY;
 
-    protected final BooleanProperty _transient;
-
     /**
      * @param nodeType
      * @param id
@@ -31,7 +29,7 @@ public abstract class GraphNode {
      * @param x
      * @param y
      */
-    protected GraphNode(DependencyGraphNodeType nodeType, String id, String text, Double x, Double y) {
+    protected GraphNode(GraphNodeType nodeType, String id, String text, Double x, Double y) {
         this(nodeType, id, text, x, y, 0.0, 0.0);
     }
 
@@ -44,7 +42,7 @@ public abstract class GraphNode {
      * @param translateX
      * @param translateY
      */
-    protected GraphNode(DependencyGraphNodeType nodeType, String id, String text, Double x, Double y,
+    protected GraphNode(GraphNodeType nodeType, String id, String text, Double x, Double y,
                         Double translateX, Double translateY) {
         this.id = new SimpleStringProperty(id);
         this.nodeType = new ReadOnlyObjectWrapper<>(nodeType);
@@ -53,15 +51,6 @@ public abstract class GraphNode {
         this.y = new SimpleDoubleProperty(y);
         this.translateX = new SimpleDoubleProperty(translateX);
         this.translateY = new SimpleDoubleProperty(translateY);
-        _transient = new ReadOnlyBooleanWrapper(false);
-        this.x.addListener((observable, oldValue, newValue) -> {
-            double d = (Double) newValue;
-            _transient.setValue(d >= 0);
-        });
-        this.y.addListener((observable, oldValue, newValue) -> {
-            double d = (Double) newValue;
-            _transient.setValue(d >= 0);
-        });
     }
 
 
@@ -89,14 +78,6 @@ public abstract class GraphNode {
         return translateY;
     }
 
-    public boolean getTransient() {
-        return _transient.get();
-    }
-
-    public final BooleanProperty transientProperty() {
-        return _transient;
-    }
-
     public String getId() {
         return id.get();
     }
@@ -109,11 +90,11 @@ public abstract class GraphNode {
         return id;
     }
 
-    public DependencyGraphNodeType getNodeType() {
+    public GraphNodeType getNodeType() {
         return nodeType.get();
     }
 
-    public final ObjectProperty<DependencyGraphNodeType> nodeTypeProperty() {
+    public final ObjectProperty<GraphNodeType> nodeTypeProperty() {
         return nodeType;
     }
 

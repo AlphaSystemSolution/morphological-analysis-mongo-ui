@@ -3,8 +3,8 @@ package com.alphasystem.morphologicalanalysis.treebank.jfx.ui.util;
 import com.alphasystem.ApplicationException;
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.*;
 import com.alphasystem.morphologicalanalysis.treebank.model.*;
-import com.alphasystem.morphologicalanalysis.wordbyword.model.support.GrammaticalRelationship;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.support.RelationshipType;
 import com.alphasystem.util.ZipFileEntry;
 import javafx.collections.ObservableList;
 import org.apache.commons.io.FilenameUtils;
@@ -259,7 +259,7 @@ public class SerializationTool {
         ObjectType objectType = OBJECT_FACTORY.createObjectType().withType(node.getClass().getName());
         List<ConstructorArgument> constructorArgs = objectType.getArgument();
 
-        constructorArgs.add(createEnumArgument(GrammaticalRelationship.class, node.getGrammaticalRelationship()));
+        constructorArgs.add(createEnumArgument(RelationshipType.class, node.getGrammaticalRelationship()));
         constructorArgs.add(createStringArgument(node.getId()));
         constructorArgs.add(createDoubleArgument(node.getX()));
         constructorArgs.add(createDoubleArgument(node.getY()));
@@ -281,7 +281,7 @@ public class SerializationTool {
         ObjectType objectType = OBJECT_FACTORY.createObjectType().withType(node.getClass().getName());
         List<ConstructorArgument> constructorArgs = objectType.getArgument();
 
-        constructorArgs.add(createEnumArgument(GrammaticalRelationship.class, node.getGrammaticalRelationship()));
+        constructorArgs.add(createEnumArgument(RelationshipType.class, node.getGrammaticalRelationship()));
         constructorArgs.add(createStringArgument(node.getId()));
         constructorArgs.add(createDoubleArgument(node.getX()));
         constructorArgs.add(createDoubleArgument(node.getY()));

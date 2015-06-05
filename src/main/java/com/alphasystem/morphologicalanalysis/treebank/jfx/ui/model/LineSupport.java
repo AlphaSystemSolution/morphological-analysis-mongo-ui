@@ -1,6 +1,6 @@
 package com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model;
 
-import com.alphasystem.morphologicalanalysis.graph.model.support.DependencyGraphNodeType;
+import com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 
@@ -42,7 +42,7 @@ public abstract class LineSupport extends GraphNode {
      * @param translateX
      * @param translateY
      */
-    protected LineSupport(DependencyGraphNodeType nodeType, String id, String text, Double x, Double y, Double x1,
+    protected LineSupport(GraphNodeType nodeType, String id, String text, Double x, Double y, Double x1,
                           Double y1, Double x2, Double y2, Double translateX, Double translateY) {
         super(nodeType, id, text, x, y, translateX, translateY);
         this.x1 = new SimpleDoubleProperty(x1);

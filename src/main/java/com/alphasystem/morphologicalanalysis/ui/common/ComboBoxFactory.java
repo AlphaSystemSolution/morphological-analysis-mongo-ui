@@ -1,7 +1,7 @@
 package com.alphasystem.morphologicalanalysis.ui.common;
 
 import com.alphasystem.arabic.model.ArabicSupportEnum;
-import com.alphasystem.morphologicalanalysis.wordbyword.model.support.GrammaticalRelationship;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.support.RelationshipType;
 import javafx.scene.control.ComboBox;
 
 import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.Global.TREE_BANK_STYLE_SHEET;
@@ -37,7 +37,7 @@ public class ComboBoxFactory {
     /**
      * @return
      */
-    public ComboBox<ArabicSupportEnumAdapter<GrammaticalRelationship>> getGrammaticalRelationshipComboBox() {
-        return createComboBox(GrammaticalRelationship.values());
+    public ComboBox<ArabicSupportEnumAdapter<RelationshipType>> getGrammaticalRelationshipComboBox() {
+        return createComboBox(RelationshipType.values());
     }
 }

@@ -93,7 +93,7 @@ public class ComboBoxHolder {
 	}
 
 	private DefaultComboBoxModel getGrammaticalTermModel() {
-		return getComboBoxModel(GrammaticalRelationship.values(), true);
+		return getComboBoxModel(RelationshipType.values(), true);
 	}
 
 	public JComboBox getNamedTagComboBox() {
@@ -170,8 +170,8 @@ public class ComboBoxHolder {
 		return getSelectedValue(GenderType.class, genderTypeComboBox);
 	}
 
-	public GrammaticalRelationship getSelectedGrammaticalTerm() {
-		return getSelectedValue(GrammaticalRelationship.class, grammaticalTermComboBox);
+	public RelationshipType getSelectedGrammaticalTerm() {
+		return getSelectedValue(RelationshipType.class, grammaticalTermComboBox);
 	}
 
 	public Location getSelectedLocation() {
@@ -290,7 +290,7 @@ public class ComboBoxHolder {
 	 */
 	public void selectGrammaticalTerm() {
 		// int index = 0;
-		// GrammaticalRelationship selectedGt = null;
+		// RelationshipType selectedGt = null;
 		// if (selectedLocation != null) {
 		// selectedGt = selectedLocation.getGrammaticalTerm();
 		// index = (selectedGt == null ? -1 : selectedGt.ordinal()) + 1;

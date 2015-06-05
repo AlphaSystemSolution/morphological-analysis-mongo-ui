@@ -1,6 +1,6 @@
 package com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model;
 
-import com.alphasystem.morphologicalanalysis.wordbyword.model.support.GrammaticalRelationship;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.support.RelationshipType;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
@@ -8,7 +8,7 @@ import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.SimpleObjectProperty;
 
 import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.Global.NONE_SELECTED;
-import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.GrammaticalRelationship.NONE;
+import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.RelationshipType.NONE;
 
 /**
  * @author sali
@@ -17,7 +17,7 @@ public final class PhraseSelectionModel {
 
     private final ReadOnlyStringWrapper firstNodeLabel;
     private final ReadOnlyStringWrapper lastNodeLabel;
-    private final ObjectProperty<GrammaticalRelationship> relationship = new SimpleObjectProperty<>(NONE);
+    private final ObjectProperty<RelationshipType> relationship = new SimpleObjectProperty<>(NONE);
     private ObjectProperty<TerminalNode> firstNode = new SimpleObjectProperty<>();
     private ObjectProperty<TerminalNode> lastNode = new SimpleObjectProperty<>();
 
@@ -76,15 +76,15 @@ public final class PhraseSelectionModel {
         return lastNode;
     }
 
-    public final GrammaticalRelationship getRelationship() {
+    public final RelationshipType getRelationship() {
         return relationship.get();
     }
 
-    public final void setRelationship(GrammaticalRelationship relationship) {
+    public final void setRelationship(RelationshipType relationship) {
         this.relationship.set(relationship);
     }
 
-    public final ObjectProperty<GrammaticalRelationship> relationshipProperty() {
+    public final ObjectProperty<RelationshipType> relationshipProperty() {
         return relationship;
     }
 
