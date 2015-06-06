@@ -3,12 +3,12 @@
  */
 package com.alphasystem.morphologicalanalysis.ui.comp;
 
-import com.alphasystem.morphologicalanalysis.repository.VerseRepository;
 import com.alphasystem.morphologicalanalysis.ui.util.ChapterAdapter;
 import com.alphasystem.morphologicalanalysis.ui.util.VerseAdapter;
-import com.alphasystem.morphologicalanalysis.util.MorphologicalAnalysisRepositoryUtil;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Chapter;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Verse;
+import com.alphasystem.morphologicalanalysis.wordbyword.repository.VerseRepository;
+import com.alphasystem.morphologicalanalysis.wordbyword.util.MorphologicalAnalysisRepositoryUtil;
 import com.alphasystem.persistence.mongo.spring.support.ApplicationContextProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

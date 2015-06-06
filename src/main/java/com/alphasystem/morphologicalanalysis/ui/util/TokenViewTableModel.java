@@ -3,9 +3,9 @@
  */
 package com.alphasystem.morphologicalanalysis.ui.util;
 
-import com.alphasystem.morphologicalanalysis.util.TokenComparator;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Verse;
+import com.alphasystem.morphologicalanalysis.wordbyword.util.TokenComparator;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
