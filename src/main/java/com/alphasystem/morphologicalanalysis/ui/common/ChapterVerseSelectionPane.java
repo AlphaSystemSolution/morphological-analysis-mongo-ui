@@ -1,8 +1,8 @@
 package com.alphasystem.morphologicalanalysis.ui.common;
 
-import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.util.RepositoryTool;
 import com.alphasystem.morphologicalanalysis.ui.common.model.ChapterAdapter;
 import com.alphasystem.morphologicalanalysis.ui.common.model.VerseAdapter;
+import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Chapter;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;

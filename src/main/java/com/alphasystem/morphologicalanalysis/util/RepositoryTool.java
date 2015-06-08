@@ -1,9 +1,8 @@
-package com.alphasystem.morphologicalanalysis.treebank.jfx.ui.util;
+package com.alphasystem.morphologicalanalysis.util;
 
 import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
 import com.alphasystem.morphologicalanalysis.graph.repository.DependencyGraphRepository;
 import com.alphasystem.morphologicalanalysis.ui.common.model.ChapterAdapter;
-import com.alphasystem.morphologicalanalysis.util.MorphologicalAnalysisRepositoryUtil;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Chapter;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;

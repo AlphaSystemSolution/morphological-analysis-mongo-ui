@@ -2,9 +2,9 @@ package com.alphasystem.morphologicalanalysis.treebank.jfx.ui.components;
 
 import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.TokenListCell;
-import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.util.RepositoryTool;
 import com.alphasystem.morphologicalanalysis.ui.common.ChapterVerseSelectionPane;
 import com.alphasystem.morphologicalanalysis.ui.common.model.VerseAdapter;
+import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.value.ObservableValue;
