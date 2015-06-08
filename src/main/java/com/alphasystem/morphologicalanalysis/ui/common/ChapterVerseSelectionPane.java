@@ -1,9 +1,12 @@
 package com.alphasystem.morphologicalanalysis.ui.common;
 
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.util.RepositoryTool;
-import com.alphasystem.morphologicalanalysis.ui.util.ChapterAdapter;
-import com.alphasystem.morphologicalanalysis.ui.util.VerseAdapter;
+import com.alphasystem.morphologicalanalysis.ui.common.model.ChapterAdapter;
+import com.alphasystem.morphologicalanalysis.ui.common.model.VerseAdapter;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Chapter;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.geometry.Insets;
@@ -29,18 +32,24 @@ public class ChapterVerseSelectionPane extends BorderPane {
     // other elements
     private RepositoryTool repositoryTool = RepositoryTool.getInstance();
     private List<ChapterAdapter> chapters;
-    private ChapterAdapter selectedChapter;
-    private VerseAdapter selectedVerse;
-    private VerseSelectionAction action;
+    private BooleanProperty avaialble = new SimpleBooleanProperty(false);
 
-    public ChapterVerseSelectionPane(VerseSelectionAction action) {
-        this.action = action;
+    public ChapterVerseSelectionPane() {
         Service<List<ChapterAdapter>> service = repositoryTool.getAllChapters();
         service.start();
         service.setOnSucceeded(event -> {
             chapters = (List<ChapterAdapter>) event.getSource().getValue();
             initPane();
+            avaialble.setValue(true);
         });
+    }
+
+    public boolean getAvaialble() {
+        return avaialble.get();
+    }
+
+    public BooleanProperty avaialbleProperty() {
+        return avaialble;
     }
 
     private void initPane() {
@@ -51,13 +60,6 @@ public class ChapterVerseSelectionPane extends BorderPane {
 
         verseAdapterComboBox = new ComboBox<>();
         verseAdapterComboBox.getStylesheets().add(TREE_BANK_STYLE_SHEET);
-        verseAdapterComboBox.setOnAction(event -> {
-            selectedVerse = verseAdapterComboBox.getSelectionModel().getSelectedItem();
-            if (selectedVerse == null) {
-                return;
-            }
-            action.doOnVerseChange();
-        });
 
         Label label = new Label(RESOURCE_BUNDLE.getString("chapterName.label"));
         grid.add(label, 0, 0);
@@ -66,23 +68,22 @@ public class ChapterVerseSelectionPane extends BorderPane {
         chapterNameComboBox.getStylesheets().add(TREE_BANK_STYLE_SHEET);
         chapterNameComboBox.getItems().addAll(chapters.toArray(new ChapterAdapter[chapters.size()]));
         chapterNameComboBox.getSelectionModel().select(0);
-        selectedChapter = chapters.get(0);
-        chapterNameComboBox.setOnAction(event -> {
-            selectedChapter = chapterNameComboBox.getSelectionModel().getSelectedItem();
-            initVerseComboBox();
-        });
+        chapterNameComboBox.getSelectionModel().selectedItemProperty().addListener(
+                (observable, oldValue, newValue) -> {
+                    initVerseComboBox(newValue);
+                });
         label.setLabelFor(chapterNameComboBox);
         grid.add(chapterNameComboBox, 0, 1);
 
         label = new Label(RESOURCE_BUNDLE.getString("verseNumber.label"));
         grid.add(label, 1, 0);
-        initVerseComboBox();
+        initVerseComboBox(chapterNameComboBox.getItems().get(0));
         grid.add(verseAdapterComboBox, 1, 1);
 
         setCenter(grid);
     }
 
-    private void initVerseComboBox() {
+    private void initVerseComboBox(ChapterAdapter selectedChapter) {
         ObservableList<VerseAdapter> items = verseAdapterComboBox.getItems();
         items.remove(0, items.size());
 
@@ -98,11 +99,19 @@ public class ChapterVerseSelectionPane extends BorderPane {
         verseAdapterComboBox.getItems().addAll(verseNumbers.toArray(new VerseAdapter[size]));
         if (size > 0) {
             verseAdapterComboBox.getSelectionModel().select(0);
-            selectedVerse = verseAdapterComboBox.getItems().get(0);
-            action.doOnVerseChange();
         }
         verseAdapterComboBox.requestLayout();
     }
 
+    public ComboBox<VerseAdapter> getVerseAdapterComboBox() {
+        return verseAdapterComboBox;
+    }
 
+    public ReadOnlyObjectProperty<VerseAdapter> selectedVerseProperty() {
+        return verseAdapterComboBox.getSelectionModel().selectedItemProperty();
+    }
+
+    public VerseAdapter getSelectedVerse() {
+        return selectedVerseProperty().get();
+    }
 }

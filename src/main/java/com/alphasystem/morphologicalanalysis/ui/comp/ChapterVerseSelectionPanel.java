@@ -3,8 +3,8 @@
  */
 package com.alphasystem.morphologicalanalysis.ui.comp;
 
-import com.alphasystem.morphologicalanalysis.ui.util.ChapterAdapter;
-import com.alphasystem.morphologicalanalysis.ui.util.VerseAdapter;
+import com.alphasystem.morphologicalanalysis.ui.common.model.ChapterAdapter;
+import com.alphasystem.morphologicalanalysis.ui.common.model.VerseAdapter;
 import com.alphasystem.morphologicalanalysis.util.MorphologicalAnalysisRepositoryUtil;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Chapter;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Verse;

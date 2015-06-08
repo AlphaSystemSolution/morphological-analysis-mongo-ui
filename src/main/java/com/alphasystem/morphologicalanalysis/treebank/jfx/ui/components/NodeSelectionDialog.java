@@ -3,9 +3,8 @@ package com.alphasystem.morphologicalanalysis.treebank.jfx.ui.components;
 import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.TokenListCell;
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.util.RepositoryTool;
-import com.alphasystem.morphologicalanalysis.ui.util.ChapterAdapter;
-import com.alphasystem.morphologicalanalysis.ui.util.VerseAdapter;
-import com.alphasystem.morphologicalanalysis.wordbyword.model.Chapter;
+import com.alphasystem.morphologicalanalysis.ui.common.ChapterVerseSelectionPane;
+import com.alphasystem.morphologicalanalysis.ui.common.model.VerseAdapter;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.value.ObservableValue;
@@ -35,26 +34,24 @@ public class NodeSelectionDialog extends Dialog<DependencyGraph> {
     private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("resources");
 
     // UI elements
-    private ComboBox<ChapterAdapter> chapterNameComboBox;
-    private ComboBox<VerseAdapter> verseAdapterComboBox;
+    private ChapterVerseSelectionPane chapterVerseSelectionPane;
     private ListView<TokenListCell> tokensList;
 
     // other elements
     private RepositoryTool repositoryTool = RepositoryTool.getInstance();
-    private List<ChapterAdapter> chapters;
-    private ChapterAdapter selectedChapter;
-    private VerseAdapter selectedVerse;
 
     public NodeSelectionDialog() {
         setTitle("Import Tokens");
         setHeaderText("Select chapter and verse.");
 
-        Service<List<ChapterAdapter>> service = repositoryTool.getAllChapters();
-        service.start();
-        service.setOnSucceeded(event -> {
-            chapters = (List<ChapterAdapter>) event.getSource().getValue();
-            initDialog();
+        chapterVerseSelectionPane = new ChapterVerseSelectionPane();
+
+        chapterVerseSelectionPane.avaialbleProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue) {
+                initDialog();
+            }
         });
+
     }
 
     private void initDialog() {
@@ -63,43 +60,19 @@ public class NodeSelectionDialog extends Dialog<DependencyGraph> {
         grid.setVgap(10);
         grid.setPadding(new Insets(25, 25, 25, 25));
 
-        verseAdapterComboBox = new ComboBox<>();
-        verseAdapterComboBox.getStylesheets().add(TREE_BANK_STYLE_SHEET);
-        verseAdapterComboBox.setOnAction(event -> {
-            selectedVerse = verseAdapterComboBox.getSelectionModel().getSelectedItem();
-            if (selectedVerse == null) {
-                return;
-            }
-            loadTokens();
-        });
+        grid.add(chapterVerseSelectionPane, 0, 0, 2, 2);
 
-        Label label = new Label(RESOURCE_BUNDLE.getString("chapterName.label"));
-        grid.add(label, 0, 0);
-
-        chapterNameComboBox = new ComboBox();
-        chapterNameComboBox.getStylesheets().add(TREE_BANK_STYLE_SHEET);
-        chapterNameComboBox.getItems().addAll(chapters.toArray(new ChapterAdapter[chapters.size()]));
-        chapterNameComboBox.getSelectionModel().select(0);
-        selectedChapter = chapters.get(0);
-        chapterNameComboBox.setOnAction(event -> {
-            selectedChapter = chapterNameComboBox.getSelectionModel().getSelectedItem();
-            initVerseComboBox();
-        });
-        label.setLabelFor(chapterNameComboBox);
-        grid.add(chapterNameComboBox, 0, 1);
-
-        label = new Label(RESOURCE_BUNDLE.getString("verseNumber.label"));
-        grid.add(label, 1, 0);
-        initVerseComboBox();
-        grid.add(verseAdapterComboBox, 1, 1);
-
-        grid.add(new Separator(), 0, 2, 2, 1);
+        grid.add(new Separator(), 0, 3, 2, 1);
 
         tokensList = new ListView<>();
         tokensList.getStylesheets().add(TREE_BANK_STYLE_SHEET);
         BorderPane borderPane = new BorderPane();
         borderPane.setCenter(tokensList);
         grid.add(borderPane, 0, 3, 2, 1);
+
+        chapterVerseSelectionPane.selectedVerseProperty().addListener((observable, oldValue, newValue) -> {
+            loadTokens();
+        });
 
         ButtonType okButton = new ButtonType("OK", OK_DONE);
         setResultConverter(dialogButton -> {
@@ -111,9 +84,13 @@ public class NodeSelectionDialog extends Dialog<DependencyGraph> {
                     item.setSelected(false);
                 }
             }
+            VerseAdapter selectedVerse = chapterVerseSelectionPane.getSelectedVerse();
             return repositoryTool.createDependencyGraph(selectedVerse.getChapterNumber(),
                     selectedVerse.getVerseNumber(), results);
         });
+
+        loadTokens();
+
         ButtonType cancelButton = new ButtonType("Cancel", CANCEL_CLOSE);
         getDialogPane().getButtonTypes().addAll(okButton, cancelButton);
         getDialogPane().setContent(grid);
@@ -121,7 +98,8 @@ public class NodeSelectionDialog extends Dialog<DependencyGraph> {
     }
 
     private void loadTokens() {
-        if (selectedChapter == null && selectedVerse == null) {
+        VerseAdapter selectedVerse = chapterVerseSelectionPane.getSelectedVerse();
+        if (selectedVerse == null) {
             return;
         }
         Service<List<Token>> service = repositoryTool.getTokens(selectedVerse.getChapterNumber(),
@@ -131,28 +109,6 @@ public class NodeSelectionDialog extends Dialog<DependencyGraph> {
             List<Token> tokens = (List<Token>) event.getSource().getValue();
             initTokenList(tokens);
         });
-    }
-
-    private void initVerseComboBox() {
-        ObservableList<VerseAdapter> items = verseAdapterComboBox.getItems();
-        items.remove(0, items.size());
-
-        List<VerseAdapter> verseNumbers = new ArrayList<>();
-        if (selectedChapter != null) {
-            Chapter chapter = selectedChapter.getChapter();
-            int verseCount = chapter.getVerseCount();
-            for (int i = 1; i <= verseCount; i++) {
-                verseNumbers.add(new VerseAdapter(chapter.getChapterNumber(), i));
-            }
-        }
-        int size = verseNumbers.size();
-        verseAdapterComboBox.getItems().addAll(verseNumbers.toArray(new VerseAdapter[size]));
-        if (size > 0) {
-            verseAdapterComboBox.getSelectionModel().select(0);
-            selectedVerse = verseAdapterComboBox.getItems().get(0);
-            loadTokens();
-        }
-        verseAdapterComboBox.requestLayout();
     }
 
     private void initTokenList(List<Token> tokens) {

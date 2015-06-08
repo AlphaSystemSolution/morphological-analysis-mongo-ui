@@ -1,4 +1,4 @@
-package com.alphasystem.morphologicalanalysis.ui.util;
+package com.alphasystem.morphologicalanalysis.ui.common.model;
 
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Chapter;
 

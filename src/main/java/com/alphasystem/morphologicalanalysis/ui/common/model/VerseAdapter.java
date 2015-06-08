@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.alphasystem.morphologicalanalysis.ui.util;
+package com.alphasystem.morphologicalanalysis.ui.common.model;
 
 import static com.alphasystem.arabic.model.ArabicWord.getArabicNumber;
 import static java.lang.String.format;
