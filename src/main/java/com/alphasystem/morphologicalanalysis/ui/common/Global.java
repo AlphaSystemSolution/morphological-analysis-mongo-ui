@@ -1,4 +1,4 @@
-package com.alphasystem.morphologicalanalysis.treebank.jfx.ui;
+package com.alphasystem.morphologicalanalysis.ui.common;
 
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech;
 import javafx.scene.Scene;

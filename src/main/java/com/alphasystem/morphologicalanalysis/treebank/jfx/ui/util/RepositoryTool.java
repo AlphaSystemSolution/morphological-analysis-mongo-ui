@@ -1,5 +1,7 @@
 package com.alphasystem.morphologicalanalysis.treebank.jfx.ui.util;
 
+import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
+import com.alphasystem.morphologicalanalysis.graph.repository.DependencyGraphRepository;
 import com.alphasystem.morphologicalanalysis.ui.util.ChapterAdapter;
 import com.alphasystem.morphologicalanalysis.util.MorphologicalAnalysisRepositoryUtil;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Chapter;
@@ -24,6 +26,8 @@ public class RepositoryTool {
     private MorphologicalAnalysisRepositoryUtil repositoryUtil;
     private TokenRepository tokenRepository;
     private LocationRepository locationRepository;
+    private DependencyGraphRepository dependencyGraphRepository;
+    private DependencyGraph currentGraph;
 
     /**
      * do not let anyone instantiate this class
@@ -33,6 +37,7 @@ public class RepositoryTool {
                 .getInstance().getBean(MorphologicalAnalysisRepositoryUtil.class);
         tokenRepository = repositoryUtil.getTokenRepository();
         locationRepository = repositoryUtil.getLocationRepository();
+        dependencyGraphRepository = repositoryUtil.getDependencyGraphRepository();
 
     }
 
@@ -87,4 +92,22 @@ public class RepositoryTool {
         return locationRepository.findOne(id);
     }
 
+    public DependencyGraph getCurrentGraph() {
+        return currentGraph;
+    }
+
+    public DependencyGraph createDependencyGraph(Integer chapterNumber, Integer verseNumber, List<Token> tokens) {
+        Long count = dependencyGraphRepository.countByChapterNumberAndVerseNumber(chapterNumber, verseNumber);
+        int segmentNumber = (int) (count + 1);
+
+        DependencyGraph dependencyGraph = new DependencyGraph(chapterNumber, verseNumber, segmentNumber);
+        dependencyGraph.setTokens(tokens);
+
+        currentGraph = dependencyGraphRepository.save(dependencyGraph);
+        return currentGraph;
+    }
+
+    public MorphologicalAnalysisRepositoryUtil getRepositoryUtil() {
+        return repositoryUtil;
+    }
 }

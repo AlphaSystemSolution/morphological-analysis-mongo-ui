@@ -11,7 +11,7 @@ import javafx.collections.ObservableList;
 import java.util.List;
 
 import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.TERMINAL;
-import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.Global.PART_OF_SPEECH_EXCLUDE_LIST;
+import static com.alphasystem.morphologicalanalysis.ui.common.Global.PART_OF_SPEECH_EXCLUDE_LIST;
 import static javafx.collections.FXCollections.observableArrayList;
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 

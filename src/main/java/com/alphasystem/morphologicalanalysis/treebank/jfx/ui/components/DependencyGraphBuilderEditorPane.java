@@ -10,9 +10,9 @@ import javafx.scene.control.SpinnerValueFactory.DoubleSpinnerValueFactory;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 
-import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.Global.ARABIC_FONT_NAME;
-import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.Global.RESOURCE_BUNDLE;
 import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.util.DecimalFormatStringConverter.THREE_DECIMAL_PLACE_CONVERTER;
+import static com.alphasystem.morphologicalanalysis.ui.common.Global.ARABIC_FONT_NAME;
+import static com.alphasystem.morphologicalanalysis.ui.common.Global.RESOURCE_BUNDLE;
 import static java.lang.String.format;
 import static javafx.geometry.Pos.CENTER;
 import static javafx.scene.control.ScrollPane.ScrollBarPolicy.ALWAYS;

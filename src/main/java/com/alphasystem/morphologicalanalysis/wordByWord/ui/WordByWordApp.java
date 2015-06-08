@@ -1,6 +1,7 @@
-package com.alphasystem.morphologicalanalysis.treebank.jfx.ui;
+package com.alphasystem.morphologicalanalysis.wordByWord.ui;
 
 import com.alphasystem.morphologicalanalysis.util.SpringContextHelper;
+import com.alphasystem.morphologicalanalysis.wordByWord.ui.component.WordByWordPane;
 import javafx.application.Application;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
@@ -10,7 +11,7 @@ import javafx.stage.Stage;
 /**
  * @author sali
  */
-public class TreeBankApp extends Application {
+public class WordByWordApp extends Application {
 
     static {
         SpringContextHelper.getInstance();
@@ -22,7 +23,7 @@ public class TreeBankApp extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        primaryStage.setTitle("Quranic Morphological Dependency Graph Builder");
+        primaryStage.setTitle("Quranic Morphological Word By Word Builder");
         Screen screen = Screen.getPrimary();
         Rectangle2D bounds = screen.getVisualBounds();
 
@@ -31,7 +32,7 @@ public class TreeBankApp extends Application {
         primaryStage.setWidth(bounds.getWidth());
         primaryStage.setHeight(bounds.getHeight());
 
-        Scene scene = new Scene(new TreeBankPane());
+        Scene scene = new Scene(new WordByWordPane());
         primaryStage.setMaximized(true);
         primaryStage.setScene(scene);
         primaryStage.show();

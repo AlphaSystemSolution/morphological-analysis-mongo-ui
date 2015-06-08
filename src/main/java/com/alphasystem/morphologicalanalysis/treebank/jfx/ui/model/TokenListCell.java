@@ -40,7 +40,7 @@ public class TokenListCell {
         return name;
     }
 
-    public boolean getSelected() {
+    public boolean isSelected() {
         return selected.get();
     }
 

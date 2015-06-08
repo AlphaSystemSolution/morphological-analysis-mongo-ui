@@ -1,5 +1,6 @@
 package com.alphasystem.morphologicalanalysis.treebank.jfx.ui.components;
 
+import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.TokenListCell;
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.util.RepositoryTool;
 import com.alphasystem.morphologicalanalysis.ui.util.ChapterAdapter;
@@ -22,14 +23,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.Global.TREE_BANK_STYLE_SHEET;
+import static com.alphasystem.morphologicalanalysis.ui.common.Global.TREE_BANK_STYLE_SHEET;
 import static javafx.scene.control.ButtonBar.ButtonData.CANCEL_CLOSE;
 import static javafx.scene.control.ButtonBar.ButtonData.OK_DONE;
 
 /**
  * @author sali
  */
-public class NodeSelectionDialog extends Dialog<List<Token>> {
+public class NodeSelectionDialog extends Dialog<DependencyGraph> {
 
     private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("resources");
 
@@ -43,8 +44,6 @@ public class NodeSelectionDialog extends Dialog<List<Token>> {
     private List<ChapterAdapter> chapters;
     private ChapterAdapter selectedChapter;
     private VerseAdapter selectedVerse;
-    private List<Token> selectedItems = new ArrayList<>();
-    private List<TokenListCell> selectedCells = new ArrayList<>();
 
     public NodeSelectionDialog() {
         setTitle("Import Tokens");
@@ -105,15 +104,15 @@ public class NodeSelectionDialog extends Dialog<List<Token>> {
         ButtonType okButton = new ButtonType("OK", OK_DONE);
         setResultConverter(dialogButton -> {
             List<Token> results = new ArrayList<Token>();
-            if (dialogButton == okButton) {
-                results.addAll(selectedItems);
+            ObservableList<TokenListCell> items = tokensList.getItems();
+            for (TokenListCell item : items) {
+                if (item.isSelected()) {
+                    results.add(item.getToken());
+                    item.setSelected(false);
+                }
             }
-            selectedItems.clear();
-            for (TokenListCell selectedCell : selectedCells) {
-                selectedCell.selectedProperty().setValue(false);
-            }
-            selectedCells.clear();
-            return results;
+            return repositoryTool.createDependencyGraph(selectedVerse.getChapterNumber(),
+                    selectedVerse.getVerseNumber(), results);
         });
         ButtonType cancelButton = new ButtonType("Cancel", CANCEL_CLOSE);
         getDialogPane().getButtonTypes().addAll(okButton, cancelButton);
@@ -125,10 +124,11 @@ public class NodeSelectionDialog extends Dialog<List<Token>> {
         if (selectedChapter == null && selectedVerse == null) {
             return;
         }
-        Service<List<Token>> service = repositoryTool.getTokens(selectedVerse.getChapterNumber(), selectedVerse.getVerseNumber());
+        Service<List<Token>> service = repositoryTool.getTokens(selectedVerse.getChapterNumber(),
+                selectedVerse.getVerseNumber());
         service.start();
-        service.setOnSucceeded(event1 -> {
-            List<Token> tokens = (List<Token>) event1.getSource().getValue();
+        service.setOnSucceeded(event -> {
+            List<Token> tokens = (List<Token>) event.getSource().getValue();
             initTokenList(tokens);
         });
     }
@@ -161,15 +161,6 @@ public class NodeSelectionDialog extends Dialog<List<Token>> {
         ObservableList<TokenListCell> listItems = FXCollections.observableArrayList();
         for (Token token : tokens) {
             TokenListCell cell = new TokenListCell(token);
-            cell.selectedProperty().addListener((observable, oldValue, newValue) -> {
-                if (newValue) {
-                    selectedItems.add(cell.getToken());
-                    selectedCells.add(cell);
-                } else {
-                    selectedItems.remove(cell.getToken());
-                    selectedItems.remove(cell);
-                }
-            });
             listItems.add(cell);
         }
         tokensList.setItems(listItems);

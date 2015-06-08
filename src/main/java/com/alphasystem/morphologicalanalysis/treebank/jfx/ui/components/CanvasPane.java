@@ -32,9 +32,9 @@ import java.util.Optional;
 
 import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.EMPTY;
 import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.HIDDEN;
-import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.Global.ARABIC_FONT_BIG;
-import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.Global.ARABIC_FONT_SMALL;
 import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.util.DependencyGraphGraphicTool.DARK_GRAY_CLOUD;
+import static com.alphasystem.morphologicalanalysis.ui.common.Global.ARABIC_FONT_BIG;
+import static com.alphasystem.morphologicalanalysis.ui.common.Global.ARABIC_FONT_SMALL;
 import static com.alphasystem.util.AppUtil.isGivenType;
 import static java.lang.String.format;
 import static javafx.scene.control.Alert.AlertType.INFORMATION;

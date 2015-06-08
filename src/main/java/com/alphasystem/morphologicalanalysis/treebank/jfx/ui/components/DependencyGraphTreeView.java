@@ -14,7 +14,7 @@ import javafx.scene.control.TreeView;
 import java.util.List;
 
 import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.*;
-import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.Global.TREE_BANK_STYLE_SHEET;
+import static com.alphasystem.morphologicalanalysis.ui.common.Global.TREE_BANK_STYLE_SHEET;
 import static javafx.scene.control.SelectionMode.SINGLE;
 
 /**
@@ -81,7 +81,7 @@ public class DependencyGraphTreeView extends TreeView<GraphNode> {
                     // first check whether current item has node type "ROOT"
                     GraphNodeType nodeType = childValue.getNodeType();
                     if (nodeType.equals(ROOT)) {
-                        // if yes look for a node whose child node type is equal to node type of current item
+                        // if yes look for a node whose dependent node type is equal to node type of current item
                         RootNode rootNode = (RootNode) childValue;
                         if (rootNode.getChildType().equals(currentNodeType)) {
                             parent = child;

@@ -1,5 +1,6 @@
 package com.alphasystem.morphologicalanalysis.treebank.jfx.ui;
 
+import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.components.CanvasPane;
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.components.ControlPane;
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.components.NodeSelectionDialog;
@@ -8,7 +9,6 @@ import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.CanvasMetaDat
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.GraphNode;
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.util.GraphBuilder;
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.util.SerializationTool;
-import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
 import javafx.beans.property.ObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
@@ -30,7 +30,6 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 import java.util.Optional;
 
 import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.util.SerializationTool.MDG_EXTENSION_ALL;
@@ -160,9 +159,9 @@ public class TreeBankPane extends BorderPane {
         menuItem.setOnAction(event -> {
             getScene().setCursor(WAIT);
             runLater(() -> {
-                Optional<List<Token>> result = dialog.showAndWait();
-                result.ifPresent(selectedItems -> {
-                    updateCanvas(graphBuilder.toGraphNodes(selectedItems));
+                Optional<DependencyGraph> result = dialog.showAndWait();
+                result.ifPresent(dg -> {
+                    updateCanvas(graphBuilder.toGraphNodes(dg.getTokens()));
                 });
 
             });

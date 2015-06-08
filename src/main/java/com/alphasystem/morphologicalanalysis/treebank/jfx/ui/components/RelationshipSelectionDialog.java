@@ -1,8 +1,8 @@
 package com.alphasystem.morphologicalanalysis.treebank.jfx.ui.components;
 
-import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.Global;
 import com.alphasystem.morphologicalanalysis.ui.common.ArabicSupportEnumAdapter;
 import com.alphasystem.morphologicalanalysis.ui.common.ComboBoxFactory;
+import com.alphasystem.morphologicalanalysis.ui.common.Global;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.RelationshipType;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -11,7 +11,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
 
-import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.Global.*;
+import static com.alphasystem.morphologicalanalysis.ui.common.Global.*;
 import static javafx.scene.control.ButtonType.CANCEL;
 import static javafx.scene.control.ButtonType.OK;
 

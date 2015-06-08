@@ -4,8 +4,8 @@ import com.alphasystem.arabic.model.ArabicSupportEnum;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.RelationshipType;
 import javafx.scene.control.ComboBox;
 
-import static com.alphasystem.morphologicalanalysis.treebank.jfx.ui.Global.TREE_BANK_STYLE_SHEET;
 import static com.alphasystem.morphologicalanalysis.ui.common.ArabicSupportEnumAdapter.populateValues;
+import static com.alphasystem.morphologicalanalysis.ui.common.Global.TREE_BANK_STYLE_SHEET;
 
 /**
  * @author sali
