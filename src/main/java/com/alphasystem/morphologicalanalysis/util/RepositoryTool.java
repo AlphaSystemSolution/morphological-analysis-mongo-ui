@@ -87,6 +87,10 @@ public class RepositoryTool {
         return tokenRepository.findOne(id);
     }
 
+    public Token getTokenByDisplayName(String displayName) {
+        return tokenRepository.findByDisplayName(displayName);
+    }
+
     public Location getLocation(String id){
         return locationRepository.findOne(id);
     }

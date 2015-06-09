@@ -14,6 +14,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -80,7 +81,10 @@ public class ChapterVerseSelectionPane extends BorderPane {
         initVerseComboBox(chapterNameComboBox.getItems().get(0));
         grid.add(verseAdapterComboBox, 1, 1);
 
-        setCenter(grid);
+        HBox hBox = new HBox();
+        hBox.setPadding(new Insets(0, 50, 0, 50));
+        hBox.getChildren().add(grid);
+        setCenter(hBox);
     }
 
     private void initVerseComboBox(ChapterAdapter selectedChapter) {
