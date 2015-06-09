@@ -1,7 +1,7 @@
-package com.alphasystem.morphologicalanalysis.wordByWord.ui;
+package com.alphasystem.morphologicalanalysis.wordbyword.ui;
 
 import com.alphasystem.morphologicalanalysis.util.SpringContextHelper;
-import com.alphasystem.morphologicalanalysis.wordByWord.ui.component.WordByWordPane;
+import com.alphasystem.morphologicalanalysis.wordbyword.ui.component.WordByWordPane;
 import javafx.application.Application;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
@@ -32,7 +32,8 @@ public class WordByWordApp extends Application {
         primaryStage.setWidth(bounds.getWidth());
         primaryStage.setHeight(bounds.getHeight());
 
-        Scene scene = new Scene(new WordByWordPane());
+        WordByWordPane root = new WordByWordPane();
+        Scene scene = new Scene(root);
         primaryStage.setMaximized(true);
         primaryStage.setScene(scene);
         primaryStage.show();

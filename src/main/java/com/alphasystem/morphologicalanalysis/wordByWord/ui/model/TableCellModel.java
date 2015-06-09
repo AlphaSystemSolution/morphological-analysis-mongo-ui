@@ -1,4 +1,4 @@
-package com.alphasystem.morphologicalanalysis.wordByWord.ui.model;
+package com.alphasystem.morphologicalanalysis.wordbyword.ui.model;
 
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
 import javafx.beans.property.*;
@@ -9,7 +9,7 @@ import static java.lang.String.format;
 /**
  * @author sali
  */
-public final class TableModel {
+public final class TableCellModel {
 
     private final Token token;
     private final BooleanProperty checked;
@@ -17,7 +17,7 @@ public final class TableModel {
     private final ReadOnlyStringWrapper tokenText;
     private final StringProperty morphologicalDescription;
 
-    public TableModel(Token token) {
+    public TableCellModel(Token token) {
         this.token = token;
         checked = new SimpleBooleanProperty(false);
         tokenNumber = new ReadOnlyStringWrapper(getTokenNumber(this.token));
@@ -38,7 +38,7 @@ public final class TableModel {
         return format("(%s:%s:%s)", chapterNumber, verseNumber, tokenNumber);
     }
 
-    public Token getToken() {
+    public final Token getToken() {
         return token;
     }
 
