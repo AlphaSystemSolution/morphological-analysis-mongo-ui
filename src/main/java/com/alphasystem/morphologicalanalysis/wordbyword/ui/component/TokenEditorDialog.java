@@ -1,9 +1,11 @@
 package com.alphasystem.morphologicalanalysis.wordbyword.ui.component;
 
 import com.alphasystem.arabic.model.ArabicLetter;
+import com.alphasystem.morphologicalanalysis.ui.common.ComboBoxFactory;
 import com.alphasystem.morphologicalanalysis.ui.common.model.LocationAdapter;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech;
 import com.alphasystem.morphologicalanalysis.wordbyword.ui.model.TokenAdapter;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -13,9 +15,9 @@ import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 
-import static com.alphasystem.morphologicalanalysis.ui.common.Global.ARABIC_FONT_MEDIUM;
-import static com.alphasystem.morphologicalanalysis.ui.common.Global.TREE_BANK_STYLE_SHEET;
+import static com.alphasystem.morphologicalanalysis.ui.common.Global.*;
 import static java.lang.String.format;
 import static javafx.geometry.NodeOrientation.RIGHT_TO_LEFT;
 import static javafx.geometry.Pos.CENTER;
@@ -33,7 +35,8 @@ public class TokenEditorDialog extends Dialog<Token> {
     private final TokenAdapter tokenAdapter = new TokenAdapter();
 
     private TextArea transaltionArea;
-    private ComboBox<LocationAdapter> locations;
+    private ComboBox<LocationAdapter> locationComboBox;
+    private ComboBox<PartOfSpeech> partOfSpeechComboBox;
     private BorderPane lettersPane;
 
     public TokenEditorDialog(Token token) {
@@ -92,7 +95,7 @@ public class TokenEditorDialog extends Dialog<Token> {
         // token letters
         gridPane.add(lettersPane, 0, 0, 2, 1);
 
-        // treanslation
+        // translation
         BorderPane borderPane = new BorderPane();
         transaltionArea = new TextArea(tokenAdapter.getTranslation());
         transaltionArea.setPrefColumnCount(5);
@@ -101,24 +104,38 @@ public class TokenEditorDialog extends Dialog<Token> {
         gridPane.add(borderPane, 0, 1, 2, 1);
         transaltionArea.textProperty().bindBidirectional(tokenAdapter.translationProperty());
 
-        //locations combobox
+        //locationComboBox comboBox
         borderPane = new BorderPane();
-        locations = new ComboBox<>();
-        locations.getStylesheets().add(TREE_BANK_STYLE_SHEET);
+        locationComboBox = new ComboBox<>();
+        locationComboBox.getStylesheets().add(TREE_BANK_STYLE_SHEET);
         initLocations();
-        locations.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+        locationComboBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             // TODO:
         });
-        borderPane.setCenter(locations);
+        borderPane.setCenter(locationComboBox);
         gridPane.add(borderPane, 0, 2, 2, 1);
 
         gridPane.add(new Separator(), 0, 3, 2, 1);
+
+        // part of speech comboBox
+        borderPane = new BorderPane();
+        GridPane gp = new GridPane();
+        Label label = new Label(RESOURCE_BUNDLE.getString("partOfSpeech.label"));
+        gp.add(label, 0, 0);
+        partOfSpeechComboBox = ComboBoxFactory.getInstance().getPartOfSpeechComboBox();
+        partOfSpeechComboBox.getSelectionModel().select(0);
+        gp.add(partOfSpeechComboBox, 0, 1);
+        label = new Label(RESOURCE_BUNDLE.getString("rootWords.label"));
+        gp.add(label, 1, 0);
+        gp.add(new Pane(), 1, 1);
+        borderPane.setCenter(gp);
+        gridPane.add(borderPane, 0, 4, 2, 1);
 
         getDialogPane().setContent(gridPane);
     }
 
     private void initLocations() {
-        ObservableList<LocationAdapter> items = locations.getItems();
+        ObservableList<LocationAdapter> items = locationComboBox.getItems();
         int size = items.size();
         items.remove(0, size);
 
@@ -128,7 +145,7 @@ public class TokenEditorDialog extends Dialog<Token> {
             locationAdapters[i] = new LocationAdapter(_locations.get(i));
         }
         items.addAll(locationAdapters);
-        locations.getSelectionModel().select(0);
+        locationComboBox.getSelectionModel().select(0);
     }
 
     private void createLettersPane(ObservableList<ArabicLetter> letters) {
