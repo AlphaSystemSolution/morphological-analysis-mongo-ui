@@ -2,7 +2,6 @@ package com.alphasystem.morphologicalanalysis.treebank.jfx.ui.components;
 
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.PhraseSelectionModel;
 import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.model.TerminalNode;
-import com.alphasystem.morphologicalanalysis.ui.common.ArabicSupportEnumAdapter;
 import com.alphasystem.morphologicalanalysis.ui.common.ComboBoxFactory;
 import com.alphasystem.morphologicalanalysis.ui.common.Global;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.RelationshipType;
@@ -21,7 +20,7 @@ import static javafx.scene.control.ButtonType.*;
  */
 public class PhraseSelectionDialog extends Dialog<PhraseSelectionModel> {
 
-    private final ComboBox<ArabicSupportEnumAdapter<RelationshipType>> comboBox;
+    private final ComboBox<RelationshipType> comboBox;
     private PhraseSelectionModel phraseSelectionModel = new PhraseSelectionModel();
     private ObjectProperty<TerminalNode> terminalNode = new SimpleObjectProperty<>();
 
@@ -29,7 +28,7 @@ public class PhraseSelectionDialog extends Dialog<PhraseSelectionModel> {
         setTitle(getLabel("title"));
         setHeaderText(getLabel("headerText"));
 
-        comboBox = ComboBoxFactory.getInstance().getGrammaticalRelationshipComboBox();
+        comboBox = ComboBoxFactory.getInstance().getRelationshipTypeComboBox();
         comboBox.disableProperty().bind(phraseSelectionModel.uninitialized());
         initDialogPane();
         setResultConverter(param -> {
@@ -87,7 +86,7 @@ public class PhraseSelectionDialog extends Dialog<PhraseSelectionModel> {
         gridPane.add(label, 0, 2);
         gridPane.add(comboBox, 1, 2);
         comboBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            phraseSelectionModel.setRelationship(newValue.getValue());
+            phraseSelectionModel.setRelationship(newValue);
         });
         phraseSelectionModel.relationshipProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null && newValue.equals(RelationshipType.NONE)) {

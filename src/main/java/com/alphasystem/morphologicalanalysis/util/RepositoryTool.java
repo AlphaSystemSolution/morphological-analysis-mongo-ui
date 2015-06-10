@@ -95,6 +95,37 @@ public class RepositoryTool {
         return locationRepository.findOne(id);
     }
 
+    public Token saveToken(Token token){
+        // A token contains one or more part of speeches and each part of speech has a location corresponding to it.
+        // A location has "startIndex" and "endIndex" of letters from the parent token. At the time of initial data
+        // creation we only created one part of speech and one location for each token. Now from UI we will start
+        // assigning part of speech and location. The logic is that user will select a part of speech and select
+        // letters (by selecting toggle buttons), now if, for example, a token has five letters but user has selected
+        // only two letters, that means three letters still doesn't have associated part of speech.
+        // we will try to find any unselected locations, if we find then we will create a new location for this token,
+        // in next iteration user can assign part of speech to those unselected letters. This process will continue
+        // until we all letters part of a location
+
+        List<Location> locations = token.getLocations();
+        Integer locationCount = token.getLocationCount();
+        System.out.println("Token locations before: " + locationCount);
+        Location lastLocation = locations.get(locationCount - 1);
+        // save this location first
+        lastLocation = locationRepository.save(lastLocation);
+        int tokenLength = token.getTokenWord().getLength();
+        if (!lastLocation.isTransient() && lastLocation.getEndIndex() < tokenLength) {
+            // there are still some unselected letters, so create new location
+            Location location = new Location(token.getChapterNumber(), token.getVerseNumber(),
+                    token.getTokenNumber(), locationCount + 1);
+            locationRepository.save(location);
+            token.getLocations().add(location);
+        }
+
+        System.out.println("Token locations after: " + token.getLocationCount());
+        tokenRepository.save(token);
+        return token;
+    }
+
     public DependencyGraph getCurrentGraph() {
         return currentGraph;
     }

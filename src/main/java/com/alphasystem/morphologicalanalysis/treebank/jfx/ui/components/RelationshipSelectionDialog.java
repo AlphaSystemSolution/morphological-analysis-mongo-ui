@@ -1,6 +1,5 @@
 package com.alphasystem.morphologicalanalysis.treebank.jfx.ui.components;
 
-import com.alphasystem.morphologicalanalysis.ui.common.ArabicSupportEnumAdapter;
 import com.alphasystem.morphologicalanalysis.ui.common.ComboBoxFactory;
 import com.alphasystem.morphologicalanalysis.ui.common.Global;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.RelationshipType;
@@ -22,12 +21,12 @@ public class RelationshipSelectionDialog extends Dialog<RelationshipType> {
 
     private final StringProperty firstPartOfSpeech = new SimpleStringProperty();
     private final StringProperty secondPartOfSpeech = new SimpleStringProperty();
-    private final ComboBox<ArabicSupportEnumAdapter<RelationshipType>> comboBox;
+    private final ComboBox<RelationshipType> comboBox;
 
     public RelationshipSelectionDialog() {
         setTitle(getLabel("title"));
         setHeaderText(getLabel("headerText"));
-        comboBox = ComboBoxFactory.getInstance().getGrammaticalRelationshipComboBox();
+        comboBox = ComboBoxFactory.getInstance().getRelationshipTypeComboBox();
         comboBox.disableProperty().bind(secondPartOfSpeech.isEqualTo(NONE_SELECTED));
         reset();
         initDialogPane();
@@ -72,7 +71,7 @@ public class RelationshipSelectionDialog extends Dialog<RelationshipType> {
         setResultConverter(param -> {
             ButtonBar.ButtonData buttonData = param.getButtonData();
             return buttonData.isCancelButton() ? RelationshipType.NONE :
-                    comboBox.getSelectionModel().getSelectedItem().getValue();
+                    comboBox.getSelectionModel().getSelectedItem();
         });
         getDialogPane().getButtonTypes().addAll(OK, CANCEL);
         Button okButton = (Button) getDialogPane().lookupButton(OK);
