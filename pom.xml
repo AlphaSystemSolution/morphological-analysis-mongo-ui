@@ -62,7 +62,7 @@
 			<version>2.4</version>
 		</dependency>
 		<!-- Batik dependencies -->
-		<dependency>
+		<!--dependency>
 			<groupId>org.apache.xmlgraphics</groupId>
 			<artifactId>batik-svg-dom</artifactId>
 			<version>${batik.version}</version>
@@ -91,7 +91,7 @@
 			<groupId>org.apache.xmlgraphics</groupId>
 			<artifactId>batik-swing</artifactId>
 			<version>${batik.version}</version>
-		</dependency>
+		</dependency-->
 		<dependency>
 			<groupId>com.alphasystem.svg</groupId>
 			<artifactId>svg-model</artifactId>
