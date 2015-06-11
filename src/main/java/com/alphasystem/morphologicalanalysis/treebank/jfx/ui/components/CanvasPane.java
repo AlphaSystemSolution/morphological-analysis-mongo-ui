@@ -7,7 +7,6 @@ import com.alphasystem.morphologicalanalysis.treebank.jfx.ui.util.GraphBuilder;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.RelationshipType;
-import com.alphasystem.svg.jfx.SVGGraphicsContext;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
@@ -27,6 +26,7 @@ import javafx.scene.shape.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -56,7 +56,6 @@ public class CanvasPane extends Pane {
     private final ContextMenu contextMenu;
     private RelationshipSelectionDialog relationshipSelectionDialog;
     private PhraseSelectionDialog phraseSelectionDialog;
-    private SVGGraphicsContext svgGraphicsContext;
     private DependencyGraphGraphicTool tool = DependencyGraphGraphicTool.getInstance();
     private GraphBuilder graphBuilder = GraphBuilder.getInstance();
     private Pane canvasPane;
@@ -78,7 +77,6 @@ public class CanvasPane extends Pane {
         initListeners();
 
         canvasPane = new Pane();
-        svgGraphicsContext = new SVGGraphicsContext(canvasPane, width, height);
         initCanvas();
 
         canvasPane.setMinSize(USE_PREF_SIZE, USE_PREF_SIZE);
@@ -103,9 +101,7 @@ public class CanvasPane extends Pane {
         contextMenu.getItems().add(menuItem);
 
         menuItem = new MenuItem("Add Empty Node");
-        menuItem.setOnAction(event -> {
-            addEmptyNode();
-        });
+        menuItem.setOnAction(event -> addEmptyNode());
         contextMenu.getItems().add(menuItem);
     }
 
@@ -199,8 +195,22 @@ public class CanvasPane extends Pane {
         requestLayout();
     }
 
+    private void removeAll(boolean removeGridLines) {
+        ObservableList<Node> children = getChildren();
+        Iterator<Node> iterator = children.iterator();
+        while (iterator.hasNext()) {
+            Node node = iterator.next();
+            String id = node.getId();
+            if (id.equals("gridLines") && !removeGridLines) {
+                continue;
+            }
+            iterator.remove();
+        }
+
+    }
+
     private void drawNodes(ObservableList<GraphNode> nodes, boolean removeGridLines) {
-        svgGraphicsContext.removeAll(removeGridLines);
+        removeAll(removeGridLines);
         for (GraphNode node : nodes) {
             GraphNodeType nodeType = node.getNodeType();
             switch (nodeType) {

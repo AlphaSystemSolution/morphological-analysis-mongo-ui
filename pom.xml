@@ -41,11 +41,11 @@
 		</plugins>
 	</build>
 	<dependencies>
-		<dependency>
+		<!--dependency>
 			<groupId>com.alphasystem.arabic</groupId>
 			<artifactId>arabic-keyboard-ui</artifactId>
 			<version>${keyboard-ui.version}</version>
-		</dependency>
+		</dependency-->
 		<dependency>
 			<groupId>com.alphasystem.arabic</groupId>
 			<artifactId>morphological-analysis-mongo-repository</artifactId>
@@ -92,11 +92,11 @@
 			<artifactId>batik-swing</artifactId>
 			<version>${batik.version}</version>
 		</dependency-->
-		<dependency>
+		<!--dependency>
 			<groupId>com.alphasystem.svg</groupId>
 			<artifactId>svg-model</artifactId>
 			<version>${svg-model.version}</version>
-		</dependency>
+		</dependency-->
 	</dependencies>
 	<properties>
 		<batik.version>1.7</batik.version>
