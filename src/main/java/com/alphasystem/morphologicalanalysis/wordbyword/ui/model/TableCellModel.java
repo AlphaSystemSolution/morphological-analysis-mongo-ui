@@ -11,11 +11,11 @@ import static java.lang.String.format;
  */
 public final class TableCellModel {
 
-    private final Token token;
     private final BooleanProperty checked;
     private final ReadOnlyStringWrapper tokenNumber;
     private final ReadOnlyStringWrapper tokenText;
     private final StringProperty morphologicalDescription;
+    private Token token;
 
     public TableCellModel(Token token) {
         this.token = token;
@@ -38,8 +38,12 @@ public final class TableCellModel {
         return format("(%s:%s:%s)", chapterNumber, verseNumber, tokenNumber);
     }
 
-    public final Token getToken() {
+    public Token getToken() {
         return token;
+    }
+
+    public void setToken(Token token) {
+        this.token = token;
     }
 
     public final boolean isChecked() {

@@ -3,6 +3,7 @@ package com.alphasystem.morphologicalanalysis.util;
 import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
 import com.alphasystem.morphologicalanalysis.graph.repository.DependencyGraphRepository;
 import com.alphasystem.morphologicalanalysis.ui.common.model.ChapterAdapter;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.AbstractProperties;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Chapter;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
@@ -108,10 +109,10 @@ public class RepositoryTool {
 
         List<Location> locations = token.getLocations();
         Integer locationCount = token.getLocationCount();
-        System.out.println("Token locations before: " + locationCount);
         Location lastLocation = locations.get(locationCount - 1);
         // save this location first
         lastLocation = locationRepository.save(lastLocation);
+        AbstractProperties properties = lastLocation.getProperties();
         int tokenLength = token.getTokenWord().getLength();
         if (!lastLocation.isTransient() && lastLocation.getEndIndex() < tokenLength) {
             // there are still some unselected letters, so create new location
@@ -121,7 +122,6 @@ public class RepositoryTool {
             token.getLocations().add(location);
         }
 
-        System.out.println("Token locations after: " + token.getLocationCount());
         tokenRepository.save(token);
         return token;
     }

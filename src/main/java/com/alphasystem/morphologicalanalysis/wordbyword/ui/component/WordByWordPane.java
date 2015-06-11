@@ -18,6 +18,8 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Screen;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.TREE_BANK_STYLE_SHEET;
@@ -68,12 +70,14 @@ public class WordByWordPane extends BorderPane {
             TableRow<TableCellModel> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2) {
-                    //TODO:
                     TableCellModel model = tableView.getItems().get(row.getIndex());
                     Token token = model.getToken();
-                    System.out.println(token.getDisplayName());
+                    tokenEditorDialog.setToken(null);
                     tokenEditorDialog.setToken(token);
-                    tokenEditorDialog.showAndWait();
+                    Optional<Token> result = tokenEditorDialog.showAndWait();
+                    result.ifPresent(t -> {
+                        model.setToken(t);
+                    });
                 }
             });
             return row;
@@ -121,6 +125,8 @@ public class WordByWordPane extends BorderPane {
 
         ObservableList items = tableView.getItems();
         items.remove(0, items.size());
+
+        List<Token> tokens = verse.getTokens();
 
         items.addAll(verse.getTokens().stream().map(TableCellModel::new).collect(Collectors.toList()));
 
