@@ -5,6 +5,8 @@ import com.alphasystem.morphologicalanalysis.ui.wordbyword.model.TableCellModel;
 import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Verse;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.control.ScrollPane;
@@ -30,6 +32,7 @@ import static javafx.scene.control.ScrollPane.ScrollBarPolicy.AS_NEEDED;
  */
 public class WordByWordPane extends BorderPane {
 
+    private final ObjectProperty<Action> action = new SimpleObjectProperty<>();
     private RepositoryTool repositoryTool = RepositoryTool.getInstance();
     private ChapterVerseSelectionPane chapterVerseSelectionPane;
     private TokenEditorDialog tokenEditorDialog;
@@ -43,6 +46,8 @@ public class WordByWordPane extends BorderPane {
                 initPane();
             }
         });
+
+        actionProperty().addListener((observable, oldValue, newValue) -> performAction(newValue));
 
         TableColumn descriptionColumn = new TableColumn<>();
         descriptionColumn.setMinWidth(700);
@@ -93,6 +98,25 @@ public class WordByWordPane extends BorderPane {
         setCenter(scrollPane);
     }
 
+    private void performAction(Action action) {
+        if (action == null) {
+            return;
+        }
+        switch (action) {
+            case CREATE_DEPENDENCY_GRAPH:
+
+                break;
+        }
+    }
+
+    public final void setAction(Action action) {
+        this.action.set(action);
+    }
+
+    public final ObjectProperty<Action> actionProperty() {
+        return action;
+    }
+
     private void initPane() {
         // top pane for Menu bar and chapter verse selection
         BorderPane topPane = new BorderPane();
@@ -130,5 +154,9 @@ public class WordByWordPane extends BorderPane {
         items.addAll(verse.getTokens().stream().map(TableCellModel::new).collect(Collectors.toList()));
 
         tableView.requestLayout();
+    }
+
+    public enum Action {
+        CREATE_DEPENDENCY_GRAPH
     }
 }

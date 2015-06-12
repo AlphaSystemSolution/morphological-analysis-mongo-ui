@@ -1,7 +1,6 @@
 package com.alphasystem.morphologicalanalysis.ui.common;
 
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech;
-import javafx.scene.Scene;
 import javafx.scene.text.Font;
 
 import java.util.List;
@@ -29,7 +28,6 @@ public class Global {
     public static final Font ENGLISH_FONT_SMALL = font("Candara", REGULAR, 14);
     public static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("resources");
     private static Global instance;
-    private Scene globalScene;
 
     private Global() {
     }
