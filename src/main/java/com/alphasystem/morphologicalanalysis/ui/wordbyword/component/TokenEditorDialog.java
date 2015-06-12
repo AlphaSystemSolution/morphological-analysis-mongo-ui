@@ -3,7 +3,7 @@ package com.alphasystem.morphologicalanalysis.ui.wordbyword.component;
 import com.alphasystem.arabic.model.ArabicLetter;
 import com.alphasystem.arabic.model.NamedTemplate;
 import com.alphasystem.morphologicalanalysis.ui.common.ComboBoxFactory;
-import com.alphasystem.morphologicalanalysis.ui.common.model.LocationAdapter;
+import com.alphasystem.morphologicalanalysis.ui.common.LocationListCell;
 import com.alphasystem.morphologicalanalysis.ui.wordbyword.model.TokenAdapter;
 import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.AbstractProperties;
@@ -18,7 +18,8 @@ import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 
-import static com.alphasystem.morphologicalanalysis.ui.common.Global.*;
+import static com.alphasystem.morphologicalanalysis.ui.common.Global.ARABIC_FONT_MEDIUM;
+import static com.alphasystem.morphologicalanalysis.ui.common.Global.RESOURCE_BUNDLE;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.AbstractProperties.*;
 import static java.lang.String.format;
 import static javafx.event.ActionEvent.ACTION;
@@ -52,7 +53,7 @@ public class TokenEditorDialog extends Dialog<Token> {
     private AbstractPropertiesPane nounPropertiesPane;
     private AbstractPropertiesPane proNounPropertiesPane;
     private AbstractPropertiesPane verbPropertiesPane;
-    private ComboBox<LocationAdapter> locationComboBox;
+    private ComboBox<Location> locationComboBox;
 
     public TokenEditorDialog(Token token) {
         setTitle(getTitle(token));
@@ -175,7 +176,8 @@ public class TokenEditorDialog extends Dialog<Token> {
         Label label = new Label(RESOURCE_BUNDLE.getString("locations.label"));
         gridPane.add(label, 0, 0);
         locationComboBox = new ComboBox<>();
-        locationComboBox.getStylesheets().add(TREE_BANK_STYLE_SHEET);
+        locationComboBox.setButtonCell(new LocationListCell());
+        locationComboBox.setCellFactory(param -> new LocationListCell());
         initLocations();
         gridPane.add(locationComboBox, 1, 0);
 
@@ -246,14 +248,14 @@ public class TokenEditorDialog extends Dialog<Token> {
     }
 
     private void initLocations() {
-        ObservableList<LocationAdapter> items = locationComboBox.getItems();
+        ObservableList<Location> items = locationComboBox.getItems();
         int size = items.size();
         items.remove(0, size);
 
         ObservableList<Location> _locations = tokenAdapter.getLocations();
-        LocationAdapter[] locationAdapters = new LocationAdapter[_locations.size()];
+        Location[] locationAdapters = new Location[_locations.size()];
         for (int i = 0; i < locationAdapters.length; i++) {
-            locationAdapters[i] = new LocationAdapter(_locations.get(i));
+            locationAdapters[i] = _locations.get(i);
         }
         items.addAll(locationAdapters);
         locationComboBox.getSelectionModel().select(0);

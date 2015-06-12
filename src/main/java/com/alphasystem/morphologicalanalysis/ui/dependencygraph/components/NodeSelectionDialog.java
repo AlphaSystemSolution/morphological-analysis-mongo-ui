@@ -2,10 +2,10 @@ package com.alphasystem.morphologicalanalysis.ui.dependencygraph.components;
 
 import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
 import com.alphasystem.morphologicalanalysis.ui.common.ChapterVerseSelectionPane;
-import com.alphasystem.morphologicalanalysis.ui.common.model.VerseAdapter;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.TokenListCell;
 import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.Verse;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -20,7 +20,6 @@ import javafx.util.Callback;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ResourceBundle;
 
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.TREE_BANK_STYLE_SHEET;
 import static javafx.scene.control.ButtonBar.ButtonData.CANCEL_CLOSE;
@@ -30,8 +29,6 @@ import static javafx.scene.control.ButtonBar.ButtonData.OK_DONE;
  * @author sali
  */
 public class NodeSelectionDialog extends Dialog<DependencyGraph> {
-
-    private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("resources");
 
     // UI elements
     private ChapterVerseSelectionPane chapterVerseSelectionPane;
@@ -76,7 +73,7 @@ public class NodeSelectionDialog extends Dialog<DependencyGraph> {
 
         ButtonType okButton = new ButtonType("OK", OK_DONE);
         setResultConverter(dialogButton -> {
-            List<Token> results = new ArrayList<Token>();
+            List<Token> results = new ArrayList<>();
             ObservableList<TokenListCell> items = tokensList.getItems();
             for (TokenListCell item : items) {
                 if (item.isSelected()) {
@@ -84,7 +81,7 @@ public class NodeSelectionDialog extends Dialog<DependencyGraph> {
                     item.setSelected(false);
                 }
             }
-            VerseAdapter selectedVerse = chapterVerseSelectionPane.getSelectedVerse();
+            Verse selectedVerse = chapterVerseSelectionPane.getSelectedVerse();
             return repositoryTool.createDependencyGraph(selectedVerse.getChapterNumber(),
                     selectedVerse.getVerseNumber(), results);
         });
@@ -98,7 +95,7 @@ public class NodeSelectionDialog extends Dialog<DependencyGraph> {
     }
 
     private void loadTokens() {
-        VerseAdapter selectedVerse = chapterVerseSelectionPane.getSelectedVerse();
+        Verse selectedVerse = chapterVerseSelectionPane.getSelectedVerse();
         if (selectedVerse == null) {
             return;
         }

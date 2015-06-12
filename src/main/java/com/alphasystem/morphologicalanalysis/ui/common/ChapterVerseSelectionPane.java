@@ -1,9 +1,8 @@
 package com.alphasystem.morphologicalanalysis.ui.common;
 
-import com.alphasystem.morphologicalanalysis.ui.common.model.ChapterAdapter;
-import com.alphasystem.morphologicalanalysis.ui.common.model.VerseAdapter;
 import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Chapter;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.Verse;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -20,26 +19,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.RESOURCE_BUNDLE;
-import static com.alphasystem.morphologicalanalysis.ui.common.Global.TREE_BANK_STYLE_SHEET;
 
 /**
  * @author sali
  */
 public class ChapterVerseSelectionPane extends BorderPane {
 
-    private ComboBox<ChapterAdapter> chapterNameComboBox;
-    private ComboBox<VerseAdapter> verseAdapterComboBox;
+    private ComboBox<Chapter> chapterNameComboBox;
+    private ComboBox<Verse> verseComboBox;
 
     // other elements
     private RepositoryTool repositoryTool = RepositoryTool.getInstance();
-    private List<ChapterAdapter> chapters;
+    private List<Chapter> chapters;
     private BooleanProperty avaialble = new SimpleBooleanProperty(false);
 
     public ChapterVerseSelectionPane() {
-        Service<List<ChapterAdapter>> service = repositoryTool.getAllChapters();
+        Service<List<Chapter>> service = repositoryTool.getAllChapters();
         service.start();
         service.setOnSucceeded(event -> {
-            chapters = (List<ChapterAdapter>) event.getSource().getValue();
+            chapters = (List<Chapter>) event.getSource().getValue();
             initPane();
             avaialble.setValue(true);
         });
@@ -59,15 +57,17 @@ public class ChapterVerseSelectionPane extends BorderPane {
         grid.setVgap(10);
         grid.setPadding(new Insets(25, 25, 25, 25));
 
-        verseAdapterComboBox = new ComboBox<>();
-        verseAdapterComboBox.getStylesheets().add(TREE_BANK_STYLE_SHEET);
+        verseComboBox = new ComboBox<>();
+        verseComboBox.setButtonCell(new VerseListCell());
+        verseComboBox.setCellFactory(param -> new VerseListCell());
 
         Label label = new Label(RESOURCE_BUNDLE.getString("chapterName.label"));
         grid.add(label, 0, 0);
 
         chapterNameComboBox = new ComboBox();
-        chapterNameComboBox.getStylesheets().add(TREE_BANK_STYLE_SHEET);
-        chapterNameComboBox.getItems().addAll(chapters.toArray(new ChapterAdapter[chapters.size()]));
+        chapterNameComboBox.setButtonCell(new ChapterListCell());
+        chapterNameComboBox.setCellFactory(param -> new ChapterListCell());
+        chapterNameComboBox.getItems().addAll(chapters.toArray(new Chapter[chapters.size()]));
         chapterNameComboBox.getSelectionModel().select(0);
         chapterNameComboBox.getSelectionModel().selectedItemProperty().addListener(
                 (observable, oldValue, newValue) -> {
@@ -79,7 +79,7 @@ public class ChapterVerseSelectionPane extends BorderPane {
         label = new Label(RESOURCE_BUNDLE.getString("verseNumber.label"));
         grid.add(label, 1, 0);
         initVerseComboBox(chapterNameComboBox.getItems().get(0));
-        grid.add(verseAdapterComboBox, 1, 1);
+        grid.add(verseComboBox, 1, 1);
 
         HBox hBox = new HBox();
         hBox.setPadding(new Insets(0, 50, 0, 50));
@@ -87,35 +87,34 @@ public class ChapterVerseSelectionPane extends BorderPane {
         setCenter(hBox);
     }
 
-    private void initVerseComboBox(ChapterAdapter selectedChapter) {
-        ObservableList<VerseAdapter> items = verseAdapterComboBox.getItems();
+    private void initVerseComboBox(Chapter chapter) {
+        ObservableList<Verse> items = verseComboBox.getItems();
         items.remove(0, items.size());
 
-        List<VerseAdapter> verseNumbers = new ArrayList<>();
-        if (selectedChapter != null) {
-            Chapter chapter = selectedChapter.getChapter();
+        List<Verse> verseNumbers = new ArrayList<>();
+        if (chapter != null) {
             int verseCount = chapter.getVerseCount();
             for (int i = 1; i <= verseCount; i++) {
-                verseNumbers.add(new VerseAdapter(chapter.getChapterNumber(), i));
+                verseNumbers.add(new Verse(chapter.getChapterNumber(), i));
             }
         }
         int size = verseNumbers.size();
-        verseAdapterComboBox.getItems().addAll(verseNumbers.toArray(new VerseAdapter[size]));
+        verseComboBox.getItems().addAll(verseNumbers.toArray(new Verse[size]));
         if (size > 0) {
-            verseAdapterComboBox.getSelectionModel().select(0);
+            verseComboBox.getSelectionModel().select(0);
         }
-        verseAdapterComboBox.requestLayout();
+        verseComboBox.requestLayout();
     }
 
-    public ComboBox<VerseAdapter> getVerseAdapterComboBox() {
-        return verseAdapterComboBox;
+    public ComboBox<Verse> getVerseComboBox() {
+        return verseComboBox;
     }
 
-    public ReadOnlyObjectProperty<VerseAdapter> selectedVerseProperty() {
-        return verseAdapterComboBox.getSelectionModel().selectedItemProperty();
+    public ReadOnlyObjectProperty<Verse> selectedVerseProperty() {
+        return verseComboBox.getSelectionModel().selectedItemProperty();
     }
 
-    public VerseAdapter getSelectedVerse() {
+    public Verse getSelectedVerse() {
         return selectedVerseProperty().get();
     }
 }

@@ -2,7 +2,6 @@ package com.alphasystem.morphologicalanalysis.util;
 
 import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
 import com.alphasystem.morphologicalanalysis.graph.repository.DependencyGraphRepository;
-import com.alphasystem.morphologicalanalysis.ui.common.model.ChapterAdapter;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.AbstractProperties;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Chapter;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
@@ -13,7 +12,6 @@ import com.alphasystem.persistence.mongo.spring.support.ApplicationContextProvid
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -48,21 +46,16 @@ public class RepositoryTool {
         return instance;
     }
 
-    public Service<List<ChapterAdapter>> getAllChapters() {
-        return new Service<List<ChapterAdapter>>() {
+    public Service<List<Chapter>> getAllChapters() {
+        return new Service<List<Chapter>>() {
 
             @Override
-            protected Task<List<ChapterAdapter>> createTask() {
-                return new Task<List<ChapterAdapter>>() {
+            protected Task<List<Chapter>> createTask() {
+                return new Task<List<Chapter>>() {
 
                     @Override
-                    protected List<ChapterAdapter> call() throws Exception {
-                        List<ChapterAdapter> results = new ArrayList<>();
-                        List<Chapter> chapters = repositoryUtil.findAllChapters();
-                        for (Chapter chapter : chapters) {
-                            results.add(new ChapterAdapter(chapter));
-                        }
-                        return results;
+                    protected List<Chapter> call() throws Exception {
+                        return repositoryUtil.findAllChapters();
                     } // end of "call"
                 }; // end of new "Task"
             } // end of "createTask"

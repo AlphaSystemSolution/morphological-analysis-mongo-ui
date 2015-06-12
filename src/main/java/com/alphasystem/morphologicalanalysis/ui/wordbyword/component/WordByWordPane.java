@@ -1,7 +1,6 @@
 package com.alphasystem.morphologicalanalysis.ui.wordbyword.component;
 
 import com.alphasystem.morphologicalanalysis.ui.common.ChapterVerseSelectionPane;
-import com.alphasystem.morphologicalanalysis.ui.common.model.VerseAdapter;
 import com.alphasystem.morphologicalanalysis.ui.wordbyword.model.TableCellModel;
 import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
@@ -114,7 +113,7 @@ public class WordByWordPane extends BorderPane {
     }
 
     private void refreshTable() {
-        VerseAdapter selectedVerse = chapterVerseSelectionPane.getSelectedVerse();
+        Verse selectedVerse = chapterVerseSelectionPane.getSelectedVerse();
         if (selectedVerse == null) {
             return;
         }
