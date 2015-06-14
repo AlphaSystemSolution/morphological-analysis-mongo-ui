@@ -49,9 +49,7 @@ public class WordByWordApp extends Application {
 
         menuItem = new MenuItem("Exit");
         menuItem.setAccelerator(new KeyCodeCombination(F4, ALT_DOWN));
-        menuItem.setOnAction(event -> {
-            stage.close();
-        });
+        menuItem.setOnAction(event -> stage.close());
         menu.getItems().add(menuItem);
 
         menuBar.getMenus().add(menu);

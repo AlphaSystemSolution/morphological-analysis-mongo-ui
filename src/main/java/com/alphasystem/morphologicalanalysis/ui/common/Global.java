@@ -11,6 +11,7 @@ import static java.lang.String.format;
 import static java.util.Collections.singletonList;
 import static javafx.scene.text.Font.font;
 import static javafx.scene.text.FontPosture.REGULAR;
+import static javafx.scene.text.FontWeight.BOLD;
 
 /**
  * @author sali
@@ -22,6 +23,7 @@ public class Global {
     public static final String ARABIC_FONT_NAME = System.getProperty("arabic-font-name", "Traditional Arabic");
     public static final Font ARABIC_FONT_BIG = font(ARABIC_FONT_NAME, REGULAR, 48);
     public static final Font ARABIC_FONT_MEDIUM = font(ARABIC_FONT_NAME, REGULAR, 36);
+    public static final Font ARABIC_FONT_MEDIUM_BOLD = font(ARABIC_FONT_NAME, BOLD, REGULAR, 30);
     public static final Font ARABIC_FONT_SMALL = font(ARABIC_FONT_NAME, REGULAR, 24);
     public static final String NONE_SELECTED = "None selected";
     public static final Font ENGLISH_FONT = font("Candara", REGULAR, 16);

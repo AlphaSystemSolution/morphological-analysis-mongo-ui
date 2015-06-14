@@ -9,22 +9,23 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.geometry.Rectangle2D;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableRow;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.text.Text;
 import javafx.stage.Screen;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.alphasystem.morphologicalanalysis.ui.common.Global.TREE_BANK_STYLE_SHEET;
+import static com.alphasystem.morphologicalanalysis.ui.common.Global.ARABIC_FONT_MEDIUM_BOLD;
+import static javafx.geometry.NodeOrientation.RIGHT_TO_LEFT;
+import static javafx.scene.control.ContentDisplay.GRAPHIC_ONLY;
 import static javafx.scene.control.ScrollPane.ScrollBarPolicy.AS_NEEDED;
+import static javafx.scene.text.TextAlignment.CENTER;
 
 
 /**
@@ -54,15 +55,61 @@ public class WordByWordPane extends BorderPane {
         descriptionColumn.setText("Description");
         descriptionColumn.setCellValueFactory(new PropertyValueFactory<>("morphologicalDescription"));
 
-        TableColumn tokenColumn = new TableColumn<>();
+        TableColumn<TableCellModel, String> tokenColumn = new TableColumn<>();
         tokenColumn.setMinWidth(200);
         tokenColumn.setText("Token");
         tokenColumn.setCellValueFactory(new PropertyValueFactory<>("tokenText"));
+        tokenColumn.setCellFactory(column -> new TableCell<TableCellModel, String>() {
+            private final Text text;
+
+            {
+                setContentDisplay(GRAPHIC_ONLY);
+                text = new Text();
+                text.setFont(ARABIC_FONT_MEDIUM_BOLD);
+                text.setTextAlignment(CENTER);
+                text.setNodeOrientation(RIGHT_TO_LEFT);
+            }
+
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+
+                BorderPane borderPane = new BorderPane();
+                if (item != null && !empty) {
+                    text.setText(item);
+                    borderPane.setCenter(text);
+                }
+                setGraphic(borderPane);
+            }
+        });
 
         TableColumn tokenNumberColumn = new TableColumn<>();
         tokenNumberColumn.setMinWidth(200);
         tokenNumberColumn.setText("Token Number");
         tokenNumberColumn.setCellValueFactory(new PropertyValueFactory<>("tokenNumber"));
+        tokenNumberColumn.setCellFactory(column -> new TableCell<TableCellModel, String>() {
+            private final Text text;
+
+            {
+                setContentDisplay(GRAPHIC_ONLY);
+                text = new Text();
+                text.setFont(ARABIC_FONT_MEDIUM_BOLD);
+                text.setTextAlignment(CENTER);
+                text.setNodeOrientation(RIGHT_TO_LEFT);
+            }
+
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+
+                BorderPane borderPane = new BorderPane();
+                if (item != null && !empty) {
+                    text.setText(item);
+                    borderPane.setCenter(text);
+                }
+                setGraphic(borderPane);
+            }
+        });
 
         TableColumn checkBoxColumn = new TableColumn<>();
         checkBoxColumn.setMaxWidth(30);
@@ -86,7 +133,6 @@ public class WordByWordPane extends BorderPane {
             });
             return row;
         });
-        tableView.getStylesheets().add(TREE_BANK_STYLE_SHEET);
         tableView.setEditable(true);
         tableView.getColumns().addAll(descriptionColumn, tokenColumn, tokenNumberColumn, checkBoxColumn);
 

@@ -1,3 +1,9 @@
+@font-face {
+    font-family: 'PDMS_Saleem';
+    src: url('PDMS_Saleem.ttf');
+}
+
+
 .list-view .check-box-list-cell .text{
     -fx-font-family: "Arabic Typesetting";
     -fx-font-size: 20pt;
