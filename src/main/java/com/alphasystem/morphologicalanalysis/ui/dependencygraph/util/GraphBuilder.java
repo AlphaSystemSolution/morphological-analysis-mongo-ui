@@ -1,5 +1,6 @@
 package com.alphasystem.morphologicalanalysis.ui.dependencygraph.util;
 
+import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.*;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
@@ -46,6 +47,10 @@ public class GraphBuilder {
             instance = new GraphBuilder();
         }
         return instance;
+    }
+
+    public ObservableList<GraphNode> toGraphNodes(DependencyGraph dependencyGraph) {
+        return toGraphNodes(dependencyGraph.getTokens());
     }
 
     public ObservableList<GraphNode> toGraphNodes(List<Token> tokens) {
@@ -126,7 +131,7 @@ public class GraphBuilder {
         PartOfSpeech partOfSpeech = NOUN;
         Location location = new Location();
         location.setPartOfSpeech(partOfSpeech);
-        PartOfSpeechNode partOfSpeechNode = new PartOfSpeechNode(partOfSpeech, location, null, 0d, 0d, 0d, 0d, false);
+        PartOfSpeechNode partOfSpeechNode = new PartOfSpeechNode(partOfSpeech, location, 0d, 0d, 0d, 0d);
         EmptyNode emptyNode = new EmptyNode(null, textX, textY, x1, y1, x2, y2, x3, y3, partOfSpeechNode);
 
         reset();

@@ -81,9 +81,7 @@ public class NodeSelectionDialog extends Dialog<DependencyGraph> {
                     item.setSelected(false);
                 }
             }
-            Verse selectedVerse = chapterVerseSelectionPane.getSelectedVerse();
-            return repositoryTool.createDependencyGraph(selectedVerse.getChapterNumber(),
-                    selectedVerse.getVerseNumber(), results);
+            return repositoryTool.createDependencyGraph(results);
         });
 
         loadTokens();

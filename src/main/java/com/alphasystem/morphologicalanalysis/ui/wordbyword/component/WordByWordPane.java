@@ -1,6 +1,8 @@
 package com.alphasystem.morphologicalanalysis.ui.wordbyword.component;
 
+import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
 import com.alphasystem.morphologicalanalysis.ui.common.ChapterVerseSelectionPane;
+import com.alphasystem.morphologicalanalysis.ui.dependencygraph.TreeBankPane;
 import com.alphasystem.morphologicalanalysis.ui.wordbyword.model.TableCellModel;
 import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
@@ -9,6 +11,7 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.geometry.Rectangle2D;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -16,13 +19,19 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.Text;
 import javafx.stage.Screen;
+import javafx.stage.Stage;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.ARABIC_FONT_MEDIUM_BOLD;
+import static java.lang.String.format;
 import static javafx.geometry.NodeOrientation.RIGHT_TO_LEFT;
+import static javafx.scene.control.Alert.AlertType.ERROR;
+import static javafx.scene.control.Alert.AlertType.INFORMATION;
+import static javafx.scene.control.ButtonType.OK;
 import static javafx.scene.control.ContentDisplay.GRAPHIC_ONLY;
 import static javafx.scene.control.ScrollPane.ScrollBarPolicy.AS_NEEDED;
 import static javafx.scene.text.TextAlignment.CENTER;
@@ -150,9 +159,41 @@ public class WordByWordPane extends BorderPane {
         }
         switch (action) {
             case CREATE_DEPENDENCY_GRAPH:
-
+                exportTokens();
                 break;
         }
+    }
+
+    private void exportTokens() {
+        ObservableList<TableCellModel> items = tableView.getItems();
+        List<Token> tokens = new ArrayList<>();
+        items.forEach(tcm -> {
+            if (tcm.isChecked()) {
+                tokens.add(tcm.getToken());
+            }
+        });
+        if (tokens.isEmpty()) {
+            Alert alert = new Alert(ERROR);
+            alert.setContentText("No row selected in the table");
+            alert.showAndWait();
+            return;
+        }
+        DependencyGraph dependencyGraph = repositoryTool.createDependencyGraph(tokens);
+        Alert alert = new Alert(INFORMATION);
+        alert.setContentText(format("Graph Created {%s}", dependencyGraph.getDisplayName()));
+        alert.showAndWait().filter(response -> response == OK).ifPresent(response -> {
+            items.forEach(tcm -> {
+                if (tcm.isChecked()) {
+                    tcm.setChecked(false);
+                }
+            });
+            Stage stage = new Stage();
+            Scene scene = new Scene(new TreeBankPane());
+            stage.setMaximized(true);
+            stage.setScene(scene);
+            stage.show();
+        });
+
     }
 
     public final void setAction(Action action) {
@@ -194,8 +235,6 @@ public class WordByWordPane extends BorderPane {
 
         ObservableList items = tableView.getItems();
         items.remove(0, items.size());
-
-        List<Token> tokens = verse.getTokens();
 
         items.addAll(verse.getTokens().stream().map(TableCellModel::new).collect(Collectors.toList()));
 

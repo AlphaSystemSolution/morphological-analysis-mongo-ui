@@ -32,7 +32,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
 
+import static com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.SerializationTool.MDG_EXTENSION_ALL;
 import static com.alphasystem.util.AppUtil.CURRENT_USER_DIR;
+import static java.lang.String.format;
 import static javafx.application.Platform.runLater;
 import static javafx.scene.Cursor.DEFAULT;
 import static javafx.scene.Cursor.WAIT;
@@ -71,18 +73,30 @@ public class TreeBankPane extends BorderPane {
     private File currentFile;
 
     public TreeBankPane() {
+        this(null);
+    }
+
+    public TreeBankPane(DependencyGraph dependencyGraph) {
         super();
 
         dialog = new NodeSelectionDialog();
         setTop(createMenuBar());
-        initPane(null);
+        initPane(createFromGraph(dependencyGraph));
         fileChooser.setInitialDirectory(CURRENT_USER_DIR);
         fileChooser.getExtensionFilters().addAll(
-                new ExtensionFilter(String.format("Morphology Dependency Graph file (%s)", SerializationTool.MDG_EXTENSION_ALL),
-                        SerializationTool.MDG_EXTENSION_ALL));
+                new ExtensionFilter(format("Morphology Dependency Graph file (%s)", MDG_EXTENSION_ALL),
+                        MDG_EXTENSION_ALL));
         imageFileChooser = new FileChooser();
         imageFileChooser.setInitialDirectory(CURRENT_USER_DIR);
         imageFileChooser.getExtensionFilters().addAll(new ExtensionFilter("PNG", "*.png"));
+    }
+
+    private CanvasData createFromGraph(DependencyGraph dependencyGraph) {
+        CanvasData canvasData = new CanvasData(new CanvasMetaData());
+        if (dependencyGraph != null) {
+
+        }
+        return canvasData;
     }
 
     private MenuBar createMenuBar() {

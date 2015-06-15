@@ -38,7 +38,6 @@ public class NounPropertiesPane extends AbstractPropertiesPane {
     protected void initListeners() {
         nounStatusComboBox.getSelectionModel().selectedItemProperty().addListener(
                 (observable, oldValue, newValue) -> {
-                    System.out.println("HERE: " + newValue);
                     tokenAdapter.setNounStatus(newValue);
                 });
         numberTypeComboBox.getSelectionModel().selectedItemProperty().addListener(

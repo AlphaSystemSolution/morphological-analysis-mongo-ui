@@ -35,8 +35,9 @@ public class SerializationTool {
     public static final ObjectFactory OBJECT_FACTORY = new ObjectFactory();
     public static final String MDG_EXTENSION = "mdg";
     public static final String MDG_EXTENSION_ALL = format("*.%s", MDG_EXTENSION);
-    public static final String ZIP_ENTRY_NAME = "graphNode.xml";
-    private static final String XML_FILE_EXTENSION = ".xml";
+    private static final String DATA_FILE_EXTENSION = ".ser";
+    public static final String ZIP_ENTRY_NAME = format("graphNode%s", DATA_FILE_EXTENSION);
+
     private static SerializationTool instance;
 
     private SerializationTool() {
@@ -116,7 +117,7 @@ public class SerializationTool {
         }
         File _file = new File(parentFile, name);
         try {
-            tempFile = createTempFile(XML_FILE_EXTENSION);
+            tempFile = createTempFile(DATA_FILE_EXTENSION);
             serialize(tempFile, svgFileName, canvasData);
             ZipFileEntry entry = new ZipFileEntry(tempFile, ZIP_ENTRY_NAME);
             archiveFile(_file, entry);
@@ -133,7 +134,7 @@ public class SerializationTool {
         CanvasData canvasData = null;
         File tempFile = null;
         try {
-            tempFile = createTempFile(XML_FILE_EXTENSION);
+            tempFile = createTempFile(DATA_FILE_EXTENSION);
             extractFile(file.getAbsolutePath(), ZIP_ENTRY_NAME, tempFile);
             canvasData = deserialize(tempFile);
         } catch (ApplicationException e) {
@@ -251,7 +252,6 @@ public class SerializationTool {
         constructorArgs.add(createDoubleArgument(node.getY()));
         constructorArgs.add(createDoubleArgument(node.getCx()));
         constructorArgs.add(createDoubleArgument(node.getCy()));
-        constructorArgs.add(createBooleanArgument(node.isExcluded()));
 
         return objectType;
     }

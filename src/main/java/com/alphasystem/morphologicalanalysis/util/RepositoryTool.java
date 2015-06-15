@@ -25,7 +25,6 @@ public class RepositoryTool {
     private TokenRepository tokenRepository;
     private LocationRepository locationRepository;
     private DependencyGraphRepository dependencyGraphRepository;
-    private DependencyGraph currentGraph;
 
     /**
      * do not let anyone instantiate this class
@@ -119,19 +118,29 @@ public class RepositoryTool {
         return token;
     }
 
-    public DependencyGraph getCurrentGraph() {
-        return currentGraph;
-    }
+    public DependencyGraph createDependencyGraph(List<Token> tokens) {
+        Token firstToken = tokens.get(0);
+        Token lastToken = tokens.get(tokens.size() - 1);
 
-    public DependencyGraph createDependencyGraph(Integer chapterNumber, Integer verseNumber, List<Token> tokens) {
-        Long count = dependencyGraphRepository.countByChapterNumberAndVerseNumber(chapterNumber, verseNumber);
-        int segmentNumber = (int) (count + 1);
+        Integer chapterNumber = firstToken.getChapterNumber();
+        Integer verseNumber = firstToken.getVerseNumber();
+        Integer firstTokenIndex = firstToken.getTokenNumber();
+        Integer lastTokenIndex = lastToken.getTokenNumber();
 
-        DependencyGraph dependencyGraph = new DependencyGraph(chapterNumber, verseNumber, segmentNumber);
-        dependencyGraph.setTokens(tokens);
+        DependencyGraph dependencyGraph = dependencyGraphRepository.
+                findByChapterNumberAndVerseNumberAndFirstTokenIndexAndLastTokenIndex(
+                        chapterNumber, verseNumber, firstTokenIndex, lastTokenIndex);
 
-        currentGraph = dependencyGraphRepository.save(dependencyGraph);
-        return currentGraph;
+        if (dependencyGraph == null) {
+            dependencyGraph = new DependencyGraph(chapterNumber, verseNumber, firstTokenIndex, lastTokenIndex);
+            dependencyGraph.setTokens(tokens);
+            dependencyGraph = dependencyGraphRepository.save(dependencyGraph);
+        }
+
+        List<Token> tokenList = dependencyGraph.getTokens();
+        tokenList.forEach(token -> System.out.println("token = " + token));
+
+        return dependencyGraph;
     }
 
     public MorphologicalAnalysisRepositoryUtil getRepositoryUtil() {
