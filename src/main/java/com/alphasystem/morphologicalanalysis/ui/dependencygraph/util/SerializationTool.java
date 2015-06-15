@@ -134,7 +134,7 @@ public class SerializationTool {
         }
     }
 
-    public <T extends Externalizable> T deserialize2(File file) {
+    public <T extends Externalizable> T deserialize(Class<T> klass, File file) {
         T obj = null;
         FileInputStream fileIn = null;
         ObjectInputStream objIn = null;

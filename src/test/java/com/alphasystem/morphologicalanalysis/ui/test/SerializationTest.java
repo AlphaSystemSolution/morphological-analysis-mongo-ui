@@ -2,6 +2,7 @@ package com.alphasystem.morphologicalanalysis.ui.test;
 
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.CanvasMetaData;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.SerializationTool;
+import org.testng.Reporter;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
@@ -58,13 +59,22 @@ public class SerializationTest {
     @Test
     public void serializeCanvasMetaData() {
         CanvasMetaData canvasMetaData = new CanvasMetaData();
+        canvasMetaData.setWidth(700);
         canvasMetaData.setShowGridLines(true);
-        serializationTool.serialize(canvasMetaData, new File(tmpFolder, canvasMetaData.getClass().getSimpleName()));
+        serializationTool.serialize(canvasMetaData,
+                getSerializeFileName(canvasMetaData.getClass()));
     }
 
     @Test(dependsOnMethods = {"serializeCanvasMetaData"})
     public void deserializeCanvasMetaData() {
+        CanvasMetaData metaData = serializationTool.deserialize(CanvasMetaData.class,
+                getSerializeFileName(CanvasMetaData.class));
+        log(format("Width: %s, Height: %s, Show Grid Lines: %s",
+                metaData.getWidth(), metaData.getHeight(), metaData.isShowGridLines()));
+    }
 
+    private File getSerializeFileName(Class<?> klass) {
+        return new File(tmpFolder, format("%s.ser", klass.getSimpleName().toLowerCase()));
     }
 
     private void deleteRecursively() throws IOException {
@@ -75,12 +85,14 @@ public class SerializationTest {
         walkFileTree(directory, new SimpleFileVisitor<Path>() {
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                log(format("Deleting file: %s", file));
                 delete(file);
                 return CONTINUE;
             }
 
             @Override
             public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                log(format("Deleting directory: %s", dir));
                 delete(dir);
                 return CONTINUE;
             }
