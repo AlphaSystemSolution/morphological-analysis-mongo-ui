@@ -97,6 +97,18 @@
 			<artifactId>svg-model</artifactId>
 			<version>${svg-model.version}</version>
 		</dependency-->
+		<dependency>
+			<groupId>org.testng</groupId>
+			<artifactId>testng</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.google.inject</groupId>
+			<artifactId>guice</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.uncommons</groupId>
+			<artifactId>reportng</artifactId>
+		</dependency>
 	</dependencies>
 	<properties>
 		<batik.version>1.7</batik.version>

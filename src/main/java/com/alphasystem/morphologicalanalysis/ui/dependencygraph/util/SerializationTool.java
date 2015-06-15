@@ -10,7 +10,7 @@ import com.alphasystem.util.ZipFileEntry;
 import javafx.collections.ObservableList;
 import org.apache.commons.io.FilenameUtils;
 
-import java.io.File;
+import java.io.*;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -105,6 +105,62 @@ public class SerializationTool {
 
     private static <T extends Enum<?>> ConstructorArgument createEnumArgument(Class<T> enumClass, T enumType) {
         return createConstructorArgument(enumClass, (enumType == null ? null : enumType.name()), null, "valueOf");
+    }
+
+    public void serialize(Object object, File file) {
+        FileOutputStream fileOutputStream = null;
+        ObjectOutputStream objectOutputStream = null;
+        try {
+            fileOutputStream = new FileOutputStream(file);
+            objectOutputStream = new ObjectOutputStream(fileOutputStream);
+            objectOutputStream.writeObject(object);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (objectOutputStream != null) {
+                try {
+                    objectOutputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (fileOutputStream != null) {
+                try {
+                    fileOutputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    public <T extends Externalizable> T deserialize2(File file) {
+        T obj = null;
+        FileInputStream fileIn = null;
+        ObjectInputStream objIn = null;
+        try {
+            fileIn = new FileInputStream(file);
+            objIn = new ObjectInputStream(fileIn);
+            obj = (T) objIn.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        } finally {
+            if (objIn != null) {
+                try {
+                    objIn.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (fileIn != null) {
+                try {
+                    fileIn.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return obj;
     }
 
     public void save(File file, String svgFileName, CanvasData canvasData) {
