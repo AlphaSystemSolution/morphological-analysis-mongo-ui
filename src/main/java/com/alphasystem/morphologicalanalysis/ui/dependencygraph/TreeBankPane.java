@@ -6,7 +6,6 @@ import com.alphasystem.morphologicalanalysis.ui.dependencygraph.components.Contr
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.components.NodeSelectionDialog;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.CanvasData;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.CanvasMetaData;
-import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.GraphNode;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.GraphBuilder;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.SerializationTool;
 import javafx.beans.property.ObjectProperty;
@@ -94,7 +93,8 @@ public class TreeBankPane extends BorderPane {
     private CanvasData createFromGraph(DependencyGraph dependencyGraph) {
         CanvasData canvasData = new CanvasData(new CanvasMetaData());
         if (dependencyGraph != null) {
-
+            canvasData.setDependencyGraph(dependencyGraph);
+            canvasData.setNodes(graphBuilder.toGraphNodes(dependencyGraph));
         }
         return canvasData;
     }
@@ -173,7 +173,7 @@ public class TreeBankPane extends BorderPane {
             runLater(() -> {
                 Optional<DependencyGraph> result = dialog.showAndWait();
                 result.ifPresent(dg -> {
-                    updateCanvas(graphBuilder.toGraphNodes(dg.getTokens()));
+                    updateCanvas(dg);
                 });
 
             });
@@ -220,7 +220,7 @@ public class TreeBankPane extends BorderPane {
     }
 
     private void saveFile() {
-        serializationTool.save(currentFile, null, canvasPane.canvasDataObjectProperty().get());
+        serializationTool.save(currentFile, canvasPane.canvasDataObjectProperty().get());
         fileChooser.setInitialDirectory(currentFile.getParentFile());
         setCursor(DEFAULT);
     }
@@ -230,10 +230,11 @@ public class TreeBankPane extends BorderPane {
         return (Stage) scene.getWindow();
     }
 
-    private void updateCanvas(ObservableList<GraphNode> nodes) {
+    private void updateCanvas(DependencyGraph dg) {
         ObjectProperty<CanvasData> canvasDataObjectProperty = canvasPane.canvasDataObjectProperty();
         CanvasData canvasData = canvasDataObjectProperty.get();
-        canvasData.setNodes(nodes);
+        canvasData.setDependencyGraph(dg);
+        canvasData.setNodes(graphBuilder.toGraphNodes(dg));
         // when we are not setting null we are not getting any updates
         // so set null first then set new value
         canvasDataObjectProperty.set(null);

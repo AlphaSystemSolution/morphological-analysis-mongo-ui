@@ -1,30 +1,25 @@
 package com.alphasystem.morphologicalanalysis.ui.dependencygraph.util;
 
 import com.alphasystem.ApplicationException;
-import com.alphasystem.morphologicalanalysis.treebank.model.*;
-import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.*;
+import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
+import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.CanvasData;
+import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.GraphNode;
+import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.PartOfSpeechNode;
+import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.TerminalNode;
 import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
-import com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech;
-import com.alphasystem.morphologicalanalysis.wordbyword.model.support.RelationshipType;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
 import com.alphasystem.util.ZipFileEntry;
 import javafx.collections.ObservableList;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.*;
-import java.lang.reflect.Array;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.List;
 
 import static com.alphasystem.util.AppUtil.createTempFile;
-import static com.alphasystem.util.JAXBUtil.marshall;
-import static com.alphasystem.util.JAXBUtil.unmarshal;
 import static com.alphasystem.util.ZipUtil.archiveFile;
 import static com.alphasystem.util.ZipUtil.extractFile;
 import static java.lang.String.format;
-import static java.lang.String.valueOf;
-import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 /**
@@ -32,12 +27,11 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
  */
 public class SerializationTool {
 
-    public static final ObjectFactory OBJECT_FACTORY = new ObjectFactory();
     public static final String MDG_EXTENSION = "mdg";
     public static final String MDG_EXTENSION_ALL = format("*.%s", MDG_EXTENSION);
     private static final String DATA_FILE_EXTENSION = ".ser";
-    public static final String ZIP_ENTRY_NAME = format("graphNode%s", DATA_FILE_EXTENSION);
-
+    public static final String ZIP_ENTRY_NAME = format("data%s", DATA_FILE_EXTENSION);
+    private static RepositoryTool repositoryTool = RepositoryTool.getInstance();
     private static SerializationTool instance;
 
     private SerializationTool() {
@@ -50,134 +44,45 @@ public class SerializationTool {
         return instance;
     }
 
-    private static <T extends Object> ConstructorArgument createConstructorArgument(Class<T> type, String value,
-                                                                                    String initMethod,
-                                                                                    String factoryMethod) {
-        ConstructorArgument constructorArgument = OBJECT_FACTORY.createConstructorArgument()
-                .withType(type.getName()).withValue(value);
-        if (!isBlank(initMethod)) {
-            constructorArgument.withInitMethod(initMethod);
-        }
-        if (!isBlank(factoryMethod)) {
-            constructorArgument.withFactoryMethod(factoryMethod);
-        }
-        return constructorArgument;
-    }
-
-    private static <T extends Object> ConstructorArgument createConstructorArgument(Class<T> type, T value,
-                                                                                    String initMethod,
-                                                                                    String factoryMethod) {
-        ConstructorArgument constructorArgument = OBJECT_FACTORY.createConstructorArgument()
-                .withType(type.getName()).withValue(valueOf(value));
-        if (!isBlank(initMethod)) {
-            constructorArgument.withInitMethod(initMethod);
-        }
-        if (!isBlank(factoryMethod)) {
-            constructorArgument.withFactoryMethod(factoryMethod);
-        }
-        return constructorArgument;
-    }
-
-    private static <T extends Object> ConstructorArgument createConstructorArgument(Class<T> type, T value,
-                                                                                    String factoryMethod) {
-        return createConstructorArgument(type, value, null, factoryMethod);
-    }
-
-    private static <T extends Object> ConstructorArgument createConstructorArgument(Class<T> type, T value) {
-        return createConstructorArgument(type, value, null);
-    }
-
-    private static ConstructorArgument createStringArgument(String value) {
-        return createConstructorArgument(String.class, value);
-    }
-
-    private static ConstructorArgument createIntegerArgument(Integer value) {
-        return createConstructorArgument(Integer.class, value, "parseInt");
-    }
-
-    private static ConstructorArgument createDoubleArgument(Double value) {
-        return createConstructorArgument(Double.class, value, "parseDouble");
-    }
-
-    private static ConstructorArgument createBooleanArgument(Boolean value) {
-        return createConstructorArgument(Boolean.class, value, "parseBoolean");
-    }
-
-    private static <T extends Enum<?>> ConstructorArgument createEnumArgument(Class<T> enumClass, T enumType) {
-        return createConstructorArgument(enumClass, (enumType == null ? null : enumType.name()), null, "valueOf");
-    }
-
-    public void serialize(Object object, File file) {
-        FileOutputStream fileOutputStream = null;
-        ObjectOutputStream objectOutputStream = null;
-        try {
-            fileOutputStream = new FileOutputStream(file);
-            objectOutputStream = new ObjectOutputStream(fileOutputStream);
-            objectOutputStream.writeObject(object);
+    public <T extends Externalizable> void serialize(T object, File file) throws IOException {
+        try (ObjectOutputStream objOut = new ObjectOutputStream(new FileOutputStream(file))) {
+            objOut.writeObject(object);
         } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (objectOutputStream != null) {
-                try {
-                    objectOutputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (fileOutputStream != null) {
-                try {
-                    fileOutputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+            throw e;
         }
     }
 
-    public <T extends Externalizable> T deserialize(Class<T> klass, File file) {
+    public <T extends Externalizable> T deserialize(Class<T> klass, File file) throws IOException {
         T obj = null;
-        FileInputStream fileIn = null;
-        ObjectInputStream objIn = null;
-        try {
-            fileIn = new FileInputStream(file);
-            objIn = new ObjectInputStream(fileIn);
+        try (ObjectInputStream objIn = new ObjectInputStream(new FileInputStream(file))) {
             obj = (T) objIn.readObject();
-        } catch (IOException | ClassNotFoundException e) {
+        } catch (ClassNotFoundException e) {
+            // this should never happened
             e.printStackTrace();
-        } finally {
-            if (objIn != null) {
-                try {
-                    objIn.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (fileIn != null) {
-                try {
-                    fileIn.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+        } catch (IOException e) {
+            throw e;
         }
         return obj;
     }
 
-    public void save(File file, String svgFileName, CanvasData canvasData) {
+    /**
+     * @param file
+     * @param canvasData
+     */
+    public void save(File file, CanvasData canvasData) {
         File tempFile = null;
         File parentFile = file.getParentFile();
         String name = file.getName();
         String extension = FilenameUtils.getExtension(file.getAbsolutePath());
-        if (extension == null || !extension.equals(MDG_EXTENSION)) {
+        if (isBlank(extension) || !extension.equals(MDG_EXTENSION)) {
             name = format("%s.%s", name, MDG_EXTENSION);
         }
         File _file = new File(parentFile, name);
         try {
             tempFile = createTempFile(DATA_FILE_EXTENSION);
-            serialize(tempFile, svgFileName, canvasData);
-            ZipFileEntry entry = new ZipFileEntry(tempFile, ZIP_ENTRY_NAME);
-            archiveFile(_file, entry);
-        } catch (ApplicationException e) {
+            serialize(canvasData, tempFile);
+            archiveFile(_file, new ZipFileEntry(tempFile, ZIP_ENTRY_NAME));
+        } catch (ApplicationException | IOException e) {
             e.printStackTrace();
         } finally {
             if (tempFile != null) {
@@ -192,8 +97,31 @@ public class SerializationTool {
         try {
             tempFile = createTempFile(DATA_FILE_EXTENSION);
             extractFile(file.getAbsolutePath(), ZIP_ENTRY_NAME, tempFile);
-            canvasData = deserialize(tempFile);
-        } catch (ApplicationException e) {
+            canvasData = deserialize(CanvasData.class, tempFile);
+            String id = canvasData.getId();
+            DependencyGraph dependencyGraph = repositoryTool.getRepositoryUtil().
+                    getDependencyGraphRepository().findOne(id);
+            if (dependencyGraph == null) {
+                throw new IllegalStateException(format("No dependency graph found with id {%s}", id));
+            }
+            canvasData.setDependencyGraph(dependencyGraph);
+            List<Token> tokens = dependencyGraph.getTokens();
+            if (tokens == null || tokens.isEmpty()) {
+                throw new IllegalStateException(format("No token(s) found in dependency graph with id {%s}", id));
+            }
+            ObservableList<GraphNode> nodes = canvasData.getNodes();
+            if (nodes == null || nodes.isEmpty()) {
+                throw new IllegalStateException(format("No node(s) found in canvas data with id {%s}", id));
+            }
+            for (GraphNode node : nodes) {
+                switch (node.getNodeType()) {
+                    case TERMINAL:
+                        loadToken((TerminalNode) node, dependencyGraph);
+                        break;
+                }
+
+            }
+        } catch (ApplicationException | IOException e) {
             e.printStackTrace();
         } finally {
             if (tempFile != null) {
@@ -203,252 +131,22 @@ public class SerializationTool {
         return canvasData;
     }
 
-    public CanvasData deserialize(File file) {
-        GraphData graphData = unmarshal(GraphData.class, file);
-        MetaData metaData = graphData.getMetaData();
-        CanvasMetaData canvasMetaData = new CanvasMetaData(metaData.getWidth(), metaData.getHeight(),
-                metaData.isShowGridLines(), metaData.isShowOutline(), metaData.isDebugMode());
-        CanvasData canvasData = new CanvasData(canvasMetaData);
-        List<ObjectType> objectList = graphData.getObject();
-        for (ObjectType objectType : objectList) {
-            GraphNode graphNode = deserialize(objectType);
-            canvasData.add(graphNode);
-        }
-        return canvasData;
+    private void loadToken(TerminalNode node, DependencyGraph dependencyGraph) {
+        List<Token> tokens = dependencyGraph.getTokens();
+        tokens.stream().filter(token -> token.getId().equals(node.getId())).forEach(token -> {
+            ObservableList<PartOfSpeechNode> partOfSpeeches = node.getPartOfSpeeches();
+            node.setToken(token);
+            List<Location> locations = token.getLocations();
+            for (PartOfSpeechNode partOfSpeech : partOfSpeeches) {
+                inner:
+                for (Location location : locations) {
+                    if (partOfSpeech.getId().equals(location.getId())) {
+                        partOfSpeech.setLocation(location);
+                        break inner;
+                    } /* end of 'if' */
+                } /* end of 'inner' (locations) loop */
+            } /* end of 'partOfSpeeches' loop */
+        });
     }
 
-    public void serialize(File file, String svgFileName, CanvasData canvasData) {
-        CanvasMetaData canvasMetaData = canvasData.getCanvasMetaData();
-        GraphData graphData = OBJECT_FACTORY.createGraphData()
-                .withMetaData(serializeMetaData(svgFileName, canvasMetaData));
-        ObservableList<GraphNode> graphNodes = canvasData.getNodes();
-        GraphNode[] nodes = graphNodes.toArray(new GraphNode[graphNodes.size()]);
-        if (!isEmpty(nodes)) {
-            ObjectType[] objectTypes = new ObjectType[nodes.length];
-            for (int i = 0; i < objectTypes.length; i++) {
-                GraphNode node = nodes[i];
-                ObjectType objectType = null;
-                switch (node.getNodeType()) {
-                    case TERMINAL:
-                        objectType = serializeTerminalNode((TerminalNode) node);
-                        break;
-                    case PART_OF_SPEECH:
-                        objectType = serializePartOfSpeechNode((PartOfSpeechNode) node);
-                        break;
-                    case PHRASE:
-                        objectType = serializePhraseNode((PhraseNode) node);
-                        break;
-                    case RELATIONSHIP:
-                        objectType = serializeRelationshipNode((RelationshipNode) node);
-                        break;
-                    case REFERENCE:
-                        objectType = serializeReferenceNode((ReferenceNode) node);
-                        break;
-                    case HIDDEN:
-                        objectType = serializeHiddenNode((HiddenNode) node);
-                        break;
-                    case EMPTY:
-                        objectType = serializeEmptyNode((EmptyNode) node);
-                        break;
-                    case ROOT:
-                        break;
-                }
-                objectTypes[i] = objectType;
-            }
-            graphData.withObject(objectTypes);
-        }
-        marshall(file, GraphData.class.getPackage().getName(), OBJECT_FACTORY.createGraphData(graphData));
-    }
-
-    private MetaData serializeMetaData(String svgFileName, CanvasMetaData metaData) {
-        return OBJECT_FACTORY.createMetaData().withSvgFileName(svgFileName).withWidth(metaData.getWidth())
-                .withHeight(metaData.getHeight()).withShowOutline(metaData.isShowOutLines())
-                .withShowGridLines(metaData.isShowGridLines()).withDebugMode(metaData.isDebugMode());
-    }
-
-    private ObjectType serializeTerminalNode(TerminalNode node) {
-        ObjectType objectType = OBJECT_FACTORY.createObjectType().withType(node.getClass().getName());
-        List<ConstructorArgument> constructorArgs = objectType.getArgument();
-
-        constructorArgs.add(createConstructorArgument(RepositoryTool.class, node.getToken().getId(),
-                "getInstance", "getToken"));
-        constructorArgs.add(createStringArgument(node.getId()));
-        constructorArgs.add(createDoubleArgument(node.getX()));
-        constructorArgs.add(createDoubleArgument(node.getY()));
-        constructorArgs.add(createDoubleArgument(node.getX1()));
-        constructorArgs.add(createDoubleArgument(node.getY1()));
-        constructorArgs.add(createDoubleArgument(node.getX2()));
-        constructorArgs.add(createDoubleArgument(node.getY2()));
-        constructorArgs.add(createDoubleArgument(node.getX3()));
-        constructorArgs.add(createDoubleArgument(node.getY3()));
-        constructorArgs.add(createDoubleArgument(node.getTranslateX()));
-        constructorArgs.add(createDoubleArgument(node.getTranslateY()));
-        ConstructorArgument constructorArgument = OBJECT_FACTORY.createConstructorArgument()
-                .withType(PartOfSpeechNode[].class.getName());
-        constructorArgs.add(constructorArgument);
-
-        ObservableList<PartOfSpeechNode> partOfSpeeches = node.getPartOfSpeeches();
-        for (PartOfSpeechNode partOfSpeech : partOfSpeeches) {
-            constructorArgument.getValues().add(serializePartOfSpeechNode(partOfSpeech));
-        }
-
-        return objectType;
-    }
-
-    private ObjectType serializePartOfSpeechNode(PartOfSpeechNode node) {
-        ObjectType objectType = OBJECT_FACTORY.createObjectType().withType(node.getClass().getName());
-        List<ConstructorArgument> constructorArgs = objectType.getArgument();
-
-        constructorArgs.add(createConstructorArgument(PartOfSpeech.class, node.getPartOfSpeech().name(),
-                null, "valueOf"));
-        constructorArgs.add(createConstructorArgument(RepositoryTool.class, node.getLocation().getId(),
-                "getInstance", "getLocation"));
-        constructorArgs.add(createStringArgument(node.getId()));
-        constructorArgs.add(createDoubleArgument(node.getX()));
-        constructorArgs.add(createDoubleArgument(node.getY()));
-        constructorArgs.add(createDoubleArgument(node.getCx()));
-        constructorArgs.add(createDoubleArgument(node.getCy()));
-
-        return objectType;
-    }
-
-    private ObjectType serializeRelationshipNode(RelationshipNode node) {
-        ObjectType objectType = OBJECT_FACTORY.createObjectType().withType(node.getClass().getName());
-        List<ConstructorArgument> constructorArgs = objectType.getArgument();
-
-        constructorArgs.add(createEnumArgument(RelationshipType.class, node.getGrammaticalRelationship()));
-        constructorArgs.add(createStringArgument(node.getId()));
-        constructorArgs.add(createDoubleArgument(node.getX()));
-        constructorArgs.add(createDoubleArgument(node.getY()));
-        constructorArgs.add(createDoubleArgument(node.getStartX()));
-        constructorArgs.add(createDoubleArgument(node.getStartY()));
-        constructorArgs.add(createDoubleArgument(node.getControlX1()));
-        constructorArgs.add(createDoubleArgument(node.getControlY1()));
-        constructorArgs.add(createDoubleArgument(node.getControlX2()));
-        constructorArgs.add(createDoubleArgument(node.getControlY2()));
-        constructorArgs.add(createDoubleArgument(node.getEndX()));
-        constructorArgs.add(createDoubleArgument(node.getEndY()));
-        constructorArgs.add(createDoubleArgument(node.getT1()));
-        constructorArgs.add(createDoubleArgument(node.getT2()));
-
-        return objectType;
-    }
-
-    private ObjectType serializePhraseNode(PhraseNode node) {
-        ObjectType objectType = OBJECT_FACTORY.createObjectType().withType(node.getClass().getName());
-        List<ConstructorArgument> constructorArgs = objectType.getArgument();
-
-        constructorArgs.add(createEnumArgument(RelationshipType.class, node.getGrammaticalRelationship()));
-        constructorArgs.add(createStringArgument(node.getId()));
-        constructorArgs.add(createDoubleArgument(node.getX()));
-        constructorArgs.add(createDoubleArgument(node.getY()));
-        constructorArgs.add(createDoubleArgument(node.getX1()));
-        constructorArgs.add(createDoubleArgument(node.getY1()));
-        constructorArgs.add(createDoubleArgument(node.getX2()));
-        constructorArgs.add(createDoubleArgument(node.getY2()));
-        constructorArgs.add(createDoubleArgument(node.getCx()));
-        constructorArgs.add(createDoubleArgument(node.getCy()));
-
-        return objectType;
-    }
-
-    private ObjectType serializeEmptyNode(EmptyNode node) {
-        ObjectType objectType = OBJECT_FACTORY.createObjectType().withType(node.getClass().getName());
-        List<ConstructorArgument> constructorArgs = objectType.getArgument();
-
-        constructorArgs.add(createStringArgument(node.getId()));
-        constructorArgs.add(createDoubleArgument(node.getX()));
-        constructorArgs.add(createDoubleArgument(node.getY()));
-        constructorArgs.add(createDoubleArgument(node.getX1()));
-        constructorArgs.add(createDoubleArgument(node.getY1()));
-        constructorArgs.add(createDoubleArgument(node.getX2()));
-        constructorArgs.add(createDoubleArgument(node.getY2()));
-        constructorArgs.add(createDoubleArgument(node.getX3()));
-        constructorArgs.add(createDoubleArgument(node.getY3()));
-        ConstructorArgument constructorArgument = OBJECT_FACTORY.createConstructorArgument()
-                .withType(PartOfSpeechNode.class.getName());
-        constructorArgument.getValues().add(serializePartOfSpeechNode(node.getPartOfSpeeches().get(0)));
-        constructorArgs.add(constructorArgument);
-
-        return objectType;
-    }
-
-    private ObjectType serializeHiddenNode(HiddenNode node) {
-        ObjectType objectType = OBJECT_FACTORY.createObjectType().withType(node.getClass().getName());
-        List<ConstructorArgument> constructorArgs = objectType.getArgument();
-
-        return objectType;
-    }
-
-    private ObjectType serializeReferenceNode(ReferenceNode node) {
-        ObjectType objectType = OBJECT_FACTORY.createObjectType().withType(node.getClass().getName());
-        List<ConstructorArgument> constructorArgs = objectType.getArgument();
-
-        return objectType;
-    }
-
-    private GraphNode deserialize(ObjectType objectType) {
-        GraphNode graphNode = null;
-        try {
-            Class<?> nodeClass = Class.forName(objectType.getType());
-            List<ConstructorArgument> constructorArgs = objectType.getArgument();
-            Object[] constructorObjects = new Object[constructorArgs.size()];
-            Class<?>[] constructorClasses = new Class<?>[constructorArgs.size()];
-            for (int i = 0; i < constructorArgs.size(); i++) {
-                ConstructorArgument arg = constructorArgs.get(i);
-                try {
-                    Object object = getConstructorArgument(arg);
-                    if (object != null) {
-                        constructorObjects[i] = object;
-                        constructorClasses[i] = object.getClass();
-                    }
-                } catch (IllegalAccessException | InvocationTargetException
-                        | NoSuchMethodException | InstantiationException e) {
-                    e.printStackTrace();
-                }
-            }
-            try {
-                Constructor<?> constructor = nodeClass.getConstructor(constructorClasses);
-                graphNode = (GraphNode) constructor.newInstance(constructorObjects);
-            } catch (NoSuchMethodException | InvocationTargetException |
-                    InstantiationException | IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        return graphNode;
-    }
-
-    private Object getConstructorArgument(ConstructorArgument arg) throws ClassNotFoundException,
-            IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
-        Object object = null;
-        Class<?> typeClass = Class.forName(arg.getType());
-        String factoryMethodName = arg.getFactoryMethod();
-        if (!isBlank(factoryMethodName)) {
-            String initMethodName = arg.getInitMethod();
-            Method factoryMethod = null;
-            Object factory = null;
-            if (initMethodName == null) {
-                factoryMethod = typeClass.getMethod(factoryMethodName, String.class);
-            } else {
-                Method initMethod = typeClass.getMethod(initMethodName);
-                factory = initMethod.invoke(null);
-                factoryMethod = typeClass.getMethod(factoryMethodName, String.class);
-            }
-            object = factoryMethod.invoke(factory, arg.getValue());
-        } else if (typeClass.getName().equals(String.class.getName())) {
-            Constructor<?> constructor = typeClass.getConstructor(String.class);
-            object = constructor.newInstance(arg.getValue());
-        } else if (typeClass.isArray()) {
-            List<ObjectType> values = arg.getValues();
-            object = Array.newInstance(typeClass.getComponentType(), values.size());
-            for (int j = 0; j < values.size(); j++) {
-                Array.set(object, j, deserialize(values.get(j)));
-            }
-        } else {
-            throw new IllegalStateException(format("Unhandled type: %s", typeClass.getName()));
-        }
-        return object;
-    }
 }

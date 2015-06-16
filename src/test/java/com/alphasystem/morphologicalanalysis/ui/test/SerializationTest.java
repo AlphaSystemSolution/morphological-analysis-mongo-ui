@@ -2,7 +2,6 @@ package com.alphasystem.morphologicalanalysis.ui.test;
 
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.CanvasMetaData;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.SerializationTool;
-import org.testng.Reporter;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
@@ -61,14 +60,23 @@ public class SerializationTest {
         CanvasMetaData canvasMetaData = new CanvasMetaData();
         canvasMetaData.setWidth(700);
         canvasMetaData.setShowGridLines(true);
-        serializationTool.serialize(canvasMetaData,
-                getSerializeFileName(canvasMetaData.getClass()));
+        try {
+            serializationTool.serialize(canvasMetaData,
+                    getSerializeFileName(canvasMetaData.getClass()));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Test(dependsOnMethods = {"serializeCanvasMetaData"})
     public void deserializeCanvasMetaData() {
-        CanvasMetaData metaData = serializationTool.deserialize(CanvasMetaData.class,
-                getSerializeFileName(CanvasMetaData.class));
+        CanvasMetaData metaData = null;
+        try {
+            metaData = serializationTool.deserialize(CanvasMetaData.class,
+                    getSerializeFileName(CanvasMetaData.class));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         log(format("Width: %s, Height: %s, Show Grid Lines: %s",
                 metaData.getWidth(), metaData.getHeight(), metaData.isShowGridLines()));
     }

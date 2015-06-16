@@ -188,7 +188,7 @@ public class WordByWordPane extends BorderPane {
                 }
             });
             Stage stage = new Stage();
-            Scene scene = new Scene(new TreeBankPane());
+            Scene scene = new Scene(new TreeBankPane(dependencyGraph));
             stage.setMaximized(true);
             stage.setScene(scene);
             stage.show();

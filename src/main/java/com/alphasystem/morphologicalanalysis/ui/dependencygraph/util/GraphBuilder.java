@@ -131,7 +131,7 @@ public class GraphBuilder {
         PartOfSpeech partOfSpeech = NOUN;
         Location location = new Location();
         location.setPartOfSpeech(partOfSpeech);
-        PartOfSpeechNode partOfSpeechNode = new PartOfSpeechNode(partOfSpeech, location, 0d, 0d, 0d, 0d);
+        PartOfSpeechNode partOfSpeechNode = new PartOfSpeechNode(location, 0d, 0d, 0d, 0d);
         EmptyNode emptyNode = new EmptyNode(null, textX, textY, x1, y1, x2, y2, x3, y3, partOfSpeechNode);
 
         reset();
@@ -147,7 +147,7 @@ public class GraphBuilder {
      * @return
      */
     private TerminalNode buildTerminalNode(Token token) {
-        TerminalNode terminalNode = new TerminalNode(token, token.getDisplayName(), textX, textY, x1, y1, x2,
+        TerminalNode terminalNode = new TerminalNode(token, textX, textY, x1, y1, x2,
                 y2, x3, y3, 0.0, 0.0);
         // update counters
         rectX = x2 + GAP_BETWEEN_TOKENS;

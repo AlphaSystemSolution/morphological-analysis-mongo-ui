@@ -137,9 +137,6 @@ public class RepositoryTool {
             dependencyGraph = dependencyGraphRepository.save(dependencyGraph);
         }
 
-        List<Token> tokenList = dependencyGraph.getTokens();
-        tokenList.forEach(token -> System.out.println("token = " + token));
-
         return dependencyGraph;
     }
 

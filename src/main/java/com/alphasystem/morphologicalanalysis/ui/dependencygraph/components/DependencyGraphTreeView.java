@@ -51,6 +51,7 @@ public class DependencyGraphTreeView extends TreeView<GraphNode> {
     static void initPartOfSpeechItems(TreeItem<GraphNode> parent, TerminalNode node) {
         ObservableList<PartOfSpeechNode> partOfSpeeches = node.getPartOfSpeeches();
         if (partOfSpeeches == null || partOfSpeeches.isEmpty()) {
+            System.out.println("???????????????? " + node.getId());
             return;
         }
         for (PartOfSpeechNode posNode : partOfSpeeches) {
