@@ -63,6 +63,7 @@ public class CanvasPane extends Pane {
     private Point2D endPoint;
     private Rectangle bound;
     private Text selectedArabicText;
+    private Node gridLines;
 
     public CanvasPane(CanvasData data) {
         this.canvasDataObject = new SimpleObjectProperty<>(data);
@@ -125,16 +126,16 @@ public class CanvasPane extends Pane {
     private void initListeners() {
         CanvasMetaData metaData = canvasDataObject.get().getCanvasMetaData();
         metaData.widthProperty().addListener((observable, oldValue, newValue) -> {
-            initCanvas();
+            resizeCanvas();
         });
         metaData.heightProperty().addListener((observable, oldValue, newValue) -> {
-            initCanvas();
+            resizeCanvas();
         });
         metaData.showGridLinesProperty().addListener((observable, oldValue, newValue) -> {
-            initCanvas();
+            toggleGridLines(newValue, metaData.isShowOutLines());
         });
         metaData.showOutLinesProperty().addListener((observable, oldValue, newValue) -> {
-            initCanvas();
+            toggleGridLines(metaData.isShowGridLines(), newValue);
         });
         metaData.debugModeProperty().addListener((observable, oldValue, newValue) -> {
             initCanvas();
@@ -172,6 +173,31 @@ public class CanvasPane extends Pane {
         return canvasDataObject;
     }
 
+    private void toggleGridLines(boolean showGridLines, boolean showOutline) {
+        canvasPane.getChildren().remove(gridLines);
+        gridLines = null;
+        if (showOutline || showGridLines) {
+            CanvasMetaData metaData = canvasDataObject.get().getCanvasMetaData();
+            int width = metaData.getWidth();
+            int height = metaData.getHeight();
+            gridLines = tool.drawGridLines(showGridLines, width, height);
+            canvasPane.getChildren().add(gridLines);
+        }
+    }
+
+    private void resizeCanvas() {
+        CanvasMetaData metaData = canvasDataObject.get().getCanvasMetaData();
+
+        int width = metaData.getWidth();
+        int height = metaData.getHeight();
+        canvasPane.setPrefSize(width, height);
+
+        setPrefSize(width + 200, height + 200);
+
+        toggleGridLines(metaData.isShowGridLines(), metaData.isShowOutLines());
+        requestLayout();
+    }
+
     private void initCanvas() {
         CanvasMetaData metaData = canvasDataObject.get().getCanvasMetaData();
         int size = canvasPane.getChildren().size();
@@ -188,7 +214,8 @@ public class CanvasPane extends Pane {
         }
 
         if (showOutline || showGridLines) {
-            canvasPane.getChildren().add(tool.drawGridLines(showGridLines, width, height));
+            gridLines = tool.drawGridLines(showGridLines, width, height);
+            canvasPane.getChildren().add(gridLines);
         }
 
         setPrefSize(width + 200, height + 200);
@@ -201,7 +228,7 @@ public class CanvasPane extends Pane {
         while (iterator.hasNext()) {
             Node node = iterator.next();
             String id = node.getId();
-            if (id.equals("gridLines") && !removeGridLines) {
+            if ("gridLines".equals(id) && !removeGridLines) {
                 continue;
             }
             iterator.remove();

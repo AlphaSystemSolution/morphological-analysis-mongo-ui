@@ -138,11 +138,10 @@ public class SerializationTool {
             node.setToken(token);
             List<Location> locations = token.getLocations();
             for (PartOfSpeechNode partOfSpeech : partOfSpeeches) {
-                inner:
                 for (Location location : locations) {
                     if (partOfSpeech.getId().equals(location.getId())) {
                         partOfSpeech.setLocation(location);
-                        break inner;
+                        break;
                     } /* end of 'if' */
                 } /* end of 'inner' (locations) loop */
             } /* end of 'partOfSpeeches' loop */

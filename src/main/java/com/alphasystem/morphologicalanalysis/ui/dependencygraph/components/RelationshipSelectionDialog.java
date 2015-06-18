@@ -58,12 +58,12 @@ public class RelationshipSelectionDialog extends Dialog<RelationshipType> {
         gridPane.add(label, 0, 2);
         gridPane.add(comboBox, 1, 2);
 
-        firstPartOfSpeech.addListener((observable, oldValue, newValue) -> {
+        firstPartOfSpeechProperty().addListener((observable, oldValue, newValue) -> {
             Font font = NONE_SELECTED.equals(newValue) ? ENGLISH_FONT : ARABIC_FONT_SMALL;
             firstPartOfSpeechLabel.setFont(font);
         });
 
-        secondPartOfSpeech.addListener((observable, oldValue, newValue) -> {
+        secondPartOfSpeechProperty().addListener((observable, oldValue, newValue) -> {
             Font font = NONE_SELECTED.equals(newValue) ? ENGLISH_FONT : ARABIC_FONT_SMALL;
             secondPartOfSpeechLabel.setFont(font);
         });

@@ -250,9 +250,10 @@ public class DependencyGraphBuilderEditorPane extends BorderPane {
         Slider slider = createSlider(0, max, initialValue);
         slider.valueProperty().addListener((observable, oldValue, newValue) -> {
             Double d = (Double) newValue;
-            if (d % 1 != 0) {
+            if (d % 1 != 0.0 && d % 0.5 != 0.0) {
                 d = StrictMath.ceil(d);
             }
+            slider.setValue(d);
             spinner.getValueFactory().setValue(d);
             s.set(node, d);
         });
