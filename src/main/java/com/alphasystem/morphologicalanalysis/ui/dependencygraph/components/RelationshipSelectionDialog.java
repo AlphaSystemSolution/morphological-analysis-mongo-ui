@@ -1,39 +1,88 @@
 package com.alphasystem.morphologicalanalysis.ui.dependencygraph.components;
 
+import com.alphasystem.morphologicalanalysis.graph.model.Relationship;
 import com.alphasystem.morphologicalanalysis.ui.common.ComboBoxFactory;
 import com.alphasystem.morphologicalanalysis.ui.common.Global;
+import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.LinkSupport;
+import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.PartOfSpeechNode;
+import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.PhraseNode;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.RelationshipType;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
-import javafx.scene.text.Font;
 
-import static com.alphasystem.morphologicalanalysis.ui.common.Global.*;
+import static com.alphasystem.morphologicalanalysis.ui.common.Global.ARABIC_FONT_SMALL_BOLD;
+import static com.alphasystem.util.AppUtil.isGivenType;
 import static javafx.scene.control.ButtonType.CANCEL;
 import static javafx.scene.control.ButtonType.OK;
 
 /**
  * @author sali
  */
-public class RelationshipSelectionDialog extends Dialog<RelationshipType> {
+public class RelationshipSelectionDialog extends Dialog<Relationship> {
 
-    private final StringProperty firstPartOfSpeech = new SimpleStringProperty();
-    private final StringProperty secondPartOfSpeech = new SimpleStringProperty();
+    private final ObjectProperty<LinkSupport> dependentNode = new SimpleObjectProperty<>();
+    private final ObjectProperty<LinkSupport> ownerNode = new SimpleObjectProperty<>();
+    private final Label dependentLabel;
+    private final Label ownerLabel;
     private final ComboBox<RelationshipType> comboBox;
 
     public RelationshipSelectionDialog() {
         setTitle(getLabel("title"));
-        setHeaderText(getLabel("headerText"));
+        // setHeaderText(getLabel("headerText"));
         comboBox = ComboBoxFactory.getInstance().getRelationshipTypeComboBox();
-        comboBox.disableProperty().bind(secondPartOfSpeech.isEqualTo(NONE_SELECTED));
+        dependentLabel = new Label();
+        dependentLabel.setFont(ARABIC_FONT_SMALL_BOLD);
+        ownerLabel = new Label();
+        ownerLabel.setFont(ARABIC_FONT_SMALL_BOLD);
+        // comboBox.disableProperty().bind(secondPartOfSpeech.isEqualTo(NONE_SELECTED));
         reset();
         initDialogPane();
+        dependentNodeProperty().addListener((observable, oldValue, newValue) ->
+                dependentLabel.setText(getLinkLabel(newValue)));
+        ownerNodeProperty().addListener((observable, oldValue, newValue) ->
+                ownerLabel.setText(getLinkLabel(newValue)));
     }
 
     private static String getLabel(String label) {
         return Global.getLabel(RelationshipSelectionDialog.class, label);
+    }
+
+    public final LinkSupport getDependentNode() {
+        return dependentNode.get();
+    }
+
+    public final void setDependentNode(LinkSupport dependentNode) {
+        this.dependentNode.set(dependentNode);
+    }
+
+    public final ObjectProperty<LinkSupport> dependentNodeProperty() {
+        return dependentNode;
+    }
+
+    public final LinkSupport getOwnerNode() {
+        return ownerNode.get();
+    }
+
+    public final void setOwnerNode(LinkSupport ownerNode) {
+        this.ownerNode.set(ownerNode);
+    }
+
+    public final ObjectProperty<LinkSupport> ownerNodeProperty() {
+        return ownerNode;
+    }
+
+    private String getLinkLabel(LinkSupport src) {
+        String text = null;
+        if (isGivenType(PartOfSpeechNode.class, src)) {
+            PartOfSpeechNode node = (PartOfSpeechNode) src;
+            text = node.getText();
+        } else if (isGivenType(PhraseNode.class, src)) {
+
+        }
+        return text;
     }
 
     private void initDialogPane() {
@@ -42,73 +91,38 @@ public class RelationshipSelectionDialog extends Dialog<RelationshipType> {
         gridPane.setVgap(10);
         gridPane.setPadding(new Insets(25, 25, 25, 25));
 
-        Label label = new Label(getLabel("firstPartOfSpeech"));
+        Label label = new Label(getLabel("dependent"));
         gridPane.add(label, 0, 0);
-        Label firstPartOfSpeechLabel = new Label(getFirstPartOfSpeech());
-        firstPartOfSpeechLabel.textProperty().bindBidirectional(firstPartOfSpeech);
-        gridPane.add(firstPartOfSpeechLabel, 1, 0);
+        gridPane.add(dependentLabel, 1, 0);
 
-        label = new Label(getLabel("secondPartOfSpeech"));
+        label = new Label(getLabel("owner"));
         gridPane.add(label, 0, 1);
-        Label secondPartOfSpeechLabel = new Label(getSecondPartOfSpeech());
-        secondPartOfSpeechLabel.textProperty().bindBidirectional(secondPartOfSpeech);
-        gridPane.add(secondPartOfSpeechLabel, 1, 1);
+        gridPane.add(ownerLabel, 1, 1);
 
         label = new Label(getLabel("comboBox"));
         gridPane.add(label, 0, 2);
         gridPane.add(comboBox, 1, 2);
 
-        firstPartOfSpeechProperty().addListener((observable, oldValue, newValue) -> {
-            Font font = NONE_SELECTED.equals(newValue) ? ENGLISH_FONT : ARABIC_FONT_SMALL;
-            firstPartOfSpeechLabel.setFont(font);
-        });
-
-        secondPartOfSpeechProperty().addListener((observable, oldValue, newValue) -> {
-            Font font = NONE_SELECTED.equals(newValue) ? ENGLISH_FONT : ARABIC_FONT_SMALL;
-            secondPartOfSpeechLabel.setFont(font);
-        });
-
         setResultConverter(param -> {
             ButtonBar.ButtonData buttonData = param.getButtonData();
-            return buttonData.isCancelButton() ? RelationshipType.NONE :
-                    comboBox.getSelectionModel().getSelectedItem();
+            Relationship relationship = null;
+            if (!buttonData.isCancelButton()) {
+                relationship = new Relationship();
+                relationship.setDependent(getDependentNode().getRelated());
+                relationship.setOwner(getOwnerNode().getRelated());
+                relationship.setRelationship(comboBox.getSelectionModel().getSelectedItem());
+            }
+            return relationship;
         });
         getDialogPane().getButtonTypes().addAll(OK, CANCEL);
         Button okButton = (Button) getDialogPane().lookupButton(OK);
-        okButton.disableProperty().bind(secondPartOfSpeech.isNotEqualTo(NONE_SELECTED)
-                .and(comboBox.getSelectionModel().selectedIndexProperty().isEqualTo(0)));
+        okButton.disableProperty().bind(comboBox.getSelectionModel().selectedIndexProperty().isEqualTo(0));
         getDialogPane().setContent(gridPane);
         getDialogPane().setPrefWidth(400);
     }
 
 
-    public final String getFirstPartOfSpeech() {
-        return firstPartOfSpeech.get();
-    }
-
-    public final void setFirstPartOfSpeech(String firstPartOfSpeech) {
-        this.firstPartOfSpeech.set(firstPartOfSpeech);
-    }
-
-    public final StringProperty firstPartOfSpeechProperty() {
-        return firstPartOfSpeech;
-    }
-
-    public final String getSecondPartOfSpeech() {
-        return secondPartOfSpeech.get();
-    }
-
-    public final void setSecondPartOfSpeech(String secondPartOfSpeech) {
-        this.secondPartOfSpeech.set(secondPartOfSpeech);
-    }
-
-    public final StringProperty secondPartOfSpeechProperty() {
-        return secondPartOfSpeech;
-    }
-
     public void reset() {
-        setFirstPartOfSpeech(NONE_SELECTED);
-        setSecondPartOfSpeech(NONE_SELECTED);
         comboBox.getSelectionModel().select(0);
     }
 

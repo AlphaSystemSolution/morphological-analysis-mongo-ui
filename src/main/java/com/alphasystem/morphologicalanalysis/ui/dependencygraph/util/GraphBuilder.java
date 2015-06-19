@@ -1,13 +1,12 @@
 package com.alphasystem.morphologicalanalysis.ui.dependencygraph.util;
 
 import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
+import com.alphasystem.morphologicalanalysis.graph.model.Relationship;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.*;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech;
-import com.alphasystem.morphologicalanalysis.wordbyword.model.support.RelationshipType;
 import javafx.collections.ObservableList;
-import javafx.geometry.Point2D;
 import javafx.scene.shape.Line;
 
 import java.util.List;
@@ -78,26 +77,25 @@ public class GraphBuilder {
         return results;
     }
 
-    /**
-     * @param id
-     * @param relationshipType
-     * @param startPoint
-     * @param endPoint
-     * @return
-     */
-    public RelationshipNode buildRelationshipNode(String id, RelationshipType relationshipType,
-                                                  Point2D startPoint, Point2D endPoint) {
-        double startX = startPoint.getX();
-        double startY = startPoint.getY();
-        double endX = endPoint.getX();
-        double endY = endPoint.getY();
-        double controlY1 = startY + 100;
-        double controlY2 = endY + 100;
-        double x = (startX + endX) / 2;
-        double y = (controlY1 + controlY2) / 2;
-
-        return new RelationshipNode(relationshipType, id, x, y, startX, startY,
-                startX, controlY1, endX, controlY2, endX, endY, 0.500, 0.550);
+    public RelationshipNode buildRelationshipNode(Relationship relationship, LinkSupport dependentNode,
+                                                  LinkSupport ownerNode) {
+        RelationshipNode relationshipNode = new RelationshipNode();
+        relationshipNode.setRelationship(relationship);
+        relationshipNode.setDependentNode(dependentNode);
+        relationshipNode.setOwnerNode(ownerNode);
+        double startX = relationshipNode.getStartX();
+        double startY = relationshipNode.getStartY();
+        double endX = relationshipNode.getEndX();
+        double endY = relationshipNode.getEndY();
+        double controlY1 = startY + 100d;
+        double controlY2 = endY + 100d;
+        relationshipNode.setControlX1(startX);
+        relationshipNode.setControlY1(controlY1);
+        relationshipNode.setControlX2(endX);
+        relationshipNode.setControlY2(controlY2);
+        relationshipNode.setX((startX + endX) / 2);
+        relationshipNode.setY((controlY1 + controlY2) / 2);
+        return relationshipNode;
     }
 
     public PhraseNode buildPhraseNode(String id, PhraseSelectionModel model) {

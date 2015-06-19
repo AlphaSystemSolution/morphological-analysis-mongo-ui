@@ -1,5 +1,6 @@
 package com.alphasystem.morphologicalanalysis.ui.dependencygraph.components;
 
+import com.alphasystem.morphologicalanalysis.graph.model.Relationship;
 import com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.*;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.DependencyGraphGraphicTool;
@@ -10,14 +11,9 @@ import com.alphasystem.morphologicalanalysis.wordbyword.model.support.Relationsh
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
-import javafx.geometry.Bounds;
-import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.Node;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.MenuItem;
+import javafx.scene.control.*;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Pane;
@@ -32,13 +28,11 @@ import java.util.Optional;
 
 import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.EMPTY;
 import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.HIDDEN;
-import static com.alphasystem.morphologicalanalysis.ui.common.Global.ARABIC_FONT_BIG;
-import static com.alphasystem.morphologicalanalysis.ui.common.Global.ARABIC_FONT_SMALL;
+import static com.alphasystem.morphologicalanalysis.ui.common.Global.*;
 import static com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.DependencyGraphGraphicTool.DARK_GRAY_CLOUD;
 import static com.alphasystem.util.AppUtil.isGivenType;
 import static java.lang.String.format;
 import static javafx.scene.control.Alert.AlertType.INFORMATION;
-import static javafx.scene.control.Alert.AlertType.WARNING;
 import static javafx.scene.paint.Color.*;
 import static javafx.scene.text.Font.font;
 import static javafx.scene.text.FontPosture.REGULAR;
@@ -53,16 +47,16 @@ public class CanvasPane extends Pane {
     public static final String TERMINAL_GROUP_ID_PREFIX = "terminal";
     private static final double RADIUS = 2.0;
     private final ObjectProperty<CanvasData> canvasDataObject;
-    private final ContextMenu contextMenu;
+    private final ContextMenu terminalContextMenu;
+    private final ContextMenu relationshipContextMenu;
     private RelationshipSelectionDialog relationshipSelectionDialog;
     private PhraseSelectionDialog phraseSelectionDialog;
     private DependencyGraphGraphicTool tool = DependencyGraphGraphicTool.getInstance();
     private GraphBuilder graphBuilder = GraphBuilder.getInstance();
     private Pane canvasPane;
-    private Point2D startPoint;
-    private Point2D endPoint;
-    private Rectangle bound;
     private Text selectedArabicText;
+    private LinkSupport dependentLinkNode;
+    private LinkSupport ownerLinkNode;
     private Node gridLines;
 
     public CanvasPane(CanvasData data) {
@@ -71,8 +65,9 @@ public class CanvasPane extends Pane {
         CanvasMetaData metaData = data.getCanvasMetaData();
         int width = metaData.getWidth();
         int height = metaData.getHeight();
-        contextMenu = new ContextMenu();
-        initContextMenu();
+        terminalContextMenu = new ContextMenu();
+        initTerminalContextMenu();
+        relationshipContextMenu = new ContextMenu();
         relationshipSelectionDialog = new RelationshipSelectionDialog();
         phraseSelectionDialog = new PhraseSelectionDialog();
         initListeners();
@@ -92,18 +87,66 @@ public class CanvasPane extends Pane {
         setPrefSize(width + 200, height + 200);
     }
 
-    private void initContextMenu() {
+    private void initTerminalContextMenu() {
         MenuItem menuItem = new MenuItem("Select Phrase");
         menuItem.setOnAction(event -> {
             if (selectedArabicText != null) {
                 selectPhrase(selectedArabicText);
             }
         });
-        contextMenu.getItems().add(menuItem);
+        terminalContextMenu.getItems().add(menuItem);
 
         menuItem = new MenuItem("Add Empty Node");
         menuItem.setOnAction(event -> addEmptyNode());
-        contextMenu.getItems().add(menuItem);
+        terminalContextMenu.getItems().add(menuItem);
+    }
+
+    private MenuItem createRelationshipMenuItem(TerminalNode terminalNode, LinkSupport ownerNode) {
+        String value = format("%s - %s", terminalNode.getText(), ownerNode.getText());
+        Text text = new Text(value);
+        text.setFont(ARABIC_FONT_SMALL_BOLD);
+        MenuItem menuItem = new MenuItem("", text);
+        menuItem.setUserData(ownerNode);
+        menuItem.setOnAction(event -> {
+            MenuItem source = (MenuItem) event.getSource();
+            relationshipSelectionDialog.reset();
+            relationshipSelectionDialog.setDependentNode(dependentLinkNode);
+            ownerLinkNode = (LinkSupport) source.getUserData();
+            relationshipSelectionDialog.setOwnerNode(ownerLinkNode);
+            Optional<Relationship> result = relationshipSelectionDialog.showAndWait();
+            result.ifPresent(relationship -> {
+                addRelationship(relationship);
+            });
+        });
+        return menuItem;
+    }
+
+    private void initRelationshipContextMenu(String currentPosId) {
+        ObservableList<MenuItem> items = relationshipContextMenu.getItems();
+        items.remove(0, items.size());
+
+        Menu menu = new Menu("Make Relationship");
+        ObservableList<GraphNode> nodes = canvasDataObject.get().getNodes();
+        nodes.forEach(graphNode -> {
+            GraphNodeType nodeType = graphNode.getNodeType();
+            switch (nodeType) {
+                case TERMINAL:
+                case EMPTY:
+                    TerminalNode tn = (TerminalNode) graphNode;
+                    ObservableList<PartOfSpeechNode> partOfSpeeches = tn.getPartOfSpeeches();
+                    for (PartOfSpeechNode partOfSpeech : partOfSpeeches) {
+                        if (currentPosId.equals(partOfSpeech.getId())) {
+                            continue;
+                        }
+                        menu.getItems().add(createRelationshipMenuItem(tn, partOfSpeech));
+                    }
+                    break;
+                case PHRASE:
+
+                    break;
+            }
+        });
+        items.add(menu);
     }
 
     private void addEmptyNode() {
@@ -142,21 +185,12 @@ public class CanvasPane extends Pane {
         });
         canvasDataObject.addListener((observable, oldValue, newData) -> {
             if (newData != null) {
-                drawNodes(newData.getNodes(), false);
+                ObservableList<GraphNode> nodes = newData.getNodes();
+                if (nodes != null && !nodes.isEmpty()) {
+                    drawNodes(nodes, false);
+                }
             }
         });
-        phraseSelectionDialog.getPhraseSelectionModel().firstNodeProperty()
-                .addListener((observable, oldValue, newValue) -> {
-                    if (oldValue != null && newValue == null) {
-                        removeSelectedShpae();
-                    }
-                });
-        phraseSelectionDialog.getPhraseSelectionModel().lastNodeProperty()
-                .addListener((observable, oldValue, newValue) -> {
-                    if (oldValue != null && newValue == null) {
-                        removeSelectedShpae();
-                    }
-                });
     }
 
     @SuppressWarnings({"unused"})
@@ -209,6 +243,7 @@ public class CanvasPane extends Pane {
         canvasPane.setPrefSize(width, height);
 
         ObservableList<GraphNode> nodes = canvasDataObject.get().getNodes();
+        System.out.println("<<<<<<<<<<<<<<< " + nodes);
         if (nodes != null && !nodes.isEmpty()) {
             drawNodes(nodes, true);
         }
@@ -223,7 +258,7 @@ public class CanvasPane extends Pane {
     }
 
     private void removeAll(boolean removeGridLines) {
-        ObservableList<Node> children = getChildren();
+        ObservableList<Node> children = canvasPane.getChildren();
         Iterator<Node> iterator = children.iterator();
         while (iterator.hasNext()) {
             Node node = iterator.next();
@@ -240,6 +275,7 @@ public class CanvasPane extends Pane {
         removeAll(removeGridLines);
         for (GraphNode node : nodes) {
             GraphNodeType nodeType = node.getNodeType();
+            System.out.println(">>>>>>>>>>>>>>> " + nodeType);
             switch (nodeType) {
                 case TERMINAL:
                 case EMPTY:
@@ -269,17 +305,11 @@ public class CanvasPane extends Pane {
         canvasDataObject.setValue(canvasData);
     }
 
-    private void addRelationship(RelationshipType relationshipType) {
-        // Step 1: call GraphBuilder to create a relationship
-        RelationshipNode relationshipNode = graphBuilder.buildRelationshipNode(null, relationshipType,
-                startPoint, endPoint);
+    private void addRelationship(Relationship relationship) {
+        RelationshipNode relationshipNode = graphBuilder.buildRelationshipNode(relationship,
+                dependentLinkNode, ownerLinkNode);
 
-        // add this node into existing list of nodes and
-        // update canvasDataObject for changes to take effect
-        CanvasData canvasData = canvasDataObject.get();
-        canvasData.getNodes().add(relationshipNode);
-        canvasDataObject.setValue(null);
-        canvasDataObject.setValue(canvasData);
+        buildRelationshipNode(relationshipNode);
     }
 
     private void addPhrase(PhraseSelectionModel model) {
@@ -349,7 +379,7 @@ public class CanvasPane extends Pane {
         arabicText.setOnMouseClicked(event -> {
             selectedArabicText = (Text) event.getSource();
             if (event.isPopupTrigger()) {
-                contextMenu.show(selectedArabicText, event.getScreenX(), event.getScreenY());
+                terminalContextMenu.show(selectedArabicText, event.getScreenX(), event.getScreenY());
             }
         });
 
@@ -369,9 +399,17 @@ public class CanvasPane extends Pane {
         for (PartOfSpeechNode pn : partOfSpeeches) {
             color = hiddenOrEmptyNode ? hiddenOrEmptyNodeColor : web(pn.getPartOfSpeech().getColorCode());
             arabicText = drawText(pn, color, ARABIC_FONT_SMALL);
-            arabicText.setOnMouseClicked(event -> selectRelationship(pn.getText(),
-                    pn.getCx(), pn.getCy(), translateX, translateY,
-                    (Text) event.getSource()));
+            arabicText.setOnMouseClicked(event -> {
+                Text source = (Text) event.getSource();
+                String thisId = pn.getId();
+                if (event.isPopupTrigger()) {
+                    ownerLinkNode = null;
+                    dependentLinkNode = pn;
+                    initRelationshipContextMenu(thisId);
+                    relationshipContextMenu.show(source, event.getScreenX(), event.getScreenY());
+                }
+                // selectRelationship(pn.getText(), pn.getCx(), pn.getCy(), translateX, translateY, source);
+            });
 
             id = format("c_%s", pn.getId());
             Circle circle = tool.drawCircle(id, color, pn.getCx(), pn.getCy(), RADIUS);
@@ -399,7 +437,6 @@ public class CanvasPane extends Pane {
         TerminalNode userData = (TerminalNode) text.getUserData();
         double translateX = userData.getTranslateX();
         double translateY = userData.getTranslateY();
-        updateSelectedShape(text, translateX, translateY);
 
         PhraseSelectionModel phraseSelectionModel = phraseSelectionDialog.getPhraseSelectionModel();
         if (phraseSelectionModel.getFirstNode() == null) {
@@ -416,51 +453,16 @@ public class CanvasPane extends Pane {
             }
             addPhrase(psm);
             phraseSelectionDialog.reset();
-            updateSelectedShape(null, translateX, translateY);
         });
     }
 
     private void selectRelationship(String text, double cx, double cy, double translateX, double translateY,
                                     Text arabicText) {
-        if (startPoint == null) {
-            Optional<RelationshipType> result = relationshipSelectionDialog.showAndWait();
-            result.ifPresent(gr -> {
-                if (result.isPresent()) {
-                    startPoint = new Point2D(cx + translateX, cy + translateY);
-                    updateSelectedShape(arabicText, translateX, translateY);
-                    relationshipSelectionDialog.setFirstPartOfSpeech(text);
-                }
-            });
-        } else {
-            if (endPoint == null) {
-                endPoint = new Point2D(cx + translateX, cy + translateY);
-                if (endPoint.equals(startPoint)) {
-                    showAlert(WARNING, "You must select different part of speech.", null);
-                    endPoint = null;
-                } else {
-                    relationshipSelectionDialog.setSecondPartOfSpeech(text);
-                    Optional<RelationshipType> result = relationshipSelectionDialog.showAndWait();
-                    result.ifPresent(gr -> {
-                        if (result.isPresent() && !gr.equals(RelationshipType.NONE)) {
-                            addRelationship(gr);
-                            updateSelectedShape(null, translateX, translateY);
-                        }
-                        startPoint = null;
-                        endPoint = null;
-                        relationshipSelectionDialog.reset();
-                    });
-                }
-            } else {
-                relationshipSelectionDialog.reset();
-                updateSelectedShape(null, translateX, translateY);
-                startPoint = null;
-                endPoint = null;
-            }
-        } // end of else
+
     }
 
     private void buildRelationshipNode(RelationshipNode rn) {
-        Color color = web(rn.getGrammaticalRelationship().getColorCode());
+        Color color = rn.getStroke();
         CubicCurve cubicCurve = tool.drawCubicCurve(rn.getId(), rn.getStartX(), rn.getStartY(), rn.getControlX1(),
                 rn.getControlY1(), rn.getControlX2(), rn.getControlY2(), rn.getEndX(), rn.getEndY(),
                 color);
@@ -529,27 +531,6 @@ public class CanvasPane extends Pane {
         }
         alert.setContentText(contentText);
         return alert.showAndWait();
-    }
-
-    private void removeSelectedShpae() {
-        updateSelectedShape(null, 0, 0);
-    }
-
-    private void updateSelectedShape(Shape shape, double translateX, double translateY) {
-        if (shape == null) {
-            canvasPane.getChildren().remove(bound);
-        } else {
-            if (bound == null) {
-                bound = tool.drawBounds(shape);
-                canvasPane.getChildren().add(bound);
-            } else {
-                Bounds boundsInLocal = shape.getBoundsInLocal();
-                bound.setX(boundsInLocal.getMinX() + translateX);
-                bound.setY(boundsInLocal.getMinY() + translateY);
-                bound.setWidth(boundsInLocal.getWidth());
-                bound.setHeight(boundsInLocal.getHeight());
-            }
-        }
     }
 
     public Pane getCanvasPane() {
