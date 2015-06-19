@@ -80,6 +80,7 @@ public class SerializationTool {
         File _file = new File(parentFile, name);
         try {
             tempFile = createTempFile(DATA_FILE_EXTENSION);
+            repositoryTool.getRepositoryUtil().getDependencyGraphRepository().save(canvasData.getDependencyGraph());
             serialize(canvasData, tempFile);
             archiveFile(_file, new ZipFileEntry(tempFile, ZIP_ENTRY_NAME));
         } catch (ApplicationException | IOException e) {
