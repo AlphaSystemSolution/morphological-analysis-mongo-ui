@@ -31,7 +31,6 @@ public class RelationshipSelectionDialog extends Dialog<Relationship> {
 
     public RelationshipSelectionDialog() {
         setTitle(getLabel("title"));
-        // setHeaderText(getLabel("headerText"));
         comboBox = ComboBoxFactory.getInstance().getRelationshipTypeComboBox();
         dependentLabel = new Label();
         dependentLabel.setFont(ARABIC_FONT_SMALL_BOLD);

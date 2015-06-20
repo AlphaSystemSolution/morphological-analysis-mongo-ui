@@ -1,6 +1,7 @@
 package com.alphasystem.morphologicalanalysis.ui.dependencygraph.util;
 
 import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
+import com.alphasystem.morphologicalanalysis.graph.model.Fragment;
 import com.alphasystem.morphologicalanalysis.graph.model.Relationship;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.*;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
@@ -98,24 +99,21 @@ public class GraphBuilder {
         return relationshipNode;
     }
 
-    public PhraseNode buildPhraseNode(String id, PhraseSelectionModel model) {
-        TerminalNode firstNode = model.getFirstNode();
-        TerminalNode lastNode = model.getLastNode();
+    public PhraseNode buildPhraseNode(Fragment fragment, List<TerminalNode> terminalNodes) {
         double yOffset = 150.0;
+        TerminalNode firstNode = terminalNodes.get(terminalNodes.size() - 1);
+        TerminalNode lastNode = terminalNodes.get(0);
         Double x1 = firstNode.getX1();
         Double y1 = firstNode.getY1() + yOffset;
-        Double x2 = firstNode.getX2();
-        Double y2 = firstNode.getY2() + yOffset;
-        if (lastNode != null) {
-            x2 = lastNode.getX2();
-            y2 = lastNode.getY2() + yOffset;
-        }
+        Double x2 = lastNode.getX2();
+        Double y2 = lastNode.getY2() + yOffset;
         Double x = (x1 + x2) / 2;
         Double y = (y1 + y2) / 2;
         Double cx = x + 15;
         Double cy = y + 15;
 
-        return new PhraseNode(model.getRelationship(), id, x, y, x1, y1, x2, y2, cx, cy);
+
+        return new PhraseNode(fragment, x, y, x1, y1, x2, y2, cx, cy);
     }
 
     public EmptyNode buildEmptyNode(Line referenceLine) {

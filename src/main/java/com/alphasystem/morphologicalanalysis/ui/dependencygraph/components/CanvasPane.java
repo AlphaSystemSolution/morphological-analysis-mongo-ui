@@ -1,5 +1,6 @@
 package com.alphasystem.morphologicalanalysis.ui.dependencygraph.components;
 
+import com.alphasystem.morphologicalanalysis.graph.model.Fragment;
 import com.alphasystem.morphologicalanalysis.graph.model.Relationship;
 import com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.*;
@@ -7,7 +8,6 @@ import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.DependencyG
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.GraphBuilder;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
-import com.alphasystem.morphologicalanalysis.wordbyword.model.support.RelationshipType;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
@@ -22,6 +22,7 @@ import javafx.scene.shape.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -32,6 +33,7 @@ import static com.alphasystem.morphologicalanalysis.ui.common.Global.*;
 import static com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.DependencyGraphGraphicTool.DARK_GRAY_CLOUD;
 import static com.alphasystem.util.AppUtil.isGivenType;
 import static java.lang.String.format;
+import static java.util.Collections.reverse;
 import static javafx.scene.control.Alert.AlertType.INFORMATION;
 import static javafx.scene.paint.Color.*;
 import static javafx.scene.text.Font.font;
@@ -57,6 +59,8 @@ public class CanvasPane extends Pane {
     private Text selectedArabicText;
     private LinkSupport dependentLinkNode;
     private LinkSupport ownerLinkNode;
+    private TerminalNode firstTerminalNode;
+    private TerminalNode lastTerminalNode;
     private Node gridLines;
 
     public CanvasPane(CanvasData data) {
@@ -66,7 +70,6 @@ public class CanvasPane extends Pane {
         int width = metaData.getWidth();
         int height = metaData.getHeight();
         terminalContextMenu = new ContextMenu();
-        initTerminalContextMenu();
         relationshipContextMenu = new ContextMenu();
         relationshipSelectionDialog = new RelationshipSelectionDialog();
         phraseSelectionDialog = new PhraseSelectionDialog();
@@ -87,18 +90,119 @@ public class CanvasPane extends Pane {
         setPrefSize(width + 200, height + 200);
     }
 
+    private List<GraphNode> createListOfNodes(boolean reverse) {
+        List<GraphNode> nodes = new ArrayList<>(canvasDataObjectProperty().get().getNodes());
+        if (reverse) {
+            reverse(nodes);
+        }
+        return nodes;
+    }
+
     private void initTerminalContextMenu() {
-        MenuItem menuItem = new MenuItem("Select Phrase");
-        menuItem.setOnAction(event -> {
-            if (selectedArabicText != null) {
-                selectPhrase(selectedArabicText);
+        ObservableList<MenuItem> items = terminalContextMenu.getItems();
+        items.remove(0, items.size());
+
+        Menu menu = new Menu("Make Phrase");
+        List<GraphNode> nodes = createListOfNodes(true);
+        nodes.forEach(graphNode -> {
+            GraphNodeType nodeType = graphNode.getNodeType();
+            switch (nodeType) {
+                case TERMINAL:
+                case EMPTY:
+                    TerminalNode tn = (TerminalNode) graphNode;
+                    menu.getItems().add(createPhraseMenuItem(tn));
+                    break;
             }
         });
-        terminalContextMenu.getItems().add(menuItem);
+        items.add(menu);
 
-        menuItem = new MenuItem("Add Empty Node");
-        menuItem.setOnAction(event -> addEmptyNode());
+        MenuItem menuItem = new MenuItem("Add Empty Node");
+        menuItem.setOnAction(event -> System.out.println("HERE"));
         terminalContextMenu.getItems().add(menuItem);
+    }
+
+    private void initRelationshipContextMenu(String currentNodeId) {
+        ObservableList<MenuItem> items = relationshipContextMenu.getItems();
+        items.remove(0, items.size());
+
+        Menu menu = new Menu("Make Relationship");
+        ObservableList<GraphNode> nodes = canvasDataObject.get().getNodes();
+        nodes.forEach(graphNode -> {
+            GraphNodeType nodeType = graphNode.getNodeType();
+            switch (nodeType) {
+                case TERMINAL:
+                case EMPTY:
+                    TerminalNode tn = (TerminalNode) graphNode;
+                    ObservableList<PartOfSpeechNode> partOfSpeeches = tn.getPartOfSpeeches();
+                    for (PartOfSpeechNode partOfSpeech : partOfSpeeches) {
+                        if (currentNodeId.equals(partOfSpeech.getId())) {
+                            continue;
+                        }
+                        menu.getItems().add(createRelationshipMenuItem(tn, partOfSpeech));
+                    }
+                    break;
+                case PHRASE:
+                    //TODO:
+                    break;
+            }
+        });
+        items.add(menu);
+    }
+
+    private MenuItem createPhraseMenuItem(TerminalNode terminalNode) {
+        Text text = new Text(terminalNode.getText());
+        text.setFont(ARABIC_FONT_SMALL_BOLD);
+        MenuItem menuItem = new MenuItem("", text);
+        menuItem.setUserData(terminalNode);
+        menuItem.setOnAction(event -> {
+            MenuItem source = (MenuItem) event.getSource();
+            phraseSelectionDialog.reset();
+            lastTerminalNode = (TerminalNode) source.getUserData();
+            Token firstToken = firstTerminalNode.getToken();
+            Token lastToken = lastTerminalNode.getToken();
+            Integer firstTokenTokenNumber = firstToken.getTokenNumber();
+            Integer lastTokenTokenNumber = lastToken.getTokenNumber();
+            if (firstTokenTokenNumber > lastTokenTokenNumber) {
+                // in UI we have laid out nodes from left to right but Arabic is read right to left.
+                // if we have selected from left, then switch the nodes to make it right to left
+                TerminalNode tmp = firstTerminalNode;
+                firstTerminalNode = lastTerminalNode;
+                lastTerminalNode = tmp;
+                tmp = null;
+                firstTokenTokenNumber = firstTerminalNode.getToken().getTokenNumber();
+                lastTokenTokenNumber = lastTerminalNode.getToken().getTokenNumber();
+            }
+            lastTokenTokenNumber++;
+            // populate the list of nodes
+            List<TerminalNode> terminalNodes = new ArrayList<>();
+            List<GraphNode> nodes = createListOfNodes(true);
+            Iterator<GraphNode> iterator = nodes.iterator();
+            loop:
+            while (iterator.hasNext()) {
+                GraphNode gn = iterator.next();
+                GraphNodeType nodeType = gn.getNodeType();
+                switch (nodeType) {
+                    case TERMINAL:
+                    case EMPTY:
+                        TerminalNode tn = (TerminalNode) gn;
+                        Integer tokenNumber = tn.getToken().getTokenNumber();
+                        if (tokenNumber < firstTokenTokenNumber) {
+                            continue loop;
+                        }
+                        if (tokenNumber > lastTokenTokenNumber) {
+                            break loop;
+                        }
+                        terminalNodes.add(tn);
+                        break;
+                }
+
+            }
+
+            phraseSelectionDialog.setNodes(terminalNodes);
+            Optional<Fragment> result = phraseSelectionDialog.showAndWait();
+            result.ifPresent(fragment -> addPhrase(fragment, terminalNodes));
+        });
+        return menuItem;
     }
 
     private MenuItem createRelationshipMenuItem(TerminalNode terminalNode, LinkSupport ownerNode) {
@@ -114,39 +218,9 @@ public class CanvasPane extends Pane {
             ownerLinkNode = (LinkSupport) source.getUserData();
             relationshipSelectionDialog.setOwnerNode(ownerLinkNode);
             Optional<Relationship> result = relationshipSelectionDialog.showAndWait();
-            result.ifPresent(relationship -> {
-                addRelationship(relationship);
-            });
+            result.ifPresent(this::addRelationship);
         });
         return menuItem;
-    }
-
-    private void initRelationshipContextMenu(String currentPosId) {
-        ObservableList<MenuItem> items = relationshipContextMenu.getItems();
-        items.remove(0, items.size());
-
-        Menu menu = new Menu("Make Relationship");
-        ObservableList<GraphNode> nodes = canvasDataObject.get().getNodes();
-        nodes.forEach(graphNode -> {
-            GraphNodeType nodeType = graphNode.getNodeType();
-            switch (nodeType) {
-                case TERMINAL:
-                case EMPTY:
-                    TerminalNode tn = (TerminalNode) graphNode;
-                    ObservableList<PartOfSpeechNode> partOfSpeeches = tn.getPartOfSpeeches();
-                    for (PartOfSpeechNode partOfSpeech : partOfSpeeches) {
-                        if (currentPosId.equals(partOfSpeech.getId())) {
-                            continue;
-                        }
-                        menu.getItems().add(createRelationshipMenuItem(tn, partOfSpeech));
-                    }
-                    break;
-                case PHRASE:
-
-                    break;
-            }
-        });
-        items.add(menu);
     }
 
     private void addEmptyNode() {
@@ -243,7 +317,6 @@ public class CanvasPane extends Pane {
         canvasPane.setPrefSize(width, height);
 
         ObservableList<GraphNode> nodes = canvasDataObject.get().getNodes();
-        System.out.println("<<<<<<<<<<<<<<< " + nodes);
         if (nodes != null && !nodes.isEmpty()) {
             drawNodes(nodes, true);
         }
@@ -275,7 +348,6 @@ public class CanvasPane extends Pane {
         removeAll(removeGridLines);
         for (GraphNode node : nodes) {
             GraphNodeType nodeType = node.getNodeType();
-            System.out.println(">>>>>>>>>>>>>>> " + nodeType);
             switch (nodeType) {
                 case TERMINAL:
                 case EMPTY:
@@ -306,15 +378,21 @@ public class CanvasPane extends Pane {
     }
 
     private void addRelationship(Relationship relationship) {
+        // Step 1: call GraphBuilder to create a relationship node
         RelationshipNode relationshipNode = graphBuilder.buildRelationshipNode(relationship,
                 dependentLinkNode, ownerLinkNode);
 
-        buildRelationshipNode(relationshipNode);
+        // add this node into existing list of nodes and
+        // update canvasDataObject for changes to take effect
+        CanvasData canvasData = canvasDataObject.get();
+        canvasData.getNodes().add(relationshipNode);
+        canvasDataObject.setValue(null);
+        canvasDataObject.setValue(canvasData);
     }
 
-    private void addPhrase(PhraseSelectionModel model) {
-        // Step 1: call GraphBuilder to create a phrase
-        PhraseNode phraseNode = graphBuilder.buildPhraseNode(null, model);
+    private void addPhrase(Fragment fragment, List<TerminalNode> nodes) {
+        // Step 1: call GraphBuilder to create a phrase node
+        PhraseNode phraseNode = graphBuilder.buildPhraseNode(fragment, nodes);
 
         // add this node into existing list of nodes and
         // update canvasDataObject for changes to take effect
@@ -377,9 +455,12 @@ public class CanvasPane extends Pane {
         double translateX = tn.getTranslateX();
         double translateY = tn.getTranslateY();
         arabicText.setOnMouseClicked(event -> {
-            selectedArabicText = (Text) event.getSource();
+            Text source = (Text) event.getSource();
             if (event.isPopupTrigger()) {
-                terminalContextMenu.show(selectedArabicText, event.getScreenX(), event.getScreenY());
+                lastTerminalNode = null;
+                firstTerminalNode = tn;
+                initTerminalContextMenu();
+                terminalContextMenu.show(source, event.getScreenX(), event.getScreenY());
             }
         });
 
@@ -408,7 +489,6 @@ public class CanvasPane extends Pane {
                     initRelationshipContextMenu(thisId);
                     relationshipContextMenu.show(source, event.getScreenX(), event.getScreenY());
                 }
-                // selectRelationship(pn.getText(), pn.getCx(), pn.getCy(), translateX, translateY, source);
             });
 
             id = format("c_%s", pn.getId());
@@ -431,29 +511,6 @@ public class CanvasPane extends Pane {
         });
 
         canvasPane.getChildren().add(group);
-    }
-
-    private void selectPhrase(Text text) {
-        TerminalNode userData = (TerminalNode) text.getUserData();
-        double translateX = userData.getTranslateX();
-        double translateY = userData.getTranslateY();
-
-        PhraseSelectionModel phraseSelectionModel = phraseSelectionDialog.getPhraseSelectionModel();
-        if (phraseSelectionModel.getFirstNode() == null) {
-            phraseSelectionModel.setFirstNode(userData);
-        } else {
-            phraseSelectionModel.setLastNode(userData);
-        }
-
-        Optional<PhraseSelectionModel> result = phraseSelectionDialog.showAndWait();
-        result.ifPresent(psm -> {
-            RelationshipType relationship = psm.getRelationship();
-            if (relationship == null || relationship.equals(RelationshipType.NONE)) {
-                return;
-            }
-            addPhrase(psm);
-            phraseSelectionDialog.reset();
-        });
     }
 
     private void selectRelationship(String text, double cx, double cy, double translateX, double translateY,
@@ -508,7 +565,7 @@ public class CanvasPane extends Pane {
     }
 
     private void buildPhraseNode(PhraseNode pn) {
-        Color color = web(pn.getGrammaticalRelationship().getColorCode());
+        Color color = web(pn.getFrament().getRelationshipType().getColorCode());
 
         Line line = drawLine(pn);
         Text arabicText = drawText(pn, color, ARABIC_FONT_SMALL);

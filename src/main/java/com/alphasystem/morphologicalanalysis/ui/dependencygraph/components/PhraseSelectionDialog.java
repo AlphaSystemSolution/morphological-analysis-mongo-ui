@@ -1,50 +1,64 @@
 package com.alphasystem.morphologicalanalysis.ui.dependencygraph.components;
 
+import com.alphasystem.morphologicalanalysis.graph.model.Fragment;
 import com.alphasystem.morphologicalanalysis.ui.common.ComboBoxFactory;
 import com.alphasystem.morphologicalanalysis.ui.common.Global;
-import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.PhraseSelectionModel;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.TerminalNode;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.RelationshipType;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.text.Font;
 
-import static com.alphasystem.morphologicalanalysis.ui.common.Global.*;
-import static javafx.scene.control.ButtonType.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.alphasystem.morphologicalanalysis.ui.common.Global.ARABIC_FONT_BIG;
+import static javafx.collections.FXCollections.observableArrayList;
+import static javafx.scene.control.ButtonType.CANCEL;
+import static javafx.scene.control.ButtonType.OK;
 
 /**
  * @author sali
  */
-public class PhraseSelectionDialog extends Dialog<PhraseSelectionModel> {
+public class PhraseSelectionDialog extends Dialog<Fragment> {
 
     private final ComboBox<RelationshipType> comboBox;
-    private PhraseSelectionModel phraseSelectionModel = new PhraseSelectionModel();
-    private ObjectProperty<TerminalNode> terminalNode = new SimpleObjectProperty<>();
+    private final ObservableList<TerminalNode> nodes;
+    private final Label phraseLabel;
 
     public PhraseSelectionDialog() {
         setTitle(getLabel("title"));
-        setHeaderText(getLabel("headerText"));
 
+        nodes = observableArrayList();
         comboBox = ComboBoxFactory.getInstance().getRelationshipTypeComboBox();
-        comboBox.disableProperty().bind(phraseSelectionModel.uninitialized());
+        phraseLabel = new Label();
+        phraseLabel.setFont(ARABIC_FONT_BIG);
+
+        nodes.addListener((ListChangeListener<TerminalNode>) c -> {
+            phraseLabel.setText("");
+            c.next();
+            if (c.wasAdded()) {
+                ObservableList<? extends TerminalNode> list = c.getList();
+                StringBuilder builder = new StringBuilder();
+                list.forEach(tn -> builder.append(tn.getText()).append(" "));
+                phraseLabel.setText(builder.toString());
+            }
+        });
+
         initDialogPane();
         setResultConverter(param -> {
             ButtonBar.ButtonData buttonData = param.getButtonData();
-            PhraseSelectionModel result = phraseSelectionModel;
-            if (buttonData.isCancelButton()) {
-                TerminalNode firstNode = phraseSelectionModel.getFirstNode();
-                TerminalNode lastNode = phraseSelectionModel.getLastNode();
-                if (firstNode != null && lastNode != null) {
-                    reset();
-                    result = null;
-                } else if (lastNode != null) {
-                    phraseSelectionModel.setLastNode(null);
-                } else if (firstNode != null) {
-                    phraseSelectionModel.setFirstNode(null);
-                }
+            Fragment result = null;
+            if (!buttonData.isCancelButton()) {
+                result = new Fragment();
+                result.setRelationshipType(comboBox.getValue());
+                List<Token> tokens = new ArrayList<>();
+                nodes.forEach(terminalNode -> tokens.add(terminalNode.getToken()));
+                result.setTokens(tokens);
             }
             return result;
         });
@@ -60,63 +74,29 @@ public class PhraseSelectionDialog extends Dialog<PhraseSelectionModel> {
         gridPane.setVgap(10);
         gridPane.setPadding(new Insets(25, 25, 25, 25));
 
-        Label label = new Label(getLabel("firstNode"));
-        gridPane.add(label, 0, 0);
+        BorderPane borderPane = new BorderPane();
+        borderPane.setCenter(phraseLabel);
+        gridPane.add(borderPane, 0, 0, 1, 2);
 
-        Label firstNodeLabel = new Label(phraseSelectionModel.getFirstNodeLabel());
-        firstNodeLabel.setFont(getFont(null));
-        firstNodeLabel.textProperty().bind(phraseSelectionModel.firstNodeLabelProperty());
-        firstNodeLabel.textProperty().addListener((observable, oldValue, newValue) -> {
-            firstNodeLabel.setFont(getFont(newValue));
-        });
-        gridPane.add(firstNodeLabel, 1, 0);
-
-        label = new Label(getLabel("lastNode"));
-        gridPane.add(label, 0, 1);
-
-        Label lastNodeLabel = new Label(phraseSelectionModel.getLastNodeLabel());
-        lastNodeLabel.setFont(getFont(null));
-        lastNodeLabel.textProperty().bind(phraseSelectionModel.lastNodeLabelProperty());
-        lastNodeLabel.textProperty().addListener((observable, oldValue, newValue) -> {
-            lastNodeLabel.setFont(getFont(newValue));
-        });
-        gridPane.add(lastNodeLabel, 1, 1);
-
-        label = new Label(getLabel("comboBox"));
+        Label label = new Label(getLabel("comboBox"));
         gridPane.add(label, 0, 2);
         gridPane.add(comboBox, 1, 2);
-        comboBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            phraseSelectionModel.setRelationship(newValue);
-        });
-        phraseSelectionModel.relationshipProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue != null && newValue.equals(RelationshipType.NONE)) {
-                comboBox.getSelectionModel().select(0);
-            }
-        });
 
-        getDialogPane().getButtonTypes().addAll(OK, FINISH, CANCEL);
+        getDialogPane().getButtonTypes().addAll(OK, CANCEL);
 
-        Button finishButton = (Button) getDialogPane().lookupButton(FINISH);
-        finishButton.disableProperty().bind(comboBox.getSelectionModel().selectedIndexProperty().isNotEqualTo(0));
+        Button okButton = (Button) getDialogPane().lookupButton(OK);
+        okButton.disableProperty().bind(comboBox.getSelectionModel().selectedIndexProperty().isEqualTo(0));
 
         getDialogPane().setContent(gridPane);
         getDialogPane().setPrefWidth(400);
     }
 
-    private Font getFont(String text) {
-        return ((text == null) || NONE_SELECTED.equals(text)) ? ENGLISH_FONT : ARABIC_FONT_MEDIUM;
-    }
-
-    @SuppressWarnings({"unused"})
-    public ObjectProperty<TerminalNode> terminalNodeProperty() {
-        return terminalNode;
-    }
-
-    public PhraseSelectionModel getPhraseSelectionModel() {
-        return phraseSelectionModel;
+    public void setNodes(List<TerminalNode> srcNodes) {
+        nodes.remove(0, nodes.size());
+        nodes.addAll(srcNodes);
     }
 
     public void reset() {
-        phraseSelectionModel.reset();
+        nodes.remove(0, nodes.size());
     }
 }
