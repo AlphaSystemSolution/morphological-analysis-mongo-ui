@@ -70,6 +70,11 @@ public class ControlPane extends BorderPane {
         tree.selectedNodeProperty().addListener((observable, oldValue, newValue) -> {
             editorPane.initPane(newValue);
         });
+        canvasData.selectedNodeProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                editorPane.initPane(newValue);
+            }
+        });
 
 
         propertiesPane = new PropertiesPane(canvasMetaData);

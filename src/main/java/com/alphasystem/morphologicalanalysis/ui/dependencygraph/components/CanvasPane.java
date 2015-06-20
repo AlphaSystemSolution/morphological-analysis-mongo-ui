@@ -142,7 +142,10 @@ public class CanvasPane extends Pane {
                     }
                     break;
                 case PHRASE:
-                    //TODO:
+                    PhraseNode pn = (PhraseNode) graphNode;
+                    if (!currentNodeId.equals(pn.getId())) {
+                        //menu.getItems().add(createRelationshipMenuItem(pn, pn));
+                    }
                     break;
             }
         });
@@ -463,6 +466,9 @@ public class CanvasPane extends Pane {
                 firstTerminalNode = tn;
                 initTerminalContextMenu();
                 terminalContextMenu.show(source, event.getScreenX(), event.getScreenY());
+            } else {
+                // single click, populate editor with this node
+                canvasDataObject.get().setSelectedNode(tn);
             }
         });
 
@@ -490,6 +496,9 @@ public class CanvasPane extends Pane {
                     dependentLinkNode = pn;
                     initRelationshipContextMenu(thisId);
                     relationshipContextMenu.show(source, event.getScreenX(), event.getScreenY());
+                } else {
+                    // single click, populate editor with this node
+                    canvasDataObject.get().setSelectedNode(pn);
                 }
             });
 
@@ -515,11 +524,6 @@ public class CanvasPane extends Pane {
         canvasPane.getChildren().add(group);
     }
 
-    private void selectRelationship(String text, double cx, double cy, double translateX, double translateY,
-                                    Text arabicText) {
-
-    }
-
     private void buildRelationshipNode(RelationshipNode rn) {
         Color color = rn.getStroke();
         CubicCurve cubicCurve = tool.drawCubicCurve(rn.getId(), rn.getStartX(), rn.getStartY(), rn.getControlX1(),
@@ -540,6 +544,16 @@ public class CanvasPane extends Pane {
 
         Text arabicText = drawText(rn, color, ARABIC_FONT_SMALL);
         arabicText.fillProperty().bind(rn.strokeProperty());
+        arabicText.setOnMouseClicked(event -> {
+            Text source = (Text) event.getSource();
+            String thisId = rn.getId();
+            if (event.isPopupTrigger()) {
+                // TODO:
+            } else {
+                // single click, populate editor with this node
+                canvasDataObject.get().setSelectedNode(rn);
+            }
+        });
 
         // small arrow pointing towards the relationship direction
         Polyline triangle = tool.drawPolyline(rn.getCurvePointX(), rn.getCurvePointY(), rn.getArrowPointX1(),
@@ -571,8 +585,16 @@ public class CanvasPane extends Pane {
 
         Line line = drawLine(pn);
         Text arabicText = drawText(pn, color, ARABIC_FONT_SMALL);
-        arabicText.setOnMouseClicked(event -> selectRelationship(pn.getText(),
-                pn.getCx(), pn.getCy(), 0d, 0d, (Text) event.getSource()));
+        arabicText.setOnMouseClicked(event -> {
+            Text source = (Text) event.getSource();
+            String thisId = pn.getId();
+            if (event.isPopupTrigger()) {
+                // TODO:
+            } else {
+                // single click, populate editor with this node
+                canvasDataObject.get().setSelectedNode(pn);
+            }
+        });
         Circle circle = tool.drawCircle(null, color, pn.getCx(), pn.getCy(), RADIUS);
         // bind coordinates
         circle.centerXProperty().bind(pn.cxProperty());
