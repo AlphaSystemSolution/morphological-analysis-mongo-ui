@@ -89,8 +89,10 @@ public class ControlPane extends BorderPane {
         BorderPane borderPane = new BorderPane();
         borderPane.setCenter(editorPane);
 
+        // removing tree tab for now, it should be removed all together in future commits
+        @SuppressWarnings({"unused"})
+        Tab treeTab = new Tab("Dependency Graph Tree", initTreePane());
         tabPane.getTabs().addAll(new Tab("Properties", propertiesPane),
-                new Tab("Dependency Graph Tree", initTreePane()),
                 new Tab("Dependency Graph Controls", borderPane));
 
         setCenter(tabPane);
