@@ -2,10 +2,9 @@ package com.alphasystem.morphologicalanalysis.ui.dependencygraph.util;
 
 import com.alphasystem.ApplicationException;
 import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
-import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.CanvasData;
-import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.GraphNode;
-import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.PartOfSpeechNode;
-import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.TerminalNode;
+import com.alphasystem.morphologicalanalysis.graph.model.Fragment;
+import com.alphasystem.morphologicalanalysis.graph.model.Relationship;
+import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.*;
 import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
@@ -117,7 +116,14 @@ public class SerializationTool {
             for (GraphNode node : nodes) {
                 switch (node.getNodeType()) {
                     case TERMINAL:
+                    case EMPTY:
                         loadToken((TerminalNode) node, dependencyGraph);
+                        break;
+                    case RELATIONSHIP:
+                        loadRelationship((RelationshipNode) node, dependencyGraph);
+                        break;
+                    case PHRASE:
+                        loadPhrase((PhraseNode) node, dependencyGraph);
                         break;
                 }
 
@@ -147,6 +153,17 @@ public class SerializationTool {
                 } /* end of 'inner' (locations) loop */
             } /* end of 'partOfSpeeches' loop */
         });
+    }
+
+    private void loadRelationship(RelationshipNode node, DependencyGraph dependencyGraph) {
+        List<Relationship> relationships = dependencyGraph.getRelationships();
+        relationships.stream().filter(relationship -> relationship.getId().equals(node.getId()))
+                .forEach(node::setRelationship);
+    }
+
+    private void loadPhrase(PhraseNode node, DependencyGraph dependencyGraph) {
+        List<Fragment> fragments = dependencyGraph.getFragments();
+        fragments.stream().filter(fragment -> fragment.getId().equals(node.getId())).forEach(node::setFrament);
     }
 
 }

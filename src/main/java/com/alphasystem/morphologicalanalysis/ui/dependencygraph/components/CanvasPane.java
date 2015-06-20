@@ -385,6 +385,7 @@ public class CanvasPane extends Pane {
         // add this node into existing list of nodes and
         // update canvasDataObject for changes to take effect
         CanvasData canvasData = canvasDataObject.get();
+        canvasData.getDependencyGraph().getRelationships().add(relationship);
         canvasData.getNodes().add(relationshipNode);
         canvasDataObject.setValue(null);
         canvasDataObject.setValue(canvasData);
@@ -397,6 +398,7 @@ public class CanvasPane extends Pane {
         // add this node into existing list of nodes and
         // update canvasDataObject for changes to take effect
         CanvasData canvasData = canvasDataObject.get();
+        canvasData.getDependencyGraph().getFragments().add(fragment);
         canvasData.getNodes().add(phraseNode);
         canvasDataObject.setValue(null);
         canvasDataObject.setValue(canvasData);

@@ -36,7 +36,6 @@ public class RelationshipSelectionDialog extends Dialog<Relationship> {
         dependentLabel.setFont(ARABIC_FONT_SMALL_BOLD);
         ownerLabel = new Label();
         ownerLabel.setFont(ARABIC_FONT_SMALL_BOLD);
-        // comboBox.disableProperty().bind(secondPartOfSpeech.isEqualTo(NONE_SELECTED));
         reset();
         initDialogPane();
         dependentNodeProperty().addListener((observable, oldValue, newValue) ->
