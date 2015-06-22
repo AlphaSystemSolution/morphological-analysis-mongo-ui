@@ -4,8 +4,6 @@ import com.alphasystem.morphologicalanalysis.graph.model.Relationship;
 import com.alphasystem.morphologicalanalysis.ui.common.ComboBoxFactory;
 import com.alphasystem.morphologicalanalysis.ui.common.Global;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.LinkSupport;
-import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.PartOfSpeechNode;
-import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.PhraseNode;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.RelationshipType;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -14,7 +12,6 @@ import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.ARABIC_FONT_SMALL_BOLD;
-import static com.alphasystem.util.AppUtil.isGivenType;
 import static javafx.scene.control.ButtonType.CANCEL;
 import static javafx.scene.control.ButtonType.OK;
 
@@ -39,9 +36,9 @@ public class RelationshipSelectionDialog extends Dialog<Relationship> {
         reset();
         initDialogPane();
         dependentNodeProperty().addListener((observable, oldValue, newValue) ->
-                dependentLabel.setText(getLinkLabel(newValue)));
+                dependentLabel.setText(newValue.getText()));
         ownerNodeProperty().addListener((observable, oldValue, newValue) ->
-                ownerLabel.setText(getLinkLabel(newValue)));
+                ownerLabel.setText(newValue.getText()));
     }
 
     private static String getLabel(String label) {
@@ -70,17 +67,6 @@ public class RelationshipSelectionDialog extends Dialog<Relationship> {
 
     public final ObjectProperty<LinkSupport> ownerNodeProperty() {
         return ownerNode;
-    }
-
-    private String getLinkLabel(LinkSupport src) {
-        String text = null;
-        if (isGivenType(PartOfSpeechNode.class, src)) {
-            PartOfSpeechNode node = (PartOfSpeechNode) src;
-            text = node.getText();
-        } else if (isGivenType(PhraseNode.class, src)) {
-
-        }
-        return text;
     }
 
     private void initDialogPane() {

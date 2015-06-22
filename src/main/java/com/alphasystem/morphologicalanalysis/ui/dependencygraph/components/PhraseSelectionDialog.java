@@ -97,6 +97,8 @@ public class PhraseSelectionDialog extends Dialog<Fragment> {
     }
 
     public void reset() {
+        comboBox.getSelectionModel().select(0);
         nodes.remove(0, nodes.size());
+        phraseLabel.setText("");
     }
 }

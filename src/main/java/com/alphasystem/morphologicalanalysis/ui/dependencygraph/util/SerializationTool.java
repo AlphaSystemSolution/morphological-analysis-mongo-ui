@@ -13,7 +13,9 @@ import javafx.collections.ObservableList;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.*;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.alphasystem.util.AppUtil.createTempFile;
 import static com.alphasystem.util.ZipUtil.archiveFile;
@@ -32,6 +34,7 @@ public class SerializationTool {
     public static final String ZIP_ENTRY_NAME = format("data%s", DATA_FILE_EXTENSION);
     private static RepositoryTool repositoryTool = RepositoryTool.getInstance();
     private static SerializationTool instance;
+    private Map<String, GraphNode> allNodes = new HashMap<>();
 
     private SerializationTool() {
     }
@@ -104,6 +107,8 @@ public class SerializationTool {
             if (dependencyGraph == null) {
                 throw new IllegalStateException(format("No dependency graph found with id {%s}", id));
             }
+            List<Relationship> relationships = dependencyGraph.getRelationships();
+            relationships.forEach(relationship -> System.out.println(relationship.getId()));
             canvasData.setDependencyGraph(dependencyGraph);
             List<Token> tokens = dependencyGraph.getTokens();
             if (tokens == null || tokens.isEmpty()) {
@@ -113,7 +118,9 @@ public class SerializationTool {
             if (nodes == null || nodes.isEmpty()) {
                 throw new IllegalStateException(format("No node(s) found in canvas data with id {%s}", id));
             }
+            allNodes.clear();
             for (GraphNode node : nodes) {
+                System.out.println(node.getNodeType() + ": " + node.getId());
                 switch (node.getNodeType()) {
                     case TERMINAL:
                     case EMPTY:
@@ -148,22 +155,33 @@ public class SerializationTool {
                 for (Location location : locations) {
                     if (partOfSpeech.getId().equals(location.getId())) {
                         partOfSpeech.setLocation(location);
+                        allNodes.put(partOfSpeech.getId(), partOfSpeech);
                         break;
                     } /* end of 'if' */
                 } /* end of 'inner' (locations) loop */
             } /* end of 'partOfSpeeches' loop */
         });
+        allNodes.put(node.getId(), node);
     }
 
     private void loadRelationship(RelationshipNode node, DependencyGraph dependencyGraph) {
         List<Relationship> relationships = dependencyGraph.getRelationships();
         relationships.stream().filter(relationship -> relationship.getId().equals(node.getId()))
-                .forEach(node::setRelationship);
+                .forEach(relationship -> {
+                    node.setRelationship(relationship);
+                    node.setDependentNode((LinkSupport) allNodes.get(node.getDependentNode().getId()));
+                    node.setOwnerNode((LinkSupport) allNodes.get(node.getOwnerNode().getId()));
+                    allNodes.put(node.getId(), node);
+                });
     }
 
     private void loadPhrase(PhraseNode node, DependencyGraph dependencyGraph) {
         List<Fragment> fragments = dependencyGraph.getFragments();
-        fragments.stream().filter(fragment -> fragment.getId().equals(node.getId())).forEach(node::setFrament);
+        fragments.stream().filter(fragment -> fragment.getId().equals(node.getId()))
+                .forEach(fragment -> {
+                    node.setFrament(fragment);
+                    allNodes.put(node.getId(), node);
+                });
     }
 
 }

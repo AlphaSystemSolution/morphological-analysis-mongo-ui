@@ -144,7 +144,7 @@ public class CanvasPane extends Pane {
                 case PHRASE:
                     PhraseNode pn = (PhraseNode) graphNode;
                     if (!currentNodeId.equals(pn.getId())) {
-                        //menu.getItems().add(createRelationshipMenuItem(pn, pn));
+                        menu.getItems().add(createRelationshipMenuItem(null, pn));
                     }
                     break;
             }
@@ -174,6 +174,8 @@ public class CanvasPane extends Pane {
                 tmp = null;
                 firstTokenTokenNumber = firstTerminalNode.getToken().getTokenNumber();
                 lastTokenTokenNumber = lastTerminalNode.getToken().getTokenNumber();
+            } else if (firstTokenTokenNumber == lastTokenTokenNumber) {
+                lastTokenTokenNumber--;
             }
             lastTokenTokenNumber++;
             // populate the list of nodes
@@ -209,7 +211,8 @@ public class CanvasPane extends Pane {
     }
 
     private MenuItem createRelationshipMenuItem(TerminalNode terminalNode, LinkSupport ownerNode) {
-        String value = format("%s - %s", terminalNode.getText(), ownerNode.getText());
+        String tnText = terminalNode == null ? "" : format("%s - ", terminalNode.getText());
+        String value = format("%s%s", tnText, ownerNode.getText());
         Text text = new Text(value);
         text.setFont(ARABIC_FONT_SMALL_BOLD);
         MenuItem menuItem = new MenuItem("", text);
@@ -395,6 +398,8 @@ public class CanvasPane extends Pane {
     }
 
     private void addPhrase(Fragment fragment, List<TerminalNode> nodes) {
+        firstTerminalNode = null;
+        lastTerminalNode = null;
         // Step 1: call GraphBuilder to create a phrase node
         PhraseNode phraseNode = graphBuilder.buildPhraseNode(fragment, nodes);
 
@@ -531,15 +536,14 @@ public class CanvasPane extends Pane {
                 color);
 
         // bind line co-ordinates
-        //TODO: bind start and end properties with the circle of part of speech
-        cubicCurve.startYProperty().bind(rn.startXProperty());
-        cubicCurve.startYProperty().bind(rn.startYProperty());
+        cubicCurve.startXProperty().bind(rn.getDependentNode().cxProperty());
+        cubicCurve.startYProperty().bind(rn.getDependentNode().cyProperty());
         cubicCurve.controlX1Property().bind(rn.controlX1Property());
         cubicCurve.controlY1Property().bind(rn.controlY1Property());
         cubicCurve.controlX2Property().bind(rn.controlX2Property());
         cubicCurve.controlY2Property().bind(rn.controlY2Property());
-        cubicCurve.endYProperty().bind(rn.endXProperty());
-        cubicCurve.endYProperty().bind(rn.endYProperty());
+        cubicCurve.endXProperty().bind(rn.getOwnerNode().cxProperty());
+        cubicCurve.endYProperty().bind(rn.getOwnerNode().cyProperty());
         cubicCurve.strokeProperty().bind(rn.strokeProperty());
 
         Text arabicText = drawText(rn, color, ARABIC_FONT_SMALL);
@@ -589,7 +593,10 @@ public class CanvasPane extends Pane {
             Text source = (Text) event.getSource();
             String thisId = pn.getId();
             if (event.isPopupTrigger()) {
-                // TODO:
+                ownerLinkNode = null;
+                dependentLinkNode = pn;
+                initRelationshipContextMenu(thisId);
+                relationshipContextMenu.show(source, event.getScreenX(), event.getScreenY());
             } else {
                 // single click, populate editor with this node
                 canvasDataObject.get().setSelectedNode(pn);
