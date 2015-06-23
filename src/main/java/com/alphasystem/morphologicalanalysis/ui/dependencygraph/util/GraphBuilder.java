@@ -4,15 +4,20 @@ import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
 import com.alphasystem.morphologicalanalysis.graph.model.Fragment;
 import com.alphasystem.morphologicalanalysis.graph.model.Relationship;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.*;
+import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech;
+import com.alphasystem.morphologicalanalysis.wordbyword.repository.TokenRepository;
 import javafx.collections.ObservableList;
 import javafx.scene.shape.Line;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.NOUN;
+import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.VERB;
 import static javafx.collections.FXCollections.observableArrayList;
 import static javafx.collections.FXCollections.reverse;
 
@@ -27,6 +32,7 @@ public class GraphBuilder {
     public static final double INITIAL_X = 0;
     public static final double INITIAL_Y = 40;
     private static GraphBuilder instance;
+
     // initial values
     private double rectX = INITIAL_X;
     private double rectY = INITIAL_Y;
@@ -39,7 +45,14 @@ public class GraphBuilder {
     private double x3 = rectX + 30;
     private double y3 = 50;
 
+    private RepositoryTool repositoryTool = RepositoryTool.getInstance();
+    private Map<String, Token> emptyOrHiddenTokensMap = new HashMap<>();
+
+
     private GraphBuilder() {
+        TokenRepository tokenRepository = repositoryTool.getRepositoryUtil().getTokenRepository();
+        emptyOrHiddenTokensMap.put(NOUN.name(), tokenRepository.findByDisplayName("0:1:1"));
+        emptyOrHiddenTokensMap.put(VERB.name(), tokenRepository.findByDisplayName("0:1:2"));
     }
 
     public synchronized static GraphBuilder getInstance() {
@@ -116,7 +129,7 @@ public class GraphBuilder {
         return new PhraseNode(fragment, x, y, x1, y1, x2, y2, cx, cy);
     }
 
-    public EmptyNode buildEmptyNode(Line referenceLine) {
+    public EmptyNode buildEmptyNode(Line referenceLine, PartOfSpeech partOfSpeech) {
         reset();
         rectX = referenceLine.getEndX() + GAP_BETWEEN_TOKENS;
         textX = rectX + 30;
@@ -124,11 +137,11 @@ public class GraphBuilder {
         x2 = RECTANGLE_WIDTH + rectX;
         x3 = rectX + 30;
 
-        PartOfSpeech partOfSpeech = NOUN;
-        Location location = new Location();
-        location.setPartOfSpeech(partOfSpeech);
+        Token token = emptyOrHiddenTokensMap.get(partOfSpeech.name());
+        Location location = token.getLocations().get(0);
+
         PartOfSpeechNode partOfSpeechNode = new PartOfSpeechNode(location, 0d, 0d, 0d, 0d);
-        EmptyNode emptyNode = new EmptyNode(null, textX, textY, x1, y1, x2, y2, x3, y3, partOfSpeechNode);
+        EmptyNode emptyNode = new EmptyNode(token, textX, textY, x1, y1, x2, y2, x3, y3, 0d, 0d, partOfSpeechNode);
 
         reset();
         textY = 160;

@@ -54,7 +54,8 @@ public class SerializationTool {
         }
     }
 
-    public <T extends Externalizable> T deserialize(Class<T> klass, File file) throws IOException {
+    @SuppressWarnings({"unchecked"})
+    public <T extends Externalizable> T deserialize(File file) throws IOException {
         T obj = null;
         try (ObjectInputStream objIn = new ObjectInputStream(new FileInputStream(file))) {
             obj = (T) objIn.readObject();
@@ -100,15 +101,13 @@ public class SerializationTool {
         try {
             tempFile = createTempFile(DATA_FILE_EXTENSION);
             extractFile(file.getAbsolutePath(), ZIP_ENTRY_NAME, tempFile);
-            canvasData = deserialize(CanvasData.class, tempFile);
+            canvasData = deserialize(tempFile);
             String id = canvasData.getId();
             DependencyGraph dependencyGraph = repositoryTool.getRepositoryUtil().
                     getDependencyGraphRepository().findOne(id);
             if (dependencyGraph == null) {
                 throw new IllegalStateException(format("No dependency graph found with id {%s}", id));
             }
-            List<Relationship> relationships = dependencyGraph.getRelationships();
-            relationships.forEach(relationship -> System.out.println(relationship.getId()));
             canvasData.setDependencyGraph(dependencyGraph);
             List<Token> tokens = dependencyGraph.getTokens();
             if (tokens == null || tokens.isEmpty()) {
@@ -120,7 +119,6 @@ public class SerializationTool {
             }
             allNodes.clear();
             for (GraphNode node : nodes) {
-                System.out.println(node.getNodeType() + ": " + node.getId());
                 switch (node.getNodeType()) {
                     case TERMINAL:
                     case EMPTY:

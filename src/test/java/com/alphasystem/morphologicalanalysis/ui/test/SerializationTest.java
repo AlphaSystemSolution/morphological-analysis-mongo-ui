@@ -72,7 +72,7 @@ public class SerializationTest {
     public void deserializeCanvasMetaData() {
         CanvasMetaData metaData = null;
         try {
-            metaData = serializationTool.deserialize(CanvasMetaData.class,
+            metaData = serializationTool.deserialize(
                     getSerializeFileName(CanvasMetaData.class));
         } catch (IOException e) {
             e.printStackTrace();
