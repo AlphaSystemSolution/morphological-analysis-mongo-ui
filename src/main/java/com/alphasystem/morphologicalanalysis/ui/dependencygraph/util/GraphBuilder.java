@@ -150,6 +150,27 @@ public class GraphBuilder {
         return emptyNode;
     }
 
+    public ReferenceNode buildReferenceNode(Line referenceLine, Token token) {
+        reset();
+        rectX = referenceLine.getEndX() + GAP_BETWEEN_TOKENS;
+        textX = rectX + 30;
+        x1 = rectX;
+        x2 = RECTANGLE_WIDTH + rectX;
+        x3 = rectX + 30;
+
+        ReferenceNode referenceNode = new ReferenceNode(token, textX, textY, x1, y1, x2, y2, x3, y3, 0d, 0d);
+
+        reset();
+        textY = 160;
+        ObservableList<PartOfSpeechNode> partOfSpeeches = referenceNode.getPartOfSpeeches();
+        partOfSpeeches.forEach(partOfSpeechNode -> {
+            double posX = referenceNode.getX1();
+            updatePartOfSpeechNode(partOfSpeechNode, posX);
+            posX += 50;
+        });
+        return referenceNode;
+    }
+
 
     /**
      * @param token

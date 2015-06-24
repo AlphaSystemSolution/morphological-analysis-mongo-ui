@@ -82,6 +82,7 @@ public class DependencyGraphBuilderEditorPane extends BorderPane {
         switch (nodeType) {
             case TERMINAL:
             case EMPTY:
+            case REFERENCE:
                 addTerminalNodeProperties((TerminalNode) graphNode);
                 break;
             case PART_OF_SPEECH:

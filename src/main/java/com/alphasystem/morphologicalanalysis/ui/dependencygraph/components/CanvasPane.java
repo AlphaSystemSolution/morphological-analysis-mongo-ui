@@ -1,5 +1,6 @@
 package com.alphasystem.morphologicalanalysis.ui.dependencygraph.components;
 
+import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
 import com.alphasystem.morphologicalanalysis.graph.model.Fragment;
 import com.alphasystem.morphologicalanalysis.graph.model.Relationship;
 import com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType;
@@ -28,6 +29,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
+import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.REFERENCE;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.*;
 import static com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.DependencyGraphGraphicTool.DARK_GRAY_CLOUD;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.NOUN;
@@ -54,6 +56,7 @@ public class CanvasPane extends Pane {
     private final ContextMenu relationshipContextMenu;
     private RelationshipSelectionDialog relationshipSelectionDialog;
     private PhraseSelectionDialog phraseSelectionDialog;
+    private ReferenceNodeSelectionDialog referenceNodeSelectionDialog;
     private DependencyGraphGraphicTool tool = DependencyGraphGraphicTool.getInstance();
     private GraphBuilder graphBuilder = GraphBuilder.getInstance();
     private Pane canvasPane;
@@ -73,6 +76,7 @@ public class CanvasPane extends Pane {
         relationshipContextMenu = new ContextMenu();
         relationshipSelectionDialog = new RelationshipSelectionDialog();
         phraseSelectionDialog = new PhraseSelectionDialog();
+        referenceNodeSelectionDialog = new ReferenceNodeSelectionDialog();
         initListeners();
 
         canvasPane = new Pane();
@@ -121,6 +125,19 @@ public class CanvasPane extends Pane {
         addEmptyNodeMenu.getItems().add(createAddEmptyNodeMenuItem(source, NOUN));
         addEmptyNodeMenu.getItems().add(createAddEmptyNodeMenuItem(source, VERB));
         items.add(addEmptyNodeMenu);
+
+        MenuItem menuItem = new MenuItem("Add Reference Node ...");
+        menuItem.setOnAction(event -> {
+            DependencyGraph dependencyGraph = canvasDataObject.get().getDependencyGraph();
+            referenceNodeSelectionDialog.setChapter(dependencyGraph.getChapterNumber());
+            referenceNodeSelectionDialog.setVerse(dependencyGraph.getVerseNumber());
+            Optional<Token> result = referenceNodeSelectionDialog.showAndWait();
+            result.ifPresent(token -> {
+                addReferenceNode(source, token);
+            });
+        });
+
+        items.add(menuItem);
     }
 
     private void initRelationshipContextMenu(String currentNodeId) {
@@ -134,6 +151,7 @@ public class CanvasPane extends Pane {
             switch (nodeType) {
                 case TERMINAL:
                 case EMPTY:
+                case REFERENCE:
                     TerminalNode tn = (TerminalNode) graphNode;
                     ObservableList<PartOfSpeechNode> partOfSpeeches = tn.getPartOfSpeeches();
                     for (PartOfSpeechNode partOfSpeech : partOfSpeeches) {
@@ -244,7 +262,7 @@ public class CanvasPane extends Pane {
         return menuItem;
     }
 
-    private void addEmptyNode(Text selectedText, PartOfSpeech partOfSpeech) {
+    private Line getReferenceLine(Text selectedText) {
         Group parent = (Group) selectedText.getParent();
         ObservableList<Node> children = parent.getChildren();
         Line line = null;
@@ -256,9 +274,23 @@ public class CanvasPane extends Pane {
         }
         if (line == null) {
             showAlert(INFORMATION, "No line found.", null);
-            return;
+            return null;
         }
-        addEmptyNode(line, partOfSpeech);
+        return line;
+    }
+
+    private void addReferenceNode(Text selectedText, Token token) {
+        Line line = getReferenceLine(selectedText);
+        if (line != null) {
+            addReferenceNode(line, token);
+        }
+    }
+
+    private void addEmptyNode(Text selectedText, PartOfSpeech partOfSpeech) {
+        Line line = getReferenceLine(selectedText);
+        if (line != null) {
+            addEmptyNode(line, partOfSpeech);
+        }
     }
 
     private void initListeners() {
@@ -372,6 +404,7 @@ public class CanvasPane extends Pane {
             switch (nodeType) {
                 case TERMINAL:
                 case EMPTY:
+                case REFERENCE:
                     buildTerminalNode((TerminalNode) node);
                     break;
                 case RELATIONSHIP:
@@ -395,6 +428,19 @@ public class CanvasPane extends Pane {
         CanvasData canvasData = canvasDataObject.get();
         canvasData.getDependencyGraph().getTokens().add(emptyNode.getToken());
         canvasData.getNodes().add(emptyNode);
+        canvasDataObject.setValue(null);
+        canvasDataObject.setValue(canvasData);
+    }
+
+    private void addReferenceNode(Line referenceLine, Token token) {
+        // Step 1: call GraphBuilder to create an reference node
+        ReferenceNode referenceNode = graphBuilder.buildReferenceNode(referenceLine, token);
+
+        // add this node into existing list of nodes and
+        // update canvasDataObject for changes to take effect
+        CanvasData canvasData = canvasDataObject.get();
+        canvasData.getDependencyGraph().getTokens().add(referenceNode.getToken());
+        canvasData.getNodes().add(referenceNode);
         canvasDataObject.setValue(null);
         canvasDataObject.setValue(canvasData);
     }
@@ -458,7 +504,8 @@ public class CanvasPane extends Pane {
         Line line = drawLine(tn);
 
         Token token = tn.getToken();
-        boolean hiddenOrEmptyNode = token.isHidden();
+        GraphNodeType nodeType = tn.getNodeType();
+        boolean hiddenOrEmptyNode = nodeType.equals(REFERENCE) || token.isHidden();
         Color hiddenOrEmptyNodeColor = LIGHTGRAY.darker();
         Color color = hiddenOrEmptyNode ? hiddenOrEmptyNodeColor : BLACK;
 
@@ -491,7 +538,7 @@ public class CanvasPane extends Pane {
         });
 
         String id = format("trans_%s", tn.getId());
-        Text englishText = tool.drawText(id, trans, CENTER, BLACK,
+        Text englishText = tool.drawText(id, trans, CENTER, color,
                 tn.getX3(), tn.getY3(), font("Candara", REGULAR, 16));
         // bind text x and y locations
         englishText.xProperty().bind(tn.x3Property());

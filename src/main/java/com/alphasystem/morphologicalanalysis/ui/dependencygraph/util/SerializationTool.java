@@ -122,6 +122,7 @@ public class SerializationTool {
                 switch (node.getNodeType()) {
                     case TERMINAL:
                     case EMPTY:
+                    case REFERENCE:
                         loadToken((TerminalNode) node, dependencyGraph);
                         break;
                     case RELATIONSHIP:
