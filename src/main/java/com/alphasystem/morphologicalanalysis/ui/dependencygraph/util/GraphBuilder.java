@@ -3,6 +3,7 @@ package com.alphasystem.morphologicalanalysis.ui.dependencygraph.util;
 import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
 import com.alphasystem.morphologicalanalysis.graph.model.Fragment;
 import com.alphasystem.morphologicalanalysis.graph.model.Relationship;
+import com.alphasystem.morphologicalanalysis.graph.model.Terminal;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.*;
 import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
@@ -63,15 +64,15 @@ public class GraphBuilder {
     }
 
     public ObservableList<GraphNode> toGraphNodes(DependencyGraph dependencyGraph) {
-        return toGraphNodes(dependencyGraph.getTokens());
+        return toGraphNodes(dependencyGraph.getTerminals());
     }
 
-    public ObservableList<GraphNode> toGraphNodes(List<Token> tokens) {
+    public ObservableList<GraphNode> toGraphNodes(List<Terminal> terminals) {
         reset();
         ObservableList<GraphNode> results = observableArrayList();
-        // first pass add the tokens first
-        for (int i = tokens.size() - 1; i >= 0; i--) {
-            results.add(buildTerminalNode(tokens.get(i)));
+        // first pass add the terminals first
+        for (int i = terminals.size() - 1; i >= 0; i--) {
+            results.add(buildTerminalNode(terminals.get(i)));
         }
 
         reset();
@@ -173,12 +174,26 @@ public class GraphBuilder {
 
 
     /**
-     * @param token
+     * @param terminal
      * @return
      */
-    private TerminalNode buildTerminalNode(Token token) {
-        TerminalNode terminalNode = new TerminalNode(token, textX, textY, x1, y1, x2,
-                y2, x3, y3, 0.0, 0.0);
+    private TerminalNode buildTerminalNode(Terminal terminal) {
+        TerminalNode terminalNode = null;
+        Token token = terminal.getToken();
+        switch (terminal.getTerminalType()) {
+            case TERMINAL:
+                terminalNode = new TerminalNode(token, textX, textY, x1, y1, x2, y2, x3, y3, 0.0, 0.0);
+                break;
+            case EMPTY:
+                terminalNode = new EmptyNode(token, textX, textY, x1, y1, x2, y2, x3, y3, 0.0, 0.0);
+                break;
+            case HIDDEN:
+                break;
+            case REFERENCE:
+                terminalNode = new ReferenceNode(token, textX, textY, x1, y1, x2, y2, x3, y3, 0.0, 0.0);
+                break;
+        }
+
         // update counters
         rectX = x2 + GAP_BETWEEN_TOKENS;
         textX = rectX + 30;

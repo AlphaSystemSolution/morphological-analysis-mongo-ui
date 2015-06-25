@@ -4,6 +4,7 @@ import com.alphasystem.ApplicationException;
 import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
 import com.alphasystem.morphologicalanalysis.graph.model.Fragment;
 import com.alphasystem.morphologicalanalysis.graph.model.Relationship;
+import com.alphasystem.morphologicalanalysis.graph.model.Terminal;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.*;
 import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
@@ -109,7 +110,7 @@ public class SerializationTool {
                 throw new IllegalStateException(format("No dependency graph found with id {%s}", id));
             }
             canvasData.setDependencyGraph(dependencyGraph);
-            List<Token> tokens = dependencyGraph.getTokens();
+            List<Terminal> tokens = dependencyGraph.getTerminals();
             if (tokens == null || tokens.isEmpty()) {
                 throw new IllegalStateException(format("No token(s) found in dependency graph with id {%s}", id));
             }
@@ -145,9 +146,10 @@ public class SerializationTool {
     }
 
     private void loadToken(TerminalNode node, DependencyGraph dependencyGraph) {
-        List<Token> tokens = dependencyGraph.getTokens();
-        tokens.stream().filter(token -> token.getId().equals(node.getId())).forEach(token -> {
+        List<Terminal> terminals = dependencyGraph.getTerminals();
+        terminals.stream().filter(terminal -> terminal.getToken().getId().equals(node.getId())).forEach(terminal -> {
             ObservableList<PartOfSpeechNode> partOfSpeeches = node.getPartOfSpeeches();
+            Token token = terminal.getToken();
             node.setToken(token);
             List<Location> locations = token.getLocations();
             for (PartOfSpeechNode partOfSpeech : partOfSpeeches) {

@@ -1,6 +1,7 @@
 package com.alphasystem.morphologicalanalysis.util;
 
 import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
+import com.alphasystem.morphologicalanalysis.graph.model.Terminal;
 import com.alphasystem.morphologicalanalysis.graph.repository.DependencyGraphRepository;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.AbstractProperties;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Chapter;
@@ -12,6 +13,7 @@ import com.alphasystem.persistence.mongo.spring.support.ApplicationContextProvid
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -133,7 +135,11 @@ public class RepositoryTool {
 
         if (dependencyGraph == null) {
             dependencyGraph = new DependencyGraph(chapterNumber, verseNumber, firstTokenIndex, lastTokenIndex);
-            dependencyGraph.setTokens(tokens);
+            List<Terminal> terminals = new ArrayList<>();
+            for (Token token : tokens) {
+                terminals.add(new Terminal(token));
+            }
+            dependencyGraph.setTerminals(terminals);
             dependencyGraph = dependencyGraphRepository.save(dependencyGraph);
         }
 

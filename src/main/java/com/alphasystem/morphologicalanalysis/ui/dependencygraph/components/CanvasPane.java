@@ -3,7 +3,9 @@ package com.alphasystem.morphologicalanalysis.ui.dependencygraph.components;
 import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
 import com.alphasystem.morphologicalanalysis.graph.model.Fragment;
 import com.alphasystem.morphologicalanalysis.graph.model.Relationship;
+import com.alphasystem.morphologicalanalysis.graph.model.Terminal;
 import com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType;
+import com.alphasystem.morphologicalanalysis.graph.model.support.TerminalType;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.*;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.DependencyGraphGraphicTool;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.GraphBuilder;
@@ -30,6 +32,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.REFERENCE;
+import static com.alphasystem.morphologicalanalysis.graph.model.support.TerminalType.EMPTY;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.*;
 import static com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.DependencyGraphGraphicTool.DARK_GRAY_CLOUD;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.NOUN;
@@ -419,6 +422,12 @@ public class CanvasPane extends Pane {
         }
     }
 
+    private List<Token> getTokens(List<Terminal> terminals) {
+        List<Token> tokens = new ArrayList<>();
+        terminals.forEach(terminal -> tokens.add(terminal.getToken()));
+        return tokens;
+    }
+
     private void addEmptyNode(Line referenceLine, PartOfSpeech partOfSpeech) {
         // Step 1: call GraphBuilder to create an empty node
         EmptyNode emptyNode = graphBuilder.buildEmptyNode(referenceLine, partOfSpeech);
@@ -426,9 +435,9 @@ public class CanvasPane extends Pane {
         // add this node into existing list of nodes and
         // update canvasDataObject for changes to take effect
         CanvasData canvasData = canvasDataObject.get();
-        List<Token> tokens = canvasData.getDependencyGraph().getTokens();
+        List<Token> tokens = getTokens(canvasData.getDependencyGraph().getTerminals());
         int index = tokens.indexOf(firstTerminalNode.getToken());
-        tokens.add(index, emptyNode.getToken());
+        canvasData.getDependencyGraph().getTerminals().add(index, new Terminal(emptyNode.getToken(), EMPTY));
         canvasData.getNodes().add(index, emptyNode);
         canvasDataObject.setValue(null);
         canvasDataObject.setValue(canvasData);
@@ -441,9 +450,10 @@ public class CanvasPane extends Pane {
         // add this node into existing list of nodes and
         // update canvasDataObject for changes to take effect
         CanvasData canvasData = canvasDataObject.get();
-        List<Token> tokens = canvasData.getDependencyGraph().getTokens();
+        List<Token> tokens = getTokens(canvasData.getDependencyGraph().getTerminals());
         int index = tokens.indexOf(firstTerminalNode.getToken());
-        tokens.add(index, referenceNode.getToken());
+        canvasData.getDependencyGraph().getTerminals().add(index, new Terminal(referenceNode.getToken(),
+                TerminalType.REFERENCE));
         canvasData.getNodes().add(index, referenceNode);
         canvasDataObject.setValue(null);
         canvasDataObject.setValue(canvasData);
