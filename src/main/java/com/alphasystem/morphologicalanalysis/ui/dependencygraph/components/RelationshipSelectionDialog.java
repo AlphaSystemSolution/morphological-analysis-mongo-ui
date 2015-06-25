@@ -1,9 +1,11 @@
 package com.alphasystem.morphologicalanalysis.ui.dependencygraph.components;
 
 import com.alphasystem.morphologicalanalysis.graph.model.Relationship;
+import com.alphasystem.morphologicalanalysis.graph.repository.RelationshipRepository;
 import com.alphasystem.morphologicalanalysis.ui.common.ComboBoxFactory;
 import com.alphasystem.morphologicalanalysis.ui.common.Global;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.LinkSupport;
+import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.RelationshipType;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -25,6 +27,8 @@ public class RelationshipSelectionDialog extends Dialog<Relationship> {
     private final Label dependentLabel;
     private final Label ownerLabel;
     private final ComboBox<RelationshipType> comboBox;
+    private final RelationshipRepository relationshipRepository = RepositoryTool.getInstance()
+            .getRepositoryUtil().getRelationshipRepository();
 
     public RelationshipSelectionDialog() {
         setTitle(getLabel("title"));
@@ -89,14 +93,19 @@ public class RelationshipSelectionDialog extends Dialog<Relationship> {
 
         setResultConverter(param -> {
             ButtonBar.ButtonData buttonData = param.getButtonData();
+            Relationship result = null;
             Relationship relationship = null;
             if (!buttonData.isCancelButton()) {
                 relationship = new Relationship();
                 relationship.setDependent(getDependentNode().getRelated());
                 relationship.setOwner(getOwnerNode().getRelated());
                 relationship.setRelationship(comboBox.getSelectionModel().getSelectedItem());
+                result = relationshipRepository.findByDisplayName(relationship.getDisplayName());
+                if(result == null){
+                    result = relationship;
+                }
             }
-            return relationship;
+            return result;
         });
         getDialogPane().getButtonTypes().addAll(OK, CANCEL);
         Button okButton = (Button) getDialogPane().lookupButton(OK);

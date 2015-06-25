@@ -426,8 +426,10 @@ public class CanvasPane extends Pane {
         // add this node into existing list of nodes and
         // update canvasDataObject for changes to take effect
         CanvasData canvasData = canvasDataObject.get();
-        canvasData.getDependencyGraph().getTokens().add(emptyNode.getToken());
-        canvasData.getNodes().add(emptyNode);
+        List<Token> tokens = canvasData.getDependencyGraph().getTokens();
+        int index = tokens.indexOf(firstTerminalNode.getToken());
+        tokens.add(index, emptyNode.getToken());
+        canvasData.getNodes().add(index, emptyNode);
         canvasDataObject.setValue(null);
         canvasDataObject.setValue(canvasData);
     }
@@ -439,8 +441,10 @@ public class CanvasPane extends Pane {
         // add this node into existing list of nodes and
         // update canvasDataObject for changes to take effect
         CanvasData canvasData = canvasDataObject.get();
-        canvasData.getDependencyGraph().getTokens().add(referenceNode.getToken());
-        canvasData.getNodes().add(referenceNode);
+        List<Token> tokens = canvasData.getDependencyGraph().getTokens();
+        int index = tokens.indexOf(firstTerminalNode.getToken());
+        tokens.add(index, referenceNode.getToken());
+        canvasData.getNodes().add(index, referenceNode);
         canvasDataObject.setValue(null);
         canvasDataObject.setValue(canvasData);
     }
@@ -538,7 +542,8 @@ public class CanvasPane extends Pane {
         });
 
         String id = format("trans_%s", tn.getId());
-        Text englishText = tool.drawText(id, trans, CENTER, color,
+        Color transColor = hiddenOrEmptyNode ? hiddenOrEmptyNodeColor : BLACK;
+        Text englishText = tool.drawText(id, trans, CENTER, transColor,
                 tn.getX3(), tn.getY3(), font("Candara", REGULAR, 16));
         // bind text x and y locations
         englishText.xProperty().bind(tn.x3Property());
@@ -597,8 +602,6 @@ public class CanvasPane extends Pane {
 
     private void buildRelationshipNode(RelationshipNode rn) {
         Color color = rn.getStroke();
-        LinkSupport dependentNode = rn.getDependentNode();
-        LinkSupport ownerNode = rn.getOwnerNode();
         CubicCurve cubicCurve = tool.drawCubicCurve(rn.getId(), rn.getStartX(),
                 rn.getStartY(), rn.getControlX1(), rn.getControlY1(), rn.getControlX2(),
                 rn.getControlY2(), rn.getEndX(), rn.getEndY(),
@@ -623,6 +626,7 @@ public class CanvasPane extends Pane {
             if (event.isPopupTrigger()) {
                 // TODO:
             } else {
+                System.out.println("RN: " + rn.getRelationship().getDisplayName());
                 // single click, populate editor with this node
                 canvasDataObject.get().setSelectedNode(rn);
             }

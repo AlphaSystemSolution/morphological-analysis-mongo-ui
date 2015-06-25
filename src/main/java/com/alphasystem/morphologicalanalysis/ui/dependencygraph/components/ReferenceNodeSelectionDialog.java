@@ -89,10 +89,12 @@ public class ReferenceNodeSelectionDialog extends Dialog<Token> {
         if (lastVerse >= 10) {
             firstVerse = lastVerse - 10 + 1;
         }
-        for (int i = firstVerse; i <= lastVerse; i++) {
-            Verse verse = verseRepository.findByChapterNumberAndVerseNumber(getChapter(), i);
-            verseComboBox.getItems().add(verse);
-        }
+        // both to and from are excluded
+        firstVerse--;
+        lastVerse++;
+        verseComboBox.getItems().addAll(verseRepository.findByChapterNumberAndVerseNumberBetween(
+                getChapter(), firstVerse, lastVerse));
+
         int lastIndex = verseComboBox.getItems().size() - 1;
         verseComboBox.getSelectionModel().select(lastIndex);
         loadTokens(verseComboBox.getItems().get(lastIndex));
