@@ -3,7 +3,6 @@ package com.alphasystem.morphologicalanalysis.ui.dependencygraph;
 import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.components.CanvasPane;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.components.ControlPane;
-import com.alphasystem.morphologicalanalysis.ui.dependencygraph.components.NodeSelectionDialog;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.CanvasData;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.CanvasMetaData;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.GraphBuilder;
@@ -29,7 +28,6 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
-import java.util.Optional;
 
 import static com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.SerializationTool.MDG_EXTENSION_ALL;
 import static com.alphasystem.util.AppUtil.CURRENT_USER_DIR;
@@ -59,8 +57,6 @@ public class TreeBankPane extends BorderPane {
 
     private ScrollPane scrollPane;
 
-    private NodeSelectionDialog dialog;
-
     private GraphBuilder graphBuilder = GraphBuilder.getInstance();
 
     private SerializationTool serializationTool = SerializationTool.getInstance();
@@ -78,7 +74,6 @@ public class TreeBankPane extends BorderPane {
     public TreeBankPane(DependencyGraph dependencyGraph) {
         super();
 
-        dialog = new NodeSelectionDialog();
         setTop(createMenuBar());
         initPane(createFromGraph(dependencyGraph));
         fileChooser.setInitialDirectory(CURRENT_USER_DIR);
@@ -164,22 +159,10 @@ public class TreeBankPane extends BorderPane {
 
         items.add(new SeparatorMenuItem());
 
-        Menu subMenu = new Menu("Operations");
+        Menu subMenu;
+        // subMenu = new Menu("Operations");
 
-        menuItem = new MenuItem("Import Tokens ...");
-        menuItem.setAccelerator(new KeyCodeCombination(I, CONTROL_DOWN));
-        menuItem.setOnAction(event -> {
-            getScene().setCursor(WAIT);
-            runLater(() -> {
-                Optional<DependencyGraph> result = dialog.showAndWait();
-                result.ifPresent(dg -> {
-                    updateCanvas(dg);
-                });
-
-            });
-        });
-        subMenu.getItems().add(menuItem);
-        items.add(subMenu);
+        //items.add(subMenu);
 
         subMenu = new Menu("Export");
 

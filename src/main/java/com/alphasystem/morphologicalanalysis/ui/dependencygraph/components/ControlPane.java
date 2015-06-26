@@ -10,16 +10,13 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 
 import static javafx.geometry.Pos.CENTER;
 import static javafx.geometry.Side.TOP;
-import static javafx.scene.control.ScrollPane.ScrollBarPolicy.AS_NEEDED;
 import static javafx.scene.control.TabPane.TabClosingPolicy.UNAVAILABLE;
 
 /**
@@ -32,7 +29,6 @@ public class ControlPane extends BorderPane {
     private final DoubleProperty canvasHeight;
 
     private PropertiesPane propertiesPane;
-    private DependencyGraphTreeView tree;
     private DependencyGraphBuilderEditorPane editorPane;
 
     public ControlPane(CanvasData canvasData) {
@@ -47,9 +43,6 @@ public class ControlPane extends BorderPane {
         vBox.setPadding(new Insets(5, 5, 5, 5));
 
         ObservableList<GraphNode> nodes = canvasData.getNodes();
-
-        // init tree
-        tree = new DependencyGraphTreeView(nodes);
 
         // init editor pane
         GraphNode graphNode = new TerminalNode();
@@ -66,9 +59,6 @@ public class ControlPane extends BorderPane {
             if (oldHeight != newHeight) {
                 editorPane.updateHeight((Double) newHeight);
             }
-        });
-        tree.selectedNodeProperty().addListener((observable, oldValue, newValue) -> {
-            editorPane.initPane(newValue);
         });
         canvasData.selectedNodeProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
@@ -90,8 +80,6 @@ public class ControlPane extends BorderPane {
         borderPane.setCenter(editorPane);
 
         // removing tree tab for now, it should be removed all together in future commits
-        @SuppressWarnings({"unused"})
-        Tab treeTab = new Tab("Dependency Graph Tree", initTreePane());
         tabPane.getTabs().addAll(new Tab("Properties", propertiesPane),
                 new Tab("Dependency Graph Controls", borderPane));
 
@@ -111,19 +99,7 @@ public class ControlPane extends BorderPane {
     }
 
     private void updateBuilderPane(CanvasData newValue) {
-        tree.initChildren(newValue.getNodes());
         requestLayout();
     }
 
-    private Pane initTreePane() {
-        BorderPane borderPane = new BorderPane();
-        ScrollPane scrollPane = new ScrollPane();
-        scrollPane.setHbarPolicy(AS_NEEDED);
-        scrollPane.setVbarPolicy(AS_NEEDED);
-        scrollPane.setContent(tree);
-        borderPane.setCenter(scrollPane);
-        borderPane.setMinSize(USE_PREF_SIZE, USE_PREF_SIZE);
-        borderPane.setMaxSize(USE_PREF_SIZE, USE_PREF_SIZE);
-        return borderPane;
-    }
 }
