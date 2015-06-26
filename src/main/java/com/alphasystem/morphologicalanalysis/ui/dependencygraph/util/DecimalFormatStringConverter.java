@@ -46,7 +46,6 @@ public class DecimalFormatStringConverter extends StringConverter<Double> {
             result = (Double) decimalFormat.parse(value);
         } catch (ParseException e) {
             // there is non-digit number, filter out numbers only
-            System.out.println("Original  value: " + value);
             StringBuilder builder = new StringBuilder();
             char[] chars = value.toCharArray();
             for (char c : chars) {
@@ -54,7 +53,6 @@ public class DecimalFormatStringConverter extends StringConverter<Double> {
                     builder.append(c);
                 }
             }
-            System.out.println("Final value: " + builder.toString());
             result = fromString(builder.toString());
         }
         return result;

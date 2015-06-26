@@ -636,7 +636,6 @@ public class CanvasPane extends Pane {
             if (event.isPopupTrigger()) {
                 // TODO:
             } else {
-                System.out.println("RN: " + rn.getRelationship().getDisplayName());
                 // single click, populate editor with this node
                 canvasDataObject.get().setSelectedNode(rn);
             }

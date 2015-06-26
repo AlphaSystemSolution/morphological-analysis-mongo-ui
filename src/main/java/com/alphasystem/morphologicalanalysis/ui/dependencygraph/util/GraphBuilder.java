@@ -206,8 +206,12 @@ public class GraphBuilder {
     private void updatePartOfSpeechNode(PartOfSpeechNode posNode, double posX) {
         posNode.setX(posX);
         posNode.setY(textY);
-        posNode.setCx(posX + 15);
-        posNode.setCy(textY + 15);
+        double x = posX + 20;
+        x = x + (x % 20);
+        posNode.setCx(x);
+        x = textY + 20;
+        x = x + (x % 20);
+        posNode.setCy(x);
     }
 
     private void reset() {
