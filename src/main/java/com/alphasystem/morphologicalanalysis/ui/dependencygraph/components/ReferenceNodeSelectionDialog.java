@@ -1,10 +1,11 @@
 package com.alphasystem.morphologicalanalysis.ui.dependencygraph.components;
 
+import com.alphasystem.morphologicalanalysis.graph.model.Terminal;
+import com.alphasystem.morphologicalanalysis.graph.repository.TerminalRepository;
 import com.alphasystem.morphologicalanalysis.ui.common.TokenListCell;
 import com.alphasystem.morphologicalanalysis.ui.common.VerseListCell;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Verse;
-import com.alphasystem.morphologicalanalysis.wordbyword.repository.TokenRepository;
 import com.alphasystem.morphologicalanalysis.wordbyword.repository.VerseRepository;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -15,6 +16,7 @@ import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 
+import static com.alphasystem.morphologicalanalysis.graph.model.support.TerminalType.REFERENCE;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.RESOURCE_BUNDLE;
 import static com.alphasystem.morphologicalanalysis.util.RepositoryTool.getInstance;
 import static javafx.scene.control.ButtonType.CANCEL;
@@ -24,14 +26,14 @@ import static javafx.scene.control.ButtonType.OK;
 /**
  * @author sali
  */
-public class ReferenceNodeSelectionDialog extends Dialog<Token> {
+public class ReferenceNodeSelectionDialog extends Dialog<Terminal> {
 
     private final IntegerProperty chapter;
     private final IntegerProperty verse;
     private final ComboBox<Token> tokenComboBox;
     private final ComboBox<Verse> verseComboBox;
-    private final TokenRepository tokenRepository = getInstance().getRepositoryUtil().getTokenRepository();
     private final VerseRepository verseRepository = getInstance().getRepositoryUtil().getVerseRepository();
+    private final TerminalRepository terminalRepository = getInstance().getRepositoryUtil().getTerminalRepository();
 
     public ReferenceNodeSelectionDialog() {
         setTitle("Select Reference Node");
@@ -64,11 +66,16 @@ public class ReferenceNodeSelectionDialog extends Dialog<Token> {
 
         getDialogPane().getButtonTypes().addAll(OK, CANCEL);
         setResultConverter(param -> {
-            Token token = null;
+            Terminal result = null;
             if (!param.getButtonData().isCancelButton()) {
-                token = tokenComboBox.getValue();
+                Token token = tokenComboBox.getValue();
+                Terminal terminal = new Terminal(token, REFERENCE);
+                result = terminalRepository.findByDisplayName(terminal.getDisplayName());
+                if (result == null) {
+                    result = terminal;
+                }
             }
-            return token;
+            return result;
         });
     }
 

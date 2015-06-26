@@ -5,7 +5,6 @@ import com.alphasystem.morphologicalanalysis.graph.model.Fragment;
 import com.alphasystem.morphologicalanalysis.graph.model.Relationship;
 import com.alphasystem.morphologicalanalysis.graph.model.Terminal;
 import com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType;
-import com.alphasystem.morphologicalanalysis.graph.model.support.TerminalType;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.*;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.DependencyGraphGraphicTool;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.GraphBuilder;
@@ -134,9 +133,9 @@ public class CanvasPane extends Pane {
             DependencyGraph dependencyGraph = canvasDataObject.get().getDependencyGraph();
             referenceNodeSelectionDialog.setChapter(dependencyGraph.getChapterNumber());
             referenceNodeSelectionDialog.setVerse(dependencyGraph.getVerseNumber());
-            Optional<Token> result = referenceNodeSelectionDialog.showAndWait();
-            result.ifPresent(token -> {
-                addReferenceNode(source, token);
+            Optional<Terminal> result = referenceNodeSelectionDialog.showAndWait();
+            result.ifPresent(terminal -> {
+                addReferenceNode(source, terminal);
             });
         });
 
@@ -282,10 +281,10 @@ public class CanvasPane extends Pane {
         return line;
     }
 
-    private void addReferenceNode(Text selectedText, Token token) {
+    private void addReferenceNode(Text selectedText, Terminal terminal) {
         Line line = getReferenceLine(selectedText);
         if (line != null) {
-            addReferenceNode(line, token);
+            addReferenceNode(line, terminal);
         }
     }
 
@@ -443,17 +442,16 @@ public class CanvasPane extends Pane {
         canvasDataObject.setValue(canvasData);
     }
 
-    private void addReferenceNode(Line referenceLine, Token token) {
+    private void addReferenceNode(Line referenceLine, Terminal terminal) {
         // Step 1: call GraphBuilder to create an reference node
-        ReferenceNode referenceNode = graphBuilder.buildReferenceNode(referenceLine, token);
+        ReferenceNode referenceNode = graphBuilder.buildReferenceNode(referenceLine, terminal.getToken());
 
         // add this node into existing list of nodes and
         // update canvasDataObject for changes to take effect
         CanvasData canvasData = canvasDataObject.get();
         List<Token> tokens = getTokens(canvasData.getDependencyGraph().getTerminals());
         int index = tokens.indexOf(firstTerminalNode.getToken());
-        canvasData.getDependencyGraph().getTerminals().add(index, new Terminal(referenceNode.getToken(),
-                TerminalType.REFERENCE));
+        canvasData.getDependencyGraph().getTerminals().add(index, terminal);
         canvasData.getNodes().add(index, referenceNode);
         canvasDataObject.setValue(null);
         canvasDataObject.setValue(canvasData);
