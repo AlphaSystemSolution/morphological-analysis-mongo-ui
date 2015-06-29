@@ -30,7 +30,6 @@ import static javafx.scene.text.FontWeight.NORMAL;
  */
 public class DependencyGraphBuilderEditorPane extends BorderPane {
 
-
     private final DoubleProperty canvasWidth;
     private final DoubleProperty canvasHeight;
     private GraphNode graphNode;
