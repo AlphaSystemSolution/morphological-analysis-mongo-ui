@@ -6,10 +6,10 @@ import com.alphasystem.morphologicalanalysis.ui.dependencygraph.components.Contr
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.CanvasData;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.CanvasMetaData;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.GraphBuilder;
+import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.SVGExport;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.SerializationTool;
 import javafx.beans.property.ObjectProperty;
 import javafx.collections.ObservableList;
-import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Menu;
@@ -23,6 +23,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
+import org.apache.commons.io.FilenameUtils;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -33,6 +34,7 @@ import static com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.Seri
 import static com.alphasystem.util.AppUtil.CURRENT_USER_DIR;
 import static java.lang.String.format;
 import static javafx.application.Platform.runLater;
+import static javafx.embed.swing.SwingFXUtils.fromFXImage;
 import static javafx.scene.Cursor.DEFAULT;
 import static javafx.scene.Cursor.WAIT;
 import static javafx.scene.control.ScrollPane.ScrollBarPolicy.AS_NEEDED;
@@ -176,7 +178,7 @@ public class TreeBankPane extends BorderPane {
                 if (file != null) {
                     WritableImage writableImage = canvasPane.getCanvasPane().snapshot(new SnapshotParameters(), null);
                     try {
-                        ImageIO.write(SwingFXUtils.fromFXImage(writableImage, null), "png", file);
+                        ImageIO.write(fromFXImage(writableImage, null), "png", file);
                         Desktop.getDesktop().open(file);
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -184,6 +186,17 @@ public class TreeBankPane extends BorderPane {
                 }
                 getScene().setCursor(DEFAULT);
             });
+        });
+        subMenu.getItems().add(menuItem);
+
+        menuItem = new MenuItem("SVG ...");
+        menuItem.setAccelerator(new KeyCodeCombination(S, CONTROL_DOWN, ALT_DOWN));
+        menuItem.setOnAction(event -> {
+            File parentFolder = currentFile.getParentFile();
+            String baseName = FilenameUtils.getBaseName(currentFile.getAbsolutePath());
+            File svgFile = new File(parentFolder, baseName + ".svg");
+            SVGExport.export(canvasPane.canvasDataObjectProperty().get().getCanvasMetaData(),
+                    canvasPane.getCanvasPane(), svgFile);
         });
         subMenu.getItems().add(menuItem);
         items.add(subMenu);

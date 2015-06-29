@@ -1,7 +1,11 @@
 package com.alphasystem.morphologicalanalysis.ui.test;
 
+import com.alphasystem.morphologicalanalysis.ui.dependencygraph.components.CanvasPane;
+import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.CanvasData;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.CanvasMetaData;
+import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.SVGExport;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.SerializationTool;
+import com.alphasystem.morphologicalanalysis.util.SpringContextHelper;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
@@ -26,11 +30,13 @@ import static org.testng.Reporter.log;
  */
 public class SerializationTest {
 
-    private SerializationTool serializationTool = SerializationTool.getInstance();
+    private SerializationTool serializationTool;
     private File tmpFolder;
 
     @BeforeSuite
     public void beforeSuite() {
+        SpringContextHelper.getInstance();
+        serializationTool = SerializationTool.getInstance();
         tmpFolder = new File("tmp");
         if (tmpFolder.exists()) {
             try {
@@ -79,6 +85,15 @@ public class SerializationTest {
         }
         log(format("Width: %s, Height: %s, Show Grid Lines: %s",
                 metaData.getWidth(), metaData.getHeight(), metaData.isShowGridLines()));
+    }
+
+    @Test(dependsOnMethods = {"deserializeCanvasMetaData"})
+    public void exportAsSvg() {
+        Path inPath = Paths.get("C:\\Users\\sali\\Arabic\\Notes\\dependency-graph\\001_002.mdg");
+        Path outPath = Paths.get("C:\\Users\\sali\\Arabic\\Notes\\dependency-graph\\001_002.svg");
+        CanvasData canvasData = serializationTool.open(inPath.toFile());
+        CanvasPane canvasPane = new CanvasPane(canvasData);
+        SVGExport.export(canvasData.getCanvasMetaData(), canvasPane.getCanvasPane(), outPath.toFile());
     }
 
     private File getSerializeFileName(Class<?> klass) {

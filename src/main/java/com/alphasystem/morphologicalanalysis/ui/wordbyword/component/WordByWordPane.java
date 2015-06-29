@@ -48,6 +48,7 @@ public class WordByWordPane extends BorderPane {
     private TokenEditorDialog tokenEditorDialog;
     private TableView<TableCellModel> tableView;
 
+    @SuppressWarnings({"unchecked"})
     public WordByWordPane() {
         tokenEditorDialog = new TokenEditorDialog(repositoryTool.getTokenByDisplayName("1:1:1"));
         chapterVerseSelectionPane = new ChapterVerseSelectionPane();
@@ -135,9 +136,7 @@ public class WordByWordPane extends BorderPane {
                     tokenEditorDialog.setToken(null);
                     tokenEditorDialog.setToken(token);
                     Optional<Token> result = tokenEditorDialog.showAndWait();
-                    result.ifPresent(t -> {
-                        model.setToken(t);
-                    });
+                    result.ifPresent(model::setToken);
                 }
             });
             return row;
@@ -223,6 +222,7 @@ public class WordByWordPane extends BorderPane {
         refreshTable();
     }
 
+    @SuppressWarnings({"unchecked"})
     private void refreshTable() {
         Verse selectedVerse = chapterVerseSelectionPane.getSelectedVerse();
         if (selectedVerse == null) {

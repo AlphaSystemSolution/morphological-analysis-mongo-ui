@@ -1,12 +1,9 @@
 package com.alphasystem.morphologicalanalysis.ui.dependencygraph.components;
 
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.CanvasData;
-import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.CanvasMetaData;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.GraphNode;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.TerminalNode;
-import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -25,8 +22,6 @@ import static javafx.scene.control.TabPane.TabClosingPolicy.UNAVAILABLE;
 public class ControlPane extends BorderPane {
 
     private final ObjectProperty<CanvasData> canvasDataObject;
-    private final DoubleProperty canvasWidth;
-    private final DoubleProperty canvasHeight;
 
     private PropertiesPane propertiesPane;
     private DependencyGraphBuilderEditorPane editorPane;
@@ -34,9 +29,6 @@ public class ControlPane extends BorderPane {
     public ControlPane(CanvasData canvasData) {
 
         canvasDataObject = new SimpleObjectProperty<>(canvasData);
-        CanvasMetaData canvasMetaData = canvasData.getCanvasMetaData();
-        canvasWidth = new SimpleDoubleProperty(canvasMetaData.getWidth());
-        canvasHeight = new SimpleDoubleProperty(canvasMetaData.getHeight());
 
         VBox vBox = new VBox(10);
         vBox.setAlignment(CENTER);
@@ -50,16 +42,7 @@ public class ControlPane extends BorderPane {
             graphNode = nodes.get(0);
         }
         editorPane = new DependencyGraphBuilderEditorPane(graphNode);
-        canvasWidth.addListener((observable1, oldWidth, newWidth) -> {
-            if (oldWidth != newWidth) {
-                editorPane.updateWidth((Double) newWidth);
-            }
-        });
-        canvasHeight.addListener((observable1, oldHeight, newHeight) -> {
-            if (oldHeight != newHeight) {
-                editorPane.updateHeight((Double) newHeight);
-            }
-        });
+
         canvasData.selectedNodeProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
                 editorPane.initPane(newValue);
@@ -67,7 +50,13 @@ public class ControlPane extends BorderPane {
         });
 
 
-        propertiesPane = new PropertiesPane(canvasMetaData);
+        propertiesPane = new PropertiesPane(canvasData.getCanvasMetaData());
+        propertiesPane.getWidthField().valueProperty().addListener((observable, oldValue, newValue) -> {
+            editorPane.setCanvasWidth(newValue);
+        });
+        propertiesPane.getHeightField().valueProperty().addListener((observable, oldValue, newValue) -> {
+            editorPane.setCanvasHeight(newValue);
+        });
 
         TabPane tabPane = new TabPane();
         tabPane.setMinSize(USE_PREF_SIZE, USE_PREF_SIZE);

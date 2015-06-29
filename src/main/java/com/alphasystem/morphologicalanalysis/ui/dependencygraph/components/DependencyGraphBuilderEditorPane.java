@@ -3,6 +3,8 @@ package com.alphasystem.morphologicalanalysis.ui.dependencygraph.components;
 import com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.*;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.DecimalFormatStringConverter;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
@@ -28,16 +30,23 @@ import static javafx.scene.text.FontWeight.NORMAL;
  */
 public class DependencyGraphBuilderEditorPane extends BorderPane {
 
-    private double canvasWidth;
-    private double canvasHeight;
+
+    private final DoubleProperty canvasWidth;
+    private final DoubleProperty canvasHeight;
     private GraphNode graphNode;
     private GridPane gridPane;
     private int row = 0;
 
     public DependencyGraphBuilderEditorPane(GraphNode graphNode) {
         this.graphNode = graphNode;
-        canvasWidth = 800;
-        canvasHeight = 400;
+        canvasWidth = new SimpleDoubleProperty();
+        canvasHeight = new SimpleDoubleProperty();
+        canvasWidthProperty().addListener((observable, oldValue, newValue) -> {
+            initPane(this.graphNode);
+        });
+        canvasHeightProperty().addListener((observable, oldValue, newValue) -> {
+            initPane(this.graphNode);
+        });
 
         gridPane = new GridPane();
         gridPane.setAlignment(CENTER);
@@ -45,7 +54,8 @@ public class DependencyGraphBuilderEditorPane extends BorderPane {
         gridPane.setVgap(10);
         gridPane.setPadding(new Insets(5, 5, 5, 5));
 
-        initPane(this.graphNode);
+        setCanvasWidth(800);
+        setCanvasHeight(400);
 
         ScrollPane scrollPane = new ScrollPane();
         scrollPane.setVbarPolicy(ALWAYS);
@@ -62,14 +72,28 @@ public class DependencyGraphBuilderEditorPane extends BorderPane {
         return RESOURCE_BUNDLE.getString(format("%s_node.label", node.getNodeType().name()));
     }
 
-    void updateWidth(double width) {
-        this.canvasWidth = width;
-        initPane(graphNode);
+    public final double getCanvasWidth() {
+        return canvasWidth.get();
     }
 
-    void updateHeight(double height) {
-        this.canvasHeight = height;
-        initPane(graphNode);
+    public final void setCanvasWidth(double canvasWidth) {
+        this.canvasWidth.set(canvasWidth);
+    }
+
+    public final DoubleProperty canvasWidthProperty() {
+        return canvasWidth;
+    }
+
+    public final double getCanvasHeight() {
+        return canvasHeight.get();
+    }
+
+    public final void setCanvasHeight(double canvasHeight) {
+        this.canvasHeight.set(canvasHeight);
+    }
+
+    public final DoubleProperty canvasHeightProperty() {
+        return canvasHeight;
     }
 
     void initPane(GraphNode graphNode) {
@@ -124,19 +148,19 @@ public class DependencyGraphBuilderEditorPane extends BorderPane {
 
         row++;
 
-        addFields("xIndex.label", GraphNode::getX, GraphNode::setX, node, canvasWidth);
-        addFields("yIndex.label", GraphNode::getY, GraphNode::setY, node, canvasHeight);
+        addFields("xIndex.label", GraphNode::getX, GraphNode::setX, node, getCanvasWidth());
+        addFields("yIndex.label", GraphNode::getY, GraphNode::setY, node, getCanvasHeight());
         gridPane.add(new Separator(), 0, row, 2, 1);
     }
 
     private void addTerminalNodeProperties(TerminalNode node) {
         row++;
-        addFields("startXIndex.label", TerminalNode::getX1, TerminalNode::setX1, node, canvasWidth);
-        addFields("startYIndex.label", TerminalNode::getY1, TerminalNode::setY1, node, canvasHeight);
-        addFields("endXIndex.label", TerminalNode::getX2, TerminalNode::setX2, node, canvasWidth);
-        addFields("endYIndex.label", TerminalNode::getY2, TerminalNode::setY2, node, canvasHeight);
-        addFields("tanslationXIndex.label", TerminalNode::getX3, TerminalNode::setX3, node, canvasWidth);
-        addFields("tanslationYIndex.label", TerminalNode::getY3, TerminalNode::setY3, node, canvasHeight);
+        addFields("startXIndex.label", TerminalNode::getX1, TerminalNode::setX1, node, getCanvasWidth());
+        addFields("startYIndex.label", TerminalNode::getY1, TerminalNode::setY1, node, getCanvasHeight());
+        addFields("endXIndex.label", TerminalNode::getX2, TerminalNode::setX2, node, getCanvasWidth());
+        addFields("endYIndex.label", TerminalNode::getY2, TerminalNode::setY2, node, getCanvasHeight());
+        addFields("tanslationXIndex.label", TerminalNode::getX3, TerminalNode::setX3, node, getCanvasWidth());
+        addFields("tanslationYIndex.label", TerminalNode::getY3, TerminalNode::setY3, node, getCanvasHeight());
         gridPane.add(new Separator(), 0, row, 2, 1);
 
         row++;
@@ -148,15 +172,15 @@ public class DependencyGraphBuilderEditorPane extends BorderPane {
 
         row++;
         addFields("groupTranslateX.label", TerminalNode::getTranslateX, TerminalNode::setTranslateX,
-                node, canvasWidth);
+                node, getCanvasWidth());
         addFields("groupTranslateY.label", TerminalNode::getTranslateY, TerminalNode::setTranslateY,
-                node, canvasHeight);
+                node, getCanvasHeight());
     }
 
     private void addPartOfSpeechProperties(PartOfSpeechNode node) {
         row++;
-        addFields("posCx.label", PartOfSpeechNode::getCx, PartOfSpeechNode::setCx, node, canvasWidth);
-        addFields("posCy.label", PartOfSpeechNode::getCy, PartOfSpeechNode::setCy, node, canvasHeight);
+        addFields("posCx.label", PartOfSpeechNode::getCx, PartOfSpeechNode::setCx, node, getCanvasWidth());
+        addFields("posCy.label", PartOfSpeechNode::getCy, PartOfSpeechNode::setCy, node, getCanvasHeight());
     }
 
     private void addRelationshipNodeProperties(RelationshipNode node) {
@@ -165,13 +189,13 @@ public class DependencyGraphBuilderEditorPane extends BorderPane {
         // addFields("startX.label", RelationshipNode::getStartX, RelationshipNode::setStartX, node, canvasWidth);
         // addFields("startY.label", RelationshipNode::getStartY, RelationshipNode::setStartY, node, canvasHeight);
         addFields("controlX1.label", RelationshipNode::getControlX1, RelationshipNode::setControlX1,
-                node, canvasWidth);
+                node, getCanvasWidth());
         addFields("controlY1.label", RelationshipNode::getControlY1, RelationshipNode::setControlY1,
-                node, canvasHeight);
+                node, getCanvasHeight());
         addFields("controlX2.label", RelationshipNode::getControlX2, RelationshipNode::setControlX2,
-                node, canvasWidth);
+                node, getCanvasWidth());
         addFields("controlY2.label", RelationshipNode::getControlY2, RelationshipNode::setControlY2,
-                node, canvasHeight);
+                node, getCanvasHeight());
 
         Label label;
         Spinner<Double> spinner;
@@ -200,12 +224,12 @@ public class DependencyGraphBuilderEditorPane extends BorderPane {
 
     private void addPhraseNode(PhraseNode node) {
         row++;
-        addFields("startXIndex.label", PhraseNode::getX1, PhraseNode::setX1, node, canvasWidth);
-        addFields("startYIndex.label", PhraseNode::getY1, PhraseNode::setY1, node, canvasHeight);
-        addFields("endXIndex.label", PhraseNode::getX2, PhraseNode::setX2, node, canvasWidth);
-        addFields("endYIndex.label", PhraseNode::getY2, PhraseNode::setY2, node, canvasHeight);
-        addFields("posCx.label", PhraseNode::getCx, PhraseNode::setCx, node, canvasWidth);
-        addFields("posCy.label", PhraseNode::getCy, PhraseNode::setCy, node, canvasHeight);
+        addFields("startXIndex.label", PhraseNode::getX1, PhraseNode::setX1, node, getCanvasWidth());
+        addFields("startYIndex.label", PhraseNode::getY1, PhraseNode::setY1, node, getCanvasHeight());
+        addFields("endXIndex.label", PhraseNode::getX2, PhraseNode::setX2, node, getCanvasWidth());
+        addFields("endYIndex.label", PhraseNode::getY2, PhraseNode::setY2, node, getCanvasHeight());
+        addFields("posCx.label", PhraseNode::getCx, PhraseNode::setCx, node, getCanvasWidth());
+        addFields("posCy.label", PhraseNode::getCy, PhraseNode::setCy, node, getCanvasHeight());
     }
 
     private Spinner<Double> getSpinner(double min, double max, double initialValue) {

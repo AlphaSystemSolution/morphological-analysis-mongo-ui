@@ -22,6 +22,17 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<systemProperties>
+						<mongo.db.name>MORPHOLOGICAL_ANALYSIS_DB</mongo.db.name>
+						<graph.db.name>MORPHOLOGICAL_ANALYSIS_DB</graph.db.name>
+						<quranic-text>quran-simple-enhanced</quranic-text>
+					</systemProperties>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 	<dependencies>
@@ -76,11 +87,11 @@
 			<artifactId>batik-swing</artifactId>
 			<version>${batik.version}</version>
 		</dependency-->
-		<!--dependency>
+		<dependency>
 			<groupId>com.alphasystem.svg</groupId>
 			<artifactId>svg-model</artifactId>
 			<version>${svg-model.version}</version>
-		</dependency-->
+		</dependency>
 		<dependency>
 			<groupId>org.testng</groupId>
 			<artifactId>testng</artifactId>
@@ -102,6 +113,6 @@
 		<keyboard-ui.version>${project.version}</keyboard-ui.version>
 		<maven.test.skip>true</maven.test.skip>
 		<genOutputDirectory>${project.build.directory}/generated/src/main/java</genOutputDirectory>
-		<mainClass>com.alphasystem.morphologicalanalysis.ui.MorphologicalAnalysisMain</mainClass>
+		<mainClass>com.alphasystem.morphologicalanalysis.ui.wordbyword.WordByWordApp</mainClass>
 	</properties>
 </project>

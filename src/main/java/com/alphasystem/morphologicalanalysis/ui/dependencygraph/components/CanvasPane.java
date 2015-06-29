@@ -5,9 +5,12 @@ import com.alphasystem.morphologicalanalysis.graph.model.Fragment;
 import com.alphasystem.morphologicalanalysis.graph.model.Relationship;
 import com.alphasystem.morphologicalanalysis.graph.model.Terminal;
 import com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType;
+import com.alphasystem.morphologicalanalysis.graph.repository.RelationshipRepository;
+import com.alphasystem.morphologicalanalysis.graph.repository.TerminalRepository;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.*;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.DependencyGraphGraphicTool;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.GraphBuilder;
+import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech;
@@ -55,7 +58,12 @@ public class CanvasPane extends Pane {
     private static final double RADIUS = 2.0;
     private final ObjectProperty<CanvasData> canvasDataObject;
     private final ContextMenu terminalContextMenu;
+    private final ContextMenu partOfSpeechContextMenu;
     private final ContextMenu relationshipContextMenu;
+    private TerminalRepository terminalRepository = RepositoryTool.getInstance()
+            .getRepositoryUtil().getTerminalRepository();
+    private RelationshipRepository relationshipRepository = RepositoryTool.getInstance()
+            .getRepositoryUtil().getRelationshipRepository();
     private RelationshipSelectionDialog relationshipSelectionDialog;
     private PhraseSelectionDialog phraseSelectionDialog;
     private ReferenceNodeSelectionDialog referenceNodeSelectionDialog;
@@ -75,6 +83,7 @@ public class CanvasPane extends Pane {
         int width = metaData.getWidth();
         int height = metaData.getHeight();
         terminalContextMenu = new ContextMenu();
+        partOfSpeechContextMenu = new ContextMenu();
         relationshipContextMenu = new ContextMenu();
         relationshipSelectionDialog = new RelationshipSelectionDialog();
         phraseSelectionDialog = new PhraseSelectionDialog();
@@ -134,16 +143,14 @@ public class CanvasPane extends Pane {
             referenceNodeSelectionDialog.setChapter(dependencyGraph.getChapterNumber());
             referenceNodeSelectionDialog.setVerse(dependencyGraph.getVerseNumber());
             Optional<Terminal> result = referenceNodeSelectionDialog.showAndWait();
-            result.ifPresent(terminal -> {
-                addReferenceNode(source, terminal);
-            });
+            result.ifPresent(terminal -> addReferenceNode(source, terminal));
         });
 
         items.add(menuItem);
     }
 
-    private void initRelationshipContextMenu(String currentNodeId) {
-        ObservableList<MenuItem> items = relationshipContextMenu.getItems();
+    private void initPartOfSpeechContextMenu(String currentNodeId) {
+        ObservableList<MenuItem> items = partOfSpeechContextMenu.getItems();
         items.remove(0, items.size());
 
         Menu menu = new Menu("Make Relationship");
@@ -174,6 +181,35 @@ public class CanvasPane extends Pane {
         items.add(menu);
     }
 
+    private void initRelationshipContextMenu(Text text) {
+        ObservableList<MenuItem> items = relationshipContextMenu.getItems();
+        items.remove(0, items.size());
+
+        MenuItem menuItem = new MenuItem("Remove");
+        menuItem.setUserData(text);
+        menuItem.setOnAction(event -> {
+            MenuItem source = (MenuItem) event.getSource();
+            Text selectedText = (Text) source.getUserData();
+            RelationshipNode relationshipNode = (RelationshipNode) selectedText.getUserData();
+            removeRelationship(relationshipNode);
+        });
+        items.add(menuItem);
+    }
+
+    private void removeRelationship(RelationshipNode relationshipNode) {
+        Relationship relationship = relationshipNode.getRelationship();
+        CanvasData canvasData = canvasDataObject.get();
+
+        canvasData.getNodes().remove(relationshipNode);
+        boolean removed = canvasData.getDependencyGraph().getRelationships().remove(relationship);
+        if (removed) {
+            relationshipRepository.delete(relationship.getId());
+        }
+
+        canvasDataObject.setValue(null);
+        canvasDataObject.setValue(canvasData);
+    }
+
     private MenuItem createPhraseMenuItem(TerminalNode terminalNode) {
         Text text = new Text(terminalNode.getText());
         text.setFont(ARABIC_FONT_SMALL_BOLD);
@@ -196,7 +232,7 @@ public class CanvasPane extends Pane {
                 tmp = null;
                 firstTokenTokenNumber = firstTerminalNode.getToken().getTokenNumber();
                 lastTokenTokenNumber = lastTerminalNode.getToken().getTokenNumber();
-            } else if (firstTokenTokenNumber == lastTokenTokenNumber) {
+            } else if (firstTokenTokenNumber.equals(lastTokenTokenNumber)) {
                 lastTokenTokenNumber--;
             }
             lastTokenTokenNumber++;
@@ -312,7 +348,7 @@ public class CanvasPane extends Pane {
         metaData.debugModeProperty().addListener((observable, oldValue, newValue) -> {
             initCanvas();
         });
-        canvasDataObject.addListener((observable, oldValue, newData) -> {
+        canvasDataObjectProperty().addListener((observable, oldValue, newData) -> {
             if (newData != null) {
                 ObservableList<GraphNode> nodes = newData.getNodes();
                 if (nodes != null && !nodes.isEmpty()) {
@@ -320,16 +356,6 @@ public class CanvasPane extends Pane {
                 }
             }
         });
-    }
-
-    @SuppressWarnings({"unused"})
-    public CanvasData getCanvasDataObject() {
-        return canvasDataObject.get();
-    }
-
-    @SuppressWarnings({"unused"})
-    public void setCanvasDataObject(CanvasData canvasDataObject) {
-        this.canvasDataObject.set(canvasDataObject);
     }
 
     public final ObjectProperty<CanvasData> canvasDataObjectProperty() {
@@ -436,7 +462,12 @@ public class CanvasPane extends Pane {
         CanvasData canvasData = canvasDataObject.get();
         List<Token> tokens = getTokens(canvasData.getDependencyGraph().getTerminals());
         int index = tokens.indexOf(firstTerminalNode.getToken());
-        canvasData.getDependencyGraph().getTerminals().add(index, new Terminal(emptyNode.getToken(), EMPTY));
+        Terminal terminal = new Terminal(emptyNode.getToken(), EMPTY);
+        Terminal result = terminalRepository.findByDisplayName(terminal.getDisplayName());
+        if (result == null) {
+            result = terminal;
+        }
+        canvasData.getDependencyGraph().getTerminals().add(index, result);
         canvasData.getNodes().add(index, emptyNode);
         canvasDataObject.setValue(null);
         canvasDataObject.setValue(canvasData);
@@ -521,8 +552,8 @@ public class CanvasPane extends Pane {
         Color hiddenOrEmptyNodeColor = LIGHTGRAY.darker();
         Color color = hiddenOrEmptyNode ? hiddenOrEmptyNodeColor : BLACK;
 
-        String tokenId = "";
-        String trans = "";
+        String tokenId;
+        String trans;
 
         tokenId = token.getDisplayName();
         trans = token.getTranslation();
@@ -574,8 +605,8 @@ public class CanvasPane extends Pane {
                 if (event.isPopupTrigger()) {
                     ownerLinkNode = null;
                     dependentLinkNode = pn;
-                    initRelationshipContextMenu(thisId);
-                    relationshipContextMenu.show(source, event.getScreenX(), event.getScreenY());
+                    initPartOfSpeechContextMenu(thisId);
+                    partOfSpeechContextMenu.show(source, event.getScreenX(), event.getScreenY());
                 } else {
                     // single click, populate editor with this node
                     canvasDataObject.get().setSelectedNode(pn);
@@ -632,7 +663,8 @@ public class CanvasPane extends Pane {
             Text source = (Text) event.getSource();
             String thisId = rn.getId();
             if (event.isPopupTrigger()) {
-                // TODO:
+                initRelationshipContextMenu(source);
+                relationshipContextMenu.show(source, event.getScreenX(), event.getScreenY());
             } else {
                 // single click, populate editor with this node
                 canvasDataObject.get().setSelectedNode(rn);
@@ -653,6 +685,7 @@ public class CanvasPane extends Pane {
 //        });
 
         Group group = new Group();
+        group.setId(format("rln_%s", rn.getRelationship().getDisplayName()));
 
         group.getChildren().addAll(cubicCurve, arabicText, triangle);
 
@@ -675,8 +708,8 @@ public class CanvasPane extends Pane {
             if (event.isPopupTrigger()) {
                 ownerLinkNode = null;
                 dependentLinkNode = pn;
-                initRelationshipContextMenu(thisId);
-                relationshipContextMenu.show(source, event.getScreenX(), event.getScreenY());
+                initPartOfSpeechContextMenu(thisId);
+                partOfSpeechContextMenu.show(source, event.getScreenX(), event.getScreenY());
             } else {
                 // single click, populate editor with this node
                 canvasDataObject.get().setSelectedNode(pn);
