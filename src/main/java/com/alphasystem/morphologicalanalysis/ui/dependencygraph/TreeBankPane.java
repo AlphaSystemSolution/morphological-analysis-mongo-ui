@@ -8,7 +8,6 @@ import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.CanvasMeta
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.GraphBuilder;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.SVGExport;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.SerializationTool;
-import javafx.beans.property.ObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
@@ -47,6 +46,8 @@ import static javafx.scene.input.KeyCombination.CONTROL_DOWN;
  */
 public class TreeBankPane extends BorderPane {
 
+    private static final String PNG_FORMATE = "png";
+    private static final String SVG_FORMAT = "svg";
     /**
      * pane for canvas
      */
@@ -65,8 +66,6 @@ public class TreeBankPane extends BorderPane {
 
     private FileChooser fileChooser = new FileChooser();
 
-    private FileChooser imageFileChooser = new FileChooser();
-
     private File currentFile;
 
     public TreeBankPane() {
@@ -82,9 +81,6 @@ public class TreeBankPane extends BorderPane {
         fileChooser.getExtensionFilters().addAll(
                 new ExtensionFilter(format("Morphology Dependency Graph file (%s)", MDG_EXTENSION_ALL),
                         MDG_EXTENSION_ALL));
-        imageFileChooser = new FileChooser();
-        imageFileChooser.setInitialDirectory(CURRENT_USER_DIR);
-        imageFileChooser.getExtensionFilters().addAll(new ExtensionFilter("PNG", "*.png"));
     }
 
     private CanvasData createFromGraph(DependencyGraph dependencyGraph) {
@@ -104,7 +100,7 @@ public class TreeBankPane extends BorderPane {
         Menu menu = new Menu("File");
         menu.setAccelerator(new KeyCodeCombination(F));
 
-        MenuItem menuItem = null;
+        MenuItem menuItem;
 
         ObservableList<MenuItem> items = menu.getItems();
 
@@ -136,9 +132,7 @@ public class TreeBankPane extends BorderPane {
                 currentFile = fileChooser.showSaveDialog(getStage());
             }
             if (currentFile != null) {
-                runLater(() -> {
-                    saveFile();
-                });
+                runLater(this::saveFile);
             } else {
                 setCursor(DEFAULT);
             }
@@ -173,12 +167,11 @@ public class TreeBankPane extends BorderPane {
         menuItem.setOnAction(event -> {
             getScene().setCursor(WAIT);
             runLater(() -> {
-                imageFileChooser.setInitialDirectory(fileChooser.getInitialDirectory());
-                File file = imageFileChooser.showSaveDialog(getStage());
+                File file = getExportFile(PNG_FORMATE);
                 if (file != null) {
                     WritableImage writableImage = canvasPane.getCanvasPane().snapshot(new SnapshotParameters(), null);
                     try {
-                        ImageIO.write(fromFXImage(writableImage, null), "png", file);
+                        ImageIO.write(fromFXImage(writableImage, null), PNG_FORMATE, file);
                         Desktop.getDesktop().open(file);
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -192,11 +185,11 @@ public class TreeBankPane extends BorderPane {
         menuItem = new MenuItem("SVG ...");
         menuItem.setAccelerator(new KeyCodeCombination(S, CONTROL_DOWN, ALT_DOWN));
         menuItem.setOnAction(event -> {
-            File parentFolder = currentFile.getParentFile();
-            String baseName = FilenameUtils.getBaseName(currentFile.getAbsolutePath());
-            File svgFile = new File(parentFolder, baseName + ".svg");
-            SVGExport.export(canvasPane.canvasDataObjectProperty().get().getCanvasMetaData(),
-                    canvasPane.getCanvasPane(), svgFile);
+            File svgFile = getExportFile(SVG_FORMAT);
+            if (svgFile != null) {
+                SVGExport.export(canvasPane.canvasDataObjectProperty().get().getCanvasMetaData(),
+                        canvasPane.getCanvasPane(), svgFile);
+            }
         });
         subMenu.getItems().add(menuItem);
         items.add(subMenu);
@@ -206,13 +199,20 @@ public class TreeBankPane extends BorderPane {
 
         menuItem = new MenuItem("Exit");
         menuItem.setAccelerator(new KeyCodeCombination(F4, ALT_DOWN));
-        menuItem.setOnAction(event -> {
-            getStage().close();
-        });
+        menuItem.setOnAction(event -> getStage().close());
         items.add(menuItem);
 
         menus.add(menu);
         return menuBar;
+    }
+
+    private File getExportFile(String ext) {
+        if (currentFile == null) {
+            return null;
+        }
+        File parentFolder = currentFile.getParentFile();
+        String baseName = FilenameUtils.getBaseName(currentFile.getAbsolutePath());
+        return new File(parentFolder, format("%s.%s", baseName, ext));
     }
 
     private void saveFile() {
@@ -224,18 +224,6 @@ public class TreeBankPane extends BorderPane {
     private Stage getStage() {
         Scene scene = getScene();
         return (Stage) scene.getWindow();
-    }
-
-    private void updateCanvas(DependencyGraph dg) {
-        ObjectProperty<CanvasData> canvasDataObjectProperty = canvasPane.canvasDataObjectProperty();
-        CanvasData canvasData = canvasDataObjectProperty.get();
-        canvasData.setDependencyGraph(dg);
-        canvasData.setNodes(graphBuilder.toGraphNodes(dg));
-        // when we are not setting null we are not getting any updates
-        // so set null first then set new value
-        canvasDataObjectProperty.set(null);
-        canvasDataObjectProperty.set(canvasData);
-        getScene().setCursor(DEFAULT);
     }
 
     private void initPane(CanvasData cd) {
