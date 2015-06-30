@@ -1,11 +1,15 @@
 package com.alphasystem.morphologicalanalysis.ui.test;
 
-import com.alphasystem.morphologicalanalysis.ui.dependencygraph.components.CanvasPane;
-import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.CanvasData;
+import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
+import com.alphasystem.morphologicalanalysis.graph.model.Relationship;
+import com.alphasystem.morphologicalanalysis.graph.repository.DependencyGraphRepository;
+import com.alphasystem.morphologicalanalysis.graph.repository.RelationshipRepository;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.CanvasMetaData;
-import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.SVGExport;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.SerializationTool;
+import com.alphasystem.morphologicalanalysis.util.MorphologicalAnalysisRepositoryUtil;
+import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
 import com.alphasystem.morphologicalanalysis.util.SpringContextHelper;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.support.RelationshipType;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
@@ -17,6 +21,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.List;
 
 import static java.lang.String.format;
 import static java.nio.file.FileVisitResult.CONTINUE;
@@ -87,13 +92,33 @@ public class SerializationTest {
                 metaData.getWidth(), metaData.getHeight(), metaData.isShowGridLines()));
     }
 
-    @Test(dependsOnMethods = {"deserializeCanvasMetaData"})
-    public void exportAsSvg() {
-        Path inPath = Paths.get("C:\\Users\\sali\\Arabic\\Notes\\dependency-graph\\001_002.mdg");
-        Path outPath = Paths.get("C:\\Users\\sali\\Arabic\\Notes\\dependency-graph\\001_002.svg");
-        CanvasData canvasData = serializationTool.open(inPath.toFile());
-        CanvasPane canvasPane = new CanvasPane(canvasData);
-        SVGExport.export(canvasData.getCanvasMetaData(), canvasPane.getCanvasPane(), outPath.toFile());
+    @SuppressWarnings({"unused"})
+    public void updateRelationship() {
+        MorphologicalAnalysisRepositoryUtil repositoryUtil = RepositoryTool.getInstance().getRepositoryUtil();
+        DependencyGraphRepository dependencyGraphRepository = repositoryUtil.getDependencyGraphRepository();
+        RelationshipRepository relationshipRepository = repositoryUtil.getRelationshipRepository();
+        DependencyGraph dg = dependencyGraphRepository.findByDisplayName("18:2:12:15");
+        List<Relationship> relationships = dg.getRelationships();
+        relationships.forEach(relationship -> {
+            RelationshipType type = relationship.getRelationship();
+            boolean update = false;
+            switch (type) {
+                case ISM_INNA:
+                    relationship.setRelationship(RelationshipType.ISM);
+                    update = true;
+                    break;
+                case KHABAR_INNA:
+                    update = true;
+                    relationship.setRelationship(RelationshipType.KHABAR);
+                    break;
+            }
+            if (update) {
+                System.out.println(format("Updating %s to %s of %s", type,
+                        relationship.getRelationship(), relationship.getId()));
+                System.out.println(relationship.getDependent() + " : " + relationship.getOwner());
+                relationshipRepository.save(relationship);
+            }
+        });
     }
 
     private File getSerializeFileName(Class<?> klass) {
