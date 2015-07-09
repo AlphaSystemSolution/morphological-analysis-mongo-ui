@@ -24,6 +24,7 @@ public final class TokenAdapter {
     private final ObjectProperty<PartOfSpeech> partOfSpeech = new SimpleObjectProperty<>();
     private final ObjectProperty<NamedTemplate> namedTemplate = new SimpleObjectProperty<>();
     private final ObjectProperty<NamedTag> namedTag = new SimpleObjectProperty<>();
+    private final ObjectProperty<RootWord> rootWord = new SimpleObjectProperty<>();
     // common properties
     private final ObjectProperty<NumberType> numberType = new SimpleObjectProperty<>();
     private final ObjectProperty<GenderType> genderType = new SimpleObjectProperty<>();
@@ -44,20 +45,12 @@ public final class TokenAdapter {
         initListeners();
     }
 
-    public VerbMode getVerbMode() {
-        return verbModeProperty().get();
-    }
-
     public void setVerbMode(VerbMode verbMode) {
         this.verbMode.set(verbMode);
     }
 
     public final ObjectProperty<VerbMode> verbModeProperty() {
         return verbMode;
-    }
-
-    public VerbType getVerbType() {
-        return verbTypeProperty().get();
     }
 
     public void setVerbType(VerbType verbType) {
@@ -68,20 +61,12 @@ public final class TokenAdapter {
         return verbType;
     }
 
-    public ProNounType getProNounType() {
-        return proNounTypeProperty().get();
-    }
-
     public void setProNounType(ProNounType proNounType) {
         this.proNounType.set(proNounType);
     }
 
     public ObjectProperty<ProNounType> proNounTypeProperty() {
         return proNounType;
-    }
-
-    public ConversationType getConversationType() {
-        return conversationTypeProperty().get();
     }
 
     public void setConversationType(ConversationType conversationType) {
@@ -92,20 +77,12 @@ public final class TokenAdapter {
         return conversationType;
     }
 
-    public NounType getNounType() {
-        return nounTypeProperty().get();
-    }
-
     public void setNounType(NounType nounType) {
         this.nounType.set(nounType);
     }
 
     public ObjectProperty<NounType> nounTypeProperty() {
         return nounType;
-    }
-
-    public NounKind getNounKind() {
-        return nounKindProperty().get();
     }
 
     public void setNounKind(NounKind nounKind) {
@@ -116,10 +93,6 @@ public final class TokenAdapter {
         return nounKind;
     }
 
-    public NounStatus getNounStatus() {
-        return nounStatusProperty().get();
-    }
-
     public void setNounStatus(NounStatus nounStatus) {
         this.nounStatus.set(nounStatus);
     }
@@ -128,20 +101,12 @@ public final class TokenAdapter {
         return nounStatus;
     }
 
-    public GenderType getGenderType() {
-        return genderTypeProperty().get();
-    }
-
     public void setGenderType(GenderType genderType) {
         this.genderType.set(genderType);
     }
 
     public ObjectProperty<GenderType> genderTypeProperty() {
         return genderType;
-    }
-
-    public NumberType getNumberType() {
-        return numberTypeProperty().get();
     }
 
     public void setNumberType(NumberType numberType) {
@@ -154,10 +119,6 @@ public final class TokenAdapter {
 
     public ObservableList<BooleanProperty> getSelectedValues() {
         return selectedValues;
-    }
-
-    public final PartOfSpeech getPartOfSpeech() {
-        return partOfSpeechProperty().get();
     }
 
     public final void setPartOfSpeech(PartOfSpeech partOfSpeech) {
@@ -188,10 +149,6 @@ public final class TokenAdapter {
         return locations;
     }
 
-    public final NamedTemplate getNamedTemplate() {
-        return namedTemplateProperty().get();
-    }
-
     public final void setNamedTemplate(NamedTemplate namedTemplate) {
         this.namedTemplate.set(namedTemplate);
     }
@@ -200,16 +157,20 @@ public final class TokenAdapter {
         return namedTemplate;
     }
 
-    public final NamedTag getNamedTag() {
-        return namedTagProperty().get();
-    }
-
     public final void setNamedTag(NamedTag namedTag) {
         this.namedTag.set(namedTag);
     }
 
     public final ObjectProperty<NamedTag> namedTagProperty() {
         return namedTag;
+    }
+
+    public final ObjectProperty<RootWord> rootWordProperty() {
+        return rootWord;
+    }
+
+    public final void setRootWord(RootWord rootWord) {
+        this.rootWord.set(rootWord);
     }
 
     public Location getLocation() {
@@ -249,6 +210,7 @@ public final class TokenAdapter {
         location.setProperties(p);
         setNamedTemplate(location.getFormTemplate());
         setNamedTag(location.getNamedTag());
+        setRootWord(location.getRootWord());
         AbstractProperties properties = location.getProperties();
         setNumberType(properties.getNumber());
         setGenderType(properties.getGender());
@@ -288,61 +250,67 @@ public final class TokenAdapter {
     }
 
     private void initListeners() {
-        translation.addListener((observable, oldValue, newValue) -> {
+        rootWordProperty().addListener((observable, oldValue, newValue) -> {
+            if (location != null) {
+                RootWord rw = newValue == null ? new RootWord() : newValue;
+                location.setRootWord(rw);
+            }
+        });
+        translationProperty().addListener((observable, oldValue, newValue) -> {
             if (location != null) {
                 String translation = isBlank(newValue) ? null : newValue;
                 location.setTranslation(translation);
             }
         });
-        partOfSpeech.addListener((observable, oldValue, newValue) -> {
+        partOfSpeechProperty().addListener((observable, oldValue, newValue) -> {
             if (location != null) {
                 location.setPartOfSpeech(newValue);
             }
         });
-        namedTemplate.addListener((observable, oldValue, newValue) -> {
+        namedTemplateProperty().addListener((observable, oldValue, newValue) -> {
             if (location != null) {
                 location.setFormTemplate(newValue);
             }
         });
-        namedTag.addListener((observable, oldValue, newValue) -> {
+        namedTagProperty().addListener((observable, oldValue, newValue) -> {
             if (location != null) {
                 location.setNamedTag(newValue);
             }
         });
-        numberType.addListener((observable, oldValue, newValue) -> {
+        numberTypeProperty().addListener((observable, oldValue, newValue) -> {
             AbstractProperties properties = (location == null) ? null : location.getProperties();
             if (properties != null) {
                 properties.setNumber(newValue);
             }
         });
-        genderType.addListener((observable, oldValue, newValue) -> {
+        genderTypeProperty().addListener((observable, oldValue, newValue) -> {
             AbstractProperties properties = (location == null) ? null : location.getProperties();
             if (properties != null) {
                 properties.setGender(newValue);
             }
         });
-        nounStatus.addListener((observable, oldValue, newValue) -> {
+        nounStatusProperty().addListener((observable, oldValue, newValue) -> {
             AbstractProperties properties = (location == null) ? null : location.getProperties();
             if (isNoun(properties) || isPronoun(properties)) {
                 AbstractNounProperties anp = (AbstractNounProperties) properties;
                 anp.setStatus(newValue);
             }
         });
-        nounKind.addListener((observable, oldValue, newValue) -> {
+        nounKindProperty().addListener((observable, oldValue, newValue) -> {
             AbstractProperties properties = (location == null) ? null : location.getProperties();
             if (isNoun(properties)) {
                 NounProperties np = (NounProperties) properties;
                 np.setNounKind(newValue);
             }
         });
-        nounType.addListener((observable, oldValue, newValue) -> {
+        nounTypeProperty().addListener((observable, oldValue, newValue) -> {
             AbstractProperties properties = (location == null) ? null : location.getProperties();
             if (isNoun(properties)) {
                 NounProperties np = (NounProperties) properties;
                 np.setNounType(newValue);
             }
         });
-        conversationType.addListener((observable, oldValue, newValue) -> {
+        conversationTypeProperty().addListener((observable, oldValue, newValue) -> {
             AbstractProperties properties = (location == null) ? null : location.getProperties();
             if (isPronoun(properties)) {
                 ProNounProperties pnp = (ProNounProperties) properties;
@@ -353,21 +321,21 @@ public final class TokenAdapter {
                 vp.setConversationType(newValue);
             }
         });
-        proNounType.addListener((observable, oldValue, newValue) -> {
+        proNounTypeProperty().addListener((observable, oldValue, newValue) -> {
             AbstractProperties properties = (location == null) ? null : location.getProperties();
             if (isPronoun(properties)) {
                 ProNounProperties pnp = (ProNounProperties) properties;
                 pnp.setProNounType(newValue);
             }
         });
-        verbType.addListener((observable, oldValue, newValue) -> {
+        verbTypeProperty().addListener((observable, oldValue, newValue) -> {
             AbstractProperties properties = (location == null) ? null : location.getProperties();
             if (isVerb(properties)) {
                 VerbProperties vp = (VerbProperties) properties;
                 vp.setVerbType(newValue);
             }
         });
-        verbMode.addListener((observable, oldValue, newValue) -> {
+        verbModeProperty().addListener((observable, oldValue, newValue) -> {
             AbstractProperties properties = (location == null) ? null : location.getProperties();
             if (isVerb(properties)) {
                 VerbProperties vp = (VerbProperties) properties;

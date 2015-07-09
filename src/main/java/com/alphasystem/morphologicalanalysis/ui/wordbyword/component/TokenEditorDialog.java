@@ -47,6 +47,7 @@ public class TokenEditorDialog extends Dialog<Token> {
     private final ComboBox<PartOfSpeech> partOfSpeechComboBox = instance.getPartOfSpeechComboBox();
     private final ComboBox<NamedTemplate> namedTemplateComboBox = instance.getNamedTemplateComboBox();
     private final ComboBox<NamedTag> namedTagComboBox = instance.getNamedTagComboBox();
+    private final RootWordPane rootWordPane = new RootWordPane(null);
     private BorderPane lettersPane;
     private TitledPane propertiesPane;
     private AbstractPropertiesPane particlePropertiesPane;
@@ -69,6 +70,7 @@ public class TokenEditorDialog extends Dialog<Token> {
 
         this.token = new SimpleObjectProperty<>(token);
         tokenAdapter.updateToken(token, 0);
+        rootWordPane.rootWordProperty().bind(tokenAdapter.rootWordProperty());
 
         // initialize initial dialog
         setup();
@@ -153,7 +155,7 @@ public class TokenEditorDialog extends Dialog<Token> {
     }
 
     private AbstractPropertiesPane getPropertiesPane(AbstractProperties properties) {
-        AbstractPropertiesPane p = null;
+        AbstractPropertiesPane p;
         if (isNoun(properties)) {
             p = nounPropertiesPane;
         } else if (isPronoun(properties)) {
@@ -197,7 +199,7 @@ public class TokenEditorDialog extends Dialog<Token> {
         return borderPane;
     }
 
-    private GridPane createPartOfSpeechPane() {
+    private GridPane createCommonPropertiesPane() {
         GridPane gp = new GridPane();
         gp.setHgap(10);
         gp.setVgap(10);
@@ -212,7 +214,7 @@ public class TokenEditorDialog extends Dialog<Token> {
         label = new Label(RESOURCE_BUNDLE.getString("rootWords.label"));
         gp.add(label, 1, 0);
 
-        gp.add(new Pane(), 1, 1);
+        gp.add(rootWordPane, 1, 1);
 
         label = new Label(RESOURCE_BUNDLE.getString("form.label"));
         gp.add(label, 0, 2);
@@ -235,7 +237,7 @@ public class TokenEditorDialog extends Dialog<Token> {
         vBox.setPadding(new Insets(25, 25, 25, 25));
 
         TitledPane locationPane = new TitledPane("Location", createLocationsPane());
-        TitledPane commonPropertiesPane = new TitledPane("Common Properties", createPartOfSpeechPane());
+        TitledPane commonPropertiesPane = new TitledPane("Common Properties", createCommonPropertiesPane());
 
         VBox vBox1 = new VBox(5);
         vBox1.setPadding(DEFAULT_PADDING);
