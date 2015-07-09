@@ -315,8 +315,7 @@ public final class TokenAdapter {
             if (isPronoun(properties)) {
                 ProNounProperties pnp = (ProNounProperties) properties;
                 pnp.setConversationType(newValue);
-            }
-            if (isVerb(properties)) {
+            } else if (isVerb(properties)) {
                 VerbProperties vp = (VerbProperties) properties;
                 vp.setConversationType(newValue);
             }

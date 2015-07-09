@@ -10,16 +10,13 @@ import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.stage.Popup;
 
 import static com.alphasystem.arabic.model.ArabicLetterType.getByUnicode;
 import static com.alphasystem.util.AppUtil.getResourceAsStream;
 import static javafx.scene.input.KeyEvent.KEY_TYPED;
-import static javafx.scene.paint.Color.LIGHTGREY;
+import static javafx.scene.paint.Color.LAVENDER;
 
 /**
  * @author sali
@@ -42,7 +39,7 @@ public class RootWordPane extends HBox {
 
         final Keyboard keyboard = new Keyboard(lettersPane);
         final VBox keyboardView = keyboard.view();
-        keyboardView.setBackground(new Background(new BackgroundFill(LIGHTGREY, null, null)));
+        keyboardView.setBackground(new Background(new BackgroundFill(LAVENDER, new CornerRadii(1.0), new Insets(10))));
         popup.getContent().add(keyboardView);
 
         final Button keyboardButton = new Button();
