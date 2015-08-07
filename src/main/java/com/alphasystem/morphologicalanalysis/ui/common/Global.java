@@ -6,8 +6,7 @@ import javafx.scene.text.Font;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.DEFINITE_ARTICLE;
-import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.QURANIC_PUNCTUATION;
+import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.*;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static javafx.scene.text.Font.font;
@@ -20,9 +19,8 @@ import static javafx.scene.text.FontWeight.BOLD;
 public class Global {
 
     public static final List<PartOfSpeech> PART_OF_SPEECH_EXCLUDE_LIST = asList(
-            DEFINITE_ARTICLE,
-            QURANIC_PUNCTUATION);
-    public static final String ARABIC_FONT_NAME = System.getProperty("arabic-font-name", "Traditional Arabic");
+            DEFINITE_ARTICLE, QURANIC_PUNCTUATION, CONJUNCTION_PARTICLE_WAW, CONJUNCTION_PARTICLE_FA);
+    public static final String ARABIC_FONT_NAME = System.getProperty("arabic-font-name", "Arabic Typesetting");
     public static final Font ARABIC_FONT_BIG = font(ARABIC_FONT_NAME, REGULAR, 48);
     public static final Font ARABIC_FONT_MEDIUM = font(ARABIC_FONT_NAME, REGULAR, 36);
     public static final Font ARABIC_FONT_MEDIUM_BOLD = font(ARABIC_FONT_NAME, BOLD, REGULAR, 30);

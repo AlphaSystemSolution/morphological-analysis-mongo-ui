@@ -56,8 +56,10 @@ public class ReferenceNodeSelectionDialog extends Dialog<Terminal> {
         tokenComboBox.setCellFactory(param -> new TokenListCell());
 
         chapterProperty().addListener((observable, oldValue, newValue) -> {
-            setTitle(String.format("Select Reference Node for chapter %s", (Integer) newValue));
+            int chapterNumber = (Integer) newValue;
+            setTitle(String.format("Select Reference Node for chapter %s", chapterNumber));
             setVerse(1);
+            initDialog();
         });
         verseProperty().addListener((observable, oldValue, newValue) -> {
             initDialog();

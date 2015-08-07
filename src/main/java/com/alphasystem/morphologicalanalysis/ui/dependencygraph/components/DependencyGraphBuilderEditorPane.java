@@ -106,6 +106,7 @@ public class DependencyGraphBuilderEditorPane extends BorderPane {
             case TERMINAL:
             case EMPTY:
             case REFERENCE:
+            case HIDDEN:
                 addTerminalNodeProperties((TerminalNode) graphNode);
                 break;
             case PART_OF_SPEECH:
@@ -171,9 +172,9 @@ public class DependencyGraphBuilderEditorPane extends BorderPane {
 
         row++;
         addFields("groupTranslateX.label", TerminalNode::getTranslateX, TerminalNode::setTranslateX,
-                node, getCanvasWidth());
+                node, -1 * getCanvasWidth(), getCanvasWidth());
         addFields("groupTranslateY.label", TerminalNode::getTranslateY, TerminalNode::setTranslateY,
-                node, getCanvasHeight());
+                node, -1 * getCanvasHeight(), getCanvasHeight());
     }
 
     private void addPartOfSpeechProperties(PartOfSpeechNode node) {
@@ -262,16 +263,21 @@ public class DependencyGraphBuilderEditorPane extends BorderPane {
 
     private <T extends GraphNode, G extends GetterAdapter<T>, S extends SetterAdapter<T>> void addFields(
             String key, G g, S s, T node, double max) {
+        addFields(key, g, s, node, 0, max);
+    }
+
+    private <T extends GraphNode, G extends GetterAdapter<T>, S extends SetterAdapter<T>> void addFields(
+            String key, G g, S s, T node, double min, double max) {
         Label label = new Label(RESOURCE_BUNDLE.getString(key));
         gridPane.add(label, 0, row);
 
         Double initialValue = g.get(node);
-        Spinner<Double> spinner = getSpinner(0, max, initialValue);
+        Spinner<Double> spinner = getSpinner(min, max, initialValue);
         spinner.setOnMouseClicked(event -> s.set(node, spinner.getValue()));
         gridPane.add(spinner, 1, row);
 
         row++;
-        Slider slider = createSlider(0, max, initialValue);
+        Slider slider = createSlider(min, max, initialValue);
         slider.valueProperty().addListener((observable, oldValue, newValue) -> {
             Double d = (Double) newValue;
             if (d % 1 != 0.0 && d % 0.5 != 0.0) {

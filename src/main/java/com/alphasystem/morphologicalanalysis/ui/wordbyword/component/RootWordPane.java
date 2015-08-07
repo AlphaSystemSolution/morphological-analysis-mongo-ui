@@ -25,13 +25,14 @@ public class RootWordPane extends HBox {
 
     private final ObjectProperty<RootWord> rootWord;
     private RootLetterPane currentPane;
+    private HBox lettersPane;
 
     public RootWordPane(RootWord rootWord) {
         setSpacing(10);
         setPadding(new Insets(10));
 
         this.rootWord = new SimpleObjectProperty<>();
-        HBox lettersPane = createLettersPane();
+        lettersPane = createLettersPane();
 
         final Popup popup = new Popup();
         popup.setAutoHide(true);
@@ -97,11 +98,21 @@ public class RootWordPane extends HBox {
             secondRadicalPane.setSelected(true);
             currentPane = secondRadicalPane;
         });
+        firstRadicalPane.setOnMouseClicked(event -> {
+            currentPane.setSelected(false);
+            firstRadicalPane.setSelected(true);
+            currentPane = firstRadicalPane;
+        });
         secondRadicalPane.letterProperty().addListener((observable, oldValue, newValue) -> {
             getRootWord().setSecondRadical(newValue);
             secondRadicalPane.setSelected(false);
             thirdRadicalPane.setSelected(true);
             currentPane = thirdRadicalPane;
+        });
+        secondRadicalPane.setOnMouseClicked(event -> {
+            currentPane.setSelected(false);
+            secondRadicalPane.setSelected(true);
+            currentPane = secondRadicalPane;
         });
         thirdRadicalPane.letterProperty().addListener((observable, oldValue, newValue) -> {
             getRootWord().setThirdRadical(newValue);
@@ -109,11 +120,21 @@ public class RootWordPane extends HBox {
             fourthRadicalPane.setSelected(true);
             currentPane = fourthRadicalPane;
         });
+        thirdRadicalPane.setOnMouseClicked(event -> {
+            currentPane.setSelected(false);
+            thirdRadicalPane.setSelected(true);
+            currentPane = thirdRadicalPane;
+        });
         fourthRadicalPane.letterProperty().addListener((observable, oldValue, newValue) -> {
             getRootWord().setFourthRadical(newValue);
             fourthRadicalPane.setSelected(false);
             firstRadicalPane.setSelected(true);
             currentPane = firstRadicalPane;
+        });
+        fourthRadicalPane.setOnMouseClicked(event -> {
+            currentPane.setSelected(false);
+            firstRadicalPane.setSelected(true);
+            currentPane = fourthRadicalPane;
         });
 
         hBox.getChildren().addAll(fourthRadicalPane, thirdRadicalPane, secondRadicalPane, firstRadicalPane);

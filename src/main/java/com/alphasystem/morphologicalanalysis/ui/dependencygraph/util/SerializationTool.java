@@ -124,6 +124,7 @@ public class SerializationTool {
                     case TERMINAL:
                     case EMPTY:
                     case REFERENCE:
+                    case HIDDEN:
                         loadToken((TerminalNode) node, dependencyGraph);
                         break;
                     case RELATIONSHIP:

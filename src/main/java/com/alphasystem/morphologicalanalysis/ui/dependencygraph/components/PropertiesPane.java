@@ -19,6 +19,10 @@ import static javafx.geometry.Pos.CENTER;
 public class PropertiesPane extends BorderPane {
 
     private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("resources");
+    private static final int MIN_WIDTH = 20;
+    private static final int MIN_HEIGHT = 20;
+    private static final int MAX_WIDTH = 1000;
+    private static final int MAX_HEIGHT = 1000;
 
     private Spinner<Integer> widthField;
     private Spinner<Integer> heightField;
@@ -53,7 +57,8 @@ public class PropertiesPane extends BorderPane {
         grid.add(label, 0, 0);
 
         widthField = new Spinner<>();
-        widthField.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(20, 1000, width, 20));
+        widthField.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(MIN_WIDTH, MAX_WIDTH,
+                width, 20));
         metaData.widthProperty().bind(widthField.valueProperty());
         grid.add(widthField, 1, 0);
 
@@ -62,7 +67,8 @@ public class PropertiesPane extends BorderPane {
         grid.add(label, 0, 1);
 
         heightField = new Spinner<>();
-        heightField.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(20, 1000, height, 20));
+        heightField.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(MIN_HEIGHT, MAX_HEIGHT,
+                height, 20));
         metaData.heightProperty().bind(heightField.valueProperty());
         grid.add(heightField, 1, 1);
 

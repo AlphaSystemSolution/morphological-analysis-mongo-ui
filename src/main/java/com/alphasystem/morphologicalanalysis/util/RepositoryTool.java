@@ -2,7 +2,9 @@ package com.alphasystem.morphologicalanalysis.util;
 
 import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
 import com.alphasystem.morphologicalanalysis.graph.model.Terminal;
+import com.alphasystem.morphologicalanalysis.graph.model.support.TerminalType;
 import com.alphasystem.morphologicalanalysis.graph.repository.DependencyGraphRepository;
+import com.alphasystem.morphologicalanalysis.graph.repository.TerminalRepository;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.AbstractProperties;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Chapter;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
@@ -16,6 +18,9 @@ import javafx.concurrent.Task;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.alphasystem.morphologicalanalysis.graph.model.support.TerminalType.HIDDEN;
+import static com.alphasystem.morphologicalanalysis.graph.model.support.TerminalType.TERMINAL;
+
 /**
  * @author sali
  */
@@ -27,6 +32,7 @@ public class RepositoryTool {
     private TokenRepository tokenRepository;
     private LocationRepository locationRepository;
     private DependencyGraphRepository dependencyGraphRepository;
+    private TerminalRepository terminalRepository;
 
     /**
      * do not let anyone instantiate this class
@@ -37,6 +43,7 @@ public class RepositoryTool {
         tokenRepository = repositoryUtil.getTokenRepository();
         locationRepository = repositoryUtil.getLocationRepository();
         dependencyGraphRepository = repositoryUtil.getDependencyGraphRepository();
+        terminalRepository = repositoryUtil.getTerminalRepository();
 
     }
 
@@ -137,7 +144,19 @@ public class RepositoryTool {
             dependencyGraph = new DependencyGraph(chapterNumber, verseNumber, firstTokenIndex, lastTokenIndex);
             List<Terminal> terminals = new ArrayList<>();
             for (Token token : tokens) {
-                terminals.add(new Terminal(token));
+                TerminalType terminalType = token.isHidden() ? HIDDEN : TERMINAL;
+                Terminal terminal = new Terminal(token, terminalType);
+                if(token.isHidden()){
+                    // if it is one of hidden node then try to get from database in order to avoid duplicate key
+                    // exception
+                    Terminal t = terminalRepository.findByDisplayName(terminal.getDisplayName());
+                    if(t == null){
+                        t = terminalRepository.save(terminal);
+                    }
+                    terminal = t;
+                }
+
+                terminals.add(terminal);
             }
             dependencyGraph.setTerminals(terminals);
             dependencyGraph = dependencyGraphRepository.save(dependencyGraph);

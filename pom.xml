@@ -111,6 +111,7 @@
 		<ma-repository.version>${project.version}</ma-repository.version>
 		<commons-ui.version>${project.version}</commons-ui.version>
 		<keyboard-ui.version>${project.version}</keyboard-ui.version>
+        <xml-model.version>${project.version}</xml-model.version>
 		<maven.test.skip>true</maven.test.skip>
 		<genOutputDirectory>${project.build.directory}/generated/src/main/java</genOutputDirectory>
 		<mainClass>com.alphasystem.morphologicalanalysis.ui.wordbyword.WordByWordApp</mainClass>

@@ -172,6 +172,29 @@ public class GraphBuilder {
         return referenceNode;
     }
 
+    public HiddenNode buildHiddenNode(Line referenceLine, String id){
+        reset();
+        rectX = referenceLine.getStartX();
+        textX = rectX + 30;
+        x1 = rectX;
+        x2 = RECTANGLE_WIDTH + rectX;
+        x3 = rectX + 30;
+
+        Token token = repositoryTool.getToken(id);
+        HiddenNode hiddenNode = new HiddenNode(token, textX, textY, x1, y1, x2, y2, x3, y3, 0d, 0d);
+
+        reset();
+        textY = 160;
+        ObservableList<PartOfSpeechNode> partOfSpeeches = hiddenNode.getPartOfSpeeches();
+        partOfSpeeches.forEach(partOfSpeechNode -> {
+            double posX = hiddenNode.getX1();
+            updatePartOfSpeechNode(partOfSpeechNode, posX);
+            posX += 50;
+        });
+
+        return hiddenNode;
+    }
+
 
     /**
      * @param terminal
@@ -188,6 +211,7 @@ public class GraphBuilder {
                 terminalNode = new EmptyNode(token, textX, textY, x1, y1, x2, y2, x3, y3, 0.0, 0.0);
                 break;
             case HIDDEN:
+                terminalNode = new HiddenNode(token, textX, textY, x1, y1, x2, y2, x3, y3, 0.0, 0.0);
                 break;
             case REFERENCE:
                 terminalNode = new ReferenceNode(token, textX, textY, x1, y1, x2, y2, x3, y3, 0.0, 0.0);

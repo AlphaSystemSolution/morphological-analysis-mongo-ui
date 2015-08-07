@@ -177,6 +177,7 @@ public class WordByWordPane extends BorderPane {
             alert.showAndWait();
             return;
         }
+
         DependencyGraph dependencyGraph = repositoryTool.createDependencyGraph(tokens);
         Alert alert = new Alert(INFORMATION);
         alert.setContentText(format("Graph Created {%s}", dependencyGraph.getDisplayName()));

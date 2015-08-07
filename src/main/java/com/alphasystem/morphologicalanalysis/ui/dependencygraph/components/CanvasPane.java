@@ -13,6 +13,7 @@ import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.GraphBuilde
 import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.VerbProperties;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -35,6 +36,7 @@ import java.util.Optional;
 
 import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.REFERENCE;
 import static com.alphasystem.morphologicalanalysis.graph.model.support.TerminalType.EMPTY;
+import static com.alphasystem.morphologicalanalysis.graph.model.support.TerminalType.HIDDEN;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.*;
 import static com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.DependencyGraphGraphicTool.DARK_GRAY_CLOUD;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.NOUN;
@@ -60,9 +62,9 @@ public class CanvasPane extends Pane {
     private final ContextMenu terminalContextMenu;
     private final ContextMenu partOfSpeechContextMenu;
     private final ContextMenu relationshipContextMenu;
-    private TerminalRepository terminalRepository = RepositoryTool.getInstance()
-            .getRepositoryUtil().getTerminalRepository();
-    private RelationshipRepository relationshipRepository = RepositoryTool.getInstance()
+    private RepositoryTool repositoryTool = RepositoryTool.getInstance();
+    private TerminalRepository terminalRepository = repositoryTool.getRepositoryUtil().getTerminalRepository();
+    private RelationshipRepository relationshipRepository = repositoryTool
             .getRepositoryUtil().getRelationshipRepository();
     private RelationshipSelectionDialog relationshipSelectionDialog;
     private PhraseSelectionDialog phraseSelectionDialog;
@@ -114,7 +116,7 @@ public class CanvasPane extends Pane {
     }
 
     private void initTerminalContextMenu(Text source) {
-        ObservableList<MenuItem> items = terminalContextMenu.getItems();
+        final ObservableList<MenuItem> items = terminalContextMenu.getItems();
         items.remove(0, items.size());
 
         Menu menu = new Menu("Make Phrase");
@@ -124,6 +126,7 @@ public class CanvasPane extends Pane {
             switch (nodeType) {
                 case TERMINAL:
                 case EMPTY:
+                case HIDDEN:
                     TerminalNode _tn = (TerminalNode) graphNode;
                     menu.getItems().add(createPhraseMenuItem(_tn));
                     break;
@@ -147,6 +150,23 @@ public class CanvasPane extends Pane {
         });
 
         items.add(menuItem);
+
+        // add "Hidden" pronoun if applicable (only for verb)
+        TerminalNode tn = (TerminalNode) source.getUserData();
+        Token token = tn.getToken();
+        token.getLocations().forEach(location -> {
+            PartOfSpeech partOfSpeech = location.getPartOfSpeech();
+            if (partOfSpeech.equals(VERB)) {
+                MenuItem mi = new MenuItem("Add Hidden Node");
+                mi.setOnAction(event -> {
+                    VerbProperties vp = (VerbProperties) location.getProperties();
+                    String id = format("%s_%s_%s", vp.getConversationType().name(), vp.getGender().name(),
+                            vp.getNumber().name());
+                    addHiddenNode(getReferenceLine(source), token, id);
+                });
+                items.add(mi);
+            }
+        });
     }
 
     private void initPartOfSpeechContextMenu(String currentNodeId) {
@@ -161,6 +181,7 @@ public class CanvasPane extends Pane {
                 case TERMINAL:
                 case EMPTY:
                 case REFERENCE:
+                case HIDDEN:
                     TerminalNode tn = (TerminalNode) graphNode;
                     ObservableList<PartOfSpeechNode> partOfSpeeches = tn.getPartOfSpeeches();
                     for (PartOfSpeechNode partOfSpeech : partOfSpeeches) {
@@ -247,6 +268,7 @@ public class CanvasPane extends Pane {
                 switch (nodeType) {
                     case TERMINAL:
                     case EMPTY:
+                    case HIDDEN:
                         TerminalNode tn = (TerminalNode) gn;
                         Integer tokenNumber = tn.getToken().getTokenNumber();
                         if (tokenNumber < firstTokenTokenNumber) {
@@ -433,6 +455,7 @@ public class CanvasPane extends Pane {
                 case TERMINAL:
                 case EMPTY:
                 case REFERENCE:
+                case HIDDEN:
                     buildTerminalNode((TerminalNode) node);
                     break;
                 case RELATIONSHIP:
@@ -513,6 +536,32 @@ public class CanvasPane extends Pane {
         CanvasData canvasData = canvasDataObject.get();
         canvasData.getDependencyGraph().getFragments().add(fragment);
         canvasData.getNodes().add(phraseNode);
+        canvasDataObject.setValue(null);
+        canvasDataObject.setValue(canvasData);
+    }
+
+    private void addHiddenNode(Line referenceLine, Token referenceTerminal, String pronounId) {
+        // Step 1: call GraphBuilder to create an hidden node
+        HiddenNode hiddenNode = graphBuilder.buildHiddenNode(referenceLine, pronounId);
+
+        // add this node into existing list of nodes and
+        // update canvasDataObject for changes to take effect
+        CanvasData canvasData = canvasDataObject.get();
+        List<Token> tokens = getTokens(canvasData.getDependencyGraph().getTerminals());
+        int index = tokens.indexOf(referenceTerminal);
+        System.out.println(format("INDEX: %s, TOKEN: %s, NEXT TOKEN: %s",
+                index, tokens.get(index), tokens.get(index + 1)));
+        index++;
+
+        Token token = hiddenNode.getToken();
+        Terminal terminal = new Terminal(token, HIDDEN);
+        Terminal result = terminalRepository.findByDisplayName(terminal.getDisplayName());
+        terminal = result;
+        if (terminal == null) {
+            terminal = terminalRepository.save(terminal);
+        }
+        canvasData.getDependencyGraph().getTerminals().add(index, terminal);
+        canvasData.getNodes().add(index, hiddenNode);
         canvasDataObject.setValue(null);
         canvasDataObject.setValue(canvasData);
     }
