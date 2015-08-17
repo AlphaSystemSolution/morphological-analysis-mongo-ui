@@ -69,24 +69,25 @@ public class TreeBankPane extends BorderPane {
     private File currentFile;
 
     public TreeBankPane() {
-        this(null);
+        this(null, new CanvasMetaData());
     }
 
-    public TreeBankPane(DependencyGraph dependencyGraph) {
+    public TreeBankPane(DependencyGraph dependencyGraph, CanvasMetaData canvasMetaData) {
         super();
 
         setTop(createMenuBar());
-        initPane(createFromGraph(dependencyGraph));
+        initPane(createFromGraph(dependencyGraph, canvasMetaData));
         fileChooser.setInitialDirectory(CURRENT_USER_DIR);
         fileChooser.getExtensionFilters().addAll(
                 new ExtensionFilter(format("Morphology Dependency Graph file (%s)", MDG_EXTENSION_ALL),
                         MDG_EXTENSION_ALL));
     }
 
-    private CanvasData createFromGraph(DependencyGraph dependencyGraph) {
-        CanvasData canvasData = new CanvasData(new CanvasMetaData());
+    private CanvasData createFromGraph(DependencyGraph dependencyGraph, CanvasMetaData canvasMetaData) {
+        CanvasData canvasData = new CanvasData(canvasMetaData);
         if (dependencyGraph != null) {
             canvasData.setDependencyGraph(dependencyGraph);
+            graphBuilder.set(canvasMetaData);
             canvasData.setNodes(graphBuilder.toGraphNodes(dependencyGraph));
         }
         return canvasData;

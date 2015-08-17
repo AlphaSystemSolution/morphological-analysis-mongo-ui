@@ -37,7 +37,7 @@ import java.util.Optional;
 import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.REFERENCE;
 import static com.alphasystem.morphologicalanalysis.graph.model.support.TerminalType.EMPTY;
 import static com.alphasystem.morphologicalanalysis.graph.model.support.TerminalType.HIDDEN;
-import static com.alphasystem.morphologicalanalysis.ui.common.Global.*;
+import static com.alphasystem.morphologicalanalysis.ui.common.Global.ARABIC_FONT_SMALL_BOLD;
 import static com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.DependencyGraphGraphicTool.DARK_GRAY_CLOUD;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.NOUN;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.VERB;
@@ -46,8 +46,6 @@ import static java.lang.String.format;
 import static java.util.Collections.reverse;
 import static javafx.scene.control.Alert.AlertType.INFORMATION;
 import static javafx.scene.paint.Color.*;
-import static javafx.scene.text.Font.font;
-import static javafx.scene.text.FontPosture.REGULAR;
 import static javafx.scene.text.TextAlignment.CENTER;
 import static javafx.scene.text.TextAlignment.RIGHT;
 
@@ -81,7 +79,7 @@ public class CanvasPane extends Pane {
     public CanvasPane(CanvasData data) {
         this.canvasDataObject = new SimpleObjectProperty<>(data);
 
-        CanvasMetaData metaData = data.getCanvasMetaData();
+        CanvasMetaData metaData = canvasDataObjectProperty().get().getCanvasMetaData();
         int width = metaData.getWidth();
         int height = metaData.getHeight();
         terminalContextMenu = new ContextMenu();
@@ -116,6 +114,9 @@ public class CanvasPane extends Pane {
     }
 
     private void initTerminalContextMenu(Text source) {
+        TerminalNode tn = (TerminalNode) source.getUserData();
+        Token token = tn.getToken();
+
         final ObservableList<MenuItem> items = terminalContextMenu.getItems();
         items.remove(0, items.size());
 
@@ -136,8 +137,8 @@ public class CanvasPane extends Pane {
 
         Menu addEmptyNodeMenu = new Menu("Add Empty Node");
 
-        addEmptyNodeMenu.getItems().add(createAddEmptyNodeMenuItem(source, NOUN));
-        addEmptyNodeMenu.getItems().add(createAddEmptyNodeMenuItem(source, VERB));
+        addEmptyNodeMenu.getItems().add(createAddEmptyNodeMenuItem(source, token, NOUN));
+        addEmptyNodeMenu.getItems().add(createAddEmptyNodeMenuItem(source, token, VERB));
         items.add(addEmptyNodeMenu);
 
         MenuItem menuItem = new MenuItem("Add Reference Node ...");
@@ -152,8 +153,6 @@ public class CanvasPane extends Pane {
         items.add(menuItem);
 
         // add "Hidden" pronoun if applicable (only for verb)
-        TerminalNode tn = (TerminalNode) source.getUserData();
-        Token token = tn.getToken();
         token.getLocations().forEach(location -> {
             PartOfSpeech partOfSpeech = location.getPartOfSpeech();
             if (partOfSpeech.equals(VERB)) {
@@ -167,6 +166,14 @@ public class CanvasPane extends Pane {
                 items.add(mi);
             }
         });
+    }
+
+    private void shiftNodes(Token token){
+        List<Token> tokens = getTokens(canvasDataObjectProperty().get().getDependencyGraph().getTerminals());
+        int index = tokens.indexOf(token);
+        int reverseIndex = canvasDataObjectProperty().get().getNodes().size() - 1 - index;
+        graphBuilder.set(canvasDataObjectProperty().get().getCanvasMetaData());
+        graphBuilder.shiftNodes(canvasDataObjectProperty().get().getNodes(), reverseIndex);
     }
 
     private void initPartOfSpeechContextMenu(String currentNodeId) {
@@ -254,7 +261,7 @@ public class CanvasPane extends Pane {
                 firstTokenTokenNumber = firstTerminalNode.getToken().getTokenNumber();
                 lastTokenTokenNumber = lastTerminalNode.getToken().getTokenNumber();
             } else if (firstTokenTokenNumber.equals(lastTokenTokenNumber)) {
-                lastTokenTokenNumber--;
+                //lastTokenTokenNumber--;
             }
             lastTokenTokenNumber++;
             // populate the list of nodes
@@ -274,7 +281,7 @@ public class CanvasPane extends Pane {
                         if (tokenNumber < firstTokenTokenNumber) {
                             continue loop;
                         }
-                        if (tokenNumber > lastTokenTokenNumber) {
+                        if (tokenNumber >= lastTokenTokenNumber) {
                             break loop;
                         }
                         terminalNodes.add(tn);
@@ -309,7 +316,7 @@ public class CanvasPane extends Pane {
         return menuItem;
     }
 
-    private MenuItem createAddEmptyNodeMenuItem(Text selectedText, PartOfSpeech partOfSpeech) {
+    private MenuItem createAddEmptyNodeMenuItem(Text selectedText, Token token, PartOfSpeech partOfSpeech) {
         Text text = new Text(partOfSpeech.getLabel().toUnicode());
         text.setFont(ARABIC_FONT_SMALL_BOLD);
         MenuItem menuItem = new MenuItem("", text);
@@ -317,7 +324,7 @@ public class CanvasPane extends Pane {
         menuItem.setOnAction(event -> {
             MenuItem source = (MenuItem) event.getSource();
             PartOfSpeech pos = (PartOfSpeech) source.getUserData();
-            addEmptyNode(selectedText, pos);
+            addEmptyNode(selectedText, token, pos);
         });
         return menuItem;
     }
@@ -346,10 +353,10 @@ public class CanvasPane extends Pane {
         }
     }
 
-    private void addEmptyNode(Text selectedText, PartOfSpeech partOfSpeech) {
+    private void addEmptyNode(Text selectedText, Token token, PartOfSpeech partOfSpeech) {
         Line line = getReferenceLine(selectedText);
         if (line != null) {
-            addEmptyNode(line, partOfSpeech);
+            addEmptyNode(line, token, partOfSpeech);
         }
     }
 
@@ -360,6 +367,15 @@ public class CanvasPane extends Pane {
         });
         metaData.heightProperty().addListener((observable, oldValue, newValue) -> {
             resizeCanvas();
+        });
+        metaData.tokenWidthProperty().addListener((observable, oldValue, newValue) -> {
+            System.out.println("tokenWidthProperty: " + newValue);
+        });
+        metaData.tokenHeightProperty().addListener((observable, oldValue, newValue) -> {
+            System.out.println("tokenHeightProperty: " + newValue);
+        });
+        metaData.gapBetweenTokensProperty().addListener((observable, oldValue, newValue) -> {
+            System.out.println("gapBetweenTokensProperty: " + newValue);
         });
         metaData.showGridLinesProperty().addListener((observable, oldValue, newValue) -> {
             toggleGridLines(newValue, metaData.isShowOutLines());
@@ -476,13 +492,15 @@ public class CanvasPane extends Pane {
         return tokens;
     }
 
-    private void addEmptyNode(Line referenceLine, PartOfSpeech partOfSpeech) {
+    private void addEmptyNode(Line referenceLine, Token token, PartOfSpeech partOfSpeech) {
+        shiftNodes(token);
+        CanvasData canvasData = canvasDataObject.get();
+        graphBuilder.set(canvasData.getCanvasMetaData());
         // Step 1: call GraphBuilder to create an empty node
         EmptyNode emptyNode = graphBuilder.buildEmptyNode(referenceLine, partOfSpeech);
 
         // add this node into existing list of nodes and
         // update canvasDataObject for changes to take effect
-        CanvasData canvasData = canvasDataObject.get();
         List<Token> tokens = getTokens(canvasData.getDependencyGraph().getTerminals());
         int index = tokens.indexOf(firstTerminalNode.getToken());
         Terminal terminal = new Terminal(emptyNode.getToken(), EMPTY);
@@ -491,18 +509,20 @@ public class CanvasPane extends Pane {
             result = terminal;
         }
         canvasData.getDependencyGraph().getTerminals().add(index, result);
+        index = (canvasData.getNodes().size() - 1) - (index - 1);
         canvasData.getNodes().add(index, emptyNode);
         canvasDataObject.setValue(null);
         canvasDataObject.setValue(canvasData);
     }
 
     private void addReferenceNode(Line referenceLine, Terminal terminal) {
+        CanvasData canvasData = canvasDataObject.get();
+        graphBuilder.set(canvasData.getCanvasMetaData());
         // Step 1: call GraphBuilder to create an reference node
         ReferenceNode referenceNode = graphBuilder.buildReferenceNode(referenceLine, terminal.getToken());
 
         // add this node into existing list of nodes and
         // update canvasDataObject for changes to take effect
-        CanvasData canvasData = canvasDataObject.get();
         List<Token> tokens = getTokens(canvasData.getDependencyGraph().getTerminals());
         int index = tokens.indexOf(firstTerminalNode.getToken());
         canvasData.getDependencyGraph().getTerminals().add(index, terminal);
@@ -512,13 +532,15 @@ public class CanvasPane extends Pane {
     }
 
     private void addRelationship(Relationship relationship) {
+        CanvasData canvasData = canvasDataObject.get();
+        final CanvasMetaData canvasMetaData = canvasData.getCanvasMetaData();
+        graphBuilder.set(canvasMetaData);
         // Step 1: call GraphBuilder to create a relationship node
         RelationshipNode relationshipNode = graphBuilder.buildRelationshipNode(relationship,
                 dependentLinkNode, ownerLinkNode);
 
         // add this node into existing list of nodes and
         // update canvasDataObject for changes to take effect
-        CanvasData canvasData = canvasDataObject.get();
         canvasData.getDependencyGraph().getRelationships().add(relationship);
         canvasData.getNodes().add(relationshipNode);
         canvasDataObject.setValue(null);
@@ -528,12 +550,13 @@ public class CanvasPane extends Pane {
     private void addPhrase(Fragment fragment, List<TerminalNode> nodes) {
         firstTerminalNode = null;
         lastTerminalNode = null;
+        CanvasData canvasData = canvasDataObject.get();
+        graphBuilder.set(canvasData.getCanvasMetaData());
         // Step 1: call GraphBuilder to create a phrase node
         PhraseNode phraseNode = graphBuilder.buildPhraseNode(fragment, nodes);
 
         // add this node into existing list of nodes and
         // update canvasDataObject for changes to take effect
-        CanvasData canvasData = canvasDataObject.get();
         canvasData.getDependencyGraph().getFragments().add(fragment);
         canvasData.getNodes().add(phraseNode);
         canvasDataObject.setValue(null);
@@ -541,26 +564,29 @@ public class CanvasPane extends Pane {
     }
 
     private void addHiddenNode(Line referenceLine, Token referenceTerminal, String pronounId) {
+        shiftNodes(referenceTerminal);
+        CanvasData canvasData = canvasDataObject.get();
+        graphBuilder.set(canvasData.getCanvasMetaData());
         // Step 1: call GraphBuilder to create an hidden node
         HiddenNode hiddenNode = graphBuilder.buildHiddenNode(referenceLine, pronounId);
 
         // add this node into existing list of nodes and
         // update canvasDataObject for changes to take effect
-        CanvasData canvasData = canvasDataObject.get();
         List<Token> tokens = getTokens(canvasData.getDependencyGraph().getTerminals());
         int index = tokens.indexOf(referenceTerminal);
-        System.out.println(format("INDEX: %s, TOKEN: %s, NEXT TOKEN: %s",
-                index, tokens.get(index), tokens.get(index + 1)));
         index++;
 
         Token token = hiddenNode.getToken();
         Terminal terminal = new Terminal(token, HIDDEN);
         Terminal result = terminalRepository.findByDisplayName(terminal.getDisplayName());
-        terminal = result;
-        if (terminal == null) {
+        if (result == null) {
             terminal = terminalRepository.save(terminal);
+        } else {
+            terminal = result;
         }
         canvasData.getDependencyGraph().getTerminals().add(index, terminal);
+
+        index = (canvasData.getNodes().size() - 1) - (index - 1);
         canvasData.getNodes().add(index, hiddenNode);
         canvasDataObject.setValue(null);
         canvasDataObject.setValue(canvasData);
@@ -612,7 +638,8 @@ public class CanvasPane extends Pane {
             color = web(location.getPartOfSpeech().getColorCode());
         }
 
-        Text arabicText = drawText(tn, color, ARABIC_FONT_BIG);
+        final Text arabicText = drawText(tn, color, getTokenFont());
+        arabicText.fontProperty().bind(canvasDataObjectProperty().get().getCanvasMetaData().tokenFontProperty());
 
         double translateX = tn.getTranslateX();
         double translateY = tn.getTranslateY();
@@ -632,10 +659,11 @@ public class CanvasPane extends Pane {
         String id = format("trans_%s", tn.getId());
         Color transColor = hiddenOrEmptyNode ? hiddenOrEmptyNodeColor : BLACK;
         Text englishText = tool.drawText(id, trans, CENTER, transColor,
-                tn.getX3(), tn.getY3(), font("Candara", REGULAR, 16));
-        // bind text x and y locations
+                tn.getX3(), tn.getY3(), getTranslationFont());
+        // bind text x and y locations and translation font
         englishText.xProperty().bind(tn.x3Property());
         englishText.yProperty().bind(tn.y3Property());
+        englishText.fontProperty().bind(canvasDataObjectProperty().get().getCanvasMetaData().translationFontProperty());
 
         Group group = new Group();
 
@@ -647,8 +675,9 @@ public class CanvasPane extends Pane {
             pn.setTranslateX(translateX);
             pn.setTranslateY(translateY);
             color = hiddenOrEmptyNode ? hiddenOrEmptyNodeColor : web(pn.getPartOfSpeech().getColorCode());
-            arabicText = drawText(pn, color, ARABIC_FONT_SMALL);
-            arabicText.setOnMouseClicked(event -> {
+            Text posArabicText = drawText(pn, color, getPartOfSpeechFont());
+            posArabicText.fontProperty().bind(canvasDataObjectProperty().get().getCanvasMetaData().partOfSpeechFontProperty());
+            posArabicText.setOnMouseClicked(event -> {
                 Text source = (Text) event.getSource();
                 String thisId = pn.getId();
                 if (event.isPopupTrigger()) {
@@ -668,7 +697,7 @@ public class CanvasPane extends Pane {
             circle.centerXProperty().bind(pn.cxProperty());
             circle.centerYProperty().bind(pn.cyProperty());
 
-            group.getChildren().addAll(arabicText, circle);
+            group.getChildren().addAll(posArabicText, circle);
         }
 
         group.setTranslateX(translateX);
@@ -706,7 +735,8 @@ public class CanvasPane extends Pane {
         cubicCurve.endYProperty().bind(rn.endYProperty());
         cubicCurve.strokeProperty().bind(rn.strokeProperty());
 
-        Text arabicText = drawText(rn, color, ARABIC_FONT_SMALL);
+        Text arabicText = drawText(rn, color, getPartOfSpeechFont());
+        arabicText.fontProperty().bind(canvasDataObjectProperty().get().getCanvasMetaData().partOfSpeechFontProperty());
         arabicText.fillProperty().bind(rn.strokeProperty());
         arabicText.setOnMouseClicked(event -> {
             Text source = (Text) event.getSource();
@@ -750,7 +780,8 @@ public class CanvasPane extends Pane {
         Color color = web(pn.getFrament().getRelationshipType().getColorCode());
 
         Line line = drawLine(pn);
-        Text arabicText = drawText(pn, color, ARABIC_FONT_SMALL);
+        Text arabicText = drawText(pn, color, getPartOfSpeechFont());
+        arabicText.fontProperty().bind(canvasDataObjectProperty().get().getCanvasMetaData().partOfSpeechFontProperty());
         arabicText.setOnMouseClicked(event -> {
             Text source = (Text) event.getSource();
             String thisId = pn.getId();
@@ -785,5 +816,17 @@ public class CanvasPane extends Pane {
 
     public Pane getCanvasPane() {
         return canvasPane;
+    }
+
+    private Font getTokenFont() {
+        return canvasDataObjectProperty().get().getCanvasMetaData().getTokenFont();
+    }
+
+    private Font getPartOfSpeechFont() {
+        return canvasDataObjectProperty().get().getCanvasMetaData().getPartOfSpeechFont();
+    }
+
+    private Font getTranslationFont() {
+        return canvasDataObjectProperty().get().getCanvasMetaData().getTranslationFont();
     }
 }

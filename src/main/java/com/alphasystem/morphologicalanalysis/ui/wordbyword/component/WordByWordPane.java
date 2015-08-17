@@ -3,6 +3,8 @@ package com.alphasystem.morphologicalanalysis.ui.wordbyword.component;
 import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
 import com.alphasystem.morphologicalanalysis.ui.common.ChapterVerseSelectionPane;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.TreeBankPane;
+import com.alphasystem.morphologicalanalysis.ui.dependencygraph.components.CanvasMetaDataSelectionDialog;
+import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.CanvasMetaData;
 import com.alphasystem.morphologicalanalysis.ui.wordbyword.model.TableCellModel;
 import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
@@ -45,12 +47,14 @@ public class WordByWordPane extends BorderPane {
     private final ObjectProperty<Action> action = new SimpleObjectProperty<>();
     private RepositoryTool repositoryTool = RepositoryTool.getInstance();
     private ChapterVerseSelectionPane chapterVerseSelectionPane;
+    private CanvasMetaDataSelectionDialog canvasMetaDataSelectionDialog;
     private TokenEditorDialog tokenEditorDialog;
     private TableView<TableCellModel> tableView;
 
     @SuppressWarnings({"unchecked"})
     public WordByWordPane() {
         tokenEditorDialog = new TokenEditorDialog(repositoryTool.getTokenByDisplayName("1:1:1"));
+        canvasMetaDataSelectionDialog = new CanvasMetaDataSelectionDialog();
         chapterVerseSelectionPane = new ChapterVerseSelectionPane();
         chapterVerseSelectionPane.avaialbleProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue) {
@@ -178,21 +182,26 @@ public class WordByWordPane extends BorderPane {
             return;
         }
 
-        DependencyGraph dependencyGraph = repositoryTool.createDependencyGraph(tokens);
-        Alert alert = new Alert(INFORMATION);
-        alert.setContentText(format("Graph Created {%s}", dependencyGraph.getDisplayName()));
-        alert.showAndWait().filter(response -> response == OK).ifPresent(response -> {
-            items.forEach(tcm -> {
-                if (tcm.isChecked()) {
-                    tcm.setChecked(false);
-                }
+        canvasMetaDataSelectionDialog.refreshDialog();
+        Optional<CanvasMetaData> result = canvasMetaDataSelectionDialog.showAndWait();
+        result.ifPresent(metaData -> {
+            DependencyGraph dependencyGraph = repositoryTool.createDependencyGraph(tokens);
+            Alert alert = new Alert(INFORMATION);
+            alert.setContentText(format("Graph Created {%s}", dependencyGraph.getDisplayName()));
+            alert.showAndWait().filter(response -> response == OK).ifPresent(response -> {
+                items.forEach(tcm -> {
+                    if (tcm.isChecked()) {
+                        tcm.setChecked(false);
+                    }
+                });
+                Stage stage = new Stage();
+                Scene scene = new Scene(new TreeBankPane(dependencyGraph, metaData));
+                stage.setMaximized(true);
+                stage.setScene(scene);
+                stage.show();
             });
-            Stage stage = new Stage();
-            Scene scene = new Scene(new TreeBankPane(dependencyGraph));
-            stage.setMaximized(true);
-            stage.setScene(scene);
-            stage.show();
         });
+
 
     }
 

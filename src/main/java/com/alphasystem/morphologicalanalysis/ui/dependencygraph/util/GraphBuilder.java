@@ -4,6 +4,7 @@ import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
 import com.alphasystem.morphologicalanalysis.graph.model.Fragment;
 import com.alphasystem.morphologicalanalysis.graph.model.Relationship;
 import com.alphasystem.morphologicalanalysis.graph.model.Terminal;
+import com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.*;
 import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
@@ -17,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.alphasystem.morphologicalanalysis.ui.common.Global.*;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.NOUN;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.VERB;
 import static javafx.collections.FXCollections.observableArrayList;
@@ -27,33 +29,42 @@ import static javafx.collections.FXCollections.reverse;
  */
 public class GraphBuilder {
 
-    public static final double RECTANGLE_WIDTH = 100;
-    public static final double RECTANGLE_HEIGHT = 100;
-    public static final double GAP_BETWEEN_TOKENS = 60;
-    public static final double INITIAL_X = 0;
-    public static final double INITIAL_Y = 40;
     private static GraphBuilder instance;
 
-    // initial values
-    private double rectX = INITIAL_X;
-    private double rectY = INITIAL_Y;
-    private double textX = rectX + 10;
-    private double textY = 105;
-    private double x1 = rectX;
-    private double y1 = RECTANGLE_HEIGHT + rectY;
-    private double x2 = RECTANGLE_WIDTH + rectX;
-    private double y2 = y1;
-    private double x3 = rectX + 30;
-    private double y3 = 50;
+    private double tokenWidth = RECTANGLE_WIDTH;
+    private double tokenHeight = RECTANGLE_HEIGHT;
+    private double gapBetweenTokens = GAP_BETWEEN_TOKENS;
+
+    private double rectX;
+    private double rectY;
+    private double textX;
+    private double textY;
+    private double x1;
+    private double y1;
+    private double x2;
+    private double y2;
+    private double x3;
+    private double y3;
 
     private RepositoryTool repositoryTool = RepositoryTool.getInstance();
     private Map<String, Token> emptyOrHiddenTokensMap = new HashMap<>();
-
 
     private GraphBuilder() {
         TokenRepository tokenRepository = repositoryTool.getRepositoryUtil().getTokenRepository();
         emptyOrHiddenTokensMap.put(NOUN.name(), tokenRepository.findByDisplayName("0:1:1"));
         emptyOrHiddenTokensMap.put(VERB.name(), tokenRepository.findByDisplayName("0:1:2"));
+
+        // initial values
+        rectX = INITIAL_X;
+        rectY = INITIAL_Y;
+        textX = rectX + 10;
+        textY = 105;
+        x1 = rectX;
+        y1 = tokenHeight + rectY;
+        x2 = tokenWidth + rectX;
+        y2 = y1;
+        x3 = rectX + 30;
+        y3 = 50;
     }
 
     public synchronized static GraphBuilder getInstance() {
@@ -61,6 +72,36 @@ public class GraphBuilder {
             instance = new GraphBuilder();
         }
         return instance;
+    }
+
+    public void setTokenWidth(double tokenWidth) {
+        this.tokenWidth = tokenWidth;
+    }
+
+    public void setTokenHeight(double tokenHeight) {
+        this.tokenHeight = tokenHeight;
+    }
+
+    public void setGapBetweenTokens(double gapBetweenTokens) {
+        this.gapBetweenTokens = gapBetweenTokens;
+    }
+
+    public void set(CanvasMetaData metaData){
+        setTokenWidth(metaData.getTokenWidth());
+        setTokenHeight(metaData.getTokenHeight());
+        setGapBetweenTokens(metaData.getGapBetweenTokens());
+    }
+
+    public void shiftNodes(ObservableList<GraphNode> terminals, int index){
+        for (int i = index; i < terminals.size(); i++) {
+            GraphNode graphNode = terminals.get(i);
+            GraphNodeType nodeType = graphNode.getNodeType();
+            if(TERMINALS.contains(nodeType)){
+                TerminalNode terminalNode = (TerminalNode) graphNode;
+                terminalNode.setTranslateX(tokenWidth + gapBetweenTokens);
+            }
+
+        }
     }
 
     public ObservableList<GraphNode> toGraphNodes(DependencyGraph dependencyGraph) {
@@ -117,10 +158,10 @@ public class GraphBuilder {
         double yOffset = 150.0;
         TerminalNode firstNode = terminalNodes.get(terminalNodes.size() - 1);
         TerminalNode lastNode = terminalNodes.get(0);
-        Double x1 = firstNode.getX1();
-        Double y1 = firstNode.getY1() + yOffset;
-        Double x2 = lastNode.getX2();
-        Double y2 = lastNode.getY2() + yOffset;
+        Double x1 = firstNode.getX1() + firstNode.getTranslateX();
+        Double y1 = firstNode.getY1() + yOffset + firstNode.getTranslateY();
+        Double x2 = lastNode.getX2() + lastNode.getTranslateX();
+        Double y2 = lastNode.getY2() + yOffset + lastNode.getTranslateY();
         Double x = (x1 + x2) / 2;
         Double y = (y1 + y2) / 2;
         Double cx = x + 15;
@@ -132,10 +173,10 @@ public class GraphBuilder {
 
     public EmptyNode buildEmptyNode(Line referenceLine, PartOfSpeech partOfSpeech) {
         reset();
-        rectX = referenceLine.getEndX() + GAP_BETWEEN_TOKENS;
+        rectX = referenceLine.getStartX();
         textX = rectX + 30;
         x1 = rectX;
-        x2 = RECTANGLE_WIDTH + rectX;
+        x2 = tokenWidth + rectX;
         x3 = rectX + 30;
 
         Token token = emptyOrHiddenTokensMap.get(partOfSpeech.name());
@@ -153,10 +194,10 @@ public class GraphBuilder {
 
     public ReferenceNode buildReferenceNode(Line referenceLine, Token token) {
         reset();
-        rectX = referenceLine.getEndX() + GAP_BETWEEN_TOKENS;
+        rectX = referenceLine.getEndX() + gapBetweenTokens;
         textX = rectX + 30;
         x1 = rectX;
-        x2 = RECTANGLE_WIDTH + rectX;
+        x2 = tokenWidth + rectX;
         x3 = rectX + 30;
 
         ReferenceNode referenceNode = new ReferenceNode(token, textX, textY, x1, y1, x2, y2, x3, y3, 0d, 0d);
@@ -177,7 +218,7 @@ public class GraphBuilder {
         rectX = referenceLine.getStartX();
         textX = rectX + 30;
         x1 = rectX;
-        x2 = RECTANGLE_WIDTH + rectX;
+        x2 = tokenWidth + rectX;
         x3 = rectX + 30;
 
         Token token = repositoryTool.getToken(id);
@@ -219,10 +260,10 @@ public class GraphBuilder {
         }
 
         // update counters
-        rectX = x2 + GAP_BETWEEN_TOKENS;
+        rectX = x2 + gapBetweenTokens;
         textX = rectX + 30;
         x1 = rectX;
-        x2 = RECTANGLE_WIDTH + rectX;
+        x2 = tokenWidth + rectX;
         x3 = rectX + 30;
         return terminalNode;
     }
@@ -244,8 +285,8 @@ public class GraphBuilder {
         textX = rectX + 10;
         textY = 105;
         x1 = rectX;
-        y1 = RECTANGLE_HEIGHT + rectY;
-        x2 = RECTANGLE_WIDTH + rectX;
+        y1 = tokenHeight + rectY;
+        x2 = tokenWidth + rectX;
         y2 = y1;
         x3 = rectX + 30;
         y3 = 50;

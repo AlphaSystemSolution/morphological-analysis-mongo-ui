@@ -36,7 +36,7 @@ public class DependencyGraphBuilderEditorPane extends BorderPane {
     private GridPane gridPane;
     private int row = 0;
 
-    public DependencyGraphBuilderEditorPane(GraphNode graphNode) {
+    public DependencyGraphBuilderEditorPane(GraphNode graphNode, int width, int height) {
         this.graphNode = graphNode;
         canvasWidth = new SimpleDoubleProperty();
         canvasHeight = new SimpleDoubleProperty();
@@ -53,8 +53,8 @@ public class DependencyGraphBuilderEditorPane extends BorderPane {
         gridPane.setVgap(10);
         gridPane.setPadding(new Insets(5, 5, 5, 5));
 
-        setCanvasWidth(800);
-        setCanvasHeight(400);
+        setCanvasWidth(width);
+        setCanvasHeight(height);
 
         ScrollPane scrollPane = new ScrollPane();
         scrollPane.setVbarPolicy(ALWAYS);

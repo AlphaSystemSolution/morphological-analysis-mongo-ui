@@ -1,8 +1,6 @@
 package com.alphasystem.morphologicalanalysis.ui.dependencygraph.components;
 
-import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.CanvasData;
-import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.GraphNode;
-import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.TerminalNode;
+import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.*;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
@@ -14,6 +12,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 
+import static com.alphasystem.util.AppUtil.isGivenType;
 import static javafx.geometry.Pos.CENTER;
 import static javafx.geometry.Side.TOP;
 import static javafx.scene.control.ScrollPane.ScrollBarPolicy.AS_NEEDED;
@@ -47,7 +46,9 @@ public class ControlPane extends BorderPane {
         if (!nodes.isEmpty()) {
             graphNode = nodes.get(0);
         }
-        editorPane = new DependencyGraphBuilderEditorPane(graphNode);
+        final CanvasMetaData canvasMetaData = canvasData.getCanvasMetaData();
+        editorPane = new DependencyGraphBuilderEditorPane(graphNode,
+                canvasMetaData.getWidth(), canvasMetaData.getHeight());
 
         canvasData.selectedNodeProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
@@ -62,12 +63,48 @@ public class ControlPane extends BorderPane {
         });
 
 
-        PropertiesPane propertiesPane = new PropertiesPane(canvasData.getCanvasMetaData());
+        PropertiesPane propertiesPane = new PropertiesPane(canvasMetaData);
         propertiesPane.getWidthField().valueProperty().addListener((observable, oldValue, newValue) -> {
             editorPane.setCanvasWidth(newValue);
         });
         propertiesPane.getHeightField().valueProperty().addListener((observable, oldValue, newValue) -> {
             editorPane.setCanvasHeight(newValue);
+        });
+        propertiesPane.getAlignTokensYField().getValueFactory().setValue(graphNode.getY());
+        propertiesPane.getAlignTokensYField().valueProperty().addListener((observable, oldValue, newValue) -> {
+            nodes.stream().filter(gn -> isGivenType(TerminalNode.class, gn)).forEach(gn -> gn.setY(newValue));
+        });
+        if(isGivenType(TerminalNode.class, graphNode)){
+            TerminalNode terminalNode = (TerminalNode) graphNode;
+            propertiesPane.getAlignTranslationsY().getValueFactory().setValue(terminalNode.getY3());
+            ObservableList<PartOfSpeechNode> partOfSpeeches = terminalNode.getPartOfSpeeches();
+            if(!partOfSpeeches.isEmpty()){
+                PartOfSpeechNode partOfSpeechNode = partOfSpeeches.get(0);
+                propertiesPane.getAlignPOSsYField().getValueFactory().setValue(partOfSpeechNode.getY());
+                propertiesPane.getAlignPOSControlYField().getValueFactory().setValue(partOfSpeechNode.getCy());
+            }
+        }
+        propertiesPane.getAlignTranslationsY().valueProperty().addListener((observable, oldValue, newValue) -> {
+            nodes.stream().filter(gn -> isGivenType(TerminalNode.class, gn)).forEach(
+                    gn -> ((TerminalNode)gn).setY3(newValue));
+        });
+        propertiesPane.getAlignPOSsYField().valueProperty().addListener((observable, oldValue, newValue) -> {
+            nodes.stream().filter(gn -> isGivenType(TerminalNode.class, gn)).forEach(gn -> {
+                TerminalNode terminalNode = (TerminalNode) gn;
+                ObservableList<PartOfSpeechNode> partOfSpeeches = terminalNode.getPartOfSpeeches();
+                if(!partOfSpeeches.isEmpty()){
+                    partOfSpeeches.forEach(partOfSpeechNode -> partOfSpeechNode.setY(newValue));
+                }
+            });
+        });
+        propertiesPane.getAlignPOSControlYField().valueProperty().addListener((observable, oldValue, newValue) -> {
+            nodes.stream().filter(gn -> isGivenType(TerminalNode.class, gn)).forEach(gn -> {
+                TerminalNode terminalNode = (TerminalNode) gn;
+                ObservableList<PartOfSpeechNode> partOfSpeeches = terminalNode.getPartOfSpeeches();
+                if(!partOfSpeeches.isEmpty()){
+                    partOfSpeeches.forEach(partOfSpeechNode -> partOfSpeechNode.setCy(newValue));
+                }
+            });
         });
 
         TabPane tabPane = new TabPane();
