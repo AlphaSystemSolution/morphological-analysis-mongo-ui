@@ -1,15 +1,14 @@
 package com.alphasystem.morphologicalanalysis.ui.dependencygraph;
 
 import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
+import com.alphasystem.morphologicalanalysis.graph.model.TerminalNode;
+import com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.components.CanvasPane;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.components.ControlPane;
-import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.CanvasData;
-import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.CanvasMetaData;
-import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.GraphBuilder;
-import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.SVGExport;
-import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.SerializationTool;
+import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.DependencyGraphAdapter;
+import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
+import com.alphasystem.util.AppUtil;
 import javafx.collections.ObservableList;
-import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
@@ -19,18 +18,13 @@ import javafx.scene.control.*;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.layout.BorderPane;
-import javafx.stage.FileChooser;
-import javafx.stage.FileChooser.ExtensionFilter;
-import javafx.stage.Stage;
-import org.apache.commons.io.FilenameUtils;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 
-import static com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.SerializationTool.MDG_EXTENSION_ALL;
-import static com.alphasystem.util.AppUtil.CURRENT_USER_DIR;
+import static com.alphasystem.util.AppUtil.USER_HOME_DIR;
 import static java.lang.String.format;
 import static javafx.application.Platform.runLater;
 import static javafx.embed.swing.SwingFXUtils.fromFXImage;
@@ -47,202 +41,113 @@ import static javafx.scene.input.KeyCombination.CONTROL_DOWN;
 public class TreeBankPane extends BorderPane {
 
     private static final String PNG_FORMATE = "png";
-    private static final String SVG_FORMAT = "svg";
+    private static final File WORKING_DIRECTORY = new File(USER_HOME_DIR, ".treebank");
+
+    static {
+        if (!WORKING_DIRECTORY.exists()) {
+            @SuppressWarnings("unused")
+            boolean mkdirs = WORKING_DIRECTORY.mkdirs();
+        }
+    }
+
+    private RepositoryTool repositoryTool = RepositoryTool.getInstance();
+
     /**
      * pane for canvas
      */
     private CanvasPane canvasPane;
 
-    /**
-     * control pane
-     */
-    private ControlPane controlPane;
-
-    private ScrollPane scrollPane;
-
-    private GraphBuilder graphBuilder = GraphBuilder.getInstance();
-
-    private SerializationTool serializationTool = SerializationTool.getInstance();
-
-    private FileChooser fileChooser = new FileChooser();
-
-    private File currentFile;
-
     public TreeBankPane() {
-        this(null, new CanvasMetaData());
+        this(new DependencyGraphAdapter(new DependencyGraph()));
     }
 
-    public TreeBankPane(DependencyGraph dependencyGraph, CanvasMetaData canvasMetaData) {
-        super();
-
+    public TreeBankPane(DependencyGraphAdapter dependencyGraph) {
         setTop(createMenuBar());
-        initPane(createFromGraph(dependencyGraph, canvasMetaData));
-        fileChooser.setInitialDirectory(CURRENT_USER_DIR);
-        fileChooser.getExtensionFilters().addAll(
-                new ExtensionFilter(format("Morphology Dependency Graph file (%s)", MDG_EXTENSION_ALL),
-                        MDG_EXTENSION_ALL));
-    }
+        canvasPane = new CanvasPane(dependencyGraph);
+        ScrollPane scrollPane = new ScrollPane(canvasPane);
+        scrollPane.setHbarPolicy(AS_NEEDED);
+        scrollPane.setVbarPolicy(AS_NEEDED);
+        setCenter(scrollPane);
 
-    private CanvasData createFromGraph(DependencyGraph dependencyGraph, CanvasMetaData canvasMetaData) {
-        CanvasData canvasData = new CanvasData(canvasMetaData);
-        if (dependencyGraph != null) {
-            canvasData.setDependencyGraph(dependencyGraph);
-            graphBuilder.set(canvasMetaData);
-            canvasData.setNodes(graphBuilder.toGraphNodes(dependencyGraph));
-        }
-        return canvasData;
+        ControlPane controlPane = new ControlPane(dependencyGraph);
+        setRight(controlPane);
+
+        // connection between Canvas pane and Control pane
+        controlPane.dependencyGraphProperty().bind(canvasPane.dependencyGraphProperty());
     }
 
     private MenuBar createMenuBar() {
         MenuBar menuBar = new MenuBar();
 
+        MenuItem menuItem;
         ObservableList<Menu> menus = menuBar.getMenus();
 
         Menu menu = new Menu("File");
         menu.setAccelerator(new KeyCodeCombination(F));
 
-        MenuItem menuItem;
-
-        ObservableList<MenuItem> items = menu.getItems();
-
         menuItem = new MenuItem("Open ...");
         menuItem.setAccelerator(new KeyCodeCombination(O, CONTROL_DOWN));
         menuItem.setOnAction(event -> {
-            getScene().setCursor(WAIT);
-            File file = fileChooser.showOpenDialog(getStage());
-            if (file != null) {
-                currentFile = file;
-                fileChooser.setInitialDirectory(file.getParentFile());
-                CanvasData savedCanvasData = serializationTool.open(file);
-                getChildren().removeAll(scrollPane, controlPane);
-                initPane(savedCanvasData);
-                requestLayout();
-                getScene().setCursor(DEFAULT);
-            } else {
-                getScene().setCursor(DEFAULT);
-            }
-
+            // TODO:
+            DependencyGraph dependencyGraph = repositoryTool.getRepositoryUtil().getDependencyGraphRepository()
+                    .findByDisplayName("1:2:1:4");
+            dependencyGraph.getNodes().stream().filter(graphNode -> AppUtil.isGivenType(TerminalNode.class, graphNode)).forEach(graphNode1 -> {
+                TerminalNode terminalNode = (TerminalNode) graphNode1;
+                System.out.println("{{{{{{{{{{{{{{{{ " + terminalNode.getToken());
+            });
+            DependencyGraphAdapter dependencyGraphAdapter = new DependencyGraphAdapter(dependencyGraph);
+            canvasPane.setDependencyGraph(dependencyGraphAdapter);
         });
-        items.add(menuItem);
+        menu.getItems().add(menuItem);
 
-        menuItem = new MenuItem("Save ...");
+        menuItem = new MenuItem("Save");
         menuItem.setAccelerator(new KeyCodeCombination(S, CONTROL_DOWN));
-        menuItem.setOnAction(event -> {
-            setCursor(WAIT);
-            if (currentFile == null) {
-                currentFile = fileChooser.showSaveDialog(getStage());
-            }
-            if (currentFile != null) {
-                runLater(this::saveFile);
-            } else {
-                setCursor(DEFAULT);
-            }
-        });
-        items.add(menuItem);
+        menuItem.setOnAction(event ->
+                repositoryTool.saveDependencyGraph(canvasPane.getDependencyGraph().getDependencyGraph()));
+        menu.getItems().add(menuItem);
 
-        menuItem = new MenuItem("Save As ...");
-        menuItem.setAccelerator(new KeyCodeCombination(S, CONTROL_DOWN, ALT_DOWN));
-        menuItem.setOnAction(event -> {
-            setCursor(WAIT);
-            File file = fileChooser.showSaveDialog(getStage());
-            if (file != null) {
-                currentFile = file;
-                saveFile();
-            } else {
-                setCursor(DEFAULT);
-            }
-        });
-        items.add(menuItem);
+        menus.add(menu);
 
-        items.add(new SeparatorMenuItem());
+        menu.getItems().add(new SeparatorMenuItem());
 
-        Menu subMenu;
-        // subMenu = new Menu("Operations");
-
-        //items.add(subMenu);
-
-        subMenu = new Menu("Export");
-
+        Menu exportMenu = new Menu("Export");
         menuItem = new MenuItem("PNG ...");
         menuItem.setAccelerator(new KeyCodeCombination(P, CONTROL_DOWN, ALT_DOWN));
         menuItem.setOnAction(event -> {
             getScene().setCursor(WAIT);
             runLater(() -> {
                 File file = getExportFile(PNG_FORMATE);
-                if (file != null) {
-                    WritableImage writableImage = canvasPane.getCanvasPane().snapshot(new SnapshotParameters(), null);
-                    try {
-                        ImageIO.write(fromFXImage(writableImage, null), PNG_FORMATE, file);
-                        Desktop.getDesktop().open(file);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                WritableImage writableImage = canvasPane.getCanvasPane().snapshot(new SnapshotParameters(), null);
+                try {
+                    ImageIO.write(fromFXImage(writableImage, null), PNG_FORMATE, file);
+                    Desktop.getDesktop().open(file);
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
                 getScene().setCursor(DEFAULT);
             });
         });
-        subMenu.getItems().add(menuItem);
+        exportMenu.getItems().add(menuItem);
+        menu.getItems().add(exportMenu);
 
-        menuItem = new MenuItem("SVG ...");
-        menuItem.setAccelerator(new KeyCodeCombination(S, CONTROL_DOWN, ALT_DOWN));
-        menuItem.setOnAction(event -> {
-            File svgFile = getExportFile(SVG_FORMAT);
-            if (svgFile != null) {
-                SVGExport.export(canvasPane.canvasDataObjectProperty().get().getCanvasMetaData(),
-                        canvasPane.getCanvasPane(), svgFile);
-            }
-        });
-        subMenu.getItems().add(menuItem);
-        items.add(subMenu);
-
-
-        items.add(new SeparatorMenuItem());
-
-        menuItem = new MenuItem("Exit");
-        menuItem.setAccelerator(new KeyCodeCombination(F4, ALT_DOWN));
-        menuItem.setOnAction(event -> getStage().close());
-        items.add(menuItem);
-
-        menus.add(menu);
         return menuBar;
     }
 
-    private File getExportFile(String ext) {
-        if (currentFile == null) {
-            return null;
+    private File getExportFile(String format) {
+        DependencyGraph dependencyGraph = canvasPane.getDependencyGraph().getDependencyGraph();
+        File parent = new File(WORKING_DIRECTORY, getFileNameWithPadding(dependencyGraph.getChapterNumber()));
+        parent = new File(parent, getFileNameWithPadding(dependencyGraph.getVerseNumber()));
+        if (!parent.exists()) {
+            @SuppressWarnings("unused")
+            boolean mkdirs = parent.mkdirs();
         }
-        File parentFolder = currentFile.getParentFile();
-        String baseName = FilenameUtils.getBaseName(currentFile.getAbsolutePath());
-        return new File(parentFolder, format("%s.%s", baseName, ext));
+        return new File(parent, format("%s_%s.%s", getFileNameWithPadding(dependencyGraph.getFirstTokenIndex()),
+                getFileNameWithPadding(dependencyGraph.getLastTokenIndex()), format));
     }
 
-    private void saveFile() {
-        serializationTool.save(currentFile, canvasPane.canvasDataObjectProperty().get());
-        fileChooser.setInitialDirectory(currentFile.getParentFile());
-        setCursor(DEFAULT);
-    }
-
-    private Stage getStage() {
-        Scene scene = getScene();
-        return (Stage) scene.getWindow();
-    }
-
-    private void initPane(CanvasData cd) {
-        CanvasData canvasData = cd == null ? new CanvasData(new CanvasMetaData()) : cd;
-
-        canvasPane = new CanvasPane(canvasData);
-        scrollPane = new ScrollPane(canvasPane);
-        scrollPane.setHbarPolicy(AS_NEEDED);
-        scrollPane.setVbarPolicy(AS_NEEDED);
-
-        controlPane = new ControlPane(canvasData);
-
-        // connection between Canvas pane and Control pane
-        // NOTE: binding is bidirectional
-        controlPane.canvasDataObjectProperty().bind(canvasPane.canvasDataObjectProperty());
-
-        setCenter(scrollPane);
-        setRight(controlPane);
+    private static String getFileNameWithPadding(int value) {
+        String padding = value < 10 ? "00" : (value < 100 ? "0" : "");
+        return format("%s%s", padding, value);
     }
 
 }

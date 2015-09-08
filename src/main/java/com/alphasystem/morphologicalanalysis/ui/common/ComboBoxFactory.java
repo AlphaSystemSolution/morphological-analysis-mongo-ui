@@ -5,6 +5,9 @@ import com.alphasystem.arabic.model.NamedTemplate;
 import com.alphasystem.morphologicalanalysis.ui.common.ArabicSupportEnumCellFactory.ListType;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.*;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
+import javafx.util.Callback;
 
 import static com.alphasystem.morphologicalanalysis.ui.common.ArabicSupportEnumCellFactory.ListType.LABEL_AND_CODE;
 import static com.alphasystem.morphologicalanalysis.ui.common.ArabicSupportEnumCellFactory.ListType.LABEL_ONLY;
@@ -33,7 +36,7 @@ public class ComboBoxFactory {
     private static <T extends ArabicSupportEnum> ComboBox<T> createComboBox(boolean addEmptyValue,
                                                                             ListType type, T... values) {
         ComboBox<T> comboBox = new ComboBox<>();
-        if(addEmptyValue){
+        if (addEmptyValue) {
             comboBox.getItems().add(null);
         }
         comboBox.getItems().addAll(values);
@@ -45,6 +48,10 @@ public class ComboBoxFactory {
         return comboBox;
     }
 
+    private static <T extends ArabicSupportEnum> ComboBox<T> createComboBox(boolean addEmptyValue, T... values) {
+        return createComboBox(addEmptyValue, LABEL_AND_CODE, values);
+    }
+
     private static <T extends ArabicSupportEnum> ComboBox<T> createComboBox(ListType type, T... values) {
         return createComboBox(false, type, values);
     }
@@ -53,7 +60,7 @@ public class ComboBoxFactory {
         return createComboBox(LABEL_AND_CODE, values);
     }
 
-    public ComboBox<RelationshipType> getRelationshipTypeComboBox(){
+    public ComboBox<RelationshipType> getRelationshipTypeComboBox() {
         return createComboBox(LABEL_ONLY, RelationshipType.values());
     }
 
@@ -61,11 +68,11 @@ public class ComboBoxFactory {
         return createComboBox(PartOfSpeech.values());
     }
 
-    public ComboBox<NamedTemplate> getNamedTemplateComboBox(){
+    public ComboBox<NamedTemplate> getNamedTemplateComboBox() {
         return createComboBox(true, LABEL_AND_CODE, NamedTemplate.values());
     }
 
-    public ComboBox<NamedTag> getNamedTagComboBox(){
+    public ComboBox<NamedTag> getNamedTagComboBox() {
         return createComboBox(true, LABEL_AND_CODE, NamedTag.values());
     }
 
@@ -73,6 +80,9 @@ public class ComboBoxFactory {
         return createComboBox(NounStatus.values());
     }
 
+    public ComboBox<AlternateStatus> getAlternateStatusComboBox(){
+        return createComboBox(true, AlternateStatus.values());
+    }
     public ComboBox<NumberType> getNumberTypeComboBox() {
         return createComboBox(NumberType.values());
     }

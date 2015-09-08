@@ -1,10 +1,11 @@
 package com.alphasystem.morphologicalanalysis.ui.wordbyword.component;
 
 import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
+import com.alphasystem.morphologicalanalysis.graph.model.GraphMetaInfo;
 import com.alphasystem.morphologicalanalysis.ui.common.ChapterVerseSelectionPane;
+import com.alphasystem.morphologicalanalysis.ui.common.GraphMetaInfoSelectionDialog;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.TreeBankPane;
-import com.alphasystem.morphologicalanalysis.ui.dependencygraph.components.CanvasMetaDataSelectionDialog;
-import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.CanvasMetaData;
+import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.DependencyGraphAdapter;
 import com.alphasystem.morphologicalanalysis.ui.wordbyword.model.TableCellModel;
 import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
@@ -47,21 +48,20 @@ public class WordByWordPane extends BorderPane {
     private final ObjectProperty<Action> action = new SimpleObjectProperty<>();
     private RepositoryTool repositoryTool = RepositoryTool.getInstance();
     private ChapterVerseSelectionPane chapterVerseSelectionPane;
-    private CanvasMetaDataSelectionDialog canvasMetaDataSelectionDialog;
     private TokenEditorDialog tokenEditorDialog;
+    private GraphMetaInfoSelectionDialog graphMetaInfoSelectionDialog;
     private TableView<TableCellModel> tableView;
 
     @SuppressWarnings({"unchecked"})
     public WordByWordPane() {
         tokenEditorDialog = new TokenEditorDialog(repositoryTool.getTokenByDisplayName("1:1:1"));
-        canvasMetaDataSelectionDialog = new CanvasMetaDataSelectionDialog();
         chapterVerseSelectionPane = new ChapterVerseSelectionPane();
         chapterVerseSelectionPane.avaialbleProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue) {
                 initPane();
             }
         });
-
+        graphMetaInfoSelectionDialog = new GraphMetaInfoSelectionDialog();
         actionProperty().addListener((observable, oldValue, newValue) -> performAction(newValue));
 
         TableColumn descriptionColumn = new TableColumn<>();
@@ -182,10 +182,11 @@ public class WordByWordPane extends BorderPane {
             return;
         }
 
-        canvasMetaDataSelectionDialog.refreshDialog();
-        Optional<CanvasMetaData> result = canvasMetaDataSelectionDialog.showAndWait();
-        result.ifPresent(metaData -> {
-            DependencyGraph dependencyGraph = repositoryTool.createDependencyGraph(tokens);
+        graphMetaInfoSelectionDialog.setGraphMetaInfo(new GraphMetaInfo());
+        Optional<GraphMetaInfo> result = graphMetaInfoSelectionDialog.showAndWait();
+        result.ifPresent(graphMetaInfo -> {
+            DependencyGraph dependencyGraph = repositoryTool.createDependencyGraph(tokens, graphMetaInfo);
+            DependencyGraphAdapter dependencyGraphAdapter = new DependencyGraphAdapter(dependencyGraph);
             Alert alert = new Alert(INFORMATION);
             alert.setContentText(format("Graph Created {%s}", dependencyGraph.getDisplayName()));
             alert.showAndWait().filter(response -> response == OK).ifPresent(response -> {
@@ -195,12 +196,14 @@ public class WordByWordPane extends BorderPane {
                     }
                 });
                 Stage stage = new Stage();
-                Scene scene = new Scene(new TreeBankPane(dependencyGraph, metaData));
+                Scene scene = new Scene(new TreeBankPane(dependencyGraphAdapter));
                 stage.setMaximized(true);
                 stage.setScene(scene);
                 stage.show();
             });
         });
+
+
 
 
     }

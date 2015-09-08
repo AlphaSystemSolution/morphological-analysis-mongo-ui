@@ -1,25 +1,24 @@
 package com.alphasystem.morphologicalanalysis.util;
 
 import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
-import com.alphasystem.morphologicalanalysis.graph.model.Terminal;
-import com.alphasystem.morphologicalanalysis.graph.model.support.TerminalType;
+import com.alphasystem.morphologicalanalysis.graph.model.GraphMetaInfo;
+import com.alphasystem.morphologicalanalysis.graph.model.TerminalNode;
+import com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType;
 import com.alphasystem.morphologicalanalysis.graph.repository.DependencyGraphRepository;
-import com.alphasystem.morphologicalanalysis.graph.repository.TerminalRepository;
+import com.alphasystem.morphologicalanalysis.graph.repository.TerminalNodeRepository;
+import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.GraphBuilder;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.AbstractProperties;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Chapter;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
 import com.alphasystem.morphologicalanalysis.wordbyword.repository.LocationRepository;
 import com.alphasystem.morphologicalanalysis.wordbyword.repository.TokenRepository;
+import com.alphasystem.persistence.mongo.repository.BaseRepository;
 import com.alphasystem.persistence.mongo.spring.support.ApplicationContextProvider;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 
-import java.util.ArrayList;
 import java.util.List;
-
-import static com.alphasystem.morphologicalanalysis.graph.model.support.TerminalType.HIDDEN;
-import static com.alphasystem.morphologicalanalysis.graph.model.support.TerminalType.TERMINAL;
 
 /**
  * @author sali
@@ -28,11 +27,12 @@ public class RepositoryTool {
 
     private static RepositoryTool instance;
 
+    private GraphBuilder graphBuilder;
     private MorphologicalAnalysisRepositoryUtil repositoryUtil;
     private TokenRepository tokenRepository;
     private LocationRepository locationRepository;
     private DependencyGraphRepository dependencyGraphRepository;
-    private TerminalRepository terminalRepository;
+    private TerminalNodeRepository terminalNodeRepository;
 
     /**
      * do not let anyone instantiate this class
@@ -43,7 +43,8 @@ public class RepositoryTool {
         tokenRepository = repositoryUtil.getTokenRepository();
         locationRepository = repositoryUtil.getLocationRepository();
         dependencyGraphRepository = repositoryUtil.getDependencyGraphRepository();
-        terminalRepository = repositoryUtil.getTerminalRepository();
+        terminalNodeRepository = repositoryUtil.getTerminalNodeRepository();
+        graphBuilder = GraphBuilder.getInstance();
 
     }
 
@@ -52,6 +53,36 @@ public class RepositoryTool {
             instance = new RepositoryTool();
         }
         return instance;
+    }
+
+    public BaseRepository getRepository(GraphNodeType nodeType) {
+        BaseRepository repository = null;
+        switch (nodeType) {
+            case TERMINAL:
+                repository = repositoryUtil.getTerminalNodeRepository();
+                break;
+            case PART_OF_SPEECH:
+                repository = repositoryUtil.getPartOfSpeechNodeRepository();
+                break;
+            case PHRASE:
+                repository = repositoryUtil.getPhraseNodeRepository();
+                break;
+            case RELATIONSHIP:
+                repository = repositoryUtil.getRelationshipNodeRepository();
+                break;
+            case REFERENCE:
+                repository = repositoryUtil.getReferenceNodeRepository();
+                break;
+            case HIDDEN:
+                repository = repositoryUtil.getHiddenNodeRepository();
+                break;
+            case EMPTY:
+                repository = repositoryUtil.getEmptyNodeRepository();
+                break;
+            default:
+                break;
+        }
+        return repository;
     }
 
     public Service<List<Chapter>> getAllChapters() {
@@ -93,11 +124,11 @@ public class RepositoryTool {
         return tokenRepository.findByDisplayName(displayName);
     }
 
-    public Location getLocation(String id){
+    public Location getLocation(String id) {
         return locationRepository.findOne(id);
     }
 
-    public Token saveToken(Token token){
+    public Token saveToken(Token token) {
         // A token contains one or more part of speeches and each part of speech has a location corresponding to it.
         // A location has "startIndex" and "endIndex" of letters from the parent token. At the time of initial data
         // creation we only created one part of speech and one location for each token. Now from UI we will start
@@ -127,7 +158,7 @@ public class RepositoryTool {
         return token;
     }
 
-    public DependencyGraph createDependencyGraph(List<Token> tokens) {
+    public DependencyGraph createDependencyGraph(List<Token> tokens, GraphMetaInfo graphMetaInfo) {
         Token firstToken = tokens.get(0);
         Token lastToken = tokens.get(tokens.size() - 1);
 
@@ -142,27 +173,21 @@ public class RepositoryTool {
 
         if (dependencyGraph == null) {
             dependencyGraph = new DependencyGraph(chapterNumber, verseNumber, firstTokenIndex, lastTokenIndex);
-            List<Terminal> terminals = new ArrayList<>();
-            for (Token token : tokens) {
-                TerminalType terminalType = token.isHidden() ? HIDDEN : TERMINAL;
-                Terminal terminal = new Terminal(token, terminalType);
-                if(token.isHidden()){
-                    // if it is one of hidden node then try to get from database in order to avoid duplicate key
-                    // exception
-                    Terminal t = terminalRepository.findByDisplayName(terminal.getDisplayName());
-                    if(t == null){
-                        t = terminalRepository.save(terminal);
-                    }
-                    terminal = t;
-                }
-
-                terminals.add(terminal);
+            dependencyGraph.setMetaInfo(graphMetaInfo);
+            graphBuilder.set(graphMetaInfo);
+            List<TerminalNode> terminalNodes = graphBuilder.buildTerminalNodes(tokens);
+            terminalNodeRepository.save(terminalNodes);
+            for (TerminalNode terminalNode : terminalNodes) {
+                dependencyGraph.addNode(terminalNode);
             }
-            dependencyGraph.setTerminals(terminals);
             dependencyGraph = dependencyGraphRepository.save(dependencyGraph);
         }
 
         return dependencyGraph;
+    }
+
+    public void saveDependencyGraph(DependencyGraph dependencyGraph) {
+        dependencyGraphRepository.save(dependencyGraph);
     }
 
     public MorphologicalAnalysisRepositoryUtil getRepositoryUtil() {

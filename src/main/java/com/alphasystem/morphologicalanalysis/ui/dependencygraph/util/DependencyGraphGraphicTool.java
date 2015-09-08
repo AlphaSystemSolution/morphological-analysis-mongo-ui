@@ -17,6 +17,7 @@ import static javafx.scene.paint.Color.TRANSPARENT;
 public final class DependencyGraphGraphicTool {
 
     public static final Color DARK_GRAY_CLOUD = Color.web("#B6B6B4");
+    public static final String GRID_LINES = "gridLines";
 
     private static DependencyGraphGraphicTool instance;
 
@@ -29,7 +30,6 @@ public final class DependencyGraphGraphicTool {
         }
         return instance;
     }
-
 
 
     /**
@@ -57,7 +57,7 @@ public final class DependencyGraphGraphicTool {
      */
     public Path drawGridLines(boolean showGridLines, int width, int height, int step) {
         Path gridLines = new Path();
-        gridLines.setId("gridLines");
+        gridLines.setId(GRID_LINES);
         gridLines.setStroke(DARK_GRAY_CLOUD);
         gridLines.setStrokeWidth(0.5);
 
@@ -143,7 +143,6 @@ public final class DependencyGraphGraphicTool {
     }
 
     /**
-     *
      * @param id
      * @param x1
      * @param y1
@@ -154,7 +153,7 @@ public final class DependencyGraphGraphicTool {
      * @return
      */
     public Line drawDashedLine(String id, double x1, double y1, double x2, double y2,
-                         Color strokeColor, double strokeWidth) {
+                               Color strokeColor, double strokeWidth) {
         Line line = new Line();
         line.getStrokeDashArray().add(2d);
         line.setStartX(x1);
@@ -169,7 +168,6 @@ public final class DependencyGraphGraphicTool {
     }
 
     /**
-     *
      * @param id
      * @param value
      * @param alignment
@@ -180,7 +178,7 @@ public final class DependencyGraphGraphicTool {
      * @return
      */
     public Text drawText(String id, String value, TextAlignment alignment, Color fillColor,
-                         double x, double y, Font font){
+                         double x, double y, Font font) {
         Text text = new Text();
         text.setId(id);
         text.setText(value);
@@ -197,7 +195,6 @@ public final class DependencyGraphGraphicTool {
     }
 
     /**
-     *
      * @param id
      * @param color
      * @param cx
@@ -205,7 +202,7 @@ public final class DependencyGraphGraphicTool {
      * @param r
      * @return
      */
-    public Circle drawCircle(String id, Color color, double cx, double cy, double r){
+    public Circle drawCircle(String id, Color color, double cx, double cy, double r) {
         Circle circle = new Circle();
         circle.setId(id);
         circle.setStroke(color);
@@ -231,7 +228,7 @@ public final class DependencyGraphGraphicTool {
      */
     public CubicCurve drawCubicCurve(String id, double startX, double startY, double controlX1,
                                      double controlY1, double controlX2, double controlY2,
-                                     double endX, double endY, Color color){
+                                     double endX, double endY, Color color) {
         CubicCurve cubicCurve = new CubicCurve(startX, startY, controlX1, controlY1,
                 controlX2, controlY2, endX, endY);
         cubicCurve.setId(id);
@@ -243,17 +240,12 @@ public final class DependencyGraphGraphicTool {
 
     /**
      *
-     * @param x0
-     * @param y0
-     * @param x1
-     * @param y1
-     * @param x2
-     * @param y2
      * @param color
+     * @param points
      * @return
      */
-    public Polyline drawPolyline(double x0, double y0, double x1, double y1, double x2, double y2, Color color) {
-        Polyline polyline = new Polyline(x0, y0, x1, y1, x2, y2, x0, y0);
+    public Polyline drawPolyline(Color color, double... points) {
+        Polyline polyline = new Polyline(points);
         polyline.setStroke(color);
         polyline.setStrokeWidth(1.0);
         polyline.setFill(color);

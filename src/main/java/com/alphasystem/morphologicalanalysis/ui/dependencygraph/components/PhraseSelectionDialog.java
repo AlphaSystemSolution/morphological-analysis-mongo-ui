@@ -1,104 +1,98 @@
 package com.alphasystem.morphologicalanalysis.ui.dependencygraph.components;
 
-import com.alphasystem.morphologicalanalysis.graph.model.Fragment;
+import com.alphasystem.morphologicalanalysis.graph.model.PhraseNode;
 import com.alphasystem.morphologicalanalysis.ui.common.ComboBoxFactory;
 import com.alphasystem.morphologicalanalysis.ui.common.Global;
-import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.TerminalNode;
-import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.support.AlternateStatus;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.RelationshipType;
-import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.text.Text;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static com.alphasystem.morphologicalanalysis.ui.common.Global.ARABIC_FONT_BIG;
-import static javafx.collections.FXCollections.observableArrayList;
+import static com.alphasystem.morphologicalanalysis.ui.common.Global.ARABIC_FONT_SMALL_BOLD;
+import static com.alphasystem.morphologicalanalysis.ui.common.Global.FI_MAHL;
 import static javafx.scene.control.ButtonType.CANCEL;
 import static javafx.scene.control.ButtonType.OK;
 
 /**
  * @author sali
  */
-public class PhraseSelectionDialog extends Dialog<Fragment> {
+public class PhraseSelectionDialog extends Dialog<PhraseNode> {
 
-    private final ComboBox<RelationshipType> comboBox;
-    private final ObservableList<TerminalNode> nodes;
     private final Label phraseLabel;
+    private final ComboBox<RelationshipType> relationshipTypeComboBox;
+    private final ComboBox<AlternateStatus> alternateStatusComboBox;
 
     public PhraseSelectionDialog() {
         setTitle(getLabel("title"));
-
-        nodes = observableArrayList();
-        comboBox = ComboBoxFactory.getInstance().getRelationshipTypeComboBox();
+        ComboBoxFactory comboBoxFactory = ComboBoxFactory.getInstance();
+        relationshipTypeComboBox = comboBoxFactory.getRelationshipTypeComboBox();
+        alternateStatusComboBox = comboBoxFactory.getAlternateStatusComboBox();
         phraseLabel = new Label();
-        phraseLabel.setFont(ARABIC_FONT_BIG);
+        phraseLabel.setFont(ARABIC_FONT_SMALL_BOLD);
+        reset();
+        initDialog();
+        setResultConverter(param -> createResult(param));
+    }
 
-        nodes.addListener((ListChangeListener<TerminalNode>) c -> {
-            phraseLabel.setText("");
-            c.next();
-            if (c.wasAdded()) {
-                ObservableList<? extends TerminalNode> list = c.getList();
-                StringBuilder builder = new StringBuilder();
-                list.forEach(tn -> builder.append(tn.getText()).append(" "));
-                phraseLabel.setText(builder.toString());
-            }
-        });
-
-        initDialogPane();
-        setResultConverter(param -> {
-            ButtonBar.ButtonData buttonData = param.getButtonData();
-            Fragment result = null;
-            if (!buttonData.isCancelButton()) {
-                result = new Fragment();
-                result.setRelationshipType(comboBox.getValue());
-                List<Token> tokens = new ArrayList<>();
-                nodes.forEach(terminalNode -> tokens.add(terminalNode.getToken()));
-                result.setTokens(tokens);
-            }
-            return result;
-        });
+    private PhraseNode createResult(ButtonType param) {
+        ButtonBar.ButtonData buttonData = param.getButtonData();
+        if (buttonData.isCancelButton()) {
+            return null;
+        }
+        PhraseNode phraseNode = new PhraseNode();
+        phraseNode.setRelationshipType(relationshipTypeComboBox.getValue());
+        phraseNode.setAlternateStatus(alternateStatusComboBox.getValue());
+        return phraseNode;
     }
 
     private static String getLabel(String label) {
         return Global.getLabel(PhraseSelectionDialog.class, label);
     }
 
-    private void initDialogPane() {
+    private void initDialog() {
         GridPane gridPane = new GridPane();
         gridPane.setHgap(10);
         gridPane.setVgap(10);
         gridPane.setPadding(new Insets(25, 25, 25, 25));
 
-        BorderPane borderPane = new BorderPane();
-        borderPane.setCenter(phraseLabel);
-        gridPane.add(borderPane, 0, 0, 1, 2);
+        Label label = new Label(getLabel("phraseText"));
+        gridPane.add(label, 0, 0);
+        gridPane.add(phraseLabel, 1, 0);
 
-        Label label = new Label(getLabel("comboBox"));
+        label = new Label(getLabel("relationshipTypeComboBox"));
         gridPane.add(label, 0, 2);
-        gridPane.add(comboBox, 1, 2);
+        gridPane.add(relationshipTypeComboBox, 1, 2);
+
+        gridPane.add(getAlternateNounStatusLabel(), 0, 3);
+        gridPane.add(alternateStatusComboBox, 1, 3);
 
         getDialogPane().getButtonTypes().addAll(OK, CANCEL);
-
         Button okButton = (Button) getDialogPane().lookupButton(OK);
-        okButton.disableProperty().bind(comboBox.getSelectionModel().selectedIndexProperty().isEqualTo(0));
+        okButton.disableProperty().bind(relationshipTypeComboBox.getSelectionModel()
+                .selectedIndexProperty().isEqualTo(0));
 
-        getDialogPane().setContent(gridPane);
-        getDialogPane().setPrefWidth(400);
+        BorderPane borderPane = new BorderPane();
+        borderPane.setCenter(gridPane);
+        getDialogPane().setContent(borderPane);
     }
 
-    public void setNodes(List<TerminalNode> srcNodes) {
-        nodes.remove(0, nodes.size());
-        nodes.addAll(srcNodes);
+    private Label getAlternateNounStatusLabel() {
+        Text text = new Text(FI_MAHL.toUnicode());
+        text.setFont(Global.ARABIC_FONT_SMALL);
+        Label label = new Label("", text);
+        return label;
     }
 
-    public void reset() {
-        comboBox.getSelectionModel().select(0);
-        nodes.remove(0, nodes.size());
-        phraseLabel.setText("");
+    private void reset() {
+        relationshipTypeComboBox.getSelectionModel().select(0);
+        alternateStatusComboBox.getSelectionModel().select(0);
+    }
+
+    public void reset(String labelText) {
+        reset();
+        phraseLabel.setText(labelText);
     }
 }

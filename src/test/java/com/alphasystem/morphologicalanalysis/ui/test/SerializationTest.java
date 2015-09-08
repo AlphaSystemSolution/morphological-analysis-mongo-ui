@@ -1,11 +1,8 @@
 package com.alphasystem.morphologicalanalysis.ui.test;
 
-import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.CanvasMetaData;
-import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.SerializationTool;
 import com.alphasystem.morphologicalanalysis.util.SpringContextHelper;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
-import org.testng.annotations.Test;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,13 +24,11 @@ import static org.testng.Reporter.log;
  */
 public class SerializationTest {
 
-    private SerializationTool serializationTool;
     private File tmpFolder;
 
     @BeforeSuite
     public void beforeSuite() {
         SpringContextHelper.getInstance();
-        serializationTool = SerializationTool.getInstance();
         tmpFolder = new File("tmp");
         if (tmpFolder.exists()) {
             try {
@@ -58,31 +53,6 @@ public class SerializationTest {
         }
     }
 
-    @Test
-    public void serializeCanvasMetaData() {
-        CanvasMetaData canvasMetaData = new CanvasMetaData();
-        canvasMetaData.setWidth(700);
-        canvasMetaData.setShowGridLines(true);
-        try {
-            serializationTool.serialize(canvasMetaData,
-                    getSerializeFileName(canvasMetaData.getClass()));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Test(dependsOnMethods = {"serializeCanvasMetaData"})
-    public void deserializeCanvasMetaData() {
-        CanvasMetaData metaData = null;
-        try {
-            metaData = serializationTool.deserialize(
-                    getSerializeFileName(CanvasMetaData.class));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        log(format("Width: %s, Height: %s, Show Grid Lines: %s",
-                metaData.getWidth(), metaData.getHeight(), metaData.isShowGridLines()));
-    }
 
     // @SuppressWarnings({"unused"})
 //    public void updateRelationship() {

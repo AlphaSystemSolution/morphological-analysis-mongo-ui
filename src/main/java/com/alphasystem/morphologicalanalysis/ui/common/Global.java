@@ -1,12 +1,18 @@
 package com.alphasystem.morphologicalanalysis.ui.common;
 
+import com.alphasystem.arabic.model.ArabicWord;
 import com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType;
+import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.TerminalNodeAdapter;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech;
 import javafx.scene.text.Font;
 
 import java.util.List;
 import java.util.ResourceBundle;
 
+import static com.alphasystem.arabic.model.ArabicLetterType.*;
+import static com.alphasystem.arabic.model.ArabicLetterType.HHA;
+import static com.alphasystem.arabic.model.ArabicLetterType.LAM;
+import static com.alphasystem.arabic.model.ArabicWord.getWord;
 import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.*;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.*;
 import static java.lang.String.format;
@@ -20,7 +26,9 @@ import static javafx.scene.text.FontWeight.BOLD;
  */
 public class Global {
 
+    public static final ArabicWord FI_MAHL = getWord(FA, YA, SPACE, MEEM, HHA, LAM);
     public static final List<GraphNodeType> TERMINALS = asList(TERMINAL, EMPTY, HIDDEN, REFERENCE);
+    public static final List<GraphNodeType> NON_TERMINALS = asList(EMPTY, HIDDEN, REFERENCE);
     public static final List<PartOfSpeech> PART_OF_SPEECH_EXCLUDE_LIST = asList(
             DEFINITE_ARTICLE, QURANIC_PUNCTUATION, CONJUNCTION_PARTICLE_WAW, CONJUNCTION_PARTICLE_FA);
     public static final String ARABIC_FONT_NAME = System.getProperty("arabic-font-name", "Arabic Typesetting");
@@ -35,8 +43,8 @@ public class Global {
     public static final Font ARABIC_FONT_SMALL = font(ARABIC_FONT_NAME, REGULAR, DEFAULT_POS_FONT_SIZE);
     public static final Font ENGLISH_FONT = font(TRANSLATION_FONT_FAMILY, REGULAR, DEFAULT_TRANSLATION_FONT_SIZE);
     public static final Font ENGLISH_FONT_SMALL = font(TRANSLATION_FONT_FAMILY, REGULAR, 14);
-    public static final int MIN_WIDTH = 20;
-    public static final int MIN_HEIGHT = 20;
+    public static final double MIN_WIDTH = 20;
+    public static final double MIN_HEIGHT = 20;
     public static final int AMOUNT_STEP_BY = 20;
     public static final int MAX_WIDTH = 1200;
     public static final int MAX_HEIGHT = 1000;
@@ -66,8 +74,13 @@ public class Global {
         return RESOURCE_BUNDLE.getString(key);
     }
 
-    public static Font createFont(int size){
+    public static Font createFont(int size) {
         return font(ARABIC_FONT_NAME, size);
+    }
+
+    public static boolean isFakeTerminal(TerminalNodeAdapter src) {
+        GraphNodeType graphNodeType = src.getGraphNodeType();
+        return graphNodeType.equals(EMPTY) || graphNodeType.equals(HIDDEN) || graphNodeType.equals(REFERENCE);
     }
 
 }

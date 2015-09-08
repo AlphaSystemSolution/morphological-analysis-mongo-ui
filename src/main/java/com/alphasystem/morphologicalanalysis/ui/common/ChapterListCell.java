@@ -32,8 +32,7 @@ public class ChapterListCell extends ListCell<Chapter> {
         super.updateItem(item, empty);
 
         if (item != null && !empty) {
-            label.setText(item == null ? "" : format("(%s) %s", getChapterNumber(item),
-                    item.getChapterNameWord().toUnicode()));
+            label.setText(format("(%s) %s", getChapterNumber(item), item.getChapterNameWord().toUnicode()));
         }
         setGraphic(label);
     }

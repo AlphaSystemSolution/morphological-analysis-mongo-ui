@@ -4,18 +4,12 @@ import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.*;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
-import javafx.geometry.Insets;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
 
 import static com.alphasystem.util.AppUtil.isGivenType;
-import static javafx.geometry.Pos.CENTER;
 import static javafx.geometry.Side.TOP;
-import static javafx.scene.control.ScrollPane.ScrollBarPolicy.AS_NEEDED;
 import static javafx.scene.control.TabPane.TabClosingPolicy.UNAVAILABLE;
 
 /**
@@ -23,89 +17,65 @@ import static javafx.scene.control.TabPane.TabClosingPolicy.UNAVAILABLE;
  */
 public class ControlPane extends BorderPane {
 
-    private final ObjectProperty<CanvasData> canvasDataObject;
-
-    private DependencyGraphTreeView tree;
+    private final ObjectProperty<DependencyGraphAdapter> dependencyGraph = new SimpleObjectProperty<>();
     private DependencyGraphBuilderEditorPane editorPane;
 
-    public ControlPane(CanvasData canvasData) {
-
-        canvasDataObject = new SimpleObjectProperty<>(canvasData);
-
-        VBox vBox = new VBox(10);
-        vBox.setAlignment(CENTER);
-        vBox.setPadding(new Insets(5, 5, 5, 5));
-
-        ObservableList<GraphNode> nodes = canvasData.getNodes();
-
-        // init tree
-        tree = new DependencyGraphTreeView(nodes);
-
-        // init editor pane
-        GraphNode graphNode = new TerminalNode();
-        if (!nodes.isEmpty()) {
-            graphNode = nodes.get(0);
-        }
-        final CanvasMetaData canvasMetaData = canvasData.getCanvasMetaData();
-        editorPane = new DependencyGraphBuilderEditorPane(graphNode,
-                canvasMetaData.getWidth(), canvasMetaData.getHeight());
-
-        canvasData.selectedNodeProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue != null) {
-                editorPane.initPane(newValue);
-            }
-        });
-
-        tree.selectedNodeProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue != null) {
-                canvasData.setSelectedNode(newValue);
-            }
-        });
-
-
-        PropertiesPane propertiesPane = new PropertiesPane(canvasMetaData);
+    public ControlPane(DependencyGraphAdapter dependencyGraph) {
+        editorPane = new DependencyGraphBuilderEditorPane(null, 0, 0);
+        PropertiesPane propertiesPane = new PropertiesPane(dependencyGraph);
         propertiesPane.getWidthField().valueProperty().addListener((observable, oldValue, newValue) -> {
             editorPane.setCanvasWidth(newValue);
         });
         propertiesPane.getHeightField().valueProperty().addListener((observable, oldValue, newValue) -> {
             editorPane.setCanvasHeight(newValue);
         });
-        propertiesPane.getAlignTokensYField().getValueFactory().setValue(graphNode.getY());
-        propertiesPane.getAlignTokensYField().valueProperty().addListener((observable, oldValue, newValue) -> {
-            nodes.stream().filter(gn -> isGivenType(TerminalNode.class, gn)).forEach(gn -> gn.setY(newValue));
-        });
-        if(isGivenType(TerminalNode.class, graphNode)){
-            TerminalNode terminalNode = (TerminalNode) graphNode;
-            propertiesPane.getAlignTranslationsY().getValueFactory().setValue(terminalNode.getY3());
-            ObservableList<PartOfSpeechNode> partOfSpeeches = terminalNode.getPartOfSpeeches();
-            if(!partOfSpeeches.isEmpty()){
-                PartOfSpeechNode partOfSpeechNode = partOfSpeeches.get(0);
+
+        dependencyGraphProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue == null) {
+                return;
+            }
+            propertiesPane.setDependencyGraph(newValue);
+            refreshPanel(newValue);
+            TerminalNodeAdapter node = new TerminalNodeAdapter();
+            ObservableList<GraphNodeAdapter> nodes = getDependencyGraph().getGraphNodes();
+            if (!nodes.isEmpty()) {
+                node = (TerminalNodeAdapter) nodes.get(0);
+            }
+            propertiesPane.getAlignTokensYField().getValueFactory().setValue(node.getY());
+            propertiesPane.getAlignTokensYField().valueProperty().addListener((observable1, oldValue1, newValue1) -> {
+                nodes.stream().filter(gn -> isGivenType(TerminalNodeAdapter.class, gn)).forEach(gn -> gn.setY(newValue1));
+            });
+            propertiesPane.getAlignTranslationsY().getValueFactory().setValue(node.getTranslationY());
+            ObservableList<PartOfSpeechNodeAdapter> partOfSpeeches = node.getPartOfSpeeches();
+            if (!partOfSpeeches.isEmpty()) {
+                PartOfSpeechNodeAdapter partOfSpeechNode = partOfSpeeches.get(0);
                 propertiesPane.getAlignPOSsYField().getValueFactory().setValue(partOfSpeechNode.getY());
                 propertiesPane.getAlignPOSControlYField().getValueFactory().setValue(partOfSpeechNode.getCy());
             }
-        }
-        propertiesPane.getAlignTranslationsY().valueProperty().addListener((observable, oldValue, newValue) -> {
-            nodes.stream().filter(gn -> isGivenType(TerminalNode.class, gn)).forEach(
-                    gn -> ((TerminalNode)gn).setY3(newValue));
-        });
-        propertiesPane.getAlignPOSsYField().valueProperty().addListener((observable, oldValue, newValue) -> {
-            nodes.stream().filter(gn -> isGivenType(TerminalNode.class, gn)).forEach(gn -> {
-                TerminalNode terminalNode = (TerminalNode) gn;
-                ObservableList<PartOfSpeechNode> partOfSpeeches = terminalNode.getPartOfSpeeches();
-                if(!partOfSpeeches.isEmpty()){
-                    partOfSpeeches.forEach(partOfSpeechNode -> partOfSpeechNode.setY(newValue));
-                }
+            propertiesPane.getAlignTranslationsY().valueProperty().addListener((observable1, oldValue1, newValue1) -> {
+                nodes.stream().filter(gn -> isGivenType(TerminalNodeAdapter.class, gn)).forEach(
+                        gn -> ((TerminalNodeAdapter) gn).setTranslationY(newValue1));
+            });
+            propertiesPane.getAlignPOSsYField().valueProperty().addListener((observable1, oldValue1, newValue1) -> {
+                nodes.stream().filter(gn -> isGivenType(TerminalNodeAdapter.class, gn)).forEach(gn -> {
+                    TerminalNodeAdapter terminalNode = (TerminalNodeAdapter) gn;
+                    ObservableList<PartOfSpeechNodeAdapter> partOfSpeeches1 = terminalNode.getPartOfSpeeches();
+                    if (!partOfSpeeches1.isEmpty()) {
+                        partOfSpeeches1.forEach(partOfSpeechNode -> partOfSpeechNode.setY(newValue1));
+                    }
+                });
+            });
+            propertiesPane.getAlignPOSControlYField().valueProperty().addListener((observable1, oldValue1, newValue1) -> {
+                nodes.stream().filter(gn -> isGivenType(TerminalNodeAdapter.class, gn)).forEach(gn -> {
+                    TerminalNodeAdapter terminalNode = (TerminalNodeAdapter) gn;
+                    ObservableList<PartOfSpeechNodeAdapter> partOfSpeeches1 = terminalNode.getPartOfSpeeches();
+                    if (!partOfSpeeches1.isEmpty()) {
+                        partOfSpeeches1.forEach(partOfSpeechNode -> partOfSpeechNode.setCy(newValue1));
+                    }
+                });
             });
         });
-        propertiesPane.getAlignPOSControlYField().valueProperty().addListener((observable, oldValue, newValue) -> {
-            nodes.stream().filter(gn -> isGivenType(TerminalNode.class, gn)).forEach(gn -> {
-                TerminalNode terminalNode = (TerminalNode) gn;
-                ObservableList<PartOfSpeechNode> partOfSpeeches = terminalNode.getPartOfSpeeches();
-                if(!partOfSpeeches.isEmpty()){
-                    partOfSpeeches.forEach(partOfSpeechNode -> partOfSpeechNode.setCy(newValue));
-                }
-            });
-        });
+
 
         TabPane tabPane = new TabPane();
         tabPane.setMinSize(USE_PREF_SIZE, USE_PREF_SIZE);
@@ -114,44 +84,43 @@ public class ControlPane extends BorderPane {
         tabPane.setTabClosingPolicy(UNAVAILABLE);
         tabPane.setSide(TOP);
 
+        setMinSize(USE_PREF_SIZE, USE_PREF_SIZE);
+        setMaxSize(USE_PREF_SIZE, USE_PREF_SIZE);
+
         BorderPane borderPane = new BorderPane();
         borderPane.setCenter(editorPane);
 
-        // removing tree tab for now, it should be removed all together in future commits
-        tabPane.getTabs().addAll(new Tab("Properties", propertiesPane),
-                new Tab("Dependency Graph Tree", initTreePane()),
+        tabPane.getTabs().addAll(new Tab("Dependency Graph Properties", propertiesPane),
                 new Tab("Dependency Graph Controls", borderPane));
 
         setCenter(tabPane);
-        canvasDataObject.addListener((observable, oldValue, newValue) -> {
-            if (newValue != null) {
-                updateBuilderPane(newValue);
-            }
-        });
-
-        setMinSize(USE_PREF_SIZE, USE_PREF_SIZE);
-        setMaxSize(USE_PREF_SIZE, USE_PREF_SIZE);
+        setDependencyGraph(dependencyGraph);
     }
 
-    public final ObjectProperty<CanvasData> canvasDataObjectProperty() {
-        return canvasDataObject;
-    }
-
-    private void updateBuilderPane(CanvasData newValue) {
-        tree.initChildren(newValue.getNodes());
+    private void refreshPanel(DependencyGraphAdapter dependencyGraph) {
+        getDependencyGraph().selectedNodeProperty().addListener(
+                (observable, oldValue, newValue) -> {
+                    editorPane.setGraphNode(newValue);
+                });
+        if (dependencyGraph != null && !dependencyGraph.isEmpty()) {
+            GraphNodeAdapter node = dependencyGraph.getGraphNodes().get(0);
+            GraphMetaInfoAdapter graphMetaInfo = dependencyGraph.getGraphMetaInfo();
+            editorPane.setCanvasWidth(graphMetaInfo.getWidth());
+            editorPane.setCanvasHeight(graphMetaInfo.getHeight());
+            editorPane.setGraphNode(node);
+        }
         requestLayout();
     }
 
-    private Pane initTreePane() {
-        BorderPane borderPane = new BorderPane();
-        ScrollPane scrollPane = new ScrollPane();
-        scrollPane.setHbarPolicy(AS_NEEDED);
-        scrollPane.setVbarPolicy(AS_NEEDED);
-        scrollPane.setContent(tree);
-        borderPane.setCenter(scrollPane);
-        borderPane.setMinSize(USE_PREF_SIZE, USE_PREF_SIZE);
-        borderPane.setMaxSize(USE_PREF_SIZE, USE_PREF_SIZE);
-        return borderPane;
+    public final DependencyGraphAdapter getDependencyGraph() {
+        return dependencyGraph.get();
     }
 
+    public final void setDependencyGraph(DependencyGraphAdapter dependencyGraph) {
+        this.dependencyGraph.set(dependencyGraph);
+    }
+
+    public final ObjectProperty<DependencyGraphAdapter> dependencyGraphProperty() {
+        return dependencyGraph;
+    }
 }

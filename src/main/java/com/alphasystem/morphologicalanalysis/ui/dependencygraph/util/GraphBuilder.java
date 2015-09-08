@@ -1,40 +1,34 @@
 package com.alphasystem.morphologicalanalysis.ui.dependencygraph.util;
 
-import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
-import com.alphasystem.morphologicalanalysis.graph.model.Fragment;
-import com.alphasystem.morphologicalanalysis.graph.model.Relationship;
-import com.alphasystem.morphologicalanalysis.graph.model.Terminal;
+import com.alphasystem.morphologicalanalysis.graph.model.*;
 import com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType;
-import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.*;
-import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
+import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.LinkSupportAdapter;
+import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.PartOfSpeechNodeAdapter;
+import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.TerminalNodeAdapter;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
-import com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech;
-import com.alphasystem.morphologicalanalysis.wordbyword.repository.TokenRepository;
-import javafx.collections.ObservableList;
 import javafx.scene.shape.Line;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
+import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.EMPTY;
+import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.TERMINAL;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.*;
-import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.NOUN;
-import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.VERB;
-import static javafx.collections.FXCollections.observableArrayList;
-import static javafx.collections.FXCollections.reverse;
+import static java.lang.String.format;
+import static java.util.Collections.reverse;
+import static java.util.Collections.singletonList;
 
 /**
  * @author sali
  */
 public class GraphBuilder {
 
-    private static GraphBuilder instance;
-
+    private static GraphBuilder instance = new GraphBuilder();
     private double tokenWidth = RECTANGLE_WIDTH;
     private double tokenHeight = RECTANGLE_HEIGHT;
     private double gapBetweenTokens = GAP_BETWEEN_TOKENS;
-
     private double rectX;
     private double rectY;
     private double textX;
@@ -46,103 +40,136 @@ public class GraphBuilder {
     private double x3;
     private double y3;
 
-    private RepositoryTool repositoryTool = RepositoryTool.getInstance();
-    private Map<String, Token> emptyOrHiddenTokensMap = new HashMap<>();
-
     private GraphBuilder() {
-        TokenRepository tokenRepository = repositoryTool.getRepositoryUtil().getTokenRepository();
-        emptyOrHiddenTokensMap.put(NOUN.name(), tokenRepository.findByDisplayName("0:1:1"));
-        emptyOrHiddenTokensMap.put(VERB.name(), tokenRepository.findByDisplayName("0:1:2"));
-
         // initial values
-        rectX = INITIAL_X;
-        rectY = INITIAL_Y;
-        textX = rectX + 10;
-        textY = 105;
-        x1 = rectX;
-        y1 = tokenHeight + rectY;
-        x2 = tokenWidth + rectX;
-        y2 = y1;
-        x3 = rectX + 30;
-        y3 = 50;
+        reset();
     }
 
-    public synchronized static GraphBuilder getInstance() {
-        if (instance == null) {
-            instance = new GraphBuilder();
-        }
+    public static GraphBuilder getInstance() {
         return instance;
     }
 
-    public void setTokenWidth(double tokenWidth) {
-        this.tokenWidth = tokenWidth;
-    }
-
-    public void setTokenHeight(double tokenHeight) {
-        this.tokenHeight = tokenHeight;
-    }
-
-    public void setGapBetweenTokens(double gapBetweenTokens) {
-        this.gapBetweenTokens = gapBetweenTokens;
-    }
-
-    public void set(CanvasMetaData metaData){
-        setTokenWidth(metaData.getTokenWidth());
-        setTokenHeight(metaData.getTokenHeight());
-        setGapBetweenTokens(metaData.getGapBetweenTokens());
-    }
-
-    public void shiftNodes(ObservableList<GraphNode> terminals, int index){
-        for (int i = index; i < terminals.size(); i++) {
-            GraphNode graphNode = terminals.get(i);
-            GraphNodeType nodeType = graphNode.getNodeType();
-            if(TERMINALS.contains(nodeType)){
-                TerminalNode terminalNode = (TerminalNode) graphNode;
-                terminalNode.setTranslateX(tokenWidth + gapBetweenTokens);
-            }
-
+    /**
+     * Build terminal nodes from given <code>tokens</code>. This method will be called when the
+     * {@link com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph} was being created for the first time.
+     *
+     * @param tokens
+     * @return
+     * @throws IllegalArgumentException
+     */
+    public List<TerminalNode> buildTerminalNodes(List<Token> tokens) throws IllegalArgumentException {
+        if (tokens == null || tokens.isEmpty()) {
+            throw new IllegalArgumentException("tokens cannot be null or empty");
         }
-    }
+        List<TerminalNode> terminalNodes = new ArrayList<>(tokens.size());
 
-    public ObservableList<GraphNode> toGraphNodes(DependencyGraph dependencyGraph) {
-        return toGraphNodes(dependencyGraph.getTerminals());
-    }
-
-    public ObservableList<GraphNode> toGraphNodes(List<Terminal> terminals) {
-        reset();
-        ObservableList<GraphNode> results = observableArrayList();
-        // first pass add the terminals first
-        for (int i = terminals.size() - 1; i >= 0; i--) {
-            results.add(buildTerminalNode(terminals.get(i)));
+        reverse(tokens);
+        // build terminal nodes first
+        for (Token token : tokens) {
+            terminalNodes.add(buildTerminalNode(token, TERMINAL));
         }
 
+        // populate part of specches
+        buildPartOfSpeechNodes(terminalNodes);
+
+        return terminalNodes;
+    }
+
+    /**
+     * @param token
+     * @param nodeType
+     * @return
+     * @throws IllegalArgumentException
+     */
+    public TerminalNode buildTerminalNode(Token token, GraphNodeType nodeType) throws IllegalArgumentException {
+        if (token == null) {
+            throw new IllegalArgumentException("Token cannot be null");
+        }
+        TerminalNode terminalNode;
+        switch (nodeType) {
+            case TERMINAL:
+                terminalNode = new TerminalNode(token);
+                break;
+            case EMPTY:
+                terminalNode = new EmptyNode(token);
+                break;
+            case HIDDEN:
+                terminalNode = new HiddenNode(token);
+                break;
+            case REFERENCE:
+                terminalNode = new ReferenceNode(token);
+                break;
+            default:
+                throw new IllegalArgumentException(format("Invalid node type {%s} for token {%s}", nodeType,
+                        token.getDisplayName()));
+        }
+        terminalNode.setX(textX);
+        terminalNode.setY(textY);
+        terminalNode.setX1(x1);
+        terminalNode.setY1(y1);
+        terminalNode.setX2(x2);
+        terminalNode.setY2(y2);
+        terminalNode.setTranslationX(x3);
+        terminalNode.setTranslationY(y3);
+
+        // update counters
+        rectX = x2 + gapBetweenTokens;
+        textX = rectX + 30;
+        x1 = rectX;
+        x2 = tokenWidth + rectX;
+        x3 = rectX + 30;
+
+        return terminalNode;
+    }
+
+    public void buildPartOfSpeechNodes(List<TerminalNode> terminalNodes) {
         reset();
         textY = 160;
-        // second pass, part of speech tag
-        for (GraphNode graphNode : results) {
-            TerminalNode terminalNode = (TerminalNode) graphNode;
-            double posX = terminalNode.getX1();
-            ObservableList<PartOfSpeechNode> partOfSpeeches = terminalNode.getPartOfSpeeches();
-            reverse(partOfSpeeches);
-            for (PartOfSpeechNode posNode : partOfSpeeches) {
-                updatePartOfSpeechNode(posNode, posX);
-                posX += 50;
-            }
-        }
 
-        return results;
+        for (TerminalNode terminalNode : terminalNodes) {
+            List<PartOfSpeechNode> partOfSpeechNodes = buildPartOfSpeechNodes(terminalNode);
+            terminalNode.setPartOfSpeechNodes(partOfSpeechNodes);
+        }
     }
 
-    public RelationshipNode buildRelationshipNode(Relationship relationship, LinkSupport dependentNode,
-                                                  LinkSupport ownerNode) {
-        RelationshipNode relationshipNode = new RelationshipNode();
-        relationshipNode.setRelationship(relationship);
-        relationshipNode.setDependentNode(dependentNode);
-        relationshipNode.setOwnerNode(ownerNode);
-        double startX = relationshipNode.getStartX();
-        double startY = relationshipNode.getStartY();
-        double endX = relationshipNode.getEndX();
-        double endY = relationshipNode.getEndY();
+    public List<PartOfSpeechNode> buildPartOfSpeechNodes(TerminalNode terminalNode) {
+        List<PartOfSpeechNode> partOfSpeechNodes = new ArrayList<>();
+
+        Token token = terminalNode.getToken();
+        List<Location> locations = token.getLocations();
+        reverse(locations);
+        Double posX = terminalNode.getX1();
+        for (Location location : locations) {
+            partOfSpeechNodes.add(buildPartOfSpeechNode(location, posX));
+            posX += 50;
+        }
+
+        return partOfSpeechNodes;
+    }
+
+    public EmptyNode buildEmptyNode(Token token, Line referenceLine) {
+        rectX = gapBetweenTokens + referenceLine.getEndX();
+        textX = rectX + 30;
+        x1 = rectX;
+        x2 = tokenWidth + rectX;
+        x3 = rectX + 30;
+
+        EmptyNode emptyNode = (EmptyNode) buildTerminalNode(token, EMPTY);
+        buildPartOfSpeechNodes(singletonList(emptyNode));
+
+        return emptyNode;
+    }
+
+    public void buildRelationshipNode(RelationshipNode relationshipNode,
+                                      LinkSupportAdapter dependentNode, LinkSupportAdapter ownerNode) {
+        LinkSupport dependent = (LinkSupport) dependentNode.getSrc();
+        relationshipNode.setDependent(dependent);
+        LinkSupport owner = (LinkSupport) ownerNode.getSrc();
+        relationshipNode.setOwner(owner);
+        double startX = dependent.getCx() + dependent.getTranslateX();
+        double startY = dependent.getCy() + dependent.getTranslateY();
+        double endX = owner.getCx() + owner.getTranslateX();
+        double endY = owner.getCy() + owner.getTranslateY();
         double controlY1 = startY + 100d;
         double controlY2 = endY + 100d;
         relationshipNode.setControlX1(startX);
@@ -151,132 +178,79 @@ public class GraphBuilder {
         relationshipNode.setControlY2(controlY2);
         relationshipNode.setX((startX + endX) / 2);
         relationshipNode.setY((controlY1 + controlY2) / 2);
-        return relationshipNode;
+        relationshipNode.setT1(0.50);
+        relationshipNode.setT2(0.55);
     }
 
-    public PhraseNode buildPhraseNode(Fragment fragment, List<TerminalNode> terminalNodes) {
-        double yOffset = 150.0;
-        TerminalNode firstNode = terminalNodes.get(terminalNodes.size() - 1);
-        TerminalNode lastNode = terminalNodes.get(0);
-        Double x1 = firstNode.getX1() + firstNode.getTranslateX();
-        Double y1 = firstNode.getY1() + yOffset + firstNode.getTranslateY();
-        Double x2 = lastNode.getX2() + lastNode.getTranslateX();
-        Double y2 = lastNode.getY2() + yOffset + lastNode.getTranslateY();
+    public void buildPhraseNode(PhraseNode phraseNode, List<PartOfSpeechNodeAdapter> fragments) {
+        double yOffset = 100.0;
+        PartOfSpeechNodeAdapter firstNode = fragments.get(fragments.size() - 1);
+        PartOfSpeechNodeAdapter lastNode = fragments.get(0);
+        TerminalNodeAdapter firstNodeParent = (TerminalNodeAdapter) firstNode.getParent();
+        TerminalNodeAdapter lastNodeParent = (TerminalNodeAdapter) lastNode.getParent();
+
+        Double x1 = firstNodeParent.getX1() + firstNodeParent.getTranslateX();
+        Double y1 = firstNodeParent.getY1() + yOffset + firstNodeParent.getTranslateY();
+        Double x2 = lastNodeParent.getX2() + lastNodeParent.getTranslateX();
+        Double y2 = lastNodeParent.getY2() + yOffset + lastNodeParent.getTranslateY();
         Double x = (x1 + x2) / 2;
-        Double y = (y1 + y2) / 2;
+        Double y = ((y1 + y2) / 2) + 15;
         Double cx = x + 15;
         Double cy = y + 15;
 
-
-        return new PhraseNode(fragment, x, y, x1, y1, x2, y2, cx, cy);
+        phraseNode.setX(x);
+        phraseNode.setY(y);
+        phraseNode.setX1(x1);
+        phraseNode.setY1(y1);
+        phraseNode.setX2(x2);
+        phraseNode.setY2(y2);
+        phraseNode.setCx(cx);
+        phraseNode.setCy(cy);
+        fragments.forEach(psna -> phraseNode.getFragments().add(psna.getSrc()));
     }
 
-    public EmptyNode buildEmptyNode(Line referenceLine, PartOfSpeech partOfSpeech) {
-        reset();
-        rectX = referenceLine.getStartX();
-        textX = rectX + 30;
-        x1 = rectX;
-        x2 = tokenWidth + rectX;
-        x3 = rectX + 30;
-
-        Token token = emptyOrHiddenTokensMap.get(partOfSpeech.name());
-        Location location = token.getLocations().get(0);
-
-        PartOfSpeechNode partOfSpeechNode = new PartOfSpeechNode(location, 0d, 0d, 0d, 0d);
-        EmptyNode emptyNode = new EmptyNode(token, textX, textY, x1, y1, x2, y2, x3, y3, 0d, 0d, partOfSpeechNode);
-
-        reset();
-        textY = 160;
-        double posX = emptyNode.getX1();
-        updatePartOfSpeechNode(emptyNode.getPartOfSpeeches().get(0), posX);
-        return emptyNode;
-    }
-
-    public ReferenceNode buildReferenceNode(Line referenceLine, Token token) {
-        reset();
-        rectX = referenceLine.getEndX() + gapBetweenTokens;
-        textX = rectX + 30;
-        x1 = rectX;
-        x2 = tokenWidth + rectX;
-        x3 = rectX + 30;
-
-        ReferenceNode referenceNode = new ReferenceNode(token, textX, textY, x1, y1, x2, y2, x3, y3, 0d, 0d);
-
-        reset();
-        textY = 160;
-        ObservableList<PartOfSpeechNode> partOfSpeeches = referenceNode.getPartOfSpeeches();
-        partOfSpeeches.forEach(partOfSpeechNode -> {
-            double posX = referenceNode.getX1();
-            updatePartOfSpeechNode(partOfSpeechNode, posX);
-            posX += 50;
-        });
-        return referenceNode;
-    }
-
-    public HiddenNode buildHiddenNode(Line referenceLine, String id){
-        reset();
-        rectX = referenceLine.getStartX();
-        textX = rectX + 30;
-        x1 = rectX;
-        x2 = tokenWidth + rectX;
-        x3 = rectX + 30;
-
-        Token token = repositoryTool.getToken(id);
-        HiddenNode hiddenNode = new HiddenNode(token, textX, textY, x1, y1, x2, y2, x3, y3, 0d, 0d);
-
-        reset();
-        textY = 160;
-        ObservableList<PartOfSpeechNode> partOfSpeeches = hiddenNode.getPartOfSpeeches();
-        partOfSpeeches.forEach(partOfSpeechNode -> {
-            double posX = hiddenNode.getX1();
-            updatePartOfSpeechNode(partOfSpeechNode, posX);
-            posX += 50;
-        });
-
-        return hiddenNode;
-    }
-
-
-    /**
-     * @param terminal
-     * @return
-     */
-    private TerminalNode buildTerminalNode(Terminal terminal) {
-        TerminalNode terminalNode = null;
-        Token token = terminal.getToken();
-        switch (terminal.getTerminalType()) {
-            case TERMINAL:
-                terminalNode = new TerminalNode(token, textX, textY, x1, y1, x2, y2, x3, y3, 0.0, 0.0);
-                break;
-            case EMPTY:
-                terminalNode = new EmptyNode(token, textX, textY, x1, y1, x2, y2, x3, y3, 0.0, 0.0);
-                break;
-            case HIDDEN:
-                terminalNode = new HiddenNode(token, textX, textY, x1, y1, x2, y2, x3, y3, 0.0, 0.0);
-                break;
-            case REFERENCE:
-                terminalNode = new ReferenceNode(token, textX, textY, x1, y1, x2, y2, x3, y3, 0.0, 0.0);
-                break;
-        }
-
-        // update counters
-        rectX = x2 + gapBetweenTokens;
-        textX = rectX + 30;
-        x1 = rectX;
-        x2 = tokenWidth + rectX;
-        x3 = rectX + 30;
-        return terminalNode;
-    }
-
-    private void updatePartOfSpeechNode(PartOfSpeechNode posNode, double posX) {
-        posNode.setX(posX);
-        posNode.setY(textY);
+    private PartOfSpeechNode buildPartOfSpeechNode(Location location, Double posX) {
+        PartOfSpeechNode partOfSpeechNode = new PartOfSpeechNode(location);
+        partOfSpeechNode.setX(posX);
+        partOfSpeechNode.setY(textY);
         double x = posX + 20;
-        x = x + (x % 20);
-        posNode.setCx(x);
+        // x = x + (x % 20);
+        partOfSpeechNode.setCx(x);
         x = textY + 20;
-        x = x + (x % 20);
-        posNode.setCy(x);
+        // x = x + (x % 20);
+        partOfSpeechNode.setCy(x);
+        return partOfSpeechNode;
+    }
+
+    public void set(GraphMetaInfo metaInfo) {
+        setTokenWidth(metaInfo.getTokenWidth());
+        setTokenHeight(metaInfo.getTokenHeight());
+        setGapBetweenTokens(metaInfo.getGapBetweenTokens());
+        reset();
+    }
+
+    public double getTokenWidth() {
+        return tokenWidth;
+    }
+
+    public void setTokenWidth(double tokenWidth) {
+        this.tokenWidth = tokenWidth;
+    }
+
+    public double getTokenHeight() {
+        return tokenHeight;
+    }
+
+    public void setTokenHeight(double tokenHeight) {
+        this.tokenHeight = tokenHeight;
+    }
+
+    public double getGapBetweenTokens() {
+        return gapBetweenTokens;
+    }
+
+    public void setGapBetweenTokens(double gapBetweenTokens) {
+        this.gapBetweenTokens = gapBetweenTokens;
     }
 
     private void reset() {

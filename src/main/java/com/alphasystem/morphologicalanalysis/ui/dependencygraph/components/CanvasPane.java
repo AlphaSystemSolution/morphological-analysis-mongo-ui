@@ -1,19 +1,14 @@
 package com.alphasystem.morphologicalanalysis.ui.dependencygraph.components;
 
-import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
-import com.alphasystem.morphologicalanalysis.graph.model.Fragment;
-import com.alphasystem.morphologicalanalysis.graph.model.Relationship;
-import com.alphasystem.morphologicalanalysis.graph.model.Terminal;
+import com.alphasystem.arabic.model.ArabicWord;
+import com.alphasystem.morphologicalanalysis.graph.model.*;
 import com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType;
-import com.alphasystem.morphologicalanalysis.graph.repository.RelationshipRepository;
-import com.alphasystem.morphologicalanalysis.graph.repository.TerminalRepository;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.*;
+import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.CanvasUtil;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.DependencyGraphGraphicTool;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.GraphBuilder;
-import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
-import com.alphasystem.morphologicalanalysis.wordbyword.model.VerbProperties;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -26,7 +21,6 @@ import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
-import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
 import java.util.ArrayList;
@@ -34,16 +28,21 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
-import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.REFERENCE;
-import static com.alphasystem.morphologicalanalysis.graph.model.support.TerminalType.EMPTY;
-import static com.alphasystem.morphologicalanalysis.graph.model.support.TerminalType.HIDDEN;
-import static com.alphasystem.morphologicalanalysis.ui.common.Global.ARABIC_FONT_SMALL_BOLD;
+import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.PHRASE;
+import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.TERMINAL;
+import static com.alphasystem.morphologicalanalysis.ui.common.Global.*;
+import static com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.CanvasUtil.getLocationWord;
+import static com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.CubicCurveHelper.arrowPoints;
 import static com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.DependencyGraphGraphicTool.DARK_GRAY_CLOUD;
+import static com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.DependencyGraphGraphicTool.GRID_LINES;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.NOUN;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.VERB;
 import static com.alphasystem.util.AppUtil.isGivenType;
 import static java.lang.String.format;
 import static java.util.Collections.reverse;
+import static java.util.Collections.singletonList;
+import static javafx.collections.FXCollections.observableArrayList;
+import static javafx.geometry.NodeOrientation.RIGHT_TO_LEFT;
 import static javafx.scene.control.Alert.AlertType.INFORMATION;
 import static javafx.scene.paint.Color.*;
 import static javafx.scene.text.TextAlignment.CENTER;
@@ -54,654 +53,230 @@ import static javafx.scene.text.TextAlignment.RIGHT;
  */
 public class CanvasPane extends Pane {
 
-    public static final String TERMINAL_GROUP_ID_PREFIX = "terminal";
+    private static final String TERMINAL_GROUP_ID_PREFIX = "terminal";
+    private static final Color DEFAULT_COLOR = BLACK;
+    private static final Color NON_TERMINAL_COLOR = LIGHTGRAY.darker();
     private static final double RADIUS = 2.0;
-    private final ObjectProperty<CanvasData> canvasDataObject;
-    private final ContextMenu terminalContextMenu;
-    private final ContextMenu partOfSpeechContextMenu;
-    private final ContextMenu relationshipContextMenu;
-    private RepositoryTool repositoryTool = RepositoryTool.getInstance();
-    private TerminalRepository terminalRepository = repositoryTool.getRepositoryUtil().getTerminalRepository();
-    private RelationshipRepository relationshipRepository = repositoryTool
-            .getRepositoryUtil().getRelationshipRepository();
+
+    private final ObjectProperty<DependencyGraphAdapter> dependencyGraph;
+    private final ContextMenu contextMenu;
+
+    private GraphMetaInfoAdapter metaInfo = new GraphMetaInfoAdapter(new GraphMetaInfo());
+    private DependencyGraphGraphicTool tool = DependencyGraphGraphicTool.getInstance();
+    private CanvasUtil canvasUtil = CanvasUtil.getInstance();
+    private GraphBuilder graphBuilder = GraphBuilder.getInstance();
     private RelationshipSelectionDialog relationshipSelectionDialog;
     private PhraseSelectionDialog phraseSelectionDialog;
-    private ReferenceNodeSelectionDialog referenceNodeSelectionDialog;
-    private DependencyGraphGraphicTool tool = DependencyGraphGraphicTool.getInstance();
-    private GraphBuilder graphBuilder = GraphBuilder.getInstance();
     private Pane canvasPane;
-    private LinkSupport dependentLinkNode;
-    private LinkSupport ownerLinkNode;
-    private TerminalNode firstTerminalNode;
-    private TerminalNode lastTerminalNode;
     private Node gridLines;
 
-    public CanvasPane(CanvasData data) {
-        this.canvasDataObject = new SimpleObjectProperty<>(data);
-
-        CanvasMetaData metaData = canvasDataObjectProperty().get().getCanvasMetaData();
-        int width = metaData.getWidth();
-        int height = metaData.getHeight();
-        terminalContextMenu = new ContextMenu();
-        partOfSpeechContextMenu = new ContextMenu();
-        relationshipContextMenu = new ContextMenu();
+    public CanvasPane(DependencyGraphAdapter src) {
         relationshipSelectionDialog = new RelationshipSelectionDialog();
         phraseSelectionDialog = new PhraseSelectionDialog();
-        referenceNodeSelectionDialog = new ReferenceNodeSelectionDialog();
-        initListeners();
+        contextMenu = new ContextMenu();
+        dependencyGraph = new SimpleObjectProperty<>();
+        src = (src == null) ? new DependencyGraphAdapter(new DependencyGraph()) : src;
+        metaInfo = src.getGraphMetaInfo();
+
+        Double canvasWidth = metaInfo.getWidth();
+        Double canvasHeight = metaInfo.getHeight();
 
         canvasPane = new Pane();
-        initCanvas();
-
         canvasPane.setMinSize(USE_PREF_SIZE, USE_PREF_SIZE);
         canvasPane.setMaxSize(USE_PREF_SIZE, USE_PREF_SIZE);
-        canvasPane.setPrefSize(width, height);
+        canvasPane.setPrefSize(canvasWidth, canvasHeight);
         canvasPane.setBackground(new Background(new BackgroundFill(BEIGE, null, null)));
+        initListeners();
+        setDependencyGraph(src);
+
+        GraphMetaInfoAdapter graphMetaInfo = getDependencyGraph().getGraphMetaInfo();
+        graphMetaInfo.widthProperty().addListener((observable, oldValue, newValue) -> {
+            metaInfo.setWidth((Double) newValue);
+            initCanvas();
+        });
+        graphMetaInfo.heightProperty().addListener((observable, oldValue, newValue) -> {
+            metaInfo.setHeight((Double) newValue);
+            initCanvas();
+        });
+        graphMetaInfo.showGridLinesProperty().addListener((observable, oldValue, newValue) -> {
+            try {
+                metaInfo.setShowGridLines(newValue);
+            } catch (Exception e) {
+            }
+            toggleGridLines();
+        });
+        graphMetaInfo.showOutLinesProperty().addListener((observable, oldValue, newValue) -> {
+            try {
+                metaInfo.setShowGridLines(newValue);
+            } catch (Exception e) {
+            }
+            toggleGridLines();
+        });
+        graphMetaInfo.debugModeProperty().addListener((observable, oldValue, newValue) -> {
+            try {
+                metaInfo.setDebugMode(newValue);
+            } catch (Exception e) {
+            }
+            toggleGridLines();
+        });
 
         getChildren().add(canvasPane);
-
         setMinSize(USE_PREF_SIZE, USE_PREF_SIZE);
         setMaxSize(USE_PREF_SIZE, USE_PREF_SIZE);
-        setPrefSize(width + 200, height + 200);
-    }
-
-    private List<GraphNode> createListOfNodes(boolean reverse) {
-        List<GraphNode> nodes = new ArrayList<>(canvasDataObjectProperty().get().getNodes());
-        if (reverse) {
-            reverse(nodes);
-        }
-        return nodes;
-    }
-
-    private void initTerminalContextMenu(Text source) {
-        TerminalNode tn = (TerminalNode) source.getUserData();
-        Token token = tn.getToken();
-
-        final ObservableList<MenuItem> items = terminalContextMenu.getItems();
-        items.remove(0, items.size());
-
-        Menu menu = new Menu("Make Phrase");
-        List<GraphNode> nodes = createListOfNodes(true);
-        nodes.forEach(graphNode -> {
-            GraphNodeType nodeType = graphNode.getNodeType();
-            switch (nodeType) {
-                case TERMINAL:
-                case EMPTY:
-                case HIDDEN:
-                    TerminalNode _tn = (TerminalNode) graphNode;
-                    menu.getItems().add(createPhraseMenuItem(_tn));
-                    break;
-            }
-        });
-        items.add(menu);
-
-        Menu addEmptyNodeMenu = new Menu("Add Empty Node");
-
-        addEmptyNodeMenu.getItems().add(createAddEmptyNodeMenuItem(source, token, NOUN));
-        addEmptyNodeMenu.getItems().add(createAddEmptyNodeMenuItem(source, token, VERB));
-        items.add(addEmptyNodeMenu);
-
-        MenuItem menuItem = new MenuItem("Add Reference Node ...");
-        menuItem.setOnAction(event -> {
-            DependencyGraph dependencyGraph = canvasDataObject.get().getDependencyGraph();
-            referenceNodeSelectionDialog.setChapter(dependencyGraph.getChapterNumber());
-            referenceNodeSelectionDialog.setVerse(dependencyGraph.getVerseNumber());
-            Optional<Terminal> result = referenceNodeSelectionDialog.showAndWait();
-            result.ifPresent(terminal -> addReferenceNode(source, terminal));
-        });
-
-        items.add(menuItem);
-
-        // add "Hidden" pronoun if applicable (only for verb)
-        token.getLocations().forEach(location -> {
-            PartOfSpeech partOfSpeech = location.getPartOfSpeech();
-            if (partOfSpeech.equals(VERB)) {
-                MenuItem mi = new MenuItem("Add Hidden Node");
-                mi.setOnAction(event -> {
-                    VerbProperties vp = (VerbProperties) location.getProperties();
-                    String id = format("%s_%s_%s", vp.getConversationType().name(), vp.getGender().name(),
-                            vp.getNumber().name());
-                    addHiddenNode(getReferenceLine(source), token, id);
-                });
-                items.add(mi);
-            }
-        });
-    }
-
-    private void shiftNodes(Token token){
-        List<Token> tokens = getTokens(canvasDataObjectProperty().get().getDependencyGraph().getTerminals());
-        int index = tokens.indexOf(token);
-        int reverseIndex = canvasDataObjectProperty().get().getNodes().size() - 1 - index;
-        graphBuilder.set(canvasDataObjectProperty().get().getCanvasMetaData());
-        graphBuilder.shiftNodes(canvasDataObjectProperty().get().getNodes(), reverseIndex);
-    }
-
-    private void initPartOfSpeechContextMenu(String currentNodeId) {
-        ObservableList<MenuItem> items = partOfSpeechContextMenu.getItems();
-        items.remove(0, items.size());
-
-        Menu menu = new Menu("Make Relationship");
-        ObservableList<GraphNode> nodes = canvasDataObject.get().getNodes();
-        nodes.forEach(graphNode -> {
-            GraphNodeType nodeType = graphNode.getNodeType();
-            switch (nodeType) {
-                case TERMINAL:
-                case EMPTY:
-                case REFERENCE:
-                case HIDDEN:
-                    TerminalNode tn = (TerminalNode) graphNode;
-                    ObservableList<PartOfSpeechNode> partOfSpeeches = tn.getPartOfSpeeches();
-                    for (PartOfSpeechNode partOfSpeech : partOfSpeeches) {
-                        if (currentNodeId.equals(partOfSpeech.getId())) {
-                            continue;
-                        }
-                        menu.getItems().add(createRelationshipMenuItem(tn, partOfSpeech));
-                    }
-                    break;
-                case PHRASE:
-                    PhraseNode pn = (PhraseNode) graphNode;
-                    if (!currentNodeId.equals(pn.getId())) {
-                        menu.getItems().add(createRelationshipMenuItem(null, pn));
-                    }
-                    break;
-            }
-        });
-        items.add(menu);
-    }
-
-    private void initRelationshipContextMenu(Text text) {
-        ObservableList<MenuItem> items = relationshipContextMenu.getItems();
-        items.remove(0, items.size());
-
-        MenuItem menuItem = new MenuItem("Remove");
-        menuItem.setUserData(text);
-        menuItem.setOnAction(event -> {
-            MenuItem source = (MenuItem) event.getSource();
-            Text selectedText = (Text) source.getUserData();
-            RelationshipNode relationshipNode = (RelationshipNode) selectedText.getUserData();
-            removeRelationship(relationshipNode);
-        });
-        items.add(menuItem);
-    }
-
-    private void removeRelationship(RelationshipNode relationshipNode) {
-        Relationship relationship = relationshipNode.getRelationship();
-        CanvasData canvasData = canvasDataObject.get();
-
-        canvasData.getNodes().remove(relationshipNode);
-        boolean removed = canvasData.getDependencyGraph().getRelationships().remove(relationship);
-        if (removed) {
-            relationshipRepository.delete(relationship.getId());
-        }
-
-        canvasDataObject.setValue(null);
-        canvasDataObject.setValue(canvasData);
-    }
-
-    private MenuItem createPhraseMenuItem(TerminalNode terminalNode) {
-        Text text = new Text(terminalNode.getText());
-        text.setFont(ARABIC_FONT_SMALL_BOLD);
-        MenuItem menuItem = new MenuItem("", text);
-        menuItem.setUserData(terminalNode);
-        menuItem.setOnAction(event -> {
-            MenuItem source = (MenuItem) event.getSource();
-            phraseSelectionDialog.reset();
-            lastTerminalNode = (TerminalNode) source.getUserData();
-            Token firstToken = firstTerminalNode.getToken();
-            Token lastToken = lastTerminalNode.getToken();
-            Integer firstTokenTokenNumber = firstToken.getTokenNumber();
-            Integer lastTokenTokenNumber = lastToken.getTokenNumber();
-            if (firstTokenTokenNumber > lastTokenTokenNumber) {
-                // in UI we have laid out nodes from left to right but Arabic is read right to left.
-                // if we have selected from left, then switch the nodes to make it right to left
-                TerminalNode tmp = firstTerminalNode;
-                firstTerminalNode = lastTerminalNode;
-                lastTerminalNode = tmp;
-                tmp = null;
-                firstTokenTokenNumber = firstTerminalNode.getToken().getTokenNumber();
-                lastTokenTokenNumber = lastTerminalNode.getToken().getTokenNumber();
-            } else if (firstTokenTokenNumber.equals(lastTokenTokenNumber)) {
-                //lastTokenTokenNumber--;
-            }
-            lastTokenTokenNumber++;
-            // populate the list of nodes
-            List<TerminalNode> terminalNodes = new ArrayList<>();
-            List<GraphNode> nodes = createListOfNodes(true);
-            Iterator<GraphNode> iterator = nodes.iterator();
-            loop:
-            while (iterator.hasNext()) {
-                GraphNode gn = iterator.next();
-                GraphNodeType nodeType = gn.getNodeType();
-                switch (nodeType) {
-                    case TERMINAL:
-                    case EMPTY:
-                    case HIDDEN:
-                        TerminalNode tn = (TerminalNode) gn;
-                        Integer tokenNumber = tn.getToken().getTokenNumber();
-                        if (tokenNumber < firstTokenTokenNumber) {
-                            continue loop;
-                        }
-                        if (tokenNumber >= lastTokenTokenNumber) {
-                            break loop;
-                        }
-                        terminalNodes.add(tn);
-                        break;
-                }
-
-            }
-
-            phraseSelectionDialog.setNodes(terminalNodes);
-            Optional<Fragment> result = phraseSelectionDialog.showAndWait();
-            result.ifPresent(fragment -> addPhrase(fragment, terminalNodes));
-        });
-        return menuItem;
-    }
-
-    private MenuItem createRelationshipMenuItem(TerminalNode terminalNode, LinkSupport ownerNode) {
-        String tnText = terminalNode == null ? "" : format("%s - ", terminalNode.getText());
-        String value = format("%s%s", tnText, ownerNode.getText());
-        Text text = new Text(value);
-        text.setFont(ARABIC_FONT_SMALL_BOLD);
-        MenuItem menuItem = new MenuItem("", text);
-        menuItem.setUserData(ownerNode);
-        menuItem.setOnAction(event -> {
-            MenuItem source = (MenuItem) event.getSource();
-            relationshipSelectionDialog.reset();
-            relationshipSelectionDialog.setDependentNode(dependentLinkNode);
-            ownerLinkNode = (LinkSupport) source.getUserData();
-            relationshipSelectionDialog.setOwnerNode(ownerLinkNode);
-            Optional<Relationship> result = relationshipSelectionDialog.showAndWait();
-            result.ifPresent(this::addRelationship);
-        });
-        return menuItem;
-    }
-
-    private MenuItem createAddEmptyNodeMenuItem(Text selectedText, Token token, PartOfSpeech partOfSpeech) {
-        Text text = new Text(partOfSpeech.getLabel().toUnicode());
-        text.setFont(ARABIC_FONT_SMALL_BOLD);
-        MenuItem menuItem = new MenuItem("", text);
-        menuItem.setUserData(partOfSpeech);
-        menuItem.setOnAction(event -> {
-            MenuItem source = (MenuItem) event.getSource();
-            PartOfSpeech pos = (PartOfSpeech) source.getUserData();
-            addEmptyNode(selectedText, token, pos);
-        });
-        return menuItem;
-    }
-
-    private Line getReferenceLine(Text selectedText) {
-        Group parent = (Group) selectedText.getParent();
-        ObservableList<Node> children = parent.getChildren();
-        Line line = null;
-        for (Node child : children) {
-            if (isGivenType(Line.class, child)) {
-                line = (Line) child;
-                break;
-            }
-        }
-        if (line == null) {
-            showAlert(INFORMATION, "No line found.", null);
-            return null;
-        }
-        return line;
-    }
-
-    private void addReferenceNode(Text selectedText, Terminal terminal) {
-        Line line = getReferenceLine(selectedText);
-        if (line != null) {
-            addReferenceNode(line, terminal);
-        }
-    }
-
-    private void addEmptyNode(Text selectedText, Token token, PartOfSpeech partOfSpeech) {
-        Line line = getReferenceLine(selectedText);
-        if (line != null) {
-            addEmptyNode(line, token, partOfSpeech);
-        }
+        setPrefSize(canvasWidth + 200, canvasHeight + 200);
     }
 
     private void initListeners() {
-        CanvasMetaData metaData = canvasDataObject.get().getCanvasMetaData();
-        metaData.widthProperty().addListener((observable, oldValue, newValue) -> {
-            resizeCanvas();
-        });
-        metaData.heightProperty().addListener((observable, oldValue, newValue) -> {
-            resizeCanvas();
-        });
-        metaData.tokenWidthProperty().addListener((observable, oldValue, newValue) -> {
-            System.out.println("tokenWidthProperty: " + newValue);
-        });
-        metaData.tokenHeightProperty().addListener((observable, oldValue, newValue) -> {
-            System.out.println("tokenHeightProperty: " + newValue);
-        });
-        metaData.gapBetweenTokensProperty().addListener((observable, oldValue, newValue) -> {
-            System.out.println("gapBetweenTokensProperty: " + newValue);
-        });
-        metaData.showGridLinesProperty().addListener((observable, oldValue, newValue) -> {
-            toggleGridLines(newValue, metaData.isShowOutLines());
-        });
-        metaData.showOutLinesProperty().addListener((observable, oldValue, newValue) -> {
-            toggleGridLines(metaData.isShowGridLines(), newValue);
-        });
-        metaData.debugModeProperty().addListener((observable, oldValue, newValue) -> {
-            initCanvas();
-        });
-        canvasDataObjectProperty().addListener((observable, oldValue, newData) -> {
-            if (newData != null) {
-                ObservableList<GraphNode> nodes = newData.getNodes();
-                if (nodes != null && !nodes.isEmpty()) {
-                    drawNodes(nodes, false);
-                }
+        dependencyGraphProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                metaInfo = newValue.getGraphMetaInfo();
+                initCanvas();
             }
         });
     }
 
-    public final ObjectProperty<CanvasData> canvasDataObjectProperty() {
-        return canvasDataObject;
-    }
+    private void initCanvas(Double width, Double height) {
+        // clear canvas content
+        removeAll(true);
 
-    private void toggleGridLines(boolean showGridLines, boolean showOutline) {
-        canvasPane.getChildren().remove(gridLines);
-        gridLines = null;
-        if (showOutline || showGridLines) {
-            CanvasMetaData metaData = canvasDataObject.get().getCanvasMetaData();
-            int width = metaData.getWidth();
-            int height = metaData.getHeight();
-            gridLines = tool.drawGridLines(showGridLines, width, height);
-            canvasPane.getChildren().add(gridLines);
-        }
-    }
+        GraphMetaInfoAdapter metaInfo = getDependencyGraph().getGraphMetaInfo();
 
-    private void resizeCanvas() {
-        CanvasMetaData metaData = canvasDataObject.get().getCanvasMetaData();
-
-        int width = metaData.getWidth();
-        int height = metaData.getHeight();
+        // resize the canvas
         canvasPane.setPrefSize(width, height);
-
         setPrefSize(width + 200, height + 200);
 
-        toggleGridLines(metaData.isShowGridLines(), metaData.isShowOutLines());
+        List<GraphNodeAdapter> nodes = getDependencyGraph().getGraphNodes();
+        drawNodes(nodes, true);
+
+        boolean showOutline = metaInfo.isShowOutLines();
+        boolean showGridLines = metaInfo.isShowGridLines();
+        if (showOutline || showGridLines) {
+            gridLines = tool.drawGridLines(showGridLines, width.intValue(), height.intValue());
+            canvasPane.getChildren().add(gridLines);
+        }
+
         requestLayout();
     }
 
     private void initCanvas() {
-        CanvasMetaData metaData = canvasDataObject.get().getCanvasMetaData();
-        int size = canvasPane.getChildren().size();
-        canvasPane.getChildren().remove(0, size);
-        boolean showOutline = metaData.isShowOutLines();
-        boolean showGridLines = metaData.isShowGridLines();
-        int width = metaData.getWidth();
-        int height = metaData.getHeight();
-        canvasPane.setPrefSize(width, height);
+        // clear canvas content
+        removeAll(true);
 
-        ObservableList<GraphNode> nodes = canvasDataObject.get().getNodes();
-        if (nodes != null && !nodes.isEmpty()) {
-            drawNodes(nodes, true);
-        }
+        Double canvasWidth = metaInfo.getWidth();
+        Double canvasHeight = metaInfo.getHeight();
+        // resize the canvas
+        canvasPane.setPrefSize(canvasWidth, canvasHeight);
+        setPrefSize(canvasWidth + 200, canvasHeight + 200);
 
+        List<GraphNodeAdapter> nodes = getDependencyGraph().getGraphNodes();
+        drawNodes(nodes, true);
+
+        boolean showOutline = metaInfo.isShowOutLines();
+        boolean showGridLines = metaInfo.isShowGridLines();
         if (showOutline || showGridLines) {
-            gridLines = tool.drawGridLines(showGridLines, width, height);
+            gridLines = tool.drawGridLines(showGridLines, canvasWidth.intValue(), canvasHeight.intValue());
             canvasPane.getChildren().add(gridLines);
         }
 
-        setPrefSize(width + 200, height + 200);
         requestLayout();
     }
 
+    private void drawNodes(List<GraphNodeAdapter> nodes, boolean removeGridLines) {
+        removeAll(removeGridLines);
+        if (nodes != null && !nodes.isEmpty()) {
+            nodes.forEach(graphNode -> {
+                switch (graphNode.getGraphNodeType()) {
+                    case TERMINAL:
+                    case EMPTY:
+                    case HIDDEN:
+                    case REFERENCE:
+                        drawTerminalNode((TerminalNodeAdapter) graphNode);
+                        break;
+                    case PHRASE:
+                        drawPhraseNode((PhraseNodeAdapter) graphNode);
+                        break;
+                    case RELATIONSHIP:
+                        drawRelationshipNode((RelationshipNodeAdapter) graphNode);
+                        break;
+                    default:
+                        break;
+                }
+            });
+        }
+    }
+
+    /**
+     * @param removeGridLines
+     */
     private void removeAll(boolean removeGridLines) {
         ObservableList<Node> children = canvasPane.getChildren();
         Iterator<Node> iterator = children.iterator();
         while (iterator.hasNext()) {
             Node node = iterator.next();
             String id = node.getId();
-            if ("gridLines".equals(id) && !removeGridLines) {
+            if (GRID_LINES.equals(id) && !removeGridLines) {
                 continue;
             }
             iterator.remove();
         }
-
     }
 
-    private void drawNodes(ObservableList<GraphNode> nodes, boolean removeGridLines) {
-        removeAll(removeGridLines);
-        for (GraphNode node : nodes) {
-            GraphNodeType nodeType = node.getNodeType();
-            switch (nodeType) {
-                case TERMINAL:
-                case EMPTY:
-                case REFERENCE:
-                case HIDDEN:
-                    buildTerminalNode((TerminalNode) node);
-                    break;
-                case RELATIONSHIP:
-                    buildRelationshipNode((RelationshipNode) node);
-                    break;
-                case PHRASE:
-                    buildPhraseNode((PhraseNode) node);
-                    break;
-                default:
-                    break;
-            }
+    private void toggleGridLines() {
+        boolean showGridLines = metaInfo.isShowGridLines();
+        boolean showOutline = metaInfo.isShowOutLines();
+        canvasPane.getChildren().remove(gridLines);
+        gridLines = null;
+        if (showOutline || showGridLines) {
+            int width = (int) metaInfo.getWidth();
+            int height = (int) metaInfo.getHeight();
+            gridLines = tool.drawGridLines(showGridLines, width, height);
+            canvasPane.getChildren().add(gridLines);
         }
     }
 
-    private List<Token> getTokens(List<Terminal> terminals) {
-        List<Token> tokens = new ArrayList<>();
-        terminals.forEach(terminal -> tokens.add(terminal.getToken()));
-        return tokens;
+    @SuppressWarnings({"unused"})
+    private void resizeCanvas() {
+        GraphMetaInfoAdapter metaInfo = getDependencyGraph().getGraphMetaInfo();
+        Double width = metaInfo.getWidth();
+        Double height = metaInfo.getHeight();
+        canvasPane.setPrefSize(width, height);
+        setPrefSize(width + 200, height + 200);
+
+        requestLayout();
     }
 
-    private void addEmptyNode(Line referenceLine, Token token, PartOfSpeech partOfSpeech) {
-        shiftNodes(token);
-        CanvasData canvasData = canvasDataObject.get();
-        graphBuilder.set(canvasData.getCanvasMetaData());
-        // Step 1: call GraphBuilder to create an empty node
-        EmptyNode emptyNode = graphBuilder.buildEmptyNode(referenceLine, partOfSpeech);
-
-        // add this node into existing list of nodes and
-        // update canvasDataObject for changes to take effect
-        List<Token> tokens = getTokens(canvasData.getDependencyGraph().getTerminals());
-        int index = tokens.indexOf(firstTerminalNode.getToken());
-        Terminal terminal = new Terminal(emptyNode.getToken(), EMPTY);
-        Terminal result = terminalRepository.findByDisplayName(terminal.getDisplayName());
-        if (result == null) {
-            result = terminal;
-        }
-        canvasData.getDependencyGraph().getTerminals().add(index, result);
-        index = (canvasData.getNodes().size() - 1) - (index - 1);
-        canvasData.getNodes().add(index, emptyNode);
-        canvasDataObject.setValue(null);
-        canvasDataObject.setValue(canvasData);
-    }
-
-    private void addReferenceNode(Line referenceLine, Terminal terminal) {
-        CanvasData canvasData = canvasDataObject.get();
-        graphBuilder.set(canvasData.getCanvasMetaData());
-        // Step 1: call GraphBuilder to create an reference node
-        ReferenceNode referenceNode = graphBuilder.buildReferenceNode(referenceLine, terminal.getToken());
-
-        // add this node into existing list of nodes and
-        // update canvasDataObject for changes to take effect
-        List<Token> tokens = getTokens(canvasData.getDependencyGraph().getTerminals());
-        int index = tokens.indexOf(firstTerminalNode.getToken());
-        canvasData.getDependencyGraph().getTerminals().add(index, terminal);
-        canvasData.getNodes().add(index, referenceNode);
-        canvasDataObject.setValue(null);
-        canvasDataObject.setValue(canvasData);
-    }
-
-    private void addRelationship(Relationship relationship) {
-        CanvasData canvasData = canvasDataObject.get();
-        final CanvasMetaData canvasMetaData = canvasData.getCanvasMetaData();
-        graphBuilder.set(canvasMetaData);
-        // Step 1: call GraphBuilder to create a relationship node
-        RelationshipNode relationshipNode = graphBuilder.buildRelationshipNode(relationship,
-                dependentLinkNode, ownerLinkNode);
-
-        // add this node into existing list of nodes and
-        // update canvasDataObject for changes to take effect
-        canvasData.getDependencyGraph().getRelationships().add(relationship);
-        canvasData.getNodes().add(relationshipNode);
-        canvasDataObject.setValue(null);
-        canvasDataObject.setValue(canvasData);
-    }
-
-    private void addPhrase(Fragment fragment, List<TerminalNode> nodes) {
-        firstTerminalNode = null;
-        lastTerminalNode = null;
-        CanvasData canvasData = canvasDataObject.get();
-        graphBuilder.set(canvasData.getCanvasMetaData());
-        // Step 1: call GraphBuilder to create a phrase node
-        PhraseNode phraseNode = graphBuilder.buildPhraseNode(fragment, nodes);
-
-        // add this node into existing list of nodes and
-        // update canvasDataObject for changes to take effect
-        canvasData.getDependencyGraph().getFragments().add(fragment);
-        canvasData.getNodes().add(phraseNode);
-        canvasDataObject.setValue(null);
-        canvasDataObject.setValue(canvasData);
-    }
-
-    private void addHiddenNode(Line referenceLine, Token referenceTerminal, String pronounId) {
-        shiftNodes(referenceTerminal);
-        CanvasData canvasData = canvasDataObject.get();
-        graphBuilder.set(canvasData.getCanvasMetaData());
-        // Step 1: call GraphBuilder to create an hidden node
-        HiddenNode hiddenNode = graphBuilder.buildHiddenNode(referenceLine, pronounId);
-
-        // add this node into existing list of nodes and
-        // update canvasDataObject for changes to take effect
-        List<Token> tokens = getTokens(canvasData.getDependencyGraph().getTerminals());
-        int index = tokens.indexOf(referenceTerminal);
-        index++;
-
-        Token token = hiddenNode.getToken();
-        Terminal terminal = new Terminal(token, HIDDEN);
-        Terminal result = terminalRepository.findByDisplayName(terminal.getDisplayName());
-        if (result == null) {
-            terminal = terminalRepository.save(terminal);
-        } else {
-            terminal = result;
-        }
-        canvasData.getDependencyGraph().getTerminals().add(index, terminal);
-
-        index = (canvasData.getNodes().size() - 1) - (index - 1);
-        canvasData.getNodes().add(index, hiddenNode);
-        canvasDataObject.setValue(null);
-        canvasDataObject.setValue(canvasData);
-    }
-
-    private Line drawLine(LineSupport node) {
-        Line line = tool.drawLine(node.getId(), node.getX1(), node.getY1(), node.getX2(), node.getY2(),
-                DARK_GRAY_CLOUD, 0.5);
-
-        // bind line co-ordinates
-        line.startXProperty().bind(node.x1Property());
-        line.startYProperty().bind(node.y1Property());
-        line.endXProperty().bind(node.x2Property());
-        line.endYProperty().bind(node.y2Property());
-
-        return line;
-    }
-
-    private Text drawText(GraphNode node, Color color, Font font) {
-        Text arabicText = tool.drawText(node.getId(), node.getText(), RIGHT, color,
-                node.getX(), node.getY(), font);
-        arabicText.setUserData(node);
-
-        // bind text x and y locations
-        arabicText.textProperty().bind(node.textProperty());
-        arabicText.xProperty().bind(node.xProperty());
-        arabicText.yProperty().bind(node.yProperty());
-
-        return arabicText;
-    }
-
-    private void buildTerminalNode(TerminalNode tn) {
+    private void drawTerminalNode(TerminalNodeAdapter tn) {
         Line line = drawLine(tn);
 
-        Token token = tn.getToken();
-        GraphNodeType nodeType = tn.getNodeType();
-        boolean hiddenOrEmptyNode = nodeType.equals(REFERENCE) || token.isHidden();
-        Color hiddenOrEmptyNodeColor = LIGHTGRAY.darker();
-        Color color = hiddenOrEmptyNode ? hiddenOrEmptyNodeColor : BLACK;
+        Token token = tn.getSrc().getToken();
+        boolean nonTerminal = NON_TERMINALS.contains(tn.getGraphNodeType());
+        Color color = nonTerminal ? NON_TERMINAL_COLOR : DEFAULT_COLOR;
 
-        String tokenId;
-        String trans;
+        String tokenId = token.getDisplayName();
 
-        tokenId = token.getDisplayName();
-        trans = token.getTranslation();
-        List<Location> locations = token.getLocations();
-        if (token.getLocationCount() == 1 && !hiddenOrEmptyNode) {
-            Location location = locations.get(0);
-            color = web(location.getPartOfSpeech().getColorCode());
-        }
-
-        final Text arabicText = drawText(tn, color, getTokenFont());
-        arabicText.fontProperty().bind(canvasDataObjectProperty().get().getCanvasMetaData().tokenFontProperty());
-
-        double translateX = tn.getTranslateX();
-        double translateY = tn.getTranslateY();
+        final Text arabicText = drawText(tn, color);
         arabicText.setOnMouseClicked(event -> {
-            Text source = (Text) event.getSource();
             if (event.isPopupTrigger()) {
-                lastTerminalNode = null;
-                firstTerminalNode = tn;
-                initTerminalContextMenu(source);
-                terminalContextMenu.show(source, event.getScreenX(), event.getScreenY());
+                initTerminalContextMenu(arabicText);
+                contextMenu.show(arabicText, event.getScreenX(), event.getScreenY());
             } else {
-                // single click, populate editor with this node
-                canvasDataObject.get().setSelectedNode(tn);
+                // by selecting the node, panels on the right hand side should be get updated
+                //getDependencyGraph().setSelectedNode(null);
+                getDependencyGraph().setSelectedNode(tn);
             }
         });
 
-        String id = format("trans_%s", tn.getId());
-        Color transColor = hiddenOrEmptyNode ? hiddenOrEmptyNodeColor : BLACK;
-        Text englishText = tool.drawText(id, trans, CENTER, transColor,
-                tn.getX3(), tn.getY3(), getTranslationFont());
-        // bind text x and y locations and translation font
-        englishText.xProperty().bind(tn.x3Property());
-        englishText.yProperty().bind(tn.y3Property());
-        englishText.fontProperty().bind(canvasDataObjectProperty().get().getCanvasMetaData().translationFontProperty());
+        Color transColor = nonTerminal ? NON_TERMINAL_COLOR : DEFAULT_COLOR;
+        Text translationText = drawTranslation(tn, transColor);
 
         Group group = new Group();
 
         group.setId(format("%s_%s", TERMINAL_GROUP_ID_PREFIX, tokenId));
-        group.getChildren().addAll(englishText, arabicText, line);
+        group.getChildren().addAll(translationText, arabicText, line);
+        buildPartOfSpeechNodes(tn, group, nonTerminal);
 
-        ObservableList<PartOfSpeechNode> partOfSpeeches = tn.getPartOfSpeeches();
-        for (PartOfSpeechNode pn : partOfSpeeches) {
-            pn.setTranslateX(translateX);
-            pn.setTranslateY(translateY);
-            color = hiddenOrEmptyNode ? hiddenOrEmptyNodeColor : web(pn.getPartOfSpeech().getColorCode());
-            Text posArabicText = drawText(pn, color, getPartOfSpeechFont());
-            posArabicText.fontProperty().bind(canvasDataObjectProperty().get().getCanvasMetaData().partOfSpeechFontProperty());
-            posArabicText.setOnMouseClicked(event -> {
-                Text source = (Text) event.getSource();
-                String thisId = pn.getId();
-                if (event.isPopupTrigger()) {
-                    ownerLinkNode = null;
-                    dependentLinkNode = pn;
-                    initPartOfSpeechContextMenu(thisId);
-                    partOfSpeechContextMenu.show(source, event.getScreenX(), event.getScreenY());
-                } else {
-                    // single click, populate editor with this node
-                    canvasDataObject.get().setSelectedNode(pn);
-                }
-            });
-
-            id = format("c_%s", pn.getId());
-            Circle circle = tool.drawCircle(id, color, pn.getCx(), pn.getCy(), RADIUS);
-            // bind coordinates
-            circle.centerXProperty().bind(pn.cxProperty());
-            circle.centerYProperty().bind(pn.cyProperty());
-
-            group.getChildren().addAll(posArabicText, circle);
-        }
-
-        group.setTranslateX(translateX);
-        group.setTranslateY(translateY);
+        group.setTranslateX(tn.getTranslateX());
+        group.setTranslateY(tn.getTranslateY());
 
         tn.translateXProperty().addListener((observable, oldValue, newValue) -> {
             Double x = (Double) newValue;
@@ -717,82 +292,42 @@ public class CanvasPane extends Pane {
         canvasPane.getChildren().add(group);
     }
 
-    private void buildRelationshipNode(RelationshipNode rn) {
-        Color color = rn.getStroke();
-        CubicCurve cubicCurve = tool.drawCubicCurve(rn.getId(), rn.getStartX(),
-                rn.getStartY(), rn.getControlX1(), rn.getControlY1(), rn.getControlX2(),
-                rn.getControlY2(), rn.getEndX(), rn.getEndY(),
-                color);
-
-        // bind line co-ordinates
-        cubicCurve.startXProperty().bind(rn.startXProperty());
-        cubicCurve.startYProperty().bind(rn.startYProperty());
-        cubicCurve.controlX1Property().bind(rn.controlX1Property());
-        cubicCurve.controlY1Property().bind(rn.controlY1Property());
-        cubicCurve.controlX2Property().bind(rn.controlX2Property());
-        cubicCurve.controlY2Property().bind(rn.controlY2Property());
-        cubicCurve.endXProperty().bind(rn.endXProperty());
-        cubicCurve.endYProperty().bind(rn.endYProperty());
-        cubicCurve.strokeProperty().bind(rn.strokeProperty());
-
-        Text arabicText = drawText(rn, color, getPartOfSpeechFont());
-        arabicText.fontProperty().bind(canvasDataObjectProperty().get().getCanvasMetaData().partOfSpeechFontProperty());
-        arabicText.fillProperty().bind(rn.strokeProperty());
-        arabicText.setOnMouseClicked(event -> {
-            Text source = (Text) event.getSource();
-            String thisId = rn.getId();
-            if (event.isPopupTrigger()) {
-                initRelationshipContextMenu(source);
-                relationshipContextMenu.show(source, event.getScreenX(), event.getScreenY());
-            } else {
-                // single click, populate editor with this node
-                canvasDataObject.get().setSelectedNode(rn);
-            }
+    private void buildPartOfSpeechNodes(TerminalNodeAdapter tn, Group group, boolean nonTerminal) {
+        tn.getPartOfSpeeches().forEach(pn -> {
+            pn.setTranslateX(tn.getTranslateX());
+            pn.setTranslateY(tn.getTranslateY());
+            PartOfSpeech partOfSpeech = pn.getSrc().getLocation().getPartOfSpeech();
+            Color color = nonTerminal ? NON_TERMINAL_COLOR :
+                    web(partOfSpeech.getColorCode());
+            Text posArabicText = drawText(pn, color);
+            posArabicText.setOnMouseClicked(event -> {
+                if (event.isPopupTrigger()) {
+                    initPartOfSpeechContextMenu(pn);
+                    contextMenu.show(posArabicText, event.getScreenX(), event.getScreenY());
+                } else {
+                    getDependencyGraph().setSelectedNode(pn);
+                }
+            });
+            String id = format("c_%s", pn.getSrc().getDisplayName());
+            Circle circle = tool.drawCircle(id, color, pn.getCx(), pn.getCy(), RADIUS);
+            // bind coordinates
+            circle.centerXProperty().bind(pn.cxProperty());
+            circle.centerYProperty().bind(pn.cyProperty());
+            group.getChildren().addAll(posArabicText, circle);
         });
-
-        // small arrow pointing towards the relationship direction
-        Polyline triangle = tool.drawPolyline(rn.getCurvePointX(), rn.getCurvePointY(), rn.getArrowPointX1(),
-                rn.getArrowPointY1(), rn.getArrowPointX2(), rn.getArrowPointY2(), color);
-        // bind line co-ordinates
-        //TODO: need to figure out how to bind polyline
-        // commented following code as it causes application to crashed
-//        rn.t1Property().addListener((observable, oldValue, newValue) -> {
-//            runLater(this::initCanvas);
-//        });
-//        rn.t2Property().addListener((observable, oldValue, newValue) -> {
-//            runLater(this::initCanvas);
-//        });
-
-        Group group = new Group();
-        group.setId(format("rln_%s", rn.getRelationship().getDisplayName()));
-
-        group.getChildren().addAll(cubicCurve, arabicText, triangle);
-
-        if (canvasDataObject.get().getCanvasMetaData().isDebugMode()) {
-            Path path = tool.drawCubicCurveBounds(rn.getStartX(), rn.getStartY(), rn.getControlX1(),
-                    rn.getControlY1(), rn.getControlX2(), rn.getControlY2(), rn.getEndX(), rn.getEndY());
-            group.getChildren().add(path);
-        }
-        canvasPane.getChildren().add(group);
     }
 
-    private void buildPhraseNode(PhraseNode pn) {
-        Color color = web(pn.getFrament().getRelationshipType().getColorCode());
-
+    private void drawPhraseNode(PhraseNodeAdapter pn) {
+        Color color = web(pn.getRelationshipType().getColorCode());
         Line line = drawLine(pn);
-        Text arabicText = drawText(pn, color, getPartOfSpeechFont());
-        arabicText.fontProperty().bind(canvasDataObjectProperty().get().getCanvasMetaData().partOfSpeechFontProperty());
+        Text arabicText = drawText(pn, color);
+        arabicText.setUserData(pn);
         arabicText.setOnMouseClicked(event -> {
-            Text source = (Text) event.getSource();
-            String thisId = pn.getId();
             if (event.isPopupTrigger()) {
-                ownerLinkNode = null;
-                dependentLinkNode = pn;
-                initPartOfSpeechContextMenu(thisId);
-                partOfSpeechContextMenu.show(source, event.getScreenX(), event.getScreenY());
+                initPhraseNodeContextMenu(pn);
+                contextMenu.show(arabicText, event.getScreenX(), event.getScreenY());
             } else {
-                // single click, populate editor with this node
-                canvasDataObject.get().setSelectedNode(pn);
+                getDependencyGraph().setSelectedNode(pn);
             }
         });
         Circle circle = tool.drawCircle(null, color, pn.getCx(), pn.getCy(), RADIUS);
@@ -805,6 +340,481 @@ public class CanvasPane extends Pane {
         canvasPane.getChildren().add(group);
     }
 
+    private void drawRelationshipNode(RelationshipNodeAdapter rn) {
+        Color color = rn.getStroke();
+        LinkSupportAdapter dependent = rn.getDependent();
+        LinkSupportAdapter owner = rn.getOwner();
+        CubicCurve cubicCurve = tool.drawCubicCurve(rn.getId(), dependent.getCx() + dependent.getTranslateX(),
+                dependent.getCy() + dependent.getTranslateY(), rn.getControlX1(), rn.getControlY1(), rn.getControlX2(),
+                rn.getControlY2(), owner.getCx() + owner.getTranslateX(), owner.getCy() + owner.getTranslateY(), color);
+
+        // bind line co-ordinates
+        cubicCurve.startXProperty().bind(dependent.cxProperty().add(dependent.translateXProperty()));
+        cubicCurve.startYProperty().bind(dependent.cyProperty().add(dependent.translateYProperty()));
+        cubicCurve.controlX1Property().bind(rn.controlX1Property());
+        cubicCurve.controlY1Property().bind(rn.controlY1Property());
+        cubicCurve.controlX2Property().bind(rn.controlX2Property());
+        cubicCurve.controlY2Property().bind(rn.controlY2Property());
+        cubicCurve.endXProperty().bind(owner.cxProperty().add(owner.translateXProperty()));
+        cubicCurve.endYProperty().bind(owner.cyProperty().add(owner.translateYProperty()));
+        cubicCurve.strokeProperty().bind(rn.strokeProperty());
+
+        Text arabicText = drawText(rn, web(rn.getRelationshipType().getColorCode()));
+        arabicText.fillProperty().bind(rn.strokeProperty());
+        arabicText.setOnMouseClicked(event -> {
+            if (event.isPopupTrigger()) {
+
+            } else {
+                getDependencyGraph().setSelectedNode(rn);
+            }
+        });
+
+        // small arrow pointing towards the relationship direction
+        double[] arrowPoints = arrowPoints(rn.getT1(), rn.getT2(), cubicCurve.getStartX(), cubicCurve.getStartY(),
+                cubicCurve.getControlX1(), cubicCurve.getControlY1(), cubicCurve.getControlX2(),
+                cubicCurve.getControlY2(), cubicCurve.getEndX(), cubicCurve.getEndY());
+        Polyline arrow = tool.drawPolyline(color, arrowPoints);
+        rn.t1Property().addListener((observable, oldValue, newValue) -> {
+            updateArrawPoints((Double) newValue, rn.getT2(), cubicCurve.getStartX(),
+                    cubicCurve.getStartY(), cubicCurve.getControlX1(), cubicCurve.getControlY1(),
+                    cubicCurve.getControlX2(), cubicCurve.getControlY2(), cubicCurve.getEndX(), cubicCurve.getEndY(),
+                    arrow);
+        });
+        rn.t2Property().addListener((observable, oldValue, newValue) -> {
+            updateArrawPoints(rn.getT1(), (Double) newValue, cubicCurve.getStartX(),
+                    cubicCurve.getStartY(), cubicCurve.getControlX1(), cubicCurve.getControlY1(),
+                    cubicCurve.getControlX2(), cubicCurve.getControlY2(), cubicCurve.getEndX(), cubicCurve.getEndY(),
+                    arrow);
+        });
+        cubicCurve.startXProperty().addListener((observable, oldValue, newValue) -> {
+            updateArrawPoints(rn.getT1(), rn.getT2(), (Double) newValue,
+                    cubicCurve.getStartY(), cubicCurve.getControlX1(), cubicCurve.getControlY1(),
+                    cubicCurve.getControlX2(), cubicCurve.getControlY2(), cubicCurve.getEndX(), cubicCurve.getEndY(),
+                    arrow);
+        });
+        cubicCurve.startYProperty().addListener((observable, oldValue, newValue) -> {
+            updateArrawPoints(rn.getT1(), rn.getT2(), cubicCurve.getStartX(),
+                    (Double) newValue, cubicCurve.getControlX1(), cubicCurve.getControlY1(),
+                    cubicCurve.getControlX2(), cubicCurve.getControlY2(), cubicCurve.getEndX(), cubicCurve.getEndY(),
+                    arrow);
+        });
+        cubicCurve.controlX1Property().addListener((observable, oldValue, newValue) -> {
+            updateArrawPoints(rn.getT1(), rn.getT2(), cubicCurve.getStartX(),
+                    cubicCurve.getStartY(), (Double) newValue, cubicCurve.getControlY1(),
+                    cubicCurve.getControlX2(), cubicCurve.getControlY2(), cubicCurve.getEndX(), cubicCurve.getEndY(),
+                    arrow);
+        });
+        cubicCurve.controlY1Property().addListener((observable, oldValue, newValue) -> {
+            updateArrawPoints(rn.getT1(), rn.getT2(), cubicCurve.getStartX(),
+                    cubicCurve.getStartY(), rn.getControlX1(), (Double) newValue,
+                    cubicCurve.getControlX2(), cubicCurve.getControlY2(), cubicCurve.getEndX(), cubicCurve.getEndY(),
+                    arrow);
+        });
+        cubicCurve.controlX2Property().addListener((observable, oldValue, newValue) -> {
+            updateArrawPoints(rn.getT1(), rn.getT2(), cubicCurve.getStartX(),
+                    cubicCurve.getStartY(), rn.getControlX1(), cubicCurve.getControlY1(),
+                    (Double) newValue, cubicCurve.getControlY2(), cubicCurve.getEndX(), cubicCurve.getEndY(),
+                    arrow);
+        });
+        cubicCurve.controlY2Property().addListener((observable, oldValue, newValue) -> {
+            updateArrawPoints(rn.getT1(), rn.getT2(), cubicCurve.getStartX(),
+                    cubicCurve.getStartY(), rn.getControlX1(), rn.getControlY1(),
+                    cubicCurve.getControlX2(), (Double) newValue, cubicCurve.getEndX(), cubicCurve.getEndY(),
+                    arrow);
+        });
+        cubicCurve.endXProperty().addListener((observable, oldValue, newValue) -> {
+            updateArrawPoints(rn.getT1(), rn.getT2(), cubicCurve.getStartX(),
+                    cubicCurve.getStartY(), cubicCurve.getControlX1(), cubicCurve.getControlY1(),
+                    cubicCurve.getControlX2(), cubicCurve.getControlY2(), (Double) newValue, cubicCurve.getEndY(),
+                    arrow);
+        });
+        cubicCurve.endYProperty().addListener((observable, oldValue, newValue) -> {
+            updateArrawPoints(rn.getT1(), rn.getT2(), cubicCurve.getStartX(),
+                    cubicCurve.getStartY(), cubicCurve.getControlX1(), cubicCurve.getControlY1(),
+                    cubicCurve.getControlX2(), cubicCurve.getControlY2(), cubicCurve.getEndX(), (Double) newValue,
+                    arrow);
+        });
+
+        Group group = new Group();
+        group.setId(format("rln_%s", rn.getSrc().getDisplayName()));
+
+        group.getChildren().addAll(cubicCurve, arabicText, arrow);
+        if (getDependencyGraph().getGraphMetaInfo().isDebugMode()) {
+            Path path = tool.drawCubicCurveBounds(cubicCurve.getStartX(), cubicCurve.getStartY(), rn.getControlX1(),
+                    rn.getControlY1(), rn.getControlX2(), rn.getControlY2(), cubicCurve.getEndX(), cubicCurve.getEndY());
+            group.getChildren().add(path);
+        }
+        canvasPane.getChildren().add(group);
+    }
+
+    private void updateArrawPoints(double t1, double t2, double startX, double startY, double controlX1,
+                                   double controlY1, double controlX2, double controlY2, double endX, double endY,
+                                   Polyline arrow) {
+        double[] newPoints = arrowPoints(t1, t2, startX, startY, controlX1, controlY1, controlX2, controlY2,
+                endX, endY);
+        Double[] elements = new Double[newPoints.length];
+        for (int i = 0; i < newPoints.length; i++) {
+            elements[i] = newPoints[i];
+        }
+        arrow.getPoints().setAll(elements);
+    }
+
+    private Line drawLine(LineSupportAdapter node) {
+        Line line = tool.drawLine(node.getId(), node.getX1(), node.getY1(), node.getX2(), node.getY2(),
+                DARK_GRAY_CLOUD, 0.5);
+
+        // bind line co-ordinates
+        line.startXProperty().bind(node.x1Property());
+        line.startYProperty().bind(node.y1Property());
+        line.endXProperty().bind(node.x2Property());
+        line.endYProperty().bind(node.y2Property());
+
+        return line;
+    }
+
+    private Text drawText(GraphNodeAdapter node, Color color) {
+        Text arabicText = tool.drawText(node.getId(), node.getText(), RIGHT, color, node.getX(), node.getY(),
+                node.getFont());
+        arabicText.setUserData(node);
+
+        // bind text x and y locations
+        arabicText.textProperty().bind(node.textProperty());
+        arabicText.xProperty().bind(node.xProperty());
+        arabicText.yProperty().bind(node.yProperty());
+
+        return arabicText;
+    }
+
+    private Text drawTranslation(TerminalNodeAdapter tn, Color color) {
+        Text translationText = tool.drawText(format("trans_%s", tn.getId()), tn.getSrc().getToken().getTranslation(),
+                CENTER, color, tn.getTranslationX(), tn.getTranslationY(), tn.getTranslationFont());
+
+        translationText.xProperty().bind(tn.translationXProperty());
+        translationText.yProperty().bind(tn.translationYProperty());
+        // TODO: FONT
+
+        return translationText;
+    }
+
+    private void initTerminalContextMenu(Text source) {
+        ObservableList<MenuItem> items = contextMenu.getItems();
+        items.remove(0, items.size());
+
+        Menu menu;
+        MenuItem menuItem;
+        TerminalNodeAdapter userData = (TerminalNodeAdapter) source.getUserData();
+        TerminalNode terminalNode = userData.getSrc();
+        int index = getIndex(userData);
+
+        menuItem = new MenuItem("Select");
+        menuItem.setOnAction(event -> {
+            getDependencyGraph().setSelectedNode(userData);
+        });
+        items.add(menuItem);
+
+        menu = new Menu("Add Empty Node");
+        menu.getItems().addAll(createAddEmptyNodeMenuItem(userData, index, NOUN),
+                createAddEmptyNodeMenuItem(userData, index, VERB));
+
+        contextMenu.getItems().add(menu);
+    }
+
+    private void initPartOfSpeechContextMenu(PartOfSpeechNodeAdapter currentNode) {
+        ObservableList<MenuItem> items = contextMenu.getItems();
+        items.remove(0, items.size());
+
+        Menu menu = new Menu("Make Relationship");
+        addRelationMenuItems(currentNode, menu);
+        contextMenu.getItems().add(menu);
+
+        TerminalNodeAdapter parent = (TerminalNodeAdapter) currentNode.getParent();
+        GraphNodeType graphNodeType = parent.getGraphNodeType();
+        // If current part of speech has parent which is Empty, Reference, or Hidden, we will not display menu
+        if (graphNodeType.equals(TERMINAL)) {
+            menu = new Menu("Make Phrase");
+            addPhraseMenuItems(currentNode, menu);
+            contextMenu.getItems().add(menu);
+        }
+    }
+
+    private void initPhraseNodeContextMenu(PhraseNodeAdapter currentNode) {
+        ObservableList<MenuItem> items = contextMenu.getItems();
+        items.clear();
+
+        Menu menu = new Menu("Make Relationship");
+        addRelationMenuItems(currentNode, menu);
+        contextMenu.getItems().add(menu);
+    }
+
+    private void addPhraseMenuItems(PartOfSpeechNodeAdapter currentNode, Menu menu) {
+        Location location = currentNode.getSrc().getLocation();
+        ObservableList<GraphNodeAdapter> nodes = copyGraphNodes();
+        nodes.forEach(graphNode -> {
+            GraphNodeType nodeType = graphNode.getGraphNodeType();
+            switch (nodeType) {
+                case TERMINAL:
+                    TerminalNodeAdapter tn = (TerminalNodeAdapter) graphNode;
+                    ObservableList<PartOfSpeechNodeAdapter> partOfSpeeches = copyPartOfSpeechNodes(tn);
+                    for (PartOfSpeechNodeAdapter partOfSpeech : partOfSpeeches) {
+                        Location other = partOfSpeech.getSrc().getLocation();
+                        boolean self = currentNode.getId().equals(partOfSpeech.getId());
+                        //TODO: figure out why before is not working
+                        if (self || isFakeTerminal(tn) || other.before(location)) {
+                            continue;
+                        }
+                        menu.getItems().add(createPhraseMenuItem(currentNode, partOfSpeech));
+                    }
+                    break;
+            }
+        });
+    }
+
+    private MenuItem createPhraseMenuItem(final PartOfSpeechNodeAdapter firstPartOfSpeech,
+                                          final PartOfSpeechNodeAdapter lastPartOfSpeech) {
+        Text text = new Text(getRelationshipMenuItemText(lastPartOfSpeech));
+        text.setNodeOrientation(RIGHT_TO_LEFT);
+        text.setFont(ARABIC_FONT_SMALL);
+        MenuItem menuItem = new MenuItem("", text);
+        menuItem.setUserData(lastPartOfSpeech);
+        menuItem.setOnAction(event -> {
+            makePhrase(firstPartOfSpeech, lastPartOfSpeech);
+        });
+        return menuItem;
+    }
+
+    private void makePhrase(final PartOfSpeechNodeAdapter firstPartOfSpeech,
+                            final PartOfSpeechNodeAdapter lastPartOfSpeech) {
+        boolean add = false;
+        List<PartOfSpeechNodeAdapter> fragments = new ArrayList<>();
+        ObservableList<GraphNodeAdapter> graphNodes = copyGraphNodes();
+        outer:
+        for (GraphNodeAdapter graphNode : graphNodes) {
+            if (graphNode.getGraphNodeType().equals(TERMINAL)) {
+                TerminalNodeAdapter node = (TerminalNodeAdapter) graphNode;
+                ObservableList<PartOfSpeechNodeAdapter> partOfSpeeches = copyPartOfSpeechNodes(node);
+                for (PartOfSpeechNodeAdapter partOfSpeech : partOfSpeeches) {
+                    String id = partOfSpeech.getId();
+                    if (id.equals(firstPartOfSpeech.getId())) {
+                        add = true;
+                    }
+                    if (add) {
+                        fragments.add(partOfSpeech);
+                    }
+                    if (id.equals(lastPartOfSpeech.getId())) {
+                        break outer;
+                    }
+                }
+            }
+        }
+        phraseSelectionDialog.reset(canvasUtil.getPhraseText(fragments));
+        Optional<PhraseNode> result = phraseSelectionDialog.showAndWait();
+        result.ifPresent(phraseNode -> addPhraseNode(phraseNode, fragments));
+    }
+
+    private void addPhraseNode(PhraseNode phraseNode, List<PartOfSpeechNodeAdapter> fragments) {
+        graphBuilder.set(getDependencyGraph().getGraphMetaInfo().getGraphMetaInfo());
+        graphBuilder.buildPhraseNode(phraseNode, fragments);
+        PhraseNodeAdapter phraseNodeAdapter = new PhraseNodeAdapter();
+        phraseNodeAdapter.setSrc(phraseNode);
+        getDependencyGraph().getDependencyGraph().getNodes().add(phraseNode);
+        getDependencyGraph().getGraphNodes().add(phraseNodeAdapter);
+        DependencyGraphAdapter dependencyGraph = getDependencyGraph();
+        setDependencyGraph(null);
+        setDependencyGraph(dependencyGraph);
+    }
+
+    private void addRelationMenuItems(LinkSupportAdapter currentNode, Menu menu) {
+        ObservableList<GraphNodeAdapter> target = copyGraphNodes();
+        target.forEach(graphNode -> {
+            GraphNodeType nodeType = graphNode.getGraphNodeType();
+            switch (nodeType) {
+                case TERMINAL:
+                case EMPTY:
+                case REFERENCE:
+                case HIDDEN:
+                    TerminalNodeAdapter tn = (TerminalNodeAdapter) graphNode;
+                    ObservableList<PartOfSpeechNodeAdapter> partOfSpeeches = copyPartOfSpeechNodes(tn);
+                    for (PartOfSpeechNodeAdapter partOfSpeech : partOfSpeeches) {
+                        boolean excluded = PART_OF_SPEECH_EXCLUDE_LIST.contains(
+                                partOfSpeech.getSrc().getLocation().getPartOfSpeech());
+                        boolean self = currentNode.getId().equals(partOfSpeech.getId());
+                        if (excluded || self) {
+                            continue;
+                        }
+                        menu.getItems().add(createRelationshipMenuItem(partOfSpeech, currentNode));
+                    }
+                    break;
+                case PHRASE:
+                    PhraseNodeAdapter pn = (PhraseNodeAdapter) graphNode;
+                    menu.getItems().add(createRelationshipMenuItem(pn, currentNode));
+                    break;
+            }
+        });
+    }
+
+    private String getRelationshipMenuItemText(final LinkSupportAdapter linkSupportAdapter) {
+        String text = null;
+        if (isGivenType(PartOfSpeechNodeAdapter.class, linkSupportAdapter)) {
+            PartOfSpeechNodeAdapter partOfSpeechNodeAdapter = (PartOfSpeechNodeAdapter) linkSupportAdapter;
+            TerminalNodeAdapter terminalNode = (TerminalNodeAdapter) partOfSpeechNodeAdapter.getParent();
+            Location location = partOfSpeechNodeAdapter.getSrc().getLocation();
+            Token token = terminalNode.getSrc().getToken();
+            ArabicWord locationWord = getLocationWord(token, location);
+            text = format("%s (%s)", locationWord.toUnicode(), location.getPartOfSpeech().getLabel().toUnicode());
+        } else if (isGivenType(PhraseNodeAdapter.class, linkSupportAdapter)) {
+            PhraseNodeAdapter phraseNodeAdapter = (PhraseNodeAdapter) linkSupportAdapter;
+            text = canvasUtil.getPhraseMenuItemText(phraseNodeAdapter);
+        }
+        return text;
+    }
+
+    private MenuItem createRelationshipMenuItem(final LinkSupportAdapter dependentNode,
+                                                final LinkSupportAdapter currentNode) {
+        Text text = new Text(getRelationshipMenuItemText(dependentNode));
+        text.setNodeOrientation(RIGHT_TO_LEFT);
+        text.setFont(ARABIC_FONT_SMALL);
+        MenuItem menuItem = new MenuItem("", text);
+        menuItem.setUserData(dependentNode);
+        menuItem.setOnAction(event -> {
+            String dependentNodeText = getRelationshipMenuItemText(currentNode);
+            MenuItem source = (MenuItem) event.getSource();
+            PartOfSpeechNodeAdapter userData = (PartOfSpeechNodeAdapter) source.getUserData();
+            makeRelationship(currentNode, userData, dependentNodeText, ((Text) source.getGraphic()).getText());
+        });
+        return menuItem;
+    }
+
+    private MenuItem createRelationshipMenuItem(PhraseNodeAdapter pn, LinkSupportAdapter currentNode) {
+        Text text = new Text(canvasUtil.getPhraseMenuItemText(pn));
+        text.setNodeOrientation(RIGHT_TO_LEFT);
+        text.setFont(ARABIC_FONT_SMALL);
+        MenuItem menuItem = new MenuItem("", text);
+        menuItem.setUserData(pn);
+        menuItem.setOnAction(event -> {
+            System.out.println("HERE");
+        });
+        return menuItem;
+    }
+
+    private void makeRelationship(final LinkSupportAdapter dependentNode, final LinkSupportAdapter ownerNode,
+                                  String dependentNodeText, String ownerNodeText) {
+        relationshipSelectionDialog.reset(dependentNodeText, ownerNodeText);
+        Optional<RelationshipNode> result = relationshipSelectionDialog.showAndWait();
+        result.ifPresent(relationshipNode -> addRelationship(relationshipNode, dependentNode, ownerNode));
+    }
+
+    private void addRelationship(RelationshipNode relationshipNode,
+                                 LinkSupportAdapter dependentNode,
+                                 LinkSupportAdapter ownerNode) {
+        graphBuilder.set(getDependencyGraph().getGraphMetaInfo().getGraphMetaInfo());
+        graphBuilder.buildRelationshipNode(relationshipNode, dependentNode, ownerNode);
+        RelationshipNodeAdapter relationshipNodeAdapter = new RelationshipNodeAdapter();
+        relationshipNodeAdapter.setSrc(relationshipNode);
+        getDependencyGraph().getDependencyGraph().getNodes().add(relationshipNode);
+        getDependencyGraph().getGraphNodes().add(relationshipNodeAdapter);
+        DependencyGraphAdapter dependencyGraph = getDependencyGraph();
+        setDependencyGraph(null);
+        setDependencyGraph(dependencyGraph);
+    }
+
+    private MenuItem createAddEmptyNodeMenuItem(TerminalNodeAdapter terminalNode, int index, PartOfSpeech partOfSpeech) {
+        Text text = new Text(partOfSpeech.getLabel().toUnicode());
+        text.setFont(ARABIC_FONT_SMALL_BOLD);
+        MenuItem menuItem = new MenuItem("", text);
+        menuItem.setOnAction(event -> addEmptyNode(terminalNode, index, partOfSpeech));
+        return menuItem;
+    }
+
+    private void addEmptyNode(TerminalNodeAdapter terminalNode, int index, PartOfSpeech partOfSpeech) {
+        GraphMetaInfoAdapter graphMetaInfo = getDependencyGraph().getGraphMetaInfo();
+        shiftNodes(index, graphMetaInfo);
+        Node node = canvasPane.getChildren().get(index - 1);
+        if (!isGivenType(Group.class, node)) {
+            // this should not happen, but we still need to handle
+            //TODO:
+            return;
+        }
+        Group group = (Group) node;
+        Line referenceLine = getReferenceLine(group);
+        graphBuilder.set(graphMetaInfo.getGraphMetaInfo());
+        EmptyNodeAdapter emptyNodeAdapter = createEmptyNodeAdapter(terminalNode, referenceLine, partOfSpeech);
+        getDependencyGraph().getDependencyGraph().getNodes().add(index, emptyNodeAdapter.getSrc());
+        getDependencyGraph().getGraphNodes().add(index, emptyNodeAdapter);
+        DependencyGraphAdapter dependencyGraph = getDependencyGraph();
+        setDependencyGraph(new DependencyGraphAdapter(new DependencyGraph()));
+        setDependencyGraph(dependencyGraph);
+    }
+
+    private EmptyNodeAdapter createEmptyNodeAdapter(TerminalNodeAdapter terminalNode, Line referenceLine,
+                                                    PartOfSpeech partOfSpeech) {
+        EmptyNodeAdapter emptyNodeAdapter = new EmptyNodeAdapter();
+        Token src = terminalNode.getSrc().getToken();
+        Token token = new Token(src).withHidden(true).withToken("(*)");
+        Location location = new Location(token.getChapterNumber(), token.getVerseNumber(),
+                token.getTokenNumber(), 1, true).withPartOfSpeech(partOfSpeech).withStartIndex(0)
+                .withEndIndex(token.getTokenWord().getLength());
+        token.setLocations(singletonList(location));
+
+        EmptyNode emptyNode = graphBuilder.buildEmptyNode(token, referenceLine);
+
+        emptyNodeAdapter.setSrc(emptyNode);
+
+        return emptyNodeAdapter;
+    }
+
+    /**
+     * When adding an {@link GraphNodeType#EMPTY}, {@link GraphNodeType#HIDDEN}, or {@link GraphNodeType#REFERENCE}
+     * node, move all nodes by {@link GraphMetaInfo#gapBetweenTokens} plus {@link GraphMetaInfo#tokenWidth} to
+     * the right.
+     *
+     * @param index
+     * @param graphMetaInfo
+     */
+    private void shiftNodes(int index, GraphMetaInfoAdapter graphMetaInfo) {
+        ObservableList<GraphNodeAdapter> graphNodes = getDependencyGraph().getGraphNodes();
+        for (int i = index; i < graphNodes.size(); i++) {
+            GraphNodeAdapter node = graphNodes.get(i);
+            if (TERMINALS.contains(node.getGraphNodeType())) {
+                double translateX = graphMetaInfo.getGapBetweenTokens() + graphMetaInfo.getTokenWidth()
+                        + node.getTranslateX();
+                node.setTranslateX(translateX);
+            }
+        }
+    }
+
+    private ObservableList<GraphNodeAdapter> copyGraphNodes() {
+        ObservableList<GraphNodeAdapter> nodes = getDependencyGraph().getGraphNodes();
+        ObservableList<GraphNodeAdapter> target = observableArrayList();
+        nodes.stream().filter(node -> TERMINALS.contains(node.getGraphNodeType())).forEach(node -> target.add(node));
+        reverse(target);
+        nodes.stream().filter(node -> node.getGraphNodeType().equals(PHRASE)).forEach(node -> target.add(node));
+        return target;
+    }
+
+    private ObservableList<PartOfSpeechNodeAdapter> copyPartOfSpeechNodes(TerminalNodeAdapter tn) {
+        ObservableList<PartOfSpeechNodeAdapter> partOfSpeeches = tn.getPartOfSpeeches();
+        ObservableList<PartOfSpeechNodeAdapter> target = observableArrayList();
+        target.setAll(partOfSpeeches);
+        reverse(target);
+        return target;
+    }
+
+    private Line getReferenceLine(Group parent) {
+        ObservableList<Node> children = parent.getChildren();
+        Line line = null;
+        for (Node child : children) {
+            if (isGivenType(Line.class, child)) {
+                line = (Line) child;
+                break;
+            }
+        }
+        if (line == null) {
+            showAlert(INFORMATION, "No line found.", null);
+            return null;
+        }
+        return line;
+    }
+
     private Optional<ButtonType> showAlert(Alert.AlertType type, String contentText, String headerText) {
         Alert alert = new Alert(type);
         if (headerText != null) {
@@ -814,19 +824,32 @@ public class CanvasPane extends Pane {
         return alert.showAndWait();
     }
 
+    private int getIndex(TerminalNodeAdapter src) {
+        int index = -1;
+        ObservableList<GraphNodeAdapter> graphNodes = getDependencyGraph().getGraphNodes();
+        for (int i = 0; i < graphNodes.size(); i++) {
+            GraphNodeAdapter node = graphNodes.get(i);
+            if (node.getId().equals(src.getId())) {
+                index = i;
+                break;
+            }
+        }
+        return index;
+    }
+
+    public final DependencyGraphAdapter getDependencyGraph() {
+        return dependencyGraph.get();
+    }
+
+    public final void setDependencyGraph(DependencyGraphAdapter dependencyGraph) {
+        this.dependencyGraph.set(dependencyGraph);
+    }
+
+    public final ObjectProperty<DependencyGraphAdapter> dependencyGraphProperty() {
+        return dependencyGraph;
+    }
+
     public Pane getCanvasPane() {
         return canvasPane;
-    }
-
-    private Font getTokenFont() {
-        return canvasDataObjectProperty().get().getCanvasMetaData().getTokenFont();
-    }
-
-    private Font getPartOfSpeechFont() {
-        return canvasDataObjectProperty().get().getCanvasMetaData().getPartOfSpeechFont();
-    }
-
-    private Font getTranslationFont() {
-        return canvasDataObjectProperty().get().getCanvasMetaData().getTranslationFont();
     }
 }

@@ -58,4 +58,13 @@ public final class CubicCurveHelper {
         double y = calculateCoordinate(t, startY, ay, by, cy);
         return new Point2D(x, y);
     }
+
+    public static double[] arrowPoints(double t1, double t2, double startX, double startY, double controlX1,
+                                       double controlY1, double controlX2, double controlY2, double endX, double endY) {
+        Point2D point1 = calculateCurvePoint(t1, startX, startY, controlX1, controlY1, controlX2, controlY2, endX, endY);
+        Point2D point2 = calculateCurvePoint(t2, startX, startY, controlX1, controlY1, controlX2, controlY2, endX, endY);
+        return new double[]{point2.getX(), point2.getY(), point1.getX(), point1.getY() + 5,
+                point1.getX(), point1.getY() - 5};
+    }
+
 }

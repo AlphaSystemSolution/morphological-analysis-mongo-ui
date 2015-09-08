@@ -1,76 +1,60 @@
 package com.alphasystem.morphologicalanalysis.ui.dependencygraph.components;
 
-import com.alphasystem.morphologicalanalysis.graph.model.Relationship;
-import com.alphasystem.morphologicalanalysis.graph.repository.RelationshipRepository;
+import com.alphasystem.morphologicalanalysis.graph.model.RelationshipNode;
 import com.alphasystem.morphologicalanalysis.ui.common.ComboBoxFactory;
 import com.alphasystem.morphologicalanalysis.ui.common.Global;
-import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.LinkSupport;
-import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.support.AlternateStatus;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.RelationshipType;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.text.Text;
 
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.ARABIC_FONT_SMALL_BOLD;
+import static com.alphasystem.morphologicalanalysis.ui.common.Global.FI_MAHL;
 import static javafx.scene.control.ButtonType.CANCEL;
 import static javafx.scene.control.ButtonType.OK;
 
 /**
  * @author sali
  */
-public class RelationshipSelectionDialog extends Dialog<Relationship> {
+public class RelationshipSelectionDialog extends Dialog<RelationshipNode> {
 
-    private final ObjectProperty<LinkSupport> dependentNode = new SimpleObjectProperty<>();
-    private final ObjectProperty<LinkSupport> ownerNode = new SimpleObjectProperty<>();
     private final Label dependentLabel;
     private final Label ownerLabel;
-    private final ComboBox<RelationshipType> comboBox;
-    private final RelationshipRepository relationshipRepository = RepositoryTool.getInstance()
-            .getRepositoryUtil().getRelationshipRepository();
+    private final ComboBox<RelationshipType> relationshipTypeComboBox;
+    private final ComboBox<AlternateStatus> alternateStatusComboBox;
 
     public RelationshipSelectionDialog() {
         setTitle(getLabel("title"));
-        comboBox = ComboBoxFactory.getInstance().getRelationshipTypeComboBox();
+        ComboBoxFactory comboBoxFactory = ComboBoxFactory.getInstance();
+        relationshipTypeComboBox = comboBoxFactory.getRelationshipTypeComboBox();
+        alternateStatusComboBox = comboBoxFactory.getAlternateStatusComboBox();
         dependentLabel = new Label();
         dependentLabel.setFont(ARABIC_FONT_SMALL_BOLD);
         ownerLabel = new Label();
         ownerLabel.setFont(ARABIC_FONT_SMALL_BOLD);
+
         reset();
         initDialogPane();
-        dependentNodeProperty().addListener((observable, oldValue, newValue) ->
-                dependentLabel.setText(newValue.getText()));
-        ownerNodeProperty().addListener((observable, oldValue, newValue) ->
-                ownerLabel.setText(newValue.getText()));
+
+        setResultConverter(param -> createResult(param));
     }
 
     private static String getLabel(String label) {
         return Global.getLabel(RelationshipSelectionDialog.class, label);
     }
 
-    public final LinkSupport getDependentNode() {
-        return dependentNode.get();
-    }
-
-    public final void setDependentNode(LinkSupport dependentNode) {
-        this.dependentNode.set(dependentNode);
-    }
-
-    public final ObjectProperty<LinkSupport> dependentNodeProperty() {
-        return dependentNode;
-    }
-
-    public final LinkSupport getOwnerNode() {
-        return ownerNode.get();
-    }
-
-    public final void setOwnerNode(LinkSupport ownerNode) {
-        this.ownerNode.set(ownerNode);
-    }
-
-    public final ObjectProperty<LinkSupport> ownerNodeProperty() {
-        return ownerNode;
+    private RelationshipNode createResult(ButtonType param) {
+        ButtonBar.ButtonData buttonData = param.getButtonData();
+        if (buttonData.isCancelButton()) {
+            return null;
+        }
+        RelationshipNode relationship = new RelationshipNode();
+        relationship.setRelationshipType(relationshipTypeComboBox.getSelectionModel().getSelectedItem());
+        relationship.setAlternateStatus(alternateStatusComboBox.getSelectionModel().getSelectedItem());
+        return relationship;
     }
 
     private void initDialogPane() {
@@ -87,36 +71,38 @@ public class RelationshipSelectionDialog extends Dialog<Relationship> {
         gridPane.add(label, 0, 1);
         gridPane.add(ownerLabel, 1, 1);
 
-        label = new Label(getLabel("comboBox"));
+        label = new Label(getLabel("relationshipTypeComboBox"));
         gridPane.add(label, 0, 2);
-        gridPane.add(comboBox, 1, 2);
+        gridPane.add(relationshipTypeComboBox, 1, 2);
 
-        setResultConverter(param -> {
-            ButtonBar.ButtonData buttonData = param.getButtonData();
-            Relationship result = null;
-            Relationship relationship = null;
-            if (!buttonData.isCancelButton()) {
-                relationship = new Relationship();
-                relationship.setDependent(getDependentNode().getRelated());
-                relationship.setOwner(getOwnerNode().getRelated());
-                relationship.setRelationship(comboBox.getSelectionModel().getSelectedItem());
-                result = relationshipRepository.findByDisplayName(relationship.getDisplayName());
-                if(result == null){
-                    result = relationship;
-                }
-            }
-            return result;
-        });
+        gridPane.add(getAlternateNounStatusLabel(), 0, 3);
+        gridPane.add(alternateStatusComboBox, 1, 3);
+
         getDialogPane().getButtonTypes().addAll(OK, CANCEL);
         Button okButton = (Button) getDialogPane().lookupButton(OK);
-        okButton.disableProperty().bind(comboBox.getSelectionModel().selectedIndexProperty().isEqualTo(0));
-        getDialogPane().setContent(gridPane);
-        getDialogPane().setPrefWidth(400);
+        okButton.disableProperty().bind(relationshipTypeComboBox.getSelectionModel()
+                .selectedIndexProperty().isEqualTo(0));
+
+        BorderPane borderPane = new BorderPane();
+        borderPane.setCenter(gridPane);
+        getDialogPane().setContent(borderPane);
     }
 
-
-    public void reset() {
-        comboBox.getSelectionModel().select(0);
+    private Label getAlternateNounStatusLabel() {
+        Text text = new Text(FI_MAHL.toUnicode());
+        text.setFont(Global.ARABIC_FONT_SMALL);
+        Label label = new Label("", text);
+        return label;
     }
 
+    private void reset() {
+        relationshipTypeComboBox.getSelectionModel().select(0);
+        alternateStatusComboBox.getSelectionModel().select(0);
+    }
+
+    public void reset(String dependentNodeLabel, String ownerNodeLabel){
+        reset();
+        dependentLabel.setText(dependentNodeLabel);
+        ownerLabel.setText(ownerNodeLabel);
+    }
 }

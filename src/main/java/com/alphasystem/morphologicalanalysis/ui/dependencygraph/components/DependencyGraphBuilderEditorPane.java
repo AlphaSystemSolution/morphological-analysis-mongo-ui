@@ -1,13 +1,13 @@
 package com.alphasystem.morphologicalanalysis.ui.dependencygraph.components;
 
-import com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.*;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.DecimalFormatStringConverter;
 import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
-import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.SpinnerValueFactory.DoubleSpinnerValueFactory;
 import javafx.scene.layout.BorderPane;
@@ -17,12 +17,8 @@ import static com.alphasystem.morphologicalanalysis.ui.common.Global.ARABIC_FONT
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.RESOURCE_BUNDLE;
 import static java.lang.String.format;
 import static javafx.geometry.Pos.CENTER;
-import static javafx.scene.control.ScrollPane.ScrollBarPolicy.ALWAYS;
-import static javafx.scene.control.ScrollPane.ScrollBarPolicy.AS_NEEDED;
-import static javafx.scene.paint.Color.BLUE;
 import static javafx.scene.text.Font.font;
 import static javafx.scene.text.FontPosture.REGULAR;
-import static javafx.scene.text.FontWeight.BOLD;
 import static javafx.scene.text.FontWeight.NORMAL;
 
 /**
@@ -30,45 +26,220 @@ import static javafx.scene.text.FontWeight.NORMAL;
  */
 public class DependencyGraphBuilderEditorPane extends BorderPane {
 
-    private final DoubleProperty canvasWidth;
-    private final DoubleProperty canvasHeight;
-    private GraphNode graphNode;
-    private GridPane gridPane;
+    private static final int DEFAULT_OFFSET = 3;
+    public static final Insets DEFAULT_PADDING = new Insets(DEFAULT_OFFSET, DEFAULT_OFFSET,
+            DEFAULT_OFFSET, DEFAULT_OFFSET);
+
+    private final ObjectProperty<GraphNodeAdapter> graphNode = new SimpleObjectProperty<>();
+    private final DoubleProperty canvasWidth = new SimpleDoubleProperty();
+    private final DoubleProperty canvasHeight = new SimpleDoubleProperty();
+    private final Accordion accordion;
     private int row = 0;
 
-    public DependencyGraphBuilderEditorPane(GraphNode graphNode, int width, int height) {
-        this.graphNode = graphNode;
-        canvasWidth = new SimpleDoubleProperty();
-        canvasHeight = new SimpleDoubleProperty();
+    public DependencyGraphBuilderEditorPane(GraphNodeAdapter graphNode, int width, int height) {
         canvasWidthProperty().addListener((observable, oldValue, newValue) -> {
-            initPane(this.graphNode);
+            initPane();
         });
         canvasHeightProperty().addListener((observable, oldValue, newValue) -> {
-            initPane(this.graphNode);
+            initPane();
         });
-
-        gridPane = new GridPane();
-        gridPane.setAlignment(CENTER);
-        gridPane.setHgap(10);
-        gridPane.setVgap(10);
-        gridPane.setPadding(new Insets(5, 5, 5, 5));
+        graphNodeProperty().addListener((observable, oldValue, newValue) -> {
+            initPane();
+        });
 
         setCanvasWidth(width);
         setCanvasHeight(height);
+        setGraphNode(graphNode);
 
-        ScrollPane scrollPane = new ScrollPane();
-        scrollPane.setVbarPolicy(ALWAYS);
-        scrollPane.setHbarPolicy(AS_NEEDED);
-        scrollPane.setContent(gridPane);
-        setCenter(scrollPane);
-
-        setMinSize(USE_PREF_SIZE, USE_PREF_SIZE);
-        setMaxSize(USE_PREF_SIZE, USE_PREF_SIZE);
-        setPrefHeight(650);
+        accordion = new Accordion();
+        accordion.setMinSize(100, 100);
+        accordion.setPrefSize(250, 650);
+        setCenter(accordion);
     }
 
-    private static String getPaneTitle(GraphNode node) {
-        return RESOURCE_BUNDLE.getString(format("%s_node.label", node.getNodeType().name()));
+    void initPane() {
+        ObservableList<TitledPane> panes = accordion.getPanes();
+        panes.remove(0, panes.size());
+
+        GraphNodeAdapter node = getGraphNode();
+        if (node != null) {
+            TitledPane commonPane = addCommonProperties(node);
+            TitledPane[] titledPanes = null;
+            switch (node.getGraphNodeType()) {
+                case TERMINAL:
+                case EMPTY:
+                case REFERENCE:
+                case HIDDEN:
+                    titledPanes = addTerminalNodeProperties((TerminalNodeAdapter) node);
+                    break;
+                case PART_OF_SPEECH:
+                    titledPanes = addPartOfSpeechProperties((PartOfSpeechNodeAdapter) node);
+                    break;
+                case RELATIONSHIP:
+                    titledPanes = addRelationshipNodeProperties((RelationshipNodeAdapter) node);
+                    break;
+                case PHRASE:
+                    titledPanes = addPhraseNodeProperties((PhraseNodeAdapter) node);
+                    break;
+                default:
+                    break;
+            }
+            panes.add(commonPane);
+            panes.addAll(titledPanes);
+            accordion.setExpandedPane(accordion.getPanes().get(0));
+        }
+
+        requestLayout();
+    }
+
+    private TitledPane addCommonProperties(GraphNodeAdapter node) {
+        GridPane gridPane = getGridPane();
+
+        row = 0;
+        Label label = new Label(RESOURCE_BUNDLE.getString("text.label"));
+        gridPane.add(label, 0, row);
+        String value = node.getText();
+        value = value == null ? "" : value;
+        TextField textField = new TextField(value);
+        textField.setOnAction(event -> {
+            TextField source = (TextField) event.getSource();
+            node.setText(source.getText());
+        });
+        row++;
+        textField.setFont(font(ARABIC_FONT_NAME, NORMAL, REGULAR, 20));
+        label.setLabelFor(textField);
+        gridPane.add(textField, 0, row);
+
+        row++;
+        addFields(gridPane, "xIndex.label", GraphNodeAdapter::getX, GraphNodeAdapter::setX, node,
+                getCanvasWidth());
+        addFields(gridPane, "yIndex.label", GraphNodeAdapter::getY, GraphNodeAdapter::setY, node,
+                getCanvasHeight());
+
+        String labelKey = format("%s_node.label", node.getGraphNodeType().name());
+        return createTitledPane(labelKey, gridPane, true);
+    }
+
+    private TitledPane addLineProperties(LineSupportAdapter node) {
+        GridPane gridPane = getGridPane();
+
+        row = 0;
+        addFields(gridPane, "startXIndex.label", LineSupportAdapter::getX1, LineSupportAdapter::setX1,
+                node, getCanvasWidth());
+        addFields(gridPane, "startYIndex.label", LineSupportAdapter::getY1, LineSupportAdapter::setY1,
+                node, getCanvasHeight());
+        addFields(gridPane, "endXIndex.label", LineSupportAdapter::getX2, LineSupportAdapter::setX2,
+                node, getCanvasWidth());
+        addFields(gridPane, "endYIndex.label", LineSupportAdapter::getY2, LineSupportAdapter::setY2,
+                node, getCanvasHeight());
+
+        return createTitledPane("lineProperties.label", gridPane);
+    }
+
+    private TitledPane addTranslationProperties(TerminalNodeAdapter node) {
+        GridPane gridPane = getGridPane();
+
+        row = 0;
+        addFields(gridPane, "tanslationXIndex.label", TerminalNodeAdapter::getTranslationX,
+                TerminalNodeAdapter::setTranslationX, node, getCanvasWidth());
+        addFields(gridPane, "tanslationYIndex.label", TerminalNodeAdapter::getTranslationY,
+                TerminalNodeAdapter::setTranslationY, node, getCanvasHeight());
+        //TODO: add Translation Font properties
+
+        return createTitledPane("translationProperties.label", gridPane);
+    }
+
+    private TitledPane addGroupTranslateProperties(TerminalNodeAdapter node) {
+        GridPane gridPane = getGridPane();
+
+        row = 0;
+        Spinner<Double> xSpinner = addFields(gridPane, "groupTranslateX.label", TerminalNodeAdapter::getTranslateX,
+                TerminalNodeAdapter::setTranslateX, node, -1 * getCanvasWidth(), getCanvasWidth());
+        node.translateXProperty().addListener((observable, oldValue, newValue) -> {
+            xSpinner.getValueFactory().setValue((Double) newValue);
+        });
+        Spinner<Double> ySpinner = addFields(gridPane, "groupTranslateY.label", TerminalNodeAdapter::getTranslateY,
+                TerminalNodeAdapter::setTranslateY, node, -1 * getCanvasHeight(), getCanvasHeight());
+        node.translateYProperty().addListener((observable, oldValue, newValue) -> {
+            ySpinner.getValueFactory().setValue((Double) newValue);
+        });
+
+        return createTitledPane("groupTranslate.label", gridPane);
+    }
+
+    private TitledPane addRelationshipControlPointProperties(LinkSupportAdapter node) {
+        GridPane gridPane = getGridPane();
+
+        row = 0;
+        addFields(gridPane, "posCx.label", LinkSupportAdapter::getCx, LinkSupportAdapter::setCx,
+                node, getCanvasWidth());
+        addFields(gridPane, "posCy.label", LinkSupportAdapter::getCy, LinkSupportAdapter::setCy,
+                node, getCanvasHeight());
+
+        return createTitledPane("controlPointProperties.label", gridPane);
+    }
+
+    private TitledPane[] addTerminalNodeProperties(TerminalNodeAdapter node) {
+        return new TitledPane[]{addLineProperties(node), addTranslationProperties(node),
+                addGroupTranslateProperties(node)};
+    }
+
+    private TitledPane[] addPartOfSpeechProperties(PartOfSpeechNodeAdapter node) {
+        return new TitledPane[]{addRelationshipControlPointProperties(node)};
+    }
+
+    private TitledPane[] addRelationshipNodeProperties(RelationshipNodeAdapter node) {
+        GridPane gridPane = getGridPane();
+
+        row = 0;
+        addFields(gridPane, "controlX1.label", RelationshipNodeAdapter::getControlX1,
+                RelationshipNodeAdapter::setControlX1, node, getCanvasWidth());
+        addFields(gridPane, "controlY1.label", RelationshipNodeAdapter::getControlY1,
+                RelationshipNodeAdapter::setControlY1, node, getCanvasHeight());
+        addFields(gridPane, "controlX2.label", RelationshipNodeAdapter::getControlX2,
+                RelationshipNodeAdapter::setControlX2, node, getCanvasWidth());
+        addFields(gridPane, "controlY2.label", RelationshipNodeAdapter::getControlY2,
+                RelationshipNodeAdapter::setControlY2, node, getCanvasHeight());
+
+        Label label;
+        Spinner<Double> spinner;
+
+        label = new Label(RESOURCE_BUNDLE.getString("t1.label"));
+        gridPane.add(label, 0, row);
+        spinner = getSpinnerThreeDecimalPlace(0, 1.000, node.getT1(), 0.005);
+        label.setLabelFor(spinner);
+        spinner.setOnMouseClicked(event -> {
+            Spinner source = (Spinner) event.getSource();
+            node.setT1((Double) source.getValue());
+        });
+        gridPane.add(spinner, 0, ++row);
+
+        row++;
+        label = new Label(RESOURCE_BUNDLE.getString("t2.label"));
+        gridPane.add(label, 0, row);
+        spinner = getSpinnerThreeDecimalPlace(0, 1.000, node.getT2(), 0.005);
+        label.setLabelFor(spinner);
+        spinner.setOnMouseClicked(event -> {
+            Spinner source = (Spinner) event.getSource();
+            node.setT2((Double) source.getValue());
+        });
+        gridPane.add(spinner, 0, ++row);
+
+        return new TitledPane[]{createTitledPane("controlPointProperties.label", gridPane)};
+    }
+
+    private TitledPane[] addPhraseNodeProperties(PhraseNodeAdapter node) {
+        return new TitledPane[]{addLineProperties(node), addRelationshipControlPointProperties(node)};
+    }
+
+    private TitledPane createTitledPane(String labelKey, GridPane gridPane) {
+        return createTitledPane(labelKey, gridPane, false);
+    }
+
+    private TitledPane createTitledPane(String labelKey, GridPane gridPane, boolean expanded) {
+        TitledPane pane = new TitledPane(RESOURCE_BUNDLE.getString(labelKey), gridPane);
+        pane.setExpanded(expanded);
+        return pane;
     }
 
     public final double getCanvasWidth() {
@@ -95,156 +266,21 @@ public class DependencyGraphBuilderEditorPane extends BorderPane {
         return canvasHeight;
     }
 
-    void initPane(GraphNode graphNode) {
-        row = 0;
-        ObservableList<Node> children = gridPane.getChildren();
-        children.remove(0, children.size());
-
-        addTextControls(graphNode);
-        GraphNodeType nodeType = graphNode.getNodeType();
-        switch (nodeType) {
-            case TERMINAL:
-            case EMPTY:
-            case REFERENCE:
-            case HIDDEN:
-                addTerminalNodeProperties((TerminalNode) graphNode);
-                break;
-            case PART_OF_SPEECH:
-                addPartOfSpeechProperties((PartOfSpeechNode) graphNode);
-                break;
-            case RELATIONSHIP:
-                addRelationshipNodeProperties((RelationshipNode) graphNode);
-                break;
-            case PHRASE:
-                addPhraseNode((PhraseNode) graphNode);
-                break;
-            default:
-                break;
-        }
-
-        gridPane.requestLayout();
+    public final GraphNodeAdapter getGraphNode() {
+        return graphNode.get();
     }
 
-    private void addTextControls(GraphNode node) {
-        Label label = new Label(getPaneTitle(node));
-        label.setFont(font("Georgia", BOLD, REGULAR, 16));
-        label.setUnderline(true);
-        label.setTextFill(BLUE);
-        gridPane.add(label, 0, row, 2, 1);
-
-        row++; // 1
-        label = new Label(RESOURCE_BUNDLE.getString("text.label"));
-        gridPane.add(label, 0, row);
-        String value = node.getText();
-        value = value == null ? "" : value;
-        TextField textField = new TextField(value);
-        textField.setOnAction(event -> {
-            TextField source = (TextField) event.getSource();
-            node.setText(source.getText());
-        });
-        textField.setFont(font(ARABIC_FONT_NAME, NORMAL, REGULAR, 20));
-        label.setLabelFor(textField);
-        gridPane.add(textField, 1, row);
-
-        row++;
-
-        addFields("xIndex.label", GraphNode::getX, GraphNode::setX, node, getCanvasWidth());
-        addFields("yIndex.label", GraphNode::getY, GraphNode::setY, node, getCanvasHeight());
-        gridPane.add(new Separator(), 0, row, 2, 1);
+    public final void setGraphNode(GraphNodeAdapter graphNode) {
+        this.graphNode.set(graphNode);
     }
 
-    private void addTerminalNodeProperties(TerminalNode node) {
-        row++;
-        addFields("startXIndex.label", TerminalNode::getX1, TerminalNode::setX1, node, getCanvasWidth());
-        addFields("startYIndex.label", TerminalNode::getY1, TerminalNode::setY1, node, getCanvasHeight());
-        addFields("endXIndex.label", TerminalNode::getX2, TerminalNode::setX2, node, getCanvasWidth());
-        addFields("endYIndex.label", TerminalNode::getY2, TerminalNode::setY2, node, getCanvasHeight());
-        addFields("tanslationXIndex.label", TerminalNode::getX3, TerminalNode::setX3, node, getCanvasWidth());
-        addFields("tanslationYIndex.label", TerminalNode::getY3, TerminalNode::setY3, node, getCanvasHeight());
-        gridPane.add(new Separator(), 0, row, 2, 1);
-
-        row++;
-        Label label = new Label(RESOURCE_BUNDLE.getString("groupTranslate.label"));
-        label.setFont(font("Georgia", BOLD, REGULAR, 12));
-        label.setUnderline(true);
-        label.setTextFill(BLUE);
-        gridPane.add(label, 0, row, 2, 1);
-
-        row++;
-        addFields("groupTranslateX.label", TerminalNode::getTranslateX, TerminalNode::setTranslateX,
-                node, -1 * getCanvasWidth(), getCanvasWidth());
-        addFields("groupTranslateY.label", TerminalNode::getTranslateY, TerminalNode::setTranslateY,
-                node, -1 * getCanvasHeight(), getCanvasHeight());
-    }
-
-    private void addPartOfSpeechProperties(PartOfSpeechNode node) {
-        row++;
-        addFields("posCx.label", PartOfSpeechNode::getCx, PartOfSpeechNode::setCx, node, getCanvasWidth());
-        addFields("posCy.label", PartOfSpeechNode::getCy, PartOfSpeechNode::setCy, node, getCanvasHeight());
-    }
-
-    private void addRelationshipNodeProperties(RelationshipNode node) {
-        row++;
-
-        // addFields("startX.label", RelationshipNode::getStartX, RelationshipNode::setStartX, node, canvasWidth);
-        // addFields("startY.label", RelationshipNode::getStartY, RelationshipNode::setStartY, node, canvasHeight);
-        addFields("controlX1.label", RelationshipNode::getControlX1, RelationshipNode::setControlX1,
-                node, getCanvasWidth());
-        addFields("controlY1.label", RelationshipNode::getControlY1, RelationshipNode::setControlY1,
-                node, getCanvasHeight());
-        addFields("controlX2.label", RelationshipNode::getControlX2, RelationshipNode::setControlX2,
-                node, getCanvasWidth());
-        addFields("controlY2.label", RelationshipNode::getControlY2, RelationshipNode::setControlY2,
-                node, getCanvasHeight());
-
-        Label label;
-        Spinner<Double> spinner;
-
-        label = new Label(RESOURCE_BUNDLE.getString("t1.label"));
-        gridPane.add(label, 0, row);
-        spinner = getSpinnerThreeDecimalPlace(0, 1.000, node.getT1(), 0.005);
-        label.setLabelFor(spinner);
-        spinner.setOnMouseClicked(event -> {
-            Spinner source = (Spinner) event.getSource();
-            node.setT1((Double) source.getValue());
-        });
-        gridPane.add(spinner, 1, row);
-
-        row++;
-        label = new Label(RESOURCE_BUNDLE.getString("t2.label"));
-        gridPane.add(label, 0, row);
-        spinner = getSpinnerThreeDecimalPlace(0, 1.000, node.getT2(), 0.005);
-        label.setLabelFor(spinner);
-        spinner.setOnMouseClicked(event -> {
-            Spinner source = (Spinner) event.getSource();
-            node.setT2((Double) source.getValue());
-        });
-        gridPane.add(spinner, 1, row);
-    }
-
-    private void addPhraseNode(PhraseNode node) {
-        row++;
-        addFields("startXIndex.label", PhraseNode::getX1, PhraseNode::setX1, node, getCanvasWidth());
-        addFields("startYIndex.label", PhraseNode::getY1, PhraseNode::setY1, node, getCanvasHeight());
-        addFields("endXIndex.label", PhraseNode::getX2, PhraseNode::setX2, node, getCanvasWidth());
-        addFields("endYIndex.label", PhraseNode::getY2, PhraseNode::setY2, node, getCanvasHeight());
-        addFields("posCx.label", PhraseNode::getCx, PhraseNode::setCx, node, getCanvasWidth());
-        addFields("posCy.label", PhraseNode::getCy, PhraseNode::setCy, node, getCanvasHeight());
+    public final ObjectProperty<GraphNodeAdapter> graphNodeProperty() {
+        return graphNode;
     }
 
     private Spinner<Double> getSpinner(double min, double max, double initialValue) {
         Spinner<Double> spinner = new Spinner<>();
         spinner.setValueFactory(new DoubleSpinnerValueFactory(min, max, initialValue, 0.5));
-        return spinner;
-    }
-
-    private Spinner<Double> getSpinnerThreeDecimalPlace(double min, double max,
-                                                        double initialValue, double amountToStepBy) {
-        Spinner<Double> spinner = new Spinner<>();
-        DoubleSpinnerValueFactory valueFactory = new DoubleSpinnerValueFactory(min, max,
-                initialValue, amountToStepBy);
-        valueFactory.setConverter(DecimalFormatStringConverter.THREE_DECIMAL_PLACE_CONVERTER);
-        spinner.setValueFactory(valueFactory);
         return spinner;
     }
 
@@ -261,20 +297,21 @@ public class DependencyGraphBuilderEditorPane extends BorderPane {
         return slider;
     }
 
-    private <T extends GraphNode, G extends GetterAdapter<T>, S extends SetterAdapter<T>> void addFields(
-            String key, G g, S s, T node, double max) {
-        addFields(key, g, s, node, 0, max);
+    private <T extends GraphNodeAdapter, G extends GetterAdapter<T>, S extends SetterAdapter<T>> Spinner<Double> addFields(
+            GridPane gridPane, String key, G g, S s, T node, double max) {
+        return addFields(gridPane, key, g, s, node, 0, max);
     }
 
-    private <T extends GraphNode, G extends GetterAdapter<T>, S extends SetterAdapter<T>> void addFields(
-            String key, G g, S s, T node, double min, double max) {
+    private <T extends GraphNodeAdapter, G extends GetterAdapter<T>, S extends SetterAdapter<T>> Spinner<Double> addFields(
+            GridPane gridPane, String key, G g, S s, T node, double min, double max) {
         Label label = new Label(RESOURCE_BUNDLE.getString(key));
         gridPane.add(label, 0, row);
 
+        row++;
         Double initialValue = g.get(node);
         Spinner<Double> spinner = getSpinner(min, max, initialValue);
         spinner.setOnMouseClicked(event -> s.set(node, spinner.getValue()));
-        gridPane.add(spinner, 1, row);
+        gridPane.add(spinner, 0, row);
 
         row++;
         Slider slider = createSlider(min, max, initialValue);
@@ -290,16 +327,37 @@ public class DependencyGraphBuilderEditorPane extends BorderPane {
         spinner.valueProperty().addListener((observable, oldValue, newValue) -> {
             slider.setValue(newValue);
         });
-        gridPane.add(slider, 1, row);
+        gridPane.add(slider, 0, row);
 
         row++;
+
+        return spinner;
     }
 
-    private interface GetterAdapter<T extends GraphNode> {
+    private GridPane getGridPane() {
+        GridPane gridPane = new GridPane();
+        gridPane.setAlignment(CENTER);
+        gridPane.setHgap(DEFAULT_OFFSET);
+        gridPane.setVgap(DEFAULT_OFFSET);
+        gridPane.setPadding(DEFAULT_PADDING);
+        return gridPane;
+    }
+
+    private Spinner<Double> getSpinnerThreeDecimalPlace(double min, double max,
+                                                        double initialValue, double amountToStepBy) {
+        Spinner<Double> spinner = new Spinner<>();
+        DoubleSpinnerValueFactory valueFactory = new DoubleSpinnerValueFactory(min, max,
+                initialValue, amountToStepBy);
+        valueFactory.setConverter(DecimalFormatStringConverter.THREE_DECIMAL_PLACE_CONVERTER);
+        spinner.setValueFactory(valueFactory);
+        return spinner;
+    }
+
+    private interface GetterAdapter<T extends GraphNodeAdapter> {
         Double get(T node);
     }
 
-    private interface SetterAdapter<T extends GraphNode> {
+    private interface SetterAdapter<T extends GraphNodeAdapter> {
         void set(T node, Double value);
     }
 }
