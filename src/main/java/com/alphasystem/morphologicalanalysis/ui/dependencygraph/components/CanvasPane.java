@@ -67,12 +67,14 @@ public class CanvasPane extends Pane {
     private GraphBuilder graphBuilder = GraphBuilder.getInstance();
     private RelationshipSelectionDialog relationshipSelectionDialog;
     private PhraseSelectionDialog phraseSelectionDialog;
+    private ReferenceSelectionDialog referenceSelectionDialog;
     private Pane canvasPane;
     private Node gridLines;
 
     public CanvasPane(DependencyGraphAdapter src) {
         relationshipSelectionDialog = new RelationshipSelectionDialog();
         phraseSelectionDialog = new PhraseSelectionDialog();
+        referenceSelectionDialog = new ReferenceSelectionDialog();
         contextMenu = new ContextMenu();
         dependencyGraph = new SimpleObjectProperty<>();
         src = (src == null) ? new DependencyGraphAdapter(new DependencyGraph()) : src;
@@ -503,7 +505,6 @@ public class CanvasPane extends Pane {
         Menu menu;
         MenuItem menuItem;
         TerminalNodeAdapter userData = (TerminalNodeAdapter) source.getUserData();
-        TerminalNode terminalNode = userData.getSrc();
         int index = getIndex(userData);
 
         menuItem = new MenuItem("Select");
@@ -517,6 +518,11 @@ public class CanvasPane extends Pane {
                 createAddEmptyNodeMenuItem(userData, index, VERB));
 
         contextMenu.getItems().add(menu);
+
+        menuItem = new MenuItem("Add Reference Node ...");
+        menuItem.setOnAction(event -> makeReference(index));
+
+        contextMenu.getItems().add(menuItem);
     }
 
     private void initPartOfSpeechContextMenu(PartOfSpeechNodeAdapter currentNode) {
@@ -694,6 +700,27 @@ public class CanvasPane extends Pane {
             System.out.println("HERE");
         });
         return menuItem;
+    }
+
+    private void makeReference(int index) {
+        DependencyGraph dependencyGraph = getDependencyGraph().getDependencyGraph();
+        referenceSelectionDialog.reset(dependencyGraph.getChapterNumber(), dependencyGraph.getVerseNumber());
+        Optional<Token> result = referenceSelectionDialog.showAndWait();
+        result.ifPresent(token -> addReference(token, index));
+    }
+
+    private void addReference(Token token, int index) {
+        graphBuilder.set(getDependencyGraph().getGraphMetaInfo().getGraphMetaInfo());
+        Group group = (Group) canvasPane.getChildren().get(index);
+        Line referenceLine = getReferenceLine(group);
+        ReferenceNode referenceNode = graphBuilder.buildReferenceNode(token, referenceLine);
+        ReferenceNodeAdapter referenceNodeAdapter = new ReferenceNodeAdapter();
+        referenceNodeAdapter.setSrc(referenceNode);
+        getDependencyGraph().getDependencyGraph().getNodes().add(referenceNode);
+        getDependencyGraph().getGraphNodes().add(referenceNodeAdapter);
+        DependencyGraphAdapter dependencyGraph = getDependencyGraph();
+        setDependencyGraph(null);
+        setDependencyGraph(dependencyGraph);
     }
 
     private void makeRelationship(final LinkSupportAdapter dependentNode, final LinkSupportAdapter ownerNode,

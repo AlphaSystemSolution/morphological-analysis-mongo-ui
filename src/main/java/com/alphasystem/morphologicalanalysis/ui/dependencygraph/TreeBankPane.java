@@ -1,13 +1,11 @@
 package com.alphasystem.morphologicalanalysis.ui.dependencygraph;
 
 import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
-import com.alphasystem.morphologicalanalysis.graph.model.TerminalNode;
-import com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType;
+import com.alphasystem.morphologicalanalysis.graph.repository.DependencyGraphRepository;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.components.CanvasPane;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.components.ControlPane;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.DependencyGraphAdapter;
 import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
-import com.alphasystem.util.AppUtil;
 import javafx.collections.ObservableList;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Menu;
@@ -76,6 +74,11 @@ public class TreeBankPane extends BorderPane {
         controlPane.dependencyGraphProperty().bind(canvasPane.dependencyGraphProperty());
     }
 
+    private static String getFileNameWithPadding(int value) {
+        String padding = value < 10 ? "00" : (value < 100 ? "0" : "");
+        return format("%s%s", padding, value);
+    }
+
     private MenuBar createMenuBar() {
         MenuBar menuBar = new MenuBar();
 
@@ -89,12 +92,10 @@ public class TreeBankPane extends BorderPane {
         menuItem.setAccelerator(new KeyCodeCombination(O, CONTROL_DOWN));
         menuItem.setOnAction(event -> {
             // TODO:
-            DependencyGraph dependencyGraph = repositoryTool.getRepositoryUtil().getDependencyGraphRepository()
-                    .findByDisplayName("1:2:1:4");
-            dependencyGraph.getNodes().stream().filter(graphNode -> AppUtil.isGivenType(TerminalNode.class, graphNode)).forEach(graphNode1 -> {
-                TerminalNode terminalNode = (TerminalNode) graphNode1;
-                System.out.println("{{{{{{{{{{{{{{{{ " + terminalNode.getToken());
-            });
+            DependencyGraphRepository dependencyGraphRepository = repositoryTool.getRepositoryUtil()
+                    .getDependencyGraphRepository();
+            DependencyGraph dependencyGraph = dependencyGraphRepository
+                    .findByDisplayName("1:3:1:2");
             DependencyGraphAdapter dependencyGraphAdapter = new DependencyGraphAdapter(dependencyGraph);
             canvasPane.setDependencyGraph(dependencyGraphAdapter);
         });
@@ -143,11 +144,6 @@ public class TreeBankPane extends BorderPane {
         }
         return new File(parent, format("%s_%s.%s", getFileNameWithPadding(dependencyGraph.getFirstTokenIndex()),
                 getFileNameWithPadding(dependencyGraph.getLastTokenIndex()), format));
-    }
-
-    private static String getFileNameWithPadding(int value) {
-        String padding = value < 10 ? "00" : (value < 100 ? "0" : "");
-        return format("%s%s", padding, value);
     }
 
 }

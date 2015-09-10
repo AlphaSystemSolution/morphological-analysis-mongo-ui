@@ -1,9 +1,9 @@
 package com.alphasystem.morphologicalanalysis.ui.dependencygraph.components;
 
-import com.alphasystem.morphologicalanalysis.graph.model.Terminal;
-import com.alphasystem.morphologicalanalysis.graph.repository.TerminalRepository;
 import com.alphasystem.morphologicalanalysis.ui.common.TokenListCell;
 import com.alphasystem.morphologicalanalysis.ui.common.VerseListCell;
+import com.alphasystem.morphologicalanalysis.util.MorphologicalAnalysisRepositoryUtil;
+import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Verse;
 import com.alphasystem.morphologicalanalysis.wordbyword.repository.VerseRepository;
@@ -16,9 +16,7 @@ import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 
-import static com.alphasystem.morphologicalanalysis.graph.model.support.TerminalType.REFERENCE;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.RESOURCE_BUNDLE;
-import static com.alphasystem.morphologicalanalysis.util.RepositoryTool.getInstance;
 import static javafx.scene.control.ButtonType.CANCEL;
 import static javafx.scene.control.ButtonType.OK;
 
@@ -26,17 +24,19 @@ import static javafx.scene.control.ButtonType.OK;
 /**
  * @author sali
  */
-public class ReferenceNodeSelectionDialog extends Dialog<Terminal> {
+public class ReferenceSelectionDialog extends Dialog<Token> {
 
     private final IntegerProperty chapter;
     private final IntegerProperty verse;
     private final ComboBox<Token> tokenComboBox;
     private final ComboBox<Verse> verseComboBox;
-    private final VerseRepository verseRepository = getInstance().getRepositoryUtil().getVerseRepository();
-    private final TerminalRepository terminalRepository = getInstance().getRepositoryUtil().getTerminalRepository();
+    private final VerseRepository verseRepository;
 
-    public ReferenceNodeSelectionDialog() {
+    public ReferenceSelectionDialog() {
         setTitle("Select Reference Node");
+
+        MorphologicalAnalysisRepositoryUtil repositoryUtil = RepositoryTool.getInstance().getRepositoryUtil();
+        verseRepository = repositoryUtil.getVerseRepository();
 
         chapter = new SimpleIntegerProperty();
         verse = new SimpleIntegerProperty();
@@ -68,14 +68,9 @@ public class ReferenceNodeSelectionDialog extends Dialog<Terminal> {
 
         getDialogPane().getButtonTypes().addAll(OK, CANCEL);
         setResultConverter(param -> {
-            Terminal result = null;
+            Token result = null;
             if (!param.getButtonData().isCancelButton()) {
-                Token token = tokenComboBox.getValue();
-                Terminal terminal = new Terminal(token, REFERENCE);
-                result = terminalRepository.findByDisplayName(terminal.getDisplayName());
-                if (result == null) {
-                    result = terminal;
-                }
+                result = tokenComboBox.getValue();
             }
             return result;
         });
@@ -125,6 +120,11 @@ public class ReferenceNodeSelectionDialog extends Dialog<Terminal> {
         removeAll(tokenComboBox.getItems());
         tokenComboBox.getItems().addAll(verse.getTokens());
         tokenComboBox.getSelectionModel().select(0);
+    }
+
+    public void reset(int chapterNumber, int verseNumber) {
+        setChapter(chapterNumber);
+        setVerse(verseNumber);
     }
 
     public final int getChapter() {

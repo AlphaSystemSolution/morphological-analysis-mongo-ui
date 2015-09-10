@@ -54,35 +54,6 @@ public class SerializationTest {
     }
 
 
-    // @SuppressWarnings({"unused"})
-//    public void updateRelationship() {
-//        MorphologicalAnalysisRepositoryUtil repositoryUtil = RepositoryTool.getInstance().getRepositoryUtil();
-//        DependencyGraphRepository dependencyGraphRepository = repositoryUtil.getDependencyGraphRepository();
-//        RelationshipRepository relationshipRepository = repositoryUtil.getRelationshipRepository();
-//        DependencyGraph dg = dependencyGraphRepository.findByDisplayName("18:2:12:15");
-//        List<Relationship> relationships = dg.getRelationships();
-//        relationships.forEach(relationship -> {
-//            RelationshipType type = relationship.getRelationship();
-//            boolean update = false;
-//            switch (type) {
-//                case ISM_INNA:
-//                    relationship.setRelationship(RelationshipType.ISM);
-//                    update = true;
-//                    break;
-//                case KHABAR_INNA:
-//                    update = true;
-//                    relationship.setRelationship(RelationshipType.KHABAR);
-//                    break;
-//            }
-//            if (update) {
-//                System.out.println(format("Updating %s to %s of %s", type,
-//                        relationship.getRelationship(), relationship.getId()));
-//                System.out.println(relationship.getDependent() + " : " + relationship.getOwner());
-//                relationshipRepository.save(relationship);
-//            }
-//        });
-//    }
-
     private File getSerializeFileName(Class<?> klass) {
         return new File(tmpFolder, format("%s.ser", klass.getSimpleName().toLowerCase()));
     }

@@ -5,16 +5,17 @@ import com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.LinkSupportAdapter;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.PartOfSpeechNodeAdapter;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.TerminalNodeAdapter;
+import com.alphasystem.morphologicalanalysis.util.MorphologicalAnalysisRepositoryUtil;
+import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
 import javafx.scene.shape.Line;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.EMPTY;
-import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.TERMINAL;
+import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.*;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.*;
 import static java.lang.String.format;
 import static java.util.Collections.reverse;
@@ -26,6 +27,7 @@ import static java.util.Collections.singletonList;
 public class GraphBuilder {
 
     private static GraphBuilder instance = new GraphBuilder();
+    private MorphologicalAnalysisRepositoryUtil repositoryUtil = RepositoryTool.getInstance().getRepositoryUtil();
     private double tokenWidth = RECTANGLE_WIDTH;
     private double tokenHeight = RECTANGLE_HEIGHT;
     private double gapBetweenTokens = GAP_BETWEEN_TOKENS;
@@ -65,11 +67,10 @@ public class GraphBuilder {
 
         reverse(tokens);
         // build terminal nodes first
-        for (Token token : tokens) {
-            terminalNodes.add(buildTerminalNode(token, TERMINAL));
-        }
+        terminalNodes.addAll(tokens.stream().map(token ->
+                buildTerminalNode(token, TERMINAL)).collect(Collectors.toList()));
 
-        // populate part of specches
+        // populate part of speeches
         buildPartOfSpeechNodes(terminalNodes);
 
         return terminalNodes;
@@ -81,7 +82,8 @@ public class GraphBuilder {
      * @return
      * @throws IllegalArgumentException
      */
-    public TerminalNode buildTerminalNode(Token token, GraphNodeType nodeType) throws IllegalArgumentException {
+    public TerminalNode buildTerminalNode(Token token, GraphNodeType nodeType)
+            throws IllegalArgumentException {
         if (token == null) {
             throw new IllegalArgumentException("Token cannot be null");
         }
@@ -103,6 +105,11 @@ public class GraphBuilder {
                 throw new IllegalArgumentException(format("Invalid node type {%s} for token {%s}", nodeType,
                         token.getDisplayName()));
         }
+        Long count = repositoryUtil.getRepository(terminalNode.getGraphNodeType())
+                .countByChapterNumberAndVerseNumberAndTokenNumber(token.getChapterNumber(),
+                        token.getVerseNumber(), token.getTokenNumber());
+        count = (count == null) ? 0L : count;
+        terminalNode.setVersion(count.intValue());
         terminalNode.setX(textX);
         terminalNode.setY(textY);
         terminalNode.setX1(x1);
@@ -209,8 +216,30 @@ public class GraphBuilder {
         fragments.forEach(psna -> phraseNode.getFragments().add(psna.getSrc()));
     }
 
+    public ReferenceNode buildReferenceNode(Token token, Line referenceLine) {
+        rectX = gapBetweenTokens + referenceLine.getEndX();
+        textX = rectX + 30;
+        x1 = rectX;
+        x2 = tokenWidth + rectX;
+        x3 = rectX + 30;
+
+        ReferenceNode referenceNode = (ReferenceNode) buildTerminalNode(token, REFERENCE);
+
+        reset();
+        textY = 160;
+        referenceNode.setPartOfSpeechNodes(buildPartOfSpeechNodes(referenceNode));
+
+        return referenceNode;
+    }
+
     private PartOfSpeechNode buildPartOfSpeechNode(Location location, Double posX) {
         PartOfSpeechNode partOfSpeechNode = new PartOfSpeechNode(location);
+        Long count = repositoryUtil.getPartOfSpeechNodeRepository()
+                .countByChapterNumberAndVerseNumberAndTokenNumberAndLocationNumber(
+                        location.getChapterNumber(), location.getVerseNumber(), location.getTokenNumber(),
+                        location.getLocationNumber());
+        count = (count == null) ? 0 : count;
+        partOfSpeechNode.setVersion(count.intValue());
         partOfSpeechNode.setX(posX);
         partOfSpeechNode.setY(textY);
         double x = posX + 20;
