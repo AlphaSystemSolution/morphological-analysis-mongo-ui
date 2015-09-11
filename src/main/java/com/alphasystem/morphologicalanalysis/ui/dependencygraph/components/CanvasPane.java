@@ -40,7 +40,6 @@ import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.Par
 import static com.alphasystem.util.AppUtil.isGivenType;
 import static java.lang.String.format;
 import static java.util.Collections.reverse;
-import static java.util.Collections.singletonList;
 import static javafx.collections.FXCollections.observableArrayList;
 import static javafx.geometry.NodeOrientation.RIGHT_TO_LEFT;
 import static javafx.scene.control.Alert.AlertType.INFORMATION;
@@ -514,8 +513,7 @@ public class CanvasPane extends Pane {
         items.add(menuItem);
 
         menu = new Menu("Add Empty Node");
-        menu.getItems().addAll(createAddEmptyNodeMenuItem(userData, index, NOUN),
-                createAddEmptyNodeMenuItem(userData, index, VERB));
+        menu.getItems().addAll(createAddEmptyNodeMenuItem(index, NOUN), createAddEmptyNodeMenuItem(index, VERB));
 
         contextMenu.getItems().add(menu);
 
@@ -744,15 +742,15 @@ public class CanvasPane extends Pane {
         setDependencyGraph(dependencyGraph);
     }
 
-    private MenuItem createAddEmptyNodeMenuItem(TerminalNodeAdapter terminalNode, int index, PartOfSpeech partOfSpeech) {
+    private MenuItem createAddEmptyNodeMenuItem(int index, PartOfSpeech partOfSpeech) {
         Text text = new Text(partOfSpeech.getLabel().toUnicode());
         text.setFont(ARABIC_FONT_SMALL_BOLD);
         MenuItem menuItem = new MenuItem("", text);
-        menuItem.setOnAction(event -> addEmptyNode(terminalNode, index, partOfSpeech));
+        menuItem.setOnAction(event -> addEmptyNode(index, partOfSpeech));
         return menuItem;
     }
 
-    private void addEmptyNode(TerminalNodeAdapter terminalNode, int index, PartOfSpeech partOfSpeech) {
+    private void addEmptyNode(int index, PartOfSpeech partOfSpeech) {
         GraphMetaInfoAdapter graphMetaInfo = getDependencyGraph().getGraphMetaInfo();
         shiftNodes(index, graphMetaInfo);
         Node node = canvasPane.getChildren().get(index - 1);
@@ -764,28 +762,18 @@ public class CanvasPane extends Pane {
         Group group = (Group) node;
         Line referenceLine = getReferenceLine(group);
         graphBuilder.set(graphMetaInfo.getGraphMetaInfo());
-        EmptyNodeAdapter emptyNodeAdapter = createEmptyNodeAdapter(terminalNode, referenceLine, partOfSpeech);
+        EmptyNodeAdapter emptyNodeAdapter = createEmptyNodeAdapter(partOfSpeech, referenceLine);
         getDependencyGraph().getDependencyGraph().getNodes().add(index, emptyNodeAdapter.getSrc());
         getDependencyGraph().getGraphNodes().add(index, emptyNodeAdapter);
         DependencyGraphAdapter dependencyGraph = getDependencyGraph();
-        setDependencyGraph(new DependencyGraphAdapter(new DependencyGraph()));
+        setDependencyGraph(null);
         setDependencyGraph(dependencyGraph);
     }
 
-    private EmptyNodeAdapter createEmptyNodeAdapter(TerminalNodeAdapter terminalNode, Line referenceLine,
-                                                    PartOfSpeech partOfSpeech) {
+    private EmptyNodeAdapter createEmptyNodeAdapter(PartOfSpeech partOfSpeech, Line referenceLine) {
         EmptyNodeAdapter emptyNodeAdapter = new EmptyNodeAdapter();
-        Token src = terminalNode.getSrc().getToken();
-        Token token = new Token(src).withHidden(true).withToken("(*)");
-        Location location = new Location(token.getChapterNumber(), token.getVerseNumber(),
-                token.getTokenNumber(), 1, true).withPartOfSpeech(partOfSpeech).withStartIndex(0)
-                .withEndIndex(token.getTokenWord().getLength());
-        token.setLocations(singletonList(location));
-
-        EmptyNode emptyNode = graphBuilder.buildEmptyNode(token, referenceLine);
-
+        EmptyNode emptyNode = graphBuilder.buildEmptyNode(partOfSpeech, referenceLine);
         emptyNodeAdapter.setSrc(emptyNode);
-
         return emptyNodeAdapter;
     }
 

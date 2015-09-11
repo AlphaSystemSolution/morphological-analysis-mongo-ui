@@ -9,6 +9,7 @@ import com.alphasystem.morphologicalanalysis.util.MorphologicalAnalysisRepositor
 import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech;
 import javafx.scene.shape.Line;
 
 import java.util.ArrayList;
@@ -27,6 +28,7 @@ import static java.util.Collections.singletonList;
 public class GraphBuilder {
 
     private static GraphBuilder instance = new GraphBuilder();
+    private final String NOUN_EMPTY_TOKEN_DISPLAY_NAME = "0:1:1";
     private MorphologicalAnalysisRepositoryUtil repositoryUtil = RepositoryTool.getInstance().getRepositoryUtil();
     private double tokenWidth = RECTANGLE_WIDTH;
     private double tokenHeight = RECTANGLE_HEIGHT;
@@ -154,14 +156,17 @@ public class GraphBuilder {
         return partOfSpeechNodes;
     }
 
-    public EmptyNode buildEmptyNode(Token token, Line referenceLine) {
+    public EmptyNode buildEmptyNode(PartOfSpeech partOfSpeech, Line referenceLine) {
+        EmptyNode emptyNode = null;
+
         rectX = gapBetweenTokens + referenceLine.getEndX();
         textX = rectX + 30;
         x1 = rectX;
         x2 = tokenWidth + rectX;
         x3 = rectX + 30;
 
-        EmptyNode emptyNode = (EmptyNode) buildTerminalNode(token, EMPTY);
+        Token token = repositoryUtil.getTokenRepository().findByDisplayName(NOUN_EMPTY_TOKEN_DISPLAY_NAME);
+        emptyNode = (EmptyNode) buildTerminalNode(token, EMPTY);
         buildPartOfSpeechNodes(singletonList(emptyNode));
 
         return emptyNode;
