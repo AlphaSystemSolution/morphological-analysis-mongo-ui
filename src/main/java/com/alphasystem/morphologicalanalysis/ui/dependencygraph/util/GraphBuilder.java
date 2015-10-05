@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.*;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.*;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.NOUN;
+import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.VERB;
 import static java.lang.String.format;
 import static java.util.Collections.reverse;
 import static java.util.Collections.singletonList;
@@ -30,12 +31,14 @@ import static java.util.Collections.singletonList;
  */
 public class GraphBuilder {
 
-    private static final String NOUN_EMPTY_TOKEN_DISPLAY_NAME = "0:1:1";
+    private static final String NOUN_IMPLIED_TOKEN_DISPLAY_NAME = "0:1:1:1";
+    private static final String VERB_IMPLIED_TOKEN_DISPLAY_NAME = "0:1:2:1";
     private static GraphBuilder instance = new GraphBuilder();
-    private static Map<PartOfSpeech, String> emptyTokenMap = new LinkedHashMap<>();
+    private static Map<PartOfSpeech, String> impliedTokenMap = new LinkedHashMap<>();
 
     static {
-        emptyTokenMap.put(NOUN, NOUN_EMPTY_TOKEN_DISPLAY_NAME);
+        impliedTokenMap.put(NOUN, NOUN_IMPLIED_TOKEN_DISPLAY_NAME);
+        impliedTokenMap.put(VERB, VERB_IMPLIED_TOKEN_DISPLAY_NAME);
     }
 
     private MorphologicalAnalysisRepositoryUtil repositoryUtil = RepositoryTool.getInstance().getRepositoryUtil();
@@ -173,7 +176,7 @@ public class GraphBuilder {
         x2 = tokenWidth + rectX;
         x3 = rectX + 30;
 
-        Token token = repositoryUtil.getTokenRepository().findByDisplayName(emptyTokenMap.get(partOfSpeech));
+        Token token = repositoryUtil.getTokenRepository().findByDisplayName(impliedTokenMap.get(partOfSpeech));
         ImpliedNode impliedNode = (ImpliedNode) buildTerminalNode(token, IMPLIED);
         buildPartOfSpeechNodes(singletonList(impliedNode));
 
