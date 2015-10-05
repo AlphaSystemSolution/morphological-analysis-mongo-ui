@@ -95,7 +95,7 @@ public class TreeBankPane extends BorderPane {
             DependencyGraphRepository dependencyGraphRepository = repositoryTool.getRepositoryUtil()
                     .getDependencyGraphRepository();
             DependencyGraph dependencyGraph = dependencyGraphRepository
-                    .findByDisplayName("1:2:1:4");
+                    .findByDisplayName("1:3:1:2");
             DependencyGraphAdapter dependencyGraphAdapter = new DependencyGraphAdapter(dependencyGraph);
             canvasPane.setDependencyGraph(dependencyGraphAdapter);
         });

@@ -67,7 +67,7 @@ public class DependencyGraphBuilderEditorPane extends BorderPane {
             TitledPane[] titledPanes = null;
             switch (node.getGraphNodeType()) {
                 case TERMINAL:
-                case EMPTY:
+                case IMPLIED:
                 case REFERENCE:
                 case HIDDEN:
                     titledPanes = addTerminalNodeProperties((TerminalNodeAdapter) node);

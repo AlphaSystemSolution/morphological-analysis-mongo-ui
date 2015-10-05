@@ -67,7 +67,7 @@ public class CanvasUtil {
         }
         switch (graphNode.getGraphNodeType()) {
             case TERMINAL:
-            case EMPTY:
+            case IMPLIED:
             case REFERENCE:
             case HIDDEN:
                 text = getTerminalNodeText((TerminalNode) graphNode);

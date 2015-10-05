@@ -76,8 +76,8 @@ public class RepositoryTool {
             case HIDDEN:
                 repository = repositoryUtil.getHiddenNodeRepository();
                 break;
-            case EMPTY:
-                repository = repositoryUtil.getEmptyNodeRepository();
+            case IMPLIED:
+                repository = repositoryUtil.getImpliedNodeRepository();
                 break;
             default:
                 break;
@@ -180,7 +180,7 @@ public class RepositoryTool {
             for (TerminalNode terminalNode : terminalNodes) {
                 dependencyGraph.addNode(terminalNode);
             }
-            dependencyGraph = dependencyGraphRepository.save(dependencyGraph);
+            // dependencyGraph = dependencyGraphRepository.save(dependencyGraph);
         }
 
         return dependencyGraph;

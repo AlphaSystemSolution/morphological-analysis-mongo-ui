@@ -13,11 +13,14 @@ import com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpee
 import javafx.scene.shape.Line;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.*;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.*;
+import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.NOUN;
 import static java.lang.String.format;
 import static java.util.Collections.reverse;
 import static java.util.Collections.singletonList;
@@ -27,8 +30,14 @@ import static java.util.Collections.singletonList;
  */
 public class GraphBuilder {
 
+    private static final String NOUN_EMPTY_TOKEN_DISPLAY_NAME = "0:1:1";
     private static GraphBuilder instance = new GraphBuilder();
-    private final String NOUN_EMPTY_TOKEN_DISPLAY_NAME = "0:1:1";
+    private static Map<PartOfSpeech, String> emptyTokenMap = new LinkedHashMap<>();
+
+    static {
+        emptyTokenMap.put(NOUN, NOUN_EMPTY_TOKEN_DISPLAY_NAME);
+    }
+
     private MorphologicalAnalysisRepositoryUtil repositoryUtil = RepositoryTool.getInstance().getRepositoryUtil();
     private double tokenWidth = RECTANGLE_WIDTH;
     private double tokenHeight = RECTANGLE_HEIGHT;
@@ -94,8 +103,8 @@ public class GraphBuilder {
             case TERMINAL:
                 terminalNode = new TerminalNode(token);
                 break;
-            case EMPTY:
-                terminalNode = new EmptyNode(token);
+            case IMPLIED:
+                terminalNode = new ImpliedNode(token);
                 break;
             case HIDDEN:
                 terminalNode = new HiddenNode(token);
@@ -146,9 +155,10 @@ public class GraphBuilder {
 
         Token token = terminalNode.getToken();
         List<Location> locations = token.getLocations();
-        reverse(locations);
         Double posX = terminalNode.getX1();
-        for (Location location : locations) {
+        for (int i = locations.size() - 1; i >= 0; i--) {
+            Location location = locations.get(i);
+            System.out.println(">>>>>>>>>>>>>>>>>>>> " + token.getDisplayName() + " : " + location.getDisplayName());
             partOfSpeechNodes.add(buildPartOfSpeechNode(location, posX));
             posX += 50;
         }
@@ -156,20 +166,18 @@ public class GraphBuilder {
         return partOfSpeechNodes;
     }
 
-    public EmptyNode buildEmptyNode(PartOfSpeech partOfSpeech, Line referenceLine) {
-        EmptyNode emptyNode = null;
-
+    public ImpliedNode buildEmptyNode(PartOfSpeech partOfSpeech, Line referenceLine) {
         rectX = gapBetweenTokens + referenceLine.getEndX();
         textX = rectX + 30;
         x1 = rectX;
         x2 = tokenWidth + rectX;
         x3 = rectX + 30;
 
-        Token token = repositoryUtil.getTokenRepository().findByDisplayName(NOUN_EMPTY_TOKEN_DISPLAY_NAME);
-        emptyNode = (EmptyNode) buildTerminalNode(token, EMPTY);
-        buildPartOfSpeechNodes(singletonList(emptyNode));
+        Token token = repositoryUtil.getTokenRepository().findByDisplayName(emptyTokenMap.get(partOfSpeech));
+        ImpliedNode impliedNode = (ImpliedNode) buildTerminalNode(token, IMPLIED);
+        buildPartOfSpeechNodes(singletonList(impliedNode));
 
-        return emptyNode;
+        return impliedNode;
     }
 
     public void buildRelationshipNode(RelationshipNode relationshipNode,

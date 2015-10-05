@@ -188,7 +188,7 @@ public class CanvasPane extends Pane {
             nodes.forEach(graphNode -> {
                 switch (graphNode.getGraphNodeType()) {
                     case TERMINAL:
-                    case EMPTY:
+                    case IMPLIED:
                     case HIDDEN:
                     case REFERENCE:
                         drawTerminalNode((TerminalNodeAdapter) graphNode);
@@ -274,7 +274,7 @@ public class CanvasPane extends Pane {
 
         group.setId(format("%s_%s", TERMINAL_GROUP_ID_PREFIX, tokenId));
         group.getChildren().addAll(translationText, arabicText, line);
-        buildPartOfSpeechNodes(tn, group, nonTerminal);
+        drawPartOfSpeechNodes(tn, group, nonTerminal);
 
         group.setTranslateX(tn.getTranslateX());
         group.setTranslateY(tn.getTranslateY());
@@ -293,10 +293,12 @@ public class CanvasPane extends Pane {
         canvasPane.getChildren().add(group);
     }
 
-    private void buildPartOfSpeechNodes(TerminalNodeAdapter tn, Group group, boolean nonTerminal) {
+    private void drawPartOfSpeechNodes(TerminalNodeAdapter tn, Group group, boolean nonTerminal) {
         tn.getPartOfSpeeches().forEach(pn -> {
             pn.setTranslateX(tn.getTranslateX());
             pn.setTranslateY(tn.getTranslateY());
+            System.out.println("<<<<<<<<<<<<<<<<< " + tn.getSrc().getToken().getDisplayName()
+                    + " : " + pn.getSrc().getLocation().getDisplayName());
             PartOfSpeech partOfSpeech = pn.getSrc().getLocation().getPartOfSpeech();
             Color color = nonTerminal ? NON_TERMINAL_COLOR :
                     web(partOfSpeech.getColorCode());
@@ -633,7 +635,7 @@ public class CanvasPane extends Pane {
             GraphNodeType nodeType = graphNode.getGraphNodeType();
             switch (nodeType) {
                 case TERMINAL:
-                case EMPTY:
+                case IMPLIED:
                 case REFERENCE:
                 case HIDDEN:
                     TerminalNodeAdapter tn = (TerminalNodeAdapter) graphNode;
@@ -762,23 +764,23 @@ public class CanvasPane extends Pane {
         Group group = (Group) node;
         Line referenceLine = getReferenceLine(group);
         graphBuilder.set(graphMetaInfo.getGraphMetaInfo());
-        EmptyNodeAdapter emptyNodeAdapter = createEmptyNodeAdapter(partOfSpeech, referenceLine);
-        getDependencyGraph().getDependencyGraph().getNodes().add(index, emptyNodeAdapter.getSrc());
-        getDependencyGraph().getGraphNodes().add(index, emptyNodeAdapter);
+        ImpliedNodeAdapter impliedNodeAdapter = createEmptyNodeAdapter(partOfSpeech, referenceLine);
+        getDependencyGraph().getDependencyGraph().getNodes().add(index, impliedNodeAdapter.getSrc());
+        getDependencyGraph().getGraphNodes().add(index, impliedNodeAdapter);
         DependencyGraphAdapter dependencyGraph = getDependencyGraph();
         setDependencyGraph(null);
         setDependencyGraph(dependencyGraph);
     }
 
-    private EmptyNodeAdapter createEmptyNodeAdapter(PartOfSpeech partOfSpeech, Line referenceLine) {
-        EmptyNodeAdapter emptyNodeAdapter = new EmptyNodeAdapter();
-        EmptyNode emptyNode = graphBuilder.buildEmptyNode(partOfSpeech, referenceLine);
-        emptyNodeAdapter.setSrc(emptyNode);
-        return emptyNodeAdapter;
+    private ImpliedNodeAdapter createEmptyNodeAdapter(PartOfSpeech partOfSpeech, Line referenceLine) {
+        ImpliedNodeAdapter impliedNodeAdapter = new ImpliedNodeAdapter();
+        ImpliedNode impliedNode = graphBuilder.buildEmptyNode(partOfSpeech, referenceLine);
+        impliedNodeAdapter.setSrc(impliedNode);
+        return impliedNodeAdapter;
     }
 
     /**
-     * When adding an {@link GraphNodeType#EMPTY}, {@link GraphNodeType#HIDDEN}, or {@link GraphNodeType#REFERENCE}
+     * When adding an {@link GraphNodeType#IMPLIED}, {@link GraphNodeType#HIDDEN}, or {@link GraphNodeType#REFERENCE}
      * node, move all nodes by {@link GraphMetaInfo#gapBetweenTokens} plus {@link GraphMetaInfo#tokenWidth} to
      * the right.
      *
