@@ -297,8 +297,6 @@ public class CanvasPane extends Pane {
         tn.getPartOfSpeeches().forEach(pn -> {
             pn.setTranslateX(tn.getTranslateX());
             pn.setTranslateY(tn.getTranslateY());
-            System.out.println("<<<<<<<<<<<<<<<<< " + tn.getSrc().getToken().getDisplayName()
-                    + " : " + pn.getSrc().getLocation().getDisplayName());
             PartOfSpeech partOfSpeech = pn.getSrc().getLocation().getPartOfSpeech();
             Color color = nonTerminal ? NON_TERMINAL_COLOR :
                     web(partOfSpeech.getColorCode());
@@ -514,9 +512,12 @@ public class CanvasPane extends Pane {
         });
         items.add(menuItem);
 
-        menu = new Menu("Add Empty Node");
+        menu = new Menu("Add Impled Node to Left");
         menu.getItems().addAll(createAddEmptyNodeMenuItem(index, NOUN), createAddEmptyNodeMenuItem(index, VERB));
+        contextMenu.getItems().add(menu);
 
+        menu = new Menu("Add Impled Node to Right");
+        menu.getItems().addAll(createAddEmptyNodeMenuItem(index + 1, NOUN), createAddEmptyNodeMenuItem(index + 1, VERB));
         contextMenu.getItems().add(menu);
 
         menuItem = new MenuItem("Add Reference Node ...");
