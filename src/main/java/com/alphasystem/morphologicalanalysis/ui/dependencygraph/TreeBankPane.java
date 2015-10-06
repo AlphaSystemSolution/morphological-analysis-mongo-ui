@@ -1,9 +1,9 @@
 package com.alphasystem.morphologicalanalysis.ui.dependencygraph;
 
 import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
-import com.alphasystem.morphologicalanalysis.graph.repository.DependencyGraphRepository;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.components.CanvasPane;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.components.ControlPane;
+import com.alphasystem.morphologicalanalysis.ui.dependencygraph.components.DependencyGraphSelectionDialog;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.DependencyGraphAdapter;
 import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
 import javafx.collections.ObservableList;
@@ -21,6 +21,7 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.util.Optional;
 
 import static com.alphasystem.util.AppUtil.USER_HOME_DIR;
 import static java.lang.String.format;
@@ -49,6 +50,7 @@ public class TreeBankPane extends BorderPane {
     }
 
     private RepositoryTool repositoryTool = RepositoryTool.getInstance();
+    private DependencyGraphSelectionDialog dependencyGraphSelectionDialog;
 
     /**
      * pane for canvas
@@ -61,6 +63,7 @@ public class TreeBankPane extends BorderPane {
 
     public TreeBankPane(DependencyGraphAdapter dependencyGraph) {
         setTop(createMenuBar());
+        dependencyGraphSelectionDialog = new DependencyGraphSelectionDialog();
         canvasPane = new CanvasPane(dependencyGraph);
         ScrollPane scrollPane = new ScrollPane(canvasPane);
         scrollPane.setHbarPolicy(AS_NEEDED);
@@ -90,15 +93,7 @@ public class TreeBankPane extends BorderPane {
 
         menuItem = new MenuItem("Open ...");
         menuItem.setAccelerator(new KeyCodeCombination(O, CONTROL_DOWN));
-        menuItem.setOnAction(event -> {
-            // TODO:
-            DependencyGraphRepository dependencyGraphRepository = repositoryTool.getRepositoryUtil()
-                    .getDependencyGraphRepository();
-            DependencyGraph dependencyGraph = dependencyGraphRepository
-                    .findByDisplayName("1:1:1:4");
-            DependencyGraphAdapter dependencyGraphAdapter = new DependencyGraphAdapter(dependencyGraph);
-            canvasPane.setDependencyGraph(dependencyGraphAdapter);
-        });
+        menuItem.setOnAction(event -> openAction());
         menu.getItems().add(menuItem);
 
         menuItem = new MenuItem("Save");
@@ -132,6 +127,13 @@ public class TreeBankPane extends BorderPane {
         menu.getItems().add(exportMenu);
 
         return menuBar;
+    }
+
+    private void openAction() {
+        Optional<DependencyGraph> result = dependencyGraphSelectionDialog.showAndWait();
+        result.ifPresent(dependencyGraph -> {
+            canvasPane.setDependencyGraph(new DependencyGraphAdapter(dependencyGraph));
+        });
     }
 
     private File getExportFile(String format) {

@@ -25,30 +25,28 @@ import static com.alphasystem.morphologicalanalysis.ui.common.Global.RESOURCE_BU
  */
 public class ChapterVerseSelectionPane extends BorderPane {
 
+    private Label chapterNameLabel;
     private ComboBox<Chapter> chapterNameComboBox;
+    private Label verseNumberLabel;
     private ComboBox<Verse> verseComboBox;
 
     // other elements
-    private RepositoryTool repositoryTool = RepositoryTool.getInstance();
     private List<Chapter> chapters;
-    private BooleanProperty avaialble = new SimpleBooleanProperty(false);
+    private BooleanProperty available = new SimpleBooleanProperty(false);
 
+    @SuppressWarnings({"unchecked"})
     public ChapterVerseSelectionPane() {
-        Service<List<Chapter>> service = repositoryTool.getAllChapters();
+        Service<List<Chapter>> service = RepositoryTool.getInstance().getAllChapters();
         service.start();
         service.setOnSucceeded(event -> {
             chapters = (List<Chapter>) event.getSource().getValue();
             initPane();
-            avaialble.setValue(true);
+            available.setValue(true);
         });
     }
 
-    public boolean getAvaialble() {
-        return avaialble.get();
-    }
-
-    public BooleanProperty avaialbleProperty() {
-        return avaialble;
+    public BooleanProperty availableProperty() {
+        return available;
     }
 
     private void initPane() {
@@ -61,10 +59,10 @@ public class ChapterVerseSelectionPane extends BorderPane {
         verseComboBox.setButtonCell(new VerseListCell());
         verseComboBox.setCellFactory(param -> new VerseListCell());
 
-        Label label = new Label(RESOURCE_BUNDLE.getString("chapterName.label"));
-        grid.add(label, 0, 0);
+        chapterNameLabel = new Label(RESOURCE_BUNDLE.getString("chapterName.label"));
+        grid.add(chapterNameLabel, 0, 0);
 
-        chapterNameComboBox = new ComboBox();
+        chapterNameComboBox = new ComboBox<>();
         chapterNameComboBox.setButtonCell(new ChapterListCell());
         chapterNameComboBox.setCellFactory(param -> new ChapterListCell());
         chapterNameComboBox.getItems().addAll(chapters.toArray(new Chapter[chapters.size()]));
@@ -73,11 +71,11 @@ public class ChapterVerseSelectionPane extends BorderPane {
                 (observable, oldValue, newValue) -> {
                     initVerseComboBox(newValue);
                 });
-        label.setLabelFor(chapterNameComboBox);
+        chapterNameLabel.setLabelFor(chapterNameComboBox);
         grid.add(chapterNameComboBox, 0, 1);
 
-        label = new Label(RESOURCE_BUNDLE.getString("verseNumber.label"));
-        grid.add(label, 1, 0);
+        verseNumberLabel = new Label(RESOURCE_BUNDLE.getString("verseNumber.label"));
+        grid.add(verseNumberLabel, 1, 0);
         initVerseComboBox(chapterNameComboBox.getItems().get(0));
         grid.add(verseComboBox, 1, 1);
 
@@ -101,13 +99,9 @@ public class ChapterVerseSelectionPane extends BorderPane {
         int size = verseNumbers.size();
         verseComboBox.getItems().addAll(verseNumbers.toArray(new Verse[size]));
         if (size > 0) {
-            verseComboBox.getSelectionModel().select(0);
+            verseComboBox.getSelectionModel().selectFirst();
         }
         verseComboBox.requestLayout();
-    }
-
-    public ComboBox<Verse> getVerseComboBox() {
-        return verseComboBox;
     }
 
     public ReadOnlyObjectProperty<Verse> selectedVerseProperty() {
@@ -116,5 +110,21 @@ public class ChapterVerseSelectionPane extends BorderPane {
 
     public Verse getSelectedVerse() {
         return selectedVerseProperty().get();
+    }
+
+    public Label getChapterNameLabel() {
+        return chapterNameLabel;
+    }
+
+    public ComboBox<Chapter> getChapterNameComboBox() {
+        return chapterNameComboBox;
+    }
+
+    public Label getVerseNumberLabel() {
+        return verseNumberLabel;
+    }
+
+    public ComboBox<Verse> getVerseComboBox() {
+        return verseComboBox;
     }
 }

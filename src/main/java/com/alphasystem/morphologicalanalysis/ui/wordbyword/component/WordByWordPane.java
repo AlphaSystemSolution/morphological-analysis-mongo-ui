@@ -56,7 +56,7 @@ public class WordByWordPane extends BorderPane {
     public WordByWordPane() {
         tokenEditorDialog = new TokenEditorDialog(repositoryTool.getTokenByDisplayName("1:1:1"));
         chapterVerseSelectionPane = new ChapterVerseSelectionPane();
-        chapterVerseSelectionPane.avaialbleProperty().addListener((observable, oldValue, newValue) -> {
+        chapterVerseSelectionPane.availableProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue) {
                 initPane();
             }

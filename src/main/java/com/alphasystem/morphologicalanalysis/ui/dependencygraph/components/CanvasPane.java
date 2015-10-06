@@ -691,7 +691,7 @@ public class CanvasPane extends Pane {
         return menuItem;
     }
 
-    private MenuItem createRelationshipMenuItem(PhraseNodeAdapter pn, LinkSupportAdapter currentNode) {
+    /*private MenuItem createRelationshipMenuItem(PhraseNodeAdapter pn, LinkSupportAdapter currentNode) {
         Text text = new Text(canvasUtil.getPhraseMenuItemText(pn));
         text.setNodeOrientation(RIGHT_TO_LEFT);
         text.setFont(ARABIC_FONT_SMALL);
@@ -701,7 +701,7 @@ public class CanvasPane extends Pane {
             System.out.println("HERE");
         });
         return menuItem;
-    }
+    }*/
 
     private void makeReference(int index) {
         DependencyGraph dependencyGraph = getDependencyGraph().getDependencyGraph();
