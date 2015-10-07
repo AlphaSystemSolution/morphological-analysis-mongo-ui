@@ -161,7 +161,6 @@ public class GraphBuilder {
         Double posX = terminalNode.getX1();
         for (int i = locations.size() - 1; i >= 0; i--) {
             Location location = locations.get(i);
-            System.out.println(">>>>>>>>>>>>>>>>>>>> " + token.getDisplayName() + " : " + location.getDisplayName());
             partOfSpeechNodes.add(buildPartOfSpeechNode(location, posX));
             posX += 50;
         }

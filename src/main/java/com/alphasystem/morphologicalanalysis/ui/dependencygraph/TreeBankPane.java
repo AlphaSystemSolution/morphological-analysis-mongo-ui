@@ -98,8 +98,7 @@ public class TreeBankPane extends BorderPane {
 
         menuItem = new MenuItem("Save");
         menuItem.setAccelerator(new KeyCodeCombination(S, CONTROL_DOWN));
-        menuItem.setOnAction(event ->
-                repositoryTool.saveDependencyGraph(canvasPane.getDependencyGraph().getDependencyGraph()));
+        menuItem.setOnAction(event -> saveAction());
         menu.getItems().add(menuItem);
 
         menus.add(menu);
@@ -134,6 +133,12 @@ public class TreeBankPane extends BorderPane {
         result.ifPresent(dependencyGraph -> {
             canvasPane.setDependencyGraph(new DependencyGraphAdapter(dependencyGraph));
         });
+    }
+
+    private void saveAction() {
+        repositoryTool.saveDependencyGraph(canvasPane.getDependencyGraph().getDependencyGraph(),
+                canvasPane.getRemovalIds());
+        canvasPane.getRemovalIds().clear();
     }
 
     private File getExportFile(String format) {

@@ -5,6 +5,7 @@ import com.alphasystem.morphologicalanalysis.graph.model.GraphMetaInfo;
 import com.alphasystem.morphologicalanalysis.graph.model.TerminalNode;
 import com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType;
 import com.alphasystem.morphologicalanalysis.graph.repository.DependencyGraphRepository;
+import com.alphasystem.morphologicalanalysis.graph.repository.PartOfSpeechNodeRepository;
 import com.alphasystem.morphologicalanalysis.graph.repository.TerminalNodeRepository;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.GraphBuilder;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.AbstractProperties;
@@ -33,6 +34,7 @@ public class RepositoryTool {
     private LocationRepository locationRepository;
     private DependencyGraphRepository dependencyGraphRepository;
     private TerminalNodeRepository terminalNodeRepository;
+    private PartOfSpeechNodeRepository partOfSpeechNodeRepository;
 
     /**
      * do not let anyone instantiate this class
@@ -44,6 +46,7 @@ public class RepositoryTool {
         locationRepository = repositoryUtil.getLocationRepository();
         dependencyGraphRepository = repositoryUtil.getDependencyGraphRepository();
         terminalNodeRepository = repositoryUtil.getTerminalNodeRepository();
+        partOfSpeechNodeRepository = repositoryUtil.getPartOfSpeechNodeRepository();
         graphBuilder = GraphBuilder.getInstance();
 
     }
@@ -182,14 +185,17 @@ public class RepositoryTool {
             for (TerminalNode terminalNode : terminalNodes) {
                 dependencyGraph.addNode(terminalNode);
             }
-            // dependencyGraph = dependencyGraphRepository.save(dependencyGraph);
         }
 
         return dependencyGraph;
     }
 
-    public void saveDependencyGraph(DependencyGraph dependencyGraph) {
+    public void saveDependencyGraph(DependencyGraph dependencyGraph, List<String> removalIds) {
+        System.out.println(removalIds);
         dependencyGraphRepository.save(dependencyGraph);
+        if (!removalIds.isEmpty()) {
+            removalIds.forEach(id -> partOfSpeechNodeRepository.delete(id));
+        }
     }
 
     public MorphologicalAnalysisRepositoryUtil getRepositoryUtil() {

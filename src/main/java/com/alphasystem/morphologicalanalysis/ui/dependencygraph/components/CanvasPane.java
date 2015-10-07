@@ -23,10 +23,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
 import javafx.scene.text.Text;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.PHRASE;
 import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.TERMINAL;
@@ -67,6 +64,7 @@ public class CanvasPane extends Pane {
     private RelationshipSelectionDialog relationshipSelectionDialog;
     private PhraseSelectionDialog phraseSelectionDialog;
     private ReferenceSelectionDialog referenceSelectionDialog;
+    private List<String> removalIds = new ArrayList<>();
     private Pane canvasPane;
     private Node gridLines;
 
@@ -535,13 +533,60 @@ public class CanvasPane extends Pane {
         contextMenu.getItems().add(menu);
 
         TerminalNodeAdapter parent = (TerminalNodeAdapter) currentNode.getParent();
-        GraphNodeType graphNodeType = parent.getGraphNodeType();
+        GraphNodeType parentNodeType = parent.getGraphNodeType();
         // If current part of speech has parent which is Empty, Reference, or Hidden, we will not display menu
-        if (graphNodeType.equals(TERMINAL)) {
+        if (parentNodeType.equals(TERMINAL)) {
             menu = new Menu("Make Phrase");
             addPhraseMenuItems(currentNode, menu);
             contextMenu.getItems().add(menu);
         }
+
+        MenuItem menuItem = new MenuItem("Remove");
+        menuItem.setOnAction(event -> {
+            removePartOfSpeech(currentNode.getId());
+        });
+        contextMenu.getItems().add(menuItem);
+    }
+
+    private void removePartOfSpeech(String removalId) {
+        DependencyGraphAdapter dependencyGraphAdapter = getDependencyGraph();
+        DependencyGraph dependencyGraph = dependencyGraphAdapter.getDependencyGraph();
+
+        // first remove it from UI Adapter
+        ObservableList<GraphNodeAdapter> graphNodes = dependencyGraphAdapter.getGraphNodes();
+        graphNodes.stream().filter(node -> node.getGraphNodeType().equals(TERMINAL)).forEach(node -> {
+            TerminalNodeAdapter terminalNode = (TerminalNodeAdapter) node;
+            ObservableList<PartOfSpeechNodeAdapter> partOfSpeeches = terminalNode.getPartOfSpeeches();
+            ListIterator<PartOfSpeechNodeAdapter> posLi = partOfSpeeches.listIterator();
+            while (posLi.hasNext()) {
+                PartOfSpeechNodeAdapter next = posLi.next();
+                if (next.getId().equals(removalId)) {
+                    posLi.remove();
+                    System.out.println("Removing: " + removalId);
+                    break;
+                }
+            }
+        });
+
+        // now remove it from database
+        dependencyGraph.getNodes().stream().filter(graphNode -> graphNode.getGraphNodeType().equals(TERMINAL))
+                .forEach(graphNode -> {
+                    TerminalNode terminalNode = (TerminalNode) graphNode;
+                    List<PartOfSpeechNode> partOfSpeechNodes = terminalNode.getPartOfSpeechNodes();
+                    ListIterator<PartOfSpeechNode> posLi = partOfSpeechNodes.listIterator();
+                    while (posLi.hasNext()) {
+                        PartOfSpeechNode next = posLi.next();
+                        if (next.getId().equals(removalId)) {
+                            posLi.remove();
+                            removalIds.add(removalId);
+                            break;
+                        }
+                    }
+                });
+
+        dependencyGraphAdapter = getDependencyGraph();
+        setDependencyGraph(null);
+        setDependencyGraph(dependencyGraphAdapter);
     }
 
     private void initPhraseNodeContextMenu(PhraseNodeAdapter currentNode) {
@@ -690,18 +735,6 @@ public class CanvasPane extends Pane {
         });
         return menuItem;
     }
-
-    /*private MenuItem createRelationshipMenuItem(PhraseNodeAdapter pn, LinkSupportAdapter currentNode) {
-        Text text = new Text(canvasUtil.getPhraseMenuItemText(pn));
-        text.setNodeOrientation(RIGHT_TO_LEFT);
-        text.setFont(ARABIC_FONT_SMALL);
-        MenuItem menuItem = new MenuItem("", text);
-        menuItem.setUserData(pn);
-        menuItem.setOnAction(event -> {
-            System.out.println("HERE");
-        });
-        return menuItem;
-    }*/
 
     private void makeReference(int index) {
         DependencyGraph dependencyGraph = getDependencyGraph().getDependencyGraph();
@@ -869,5 +902,9 @@ public class CanvasPane extends Pane {
 
     public Pane getCanvasPane() {
         return canvasPane;
+    }
+
+    public List<String> getRemovalIds() {
+        return removalIds;
     }
 }
