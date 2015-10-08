@@ -512,11 +512,11 @@ public class CanvasPane extends Pane {
         items.add(menuItem);
 
         menu = new Menu("Add Impled Node to Left");
-        menu.getItems().addAll(createAddEmptyNodeMenuItem(index, NOUN), createAddEmptyNodeMenuItem(index, VERB));
+        menu.getItems().addAll(createAddImpliedNodeMenuItem(index, NOUN), createAddImpliedNodeMenuItem(index, VERB));
         contextMenu.getItems().add(menu);
 
         menu = new Menu("Add Impled Node to Right");
-        menu.getItems().addAll(createAddEmptyNodeMenuItem(index + 1, NOUN), createAddEmptyNodeMenuItem(index + 1, VERB));
+        menu.getItems().addAll(createAddImpliedNodeMenuItem(index + 1, NOUN), createAddImpliedNodeMenuItem(index + 1, VERB));
         contextMenu.getItems().add(menu);
 
         // add "Hidden" pronoun if applicable (only for verb)
@@ -789,15 +789,15 @@ public class CanvasPane extends Pane {
         setDependencyGraph(dependencyGraph);
     }
 
-    private MenuItem createAddEmptyNodeMenuItem(int index, PartOfSpeech partOfSpeech) {
+    private MenuItem createAddImpliedNodeMenuItem(int index, PartOfSpeech partOfSpeech) {
         Text text = new Text(partOfSpeech.getLabel().toUnicode());
         text.setFont(ARABIC_FONT_SMALL_BOLD);
         MenuItem menuItem = new MenuItem("", text);
-        menuItem.setOnAction(event -> addEmptyNode(index, partOfSpeech));
+        menuItem.setOnAction(event -> addImpliedNode(index, partOfSpeech));
         return menuItem;
     }
 
-    private void addEmptyNode(int index, PartOfSpeech partOfSpeech) {
+    private void addImpliedNode(int index, PartOfSpeech partOfSpeech) {
         GraphMetaInfoAdapter graphMetaInfo = getDependencyGraph().getGraphMetaInfo();
         shiftNodes(index, graphMetaInfo);
         Node node = canvasPane.getChildren().get(index - 1);
@@ -809,7 +809,7 @@ public class CanvasPane extends Pane {
         Group group = (Group) node;
         Line referenceLine = getReferenceLine(group);
         graphBuilder.set(graphMetaInfo.getGraphMetaInfo());
-        ImpliedNodeAdapter impliedNodeAdapter = createEmptyNodeAdapter(partOfSpeech, referenceLine);
+        ImpliedNodeAdapter impliedNodeAdapter = createImpliedNodeAdapter(partOfSpeech, referenceLine);
         getDependencyGraph().getDependencyGraph().getNodes().add(index, impliedNodeAdapter.getSrc());
         getDependencyGraph().getGraphNodes().add(index, impliedNodeAdapter);
         DependencyGraphAdapter dependencyGraph = getDependencyGraph();
@@ -817,7 +817,7 @@ public class CanvasPane extends Pane {
         setDependencyGraph(dependencyGraph);
     }
 
-    private ImpliedNodeAdapter createEmptyNodeAdapter(PartOfSpeech partOfSpeech, Line referenceLine) {
+    private ImpliedNodeAdapter createImpliedNodeAdapter(PartOfSpeech partOfSpeech, Line referenceLine) {
         ImpliedNodeAdapter impliedNodeAdapter = new ImpliedNodeAdapter();
         ImpliedNode impliedNode = graphBuilder.buildEmptyNode(partOfSpeech, referenceLine);
         impliedNodeAdapter.setSrc(impliedNode);
