@@ -191,7 +191,6 @@ public class RepositoryTool {
     }
 
     public void saveDependencyGraph(DependencyGraph dependencyGraph, List<String> removalIds) {
-        System.out.println(removalIds);
         dependencyGraphRepository.save(dependencyGraph);
         if (!removalIds.isEmpty()) {
             removalIds.forEach(id -> partOfSpeechNodeRepository.delete(id));

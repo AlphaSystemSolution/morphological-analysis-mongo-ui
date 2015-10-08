@@ -9,6 +9,7 @@ import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.DependencyG
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.GraphBuilder;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.VerbProperties;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -518,6 +519,17 @@ public class CanvasPane extends Pane {
         menu.getItems().addAll(createAddEmptyNodeMenuItem(index + 1, NOUN), createAddEmptyNodeMenuItem(index + 1, VERB));
         contextMenu.getItems().add(menu);
 
+        // add "Hidden" pronoun if applicable (only for verb)
+        userData.getPartOfSpeeches().forEach(node -> {
+            Location location = node.getSrc().getLocation();
+            PartOfSpeech partOfSpeech = location.getPartOfSpeech();
+            if (partOfSpeech.equals(VERB)) {
+                MenuItem mi = new MenuItem("Add Hidden Node");
+                mi.setOnAction(event -> addHiddenNode(index, location));
+                contextMenu.getItems().add(mi);
+            }
+        });
+
         menuItem = new MenuItem("Add Reference Node ...");
         menuItem.setOnAction(event -> makeReference(index));
 
@@ -562,7 +574,6 @@ public class CanvasPane extends Pane {
                 PartOfSpeechNodeAdapter next = posLi.next();
                 if (next.getId().equals(removalId)) {
                     posLi.remove();
-                    System.out.println("Removing: " + removalId);
                     break;
                 }
             }
@@ -811,6 +822,36 @@ public class CanvasPane extends Pane {
         ImpliedNode impliedNode = graphBuilder.buildEmptyNode(partOfSpeech, referenceLine);
         impliedNodeAdapter.setSrc(impliedNode);
         return impliedNodeAdapter;
+    }
+
+    private void addHiddenNode(int index, Location location) {
+        GraphMetaInfoAdapter graphMetaInfo = getDependencyGraph().getGraphMetaInfo();
+        shiftNodes(index, graphMetaInfo);
+        Node node = canvasPane.getChildren().get(index - 1);
+        if (!isGivenType(Group.class, node)) {
+            // this should not happen, but we still need to handle
+            //TODO:
+            return;
+        }
+        Group group = (Group) node;
+        Line referenceLine = getReferenceLine(group);
+        graphBuilder.set(graphMetaInfo.getGraphMetaInfo());
+        VerbProperties vp = (VerbProperties) location.getProperties();
+        String pronounId = format("%s_%s_%s", vp.getConversationType().name(), vp.getGender().name(),
+                vp.getNumber().name());
+        HiddenNodeAdapter hiddenNodeAdapter = createHiddenNodeAdapter(pronounId, referenceLine);
+        getDependencyGraph().getDependencyGraph().getNodes().add(index, hiddenNodeAdapter.getSrc());
+        getDependencyGraph().getGraphNodes().add(index, hiddenNodeAdapter);
+        DependencyGraphAdapter dependencyGraph = getDependencyGraph();
+        setDependencyGraph(null);
+        setDependencyGraph(dependencyGraph);
+    }
+
+    private HiddenNodeAdapter createHiddenNodeAdapter(String pronounId, Line referenceLine) {
+        HiddenNodeAdapter hiddenNodeAdapter = new HiddenNodeAdapter();
+        HiddenNode hiddenNode = graphBuilder.buildHiddenNode(pronounId, referenceLine);
+        hiddenNodeAdapter.setSrc(hiddenNode);
+        return hiddenNodeAdapter;
     }
 
     /**
