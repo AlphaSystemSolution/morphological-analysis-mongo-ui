@@ -5,6 +5,7 @@ import com.alphasystem.morphologicalanalysis.graph.repository.DependencyGraphRep
 import com.alphasystem.morphologicalanalysis.ui.common.ChapterVerseSelectionPane;
 import com.alphasystem.morphologicalanalysis.ui.common.DependencyGraphListCell;
 import com.alphasystem.morphologicalanalysis.ui.common.Global;
+import com.alphasystem.morphologicalanalysis.util.DependencyGraphComparator;
 import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Verse;
 import javafx.geometry.Insets;
@@ -14,6 +15,7 @@ import javafx.scene.layout.GridPane;
 
 import java.util.List;
 
+import static java.util.Collections.sort;
 import static javafx.scene.control.ButtonType.CANCEL;
 import static javafx.scene.control.ButtonType.OK;
 
@@ -58,6 +60,7 @@ public class DependencyGraphSelectionDialog extends Dialog<DependencyGraph> {
         Verse selectedVerse = chapterVerseSelectionPane.getSelectedVerse();
         List<DependencyGraph> dependencyGraphs = dependencyGraphRepository.findByChapterNumberAndVerseNumber(
                 selectedVerse.getChapterNumber(), selectedVerse.getVerseNumber());
+        sort(dependencyGraphs, new DependencyGraphComparator());
         dependencyGraphComboBox.getItems().remove(0, dependencyGraphComboBox.getItems().size());
         dependencyGraphComboBox.getItems().addAll(dependencyGraphs);
         dependencyGraphComboBox.getSelectionModel().selectFirst();
