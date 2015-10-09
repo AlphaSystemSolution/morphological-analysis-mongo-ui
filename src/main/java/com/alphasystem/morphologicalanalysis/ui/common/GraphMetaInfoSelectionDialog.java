@@ -70,12 +70,10 @@ public class GraphMetaInfoSelectionDialog extends Dialog<GraphMetaInfo> {
         Label label = new Label(RESOURCE_BUNDLE.getString("totalWidth.label"));
         grid.add(label, 0, rowIndex);
 
-        GraphMetaInfo graphMetaInfo = getGraphMetaInfo();
-
-        widthField.setValueFactory(new DoubleSpinnerValueFactory(MIN_WIDTH, MAX_WIDTH, graphMetaInfo.getWidth(),
+        widthField.setValueFactory(new DoubleSpinnerValueFactory(MIN_WIDTH, MAX_WIDTH, graphMetaInfo.get().getWidth(),
                 AMOUNT_STEP_BY));
         widthField.valueProperty().addListener((observable, oldValue, newValue) -> {
-            graphMetaInfo.setWidth(newValue);
+            graphMetaInfo.get().setWidth(newValue);
         });
         grid.add(widthField, 1, rowIndex);
 
@@ -84,10 +82,10 @@ public class GraphMetaInfoSelectionDialog extends Dialog<GraphMetaInfo> {
         label = new Label(RESOURCE_BUNDLE.getString("totalHeight.label"));
         grid.add(label, 0, rowIndex);
 
-        heightField.setValueFactory(new DoubleSpinnerValueFactory(MIN_HEIGHT, MAX_HEIGHT, graphMetaInfo.getHeight(),
+        heightField.setValueFactory(new DoubleSpinnerValueFactory(MIN_HEIGHT, MAX_HEIGHT, graphMetaInfo.get().getHeight(),
                 AMOUNT_STEP_BY));
         heightField.valueProperty().addListener((observable, oldValue, newValue) -> {
-            graphMetaInfo.setHeight(newValue);
+            graphMetaInfo.get().setHeight(newValue);
         });
         grid.add(heightField, 1, rowIndex);
 
@@ -97,9 +95,9 @@ public class GraphMetaInfoSelectionDialog extends Dialog<GraphMetaInfo> {
         grid.add(label, 0, rowIndex);
 
         tokenWidth.setValueFactory(new DoubleSpinnerValueFactory(MIN_RECTANGLE_WIDTH, RECTANGLE_WIDTH,
-                graphMetaInfo.getTokenWidth(), 10));
+                graphMetaInfo.get().getTokenWidth(), 10));
         tokenWidth.valueProperty().addListener((observable, oldValue, newValue) -> {
-            graphMetaInfo.setTokenWidth(newValue);
+            graphMetaInfo.get().setTokenWidth(newValue);
         });
         grid.add(tokenWidth, 1, rowIndex);
 
@@ -109,9 +107,9 @@ public class GraphMetaInfoSelectionDialog extends Dialog<GraphMetaInfo> {
         grid.add(label, 0, rowIndex);
 
         tokenHeight.setValueFactory(new DoubleSpinnerValueFactory(MIN_RECTANGLE_HEIGHT, RECTANGLE_HEIGHT,
-                graphMetaInfo.getTokenHeight(), 10));
+                graphMetaInfo.get().getTokenHeight(), 10));
         tokenHeight.valueProperty().addListener((observable, oldValue, newValue) -> {
-            graphMetaInfo.setTokenHeight(newValue);
+            graphMetaInfo.get().setTokenHeight(newValue);
         });
         grid.add(tokenHeight, 1, rowIndex);
 
@@ -121,9 +119,9 @@ public class GraphMetaInfoSelectionDialog extends Dialog<GraphMetaInfo> {
         grid.add(label, 0, rowIndex);
 
         gapBetweenTokens.setValueFactory(new DoubleSpinnerValueFactory(MIN_GAP_BETWEEN_TOKENS, GAP_BETWEEN_TOKENS,
-                graphMetaInfo.getGapBetweenTokens(), 10));
+                graphMetaInfo.get().getGapBetweenTokens(), 10));
         this.gapBetweenTokens.valueProperty().addListener((observable, oldValue, newValue) -> {
-            graphMetaInfo.setGapBetweenTokens(newValue);
+            graphMetaInfo.get().setGapBetweenTokens(newValue);
         });
         grid.add(this.gapBetweenTokens, 1, rowIndex);
 

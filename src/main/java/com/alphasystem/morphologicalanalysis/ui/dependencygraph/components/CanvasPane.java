@@ -506,9 +506,7 @@ public class CanvasPane extends Pane {
         int index = getIndex(userData);
 
         menuItem = new MenuItem("Select");
-        menuItem.setOnAction(event -> {
-            getDependencyGraph().setSelectedNode(userData);
-        });
+        menuItem.setOnAction(event -> getDependencyGraph().setSelectedNode(userData));
         items.add(menuItem);
 
         menu = new Menu("Add Impled Node to Left");
@@ -554,9 +552,7 @@ public class CanvasPane extends Pane {
         }
 
         MenuItem menuItem = new MenuItem("Remove");
-        menuItem.setOnAction(event -> {
-            removePartOfSpeech(currentNode.getId());
-        });
+        menuItem.setOnAction(event -> removePartOfSpeech(currentNode.getId()));
         contextMenu.getItems().add(menuItem);
     }
 
