@@ -81,6 +81,10 @@ public class CanvasUtil {
             case RELATIONSHIP:
                 text = getRelationshipNodeText((RelationshipNode) graphNode);
                 break;
+            case ROOT:
+                RootNode rootNode = (RootNode) graphNode;
+                text = rootNode.getChildNodeType().name();
+                break;
             default:
                 break;
         }

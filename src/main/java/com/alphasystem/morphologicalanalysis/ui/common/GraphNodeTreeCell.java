@@ -1,7 +1,7 @@
 package com.alphasystem.morphologicalanalysis.ui.common;
 
-import com.alphasystem.morphologicalanalysis.graph.model.GraphNode;
 import com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType;
+import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.GraphNodeAdapter;
 import javafx.scene.control.TreeCell;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -14,7 +14,7 @@ import static javafx.scene.control.ContentDisplay.GRAPHIC_ONLY;
 /**
  * @author sali
  */
-public class GraphNodeTreeCell extends TreeCell<GraphNode> {
+public class GraphNodeTreeCell extends TreeCell<GraphNodeAdapter> {
 
     private final Text label;
 
@@ -24,12 +24,12 @@ public class GraphNodeTreeCell extends TreeCell<GraphNode> {
     }
 
     @Override
-    protected void updateItem(GraphNode item, boolean empty) {
+    protected void updateItem(GraphNodeAdapter item, boolean empty) {
         super.updateItem(item, empty);
 
         if(item != null && !empty){
             GraphNodeType nodeType = item.getGraphNodeType();
-            label.setText(item.toString());
+            label.setText(item.getText());
             Font font = nodeType.equals(ROOT) ? ENGLISH_FONT_SMALL : ARABIC_FONT_SMALL;
             label.setFont(font);
             setGraphic(label);
