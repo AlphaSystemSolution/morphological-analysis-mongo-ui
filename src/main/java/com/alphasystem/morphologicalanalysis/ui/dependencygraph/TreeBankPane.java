@@ -6,7 +6,6 @@ import com.alphasystem.morphologicalanalysis.ui.dependencygraph.components.Contr
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.components.DependencyGraphSelectionDialog;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.DependencyGraphAdapter;
 import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
-import javafx.collections.ObservableList;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
@@ -16,6 +15,7 @@ import javafx.scene.control.*;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.layout.BorderPane;
+import javafx.stage.Stage;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -31,8 +31,7 @@ import static javafx.scene.Cursor.DEFAULT;
 import static javafx.scene.Cursor.WAIT;
 import static javafx.scene.control.ScrollPane.ScrollBarPolicy.AS_NEEDED;
 import static javafx.scene.input.KeyCode.*;
-import static javafx.scene.input.KeyCombination.ALT_DOWN;
-import static javafx.scene.input.KeyCombination.CONTROL_DOWN;
+import static javafx.scene.input.KeyCombination.*;
 
 /**
  * @author sali
@@ -51,6 +50,7 @@ public class TreeBankPane extends BorderPane {
 
     private RepositoryTool repositoryTool = RepositoryTool.getInstance();
     private DependencyGraphSelectionDialog dependencyGraphSelectionDialog;
+    private Menu operationMenu;
 
     /**
      * pane for canvas
@@ -75,6 +75,15 @@ public class TreeBankPane extends BorderPane {
 
         // connection between Canvas pane and Control pane
         controlPane.dependencyGraphProperty().bind(canvasPane.dependencyGraphProperty());
+        canvasPane.dependencyGraphProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                canvasPane.dependencyGraphProperty().get().selectedNodeProperty().addListener(
+                        (observable1, oldValue1, newValue1) -> {
+                            canvasPane.updateOperations(newValue1, operationMenu);
+                        });
+            }
+        });
+
     }
 
     private static String getFileNameWithPadding(int value) {
@@ -85,9 +94,16 @@ public class TreeBankPane extends BorderPane {
     private MenuBar createMenuBar() {
         MenuBar menuBar = new MenuBar();
 
-        MenuItem menuItem;
-        ObservableList<Menu> menus = menuBar.getMenus();
+        menuBar.getMenus().add(createFileMenu());
 
+        operationMenu = new Menu("Operation");
+        menuBar.getMenus().add(operationMenu);
+
+        return menuBar;
+    }
+
+    private Menu createFileMenu() {
+        MenuItem menuItem;
         Menu menu = new Menu("File");
         menu.setAccelerator(new KeyCodeCombination(F));
 
@@ -101,37 +117,30 @@ public class TreeBankPane extends BorderPane {
         menuItem.setOnAction(event -> saveAction());
         menu.getItems().add(menuItem);
 
-        menus.add(menu);
-
         menu.getItems().add(new SeparatorMenuItem());
 
         Menu exportMenu = new Menu("Export");
         menuItem = new MenuItem("PNG ...");
         menuItem.setAccelerator(new KeyCodeCombination(P, CONTROL_DOWN, ALT_DOWN));
-        menuItem.setOnAction(event -> {
-            getScene().setCursor(WAIT);
-            runLater(() -> {
-                File file = getExportFile(PNG_FORMATE);
-                WritableImage writableImage = canvasPane.getCanvasPane().snapshot(new SnapshotParameters(), null);
-                try {
-                    ImageIO.write(fromFXImage(writableImage, null), PNG_FORMATE, file);
-                    Desktop.getDesktop().open(file);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                getScene().setCursor(DEFAULT);
-            });
-        });
+        menuItem.setOnAction(event -> exportToPngAction());
         exportMenu.getItems().add(menuItem);
         menu.getItems().add(exportMenu);
 
-        return menuBar;
+        menu.getItems().add(new SeparatorMenuItem());
+
+        menuItem = new MenuItem("Exit");
+        menuItem.setAccelerator(new KeyCodeCombination(F4, SHORTCUT_DOWN));
+        menuItem.setOnAction(event -> exitAction());
+        menu.getItems().add(menuItem);
+        return menu;
     }
 
     private void openAction() {
         Optional<DependencyGraph> result = dependencyGraphSelectionDialog.showAndWait();
         result.ifPresent(dependencyGraph -> {
-            canvasPane.setDependencyGraph(new DependencyGraphAdapter(dependencyGraph));
+            DependencyGraphAdapter dependencyGraphAdapter = new DependencyGraphAdapter(dependencyGraph);
+            canvasPane.setDependencyGraph(dependencyGraphAdapter);
+            canvasPane.getDependencyGraph().setSelectedNode(dependencyGraphAdapter.getGraphNodes().get(0));
         });
     }
 
@@ -139,6 +148,26 @@ public class TreeBankPane extends BorderPane {
         repositoryTool.saveDependencyGraph(canvasPane.getDependencyGraph().getDependencyGraph(),
                 canvasPane.getRemovalIds());
         canvasPane.getRemovalIds().clear();
+    }
+
+    private void exitAction() {
+        Stage stage = (Stage) getScene().getWindow();
+        stage.close();
+    }
+
+    private void exportToPngAction() {
+        getScene().setCursor(WAIT);
+        runLater(() -> {
+            File file = getExportFile(PNG_FORMATE);
+            WritableImage writableImage = canvasPane.getCanvasPane().snapshot(new SnapshotParameters(), null);
+            try {
+                ImageIO.write(fromFXImage(writableImage, null), PNG_FORMATE, file);
+                Desktop.getDesktop().open(file);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            getScene().setCursor(DEFAULT);
+        });
     }
 
     private File getExportFile(String format) {

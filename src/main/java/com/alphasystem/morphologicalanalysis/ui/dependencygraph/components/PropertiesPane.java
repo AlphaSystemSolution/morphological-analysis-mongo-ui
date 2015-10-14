@@ -95,10 +95,12 @@ public class PropertiesPane extends BorderPane {
 
         rowIndex++;
         showGridLinesCheckBox.setSelected(graphMetaInfo.isShowGridLines());
-        graphMetaInfo.showGridLinesProperty().bind(showGridLinesCheckBox.selectedProperty());
         showGridLinesCheckBox.setOnAction(event -> {
             boolean selected = showGridLinesCheckBox.isSelected();
-            showOutlineOnlyCheckBox.setSelected(selected);
+            showGridLinesCheckBox.setSelected(selected);
+        });
+        showGridLinesCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            graphMetaInfo.setShowGridLines(newValue);
         });
         grid.add(showGridLinesCheckBox, 0, rowIndex);
 
@@ -109,8 +111,10 @@ public class PropertiesPane extends BorderPane {
 
         rowIndex++;
         showOutlineOnlyCheckBox.setSelected(graphMetaInfo.isShowOutLines());
-        graphMetaInfo.showOutLinesProperty().bind(showOutlineOnlyCheckBox.selectedProperty());
         showOutlineOnlyCheckBox.disableProperty().bind(showGridLinesCheckBox.selectedProperty());
+        showOutlineOnlyCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            graphMetaInfo.setShowOutLines(newValue);
+        });
         grid.add(showOutlineOnlyCheckBox, 0, rowIndex);
 
         rowIndex++;
@@ -202,11 +206,11 @@ public class PropertiesPane extends BorderPane {
         return dependencyGraph.get();
     }
 
-    public final ObjectProperty<DependencyGraphAdapter> dependencyGraphProperty() {
-        return dependencyGraph;
-    }
-
     public final void setDependencyGraph(DependencyGraphAdapter dependencyGraph) {
         this.dependencyGraph.set(dependencyGraph);
+    }
+
+    public final ObjectProperty<DependencyGraphAdapter> dependencyGraphProperty() {
+        return dependencyGraph;
     }
 }

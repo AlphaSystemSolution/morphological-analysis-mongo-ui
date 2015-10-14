@@ -100,9 +100,9 @@ public class ControlPane extends BorderPane {
         borderPane.setCenter(editorPane);
 
         tabPane.getTabs().addAll(
-                new Tab("Properties", propertiesPane),
-                new Tab("Tree", initTreePane()),
-                new Tab("Editor", borderPane));
+                new Tab(" Properties ", propertiesPane),
+                new Tab("    Tree    ", initTreePane()),
+                new Tab("   Editor   ", borderPane));
 
         setCenter(tabPane);
         setDependencyGraph(dependencyGraph);
