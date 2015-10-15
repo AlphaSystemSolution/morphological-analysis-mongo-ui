@@ -89,14 +89,9 @@ public class ControlPane extends BorderPane {
             getDependencyGraph().setSelectedNode(newValue);
         });
         TabPane tabPane = new TabPane();
-        //tabPane.setMinSize(USE_PREF_SIZE, USE_PREF_SIZE);
-        //tabPane.setMaxSize(USE_PREF_SIZE, USE_PREF_SIZE);
         tabPane.setRotateGraphic(false);
         tabPane.setTabClosingPolicy(UNAVAILABLE);
         tabPane.setSide(TOP);
-
-        //setMinSize(USE_PREF_SIZE, USE_PREF_SIZE);
-        //setMaxSize(USE_PREF_SIZE, USE_PREF_SIZE);
 
         BorderPane borderPane = new BorderPane();
         borderPane.setCenter(editorPane);
@@ -117,8 +112,6 @@ public class ControlPane extends BorderPane {
         scrollPane.setVbarPolicy(AS_NEEDED);
         scrollPane.setContent(tree);
         borderPane.setCenter(scrollPane);
-        //borderPane.setMinSize(USE_PREF_SIZE, USE_PREF_SIZE);
-        //borderPane.setMaxSize(USE_PREF_SIZE, USE_PREF_SIZE);
         return borderPane;
     }
 
