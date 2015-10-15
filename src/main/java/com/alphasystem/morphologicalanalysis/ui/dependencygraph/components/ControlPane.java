@@ -80,6 +80,8 @@ public class ControlPane extends BorderPane {
                     }
                 });
             });
+            // set null value first in order to listener to pick
+            tree.setGraph(null);
             tree.setGraph(newValue);
         });
 
