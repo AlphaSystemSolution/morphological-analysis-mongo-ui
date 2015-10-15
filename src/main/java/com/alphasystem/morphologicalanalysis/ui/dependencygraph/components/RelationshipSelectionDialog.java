@@ -39,7 +39,7 @@ public class RelationshipSelectionDialog extends Dialog<RelationshipNode> {
         reset();
         initDialogPane();
 
-        setResultConverter(param -> createResult(param));
+        setResultConverter(this::createResult);
     }
 
     private static String getLabel(String label) {
@@ -91,8 +91,7 @@ public class RelationshipSelectionDialog extends Dialog<RelationshipNode> {
     private Label getAlternateNounStatusLabel() {
         Text text = new Text(FI_MAHL.toUnicode());
         text.setFont(Global.ARABIC_FONT_SMALL);
-        Label label = new Label("", text);
-        return label;
+        return new Label("", text);
     }
 
     private void reset() {

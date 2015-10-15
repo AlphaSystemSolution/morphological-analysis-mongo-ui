@@ -1,6 +1,5 @@
 package com.alphasystem.morphologicalanalysis.ui.dependencygraph.components;
 
-import com.alphasystem.arabic.model.ArabicWord;
 import com.alphasystem.morphologicalanalysis.graph.model.*;
 import com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.*;
@@ -29,7 +28,6 @@ import java.util.*;
 import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.PHRASE;
 import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.TERMINAL;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.*;
-import static com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.CanvasUtil.getLocationWord;
 import static com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.CubicCurveHelper.arrowPoints;
 import static com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.DependencyGraphGraphicTool.DARK_GRAY_CLOUD;
 import static com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.DependencyGraphGraphicTool.GRID_LINES;
@@ -652,7 +650,7 @@ public class CanvasPane extends Pane {
 
     private MenuItem createPhraseMenuItem(final PartOfSpeechNodeAdapter firstPartOfSpeech,
                                           final PartOfSpeechNodeAdapter lastPartOfSpeech) {
-        Text text = new Text(getRelationshipMenuItemText(lastPartOfSpeech));
+        Text text = new Text(canvasUtil.getRelationshipMenuItemText(lastPartOfSpeech));
         text.setNodeOrientation(RIGHT_TO_LEFT);
         text.setFont(ARABIC_FONT_SMALL);
         MenuItem menuItem = new MenuItem("", text);
@@ -731,31 +729,17 @@ public class CanvasPane extends Pane {
         });
     }
 
-    private String getRelationshipMenuItemText(final LinkSupportAdapter linkSupportAdapter) {
-        String text = null;
-        if (isGivenType(PartOfSpeechNodeAdapter.class, linkSupportAdapter)) {
-            PartOfSpeechNodeAdapter partOfSpeechNodeAdapter = (PartOfSpeechNodeAdapter) linkSupportAdapter;
-            TerminalNodeAdapter terminalNode = (TerminalNodeAdapter) partOfSpeechNodeAdapter.getParent();
-            Location location = partOfSpeechNodeAdapter.getSrc().getLocation();
-            Token token = terminalNode.getSrc().getToken();
-            ArabicWord locationWord = getLocationWord(token, location);
-            text = format("%s (%s)", locationWord.toUnicode(), location.getPartOfSpeech().getLabel().toUnicode());
-        } else if (isGivenType(PhraseNodeAdapter.class, linkSupportAdapter)) {
-            PhraseNodeAdapter phraseNodeAdapter = (PhraseNodeAdapter) linkSupportAdapter;
-            text = canvasUtil.getPhraseMenuItemText(phraseNodeAdapter);
-        }
-        return text;
-    }
+
 
     private MenuItem createRelationshipMenuItem(final LinkSupportAdapter dependentNode,
                                                 final LinkSupportAdapter currentNode) {
-        Text text = new Text(getRelationshipMenuItemText(dependentNode));
+        Text text = new Text(canvasUtil.getRelationshipMenuItemText(dependentNode));
         text.setNodeOrientation(RIGHT_TO_LEFT);
         text.setFont(ARABIC_FONT_SMALL);
         MenuItem menuItem = new MenuItem("", text);
         menuItem.setUserData(dependentNode);
         menuItem.setOnAction(event -> {
-            String dependentNodeText = getRelationshipMenuItemText(currentNode);
+            String dependentNodeText = canvasUtil.getRelationshipMenuItemText(currentNode);
             MenuItem source = (MenuItem) event.getSource();
             PartOfSpeechNodeAdapter userData = (PartOfSpeechNodeAdapter) source.getUserData();
             makeRelationship(currentNode, userData, dependentNodeText, ((Text) source.getGraphic()).getText());

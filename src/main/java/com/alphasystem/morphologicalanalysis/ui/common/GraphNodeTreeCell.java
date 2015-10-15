@@ -1,7 +1,8 @@
 package com.alphasystem.morphologicalanalysis.ui.common;
 
 import com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType;
-import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.GraphNodeAdapter;
+import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.*;
+import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.CanvasUtil;
 import javafx.scene.control.TreeCell;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -17,6 +18,7 @@ import static javafx.scene.control.ContentDisplay.GRAPHIC_ONLY;
 public class GraphNodeTreeCell extends TreeCell<GraphNodeAdapter> {
 
     private final Text label;
+    private final CanvasUtil canvasUtil = CanvasUtil.getInstance();
 
     public GraphNodeTreeCell() {
         label = new Text();
@@ -27,13 +29,39 @@ public class GraphNodeTreeCell extends TreeCell<GraphNodeAdapter> {
     protected void updateItem(GraphNodeAdapter item, boolean empty) {
         super.updateItem(item, empty);
 
-        if(item != null && !empty){
+        if (item != null && !empty) {
             GraphNodeType nodeType = item.getGraphNodeType();
-            label.setText(item.getText());
+            StringBuilder builder = new StringBuilder();
+            String text = item.getText();
+            switch (nodeType) {
+                case PART_OF_SPEECH:
+                    PartOfSpeechNodeAdapter posna = (PartOfSpeechNodeAdapter) item;
+                    builder.append(canvasUtil.getLocationText((TerminalNodeAdapter) posna.getParent(), posna))
+                            .append(" ").append(getText(item));
+                    break;
+                case PHRASE:
+                    PhraseNodeAdapter pna = (PhraseNodeAdapter) item;
+                    builder.append(canvasUtil.getPhraseText(pna.getFragments())).append(" ").append(getText(item));
+                    break;
+                case RELATIONSHIP:
+                    RelationshipNodeAdapter rna = (RelationshipNodeAdapter) item;
+                    builder.append(canvasUtil.getRelationshipText(rna)).append(getText(item));
+                    break;
+                default:
+                    builder.append(text);
+                    break;
+            }
+            label.setText(builder.toString());
             Font font = nodeType.equals(ROOT) ? ENGLISH_FONT_SMALL : ARABIC_FONT_SMALL;
             label.setFont(font);
             setGraphic(label);
         }
 
+    }
+
+    private String getText(GraphNodeAdapter item) {
+        StringBuilder builder = new StringBuilder();
+        builder.append("(").append(item.getText()).append(")");
+        return builder.toString();
     }
 }

@@ -3,10 +3,7 @@ package com.alphasystem.morphologicalanalysis.ui.dependencygraph.util;
 import com.alphasystem.arabic.model.ArabicWord;
 import com.alphasystem.morphologicalanalysis.common.model.Linkable;
 import com.alphasystem.morphologicalanalysis.graph.model.*;
-import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.LinkSupportAdapter;
-import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.PartOfSpeechNodeAdapter;
-import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.PhraseNodeAdapter;
-import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.TerminalNodeAdapter;
+import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.*;
 import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.*;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.AlternateStatus;
@@ -38,8 +35,9 @@ public class CanvasUtil {
 
     private static CanvasUtil instance = new CanvasUtil();
 
-    private LocationRepository locationRepository = RepositoryTool.getInstance()
-            .getRepositoryUtil().getLocationRepository();
+    private RepositoryTool repositoryTool = RepositoryTool.getInstance();
+
+    private LocationRepository locationRepository = repositoryTool.getRepositoryUtil().getLocationRepository();
 
     private CanvasUtil() {
     }
@@ -52,8 +50,8 @@ public class CanvasUtil {
         return getSubWord(token.getTokenWord(), location.getStartIndex(), location.getEndIndex());
     }
 
-    private static String getLocationText(final TerminalNodeAdapter terminalNode,
-                                          final PartOfSpeechNodeAdapter partOfSpeechNodeAdapter) {
+    public String getLocationText(final TerminalNodeAdapter terminalNode,
+                                  final PartOfSpeechNodeAdapter partOfSpeechNodeAdapter) {
         Location location = partOfSpeechNodeAdapter.getSrc().getLocation();
         Token token = terminalNode.getSrc().getToken();
         ArabicWord locationWord = getLocationWord(token, location);
@@ -190,6 +188,48 @@ public class CanvasUtil {
         StringBuilder builder = new StringBuilder();
         builder.append(getPhraseText(phraseNodeAdapter.getFragments())).append(" (")
                 .append(phraseNodeAdapter.getRelationshipType().getLabel().toUnicode()).append(" )");
+        return builder.toString();
+    }
+
+    public String getRelationshipMenuItemText(final LinkSupportAdapter linkSupportAdapter) {
+        String text = null;
+        if (isGivenType(PartOfSpeechNodeAdapter.class, linkSupportAdapter)) {
+            PartOfSpeechNodeAdapter partOfSpeechNodeAdapter = (PartOfSpeechNodeAdapter) linkSupportAdapter;
+            TerminalNodeAdapter terminalNode = (TerminalNodeAdapter) partOfSpeechNodeAdapter.getParent();
+            Location location = partOfSpeechNodeAdapter.getSrc().getLocation();
+            Token token = terminalNode.getSrc().getToken();
+            ArabicWord locationWord = getLocationWord(token, location);
+            text = format("%s (%s)", locationWord.toUnicode(), location.getPartOfSpeech().getLabel().toUnicode());
+        } else if (isGivenType(PhraseNodeAdapter.class, linkSupportAdapter)) {
+            PhraseNodeAdapter phraseNodeAdapter = (PhraseNodeAdapter) linkSupportAdapter;
+            text = getPhraseMenuItemText(phraseNodeAdapter);
+        }
+        return text;
+    }
+
+    public String getRelationshipText(RelationshipNodeAdapter rna) {
+        StringBuilder builder = new StringBuilder();
+
+        LinkSupportAdapter dependent = rna.getDependent();
+        LinkSupportAdapter owner = rna.getOwner();
+        if (isGivenType(PartOfSpeechNodeAdapter.class, dependent)) {
+            PartOfSpeechNodeAdapter pna = (PartOfSpeechNodeAdapter) dependent;
+            builder.append(getLocationText((TerminalNodeAdapter) pna.getParent(), pna));
+        } else if (isGivenType(PhraseNodeAdapter.class, dependent)) {
+            PhraseNodeAdapter pna = (PhraseNodeAdapter) dependent;
+            builder.append(getPhraseText(pna.getFragments()));
+        }
+        builder.append(" -> ");
+
+        if (isGivenType(PartOfSpeechNodeAdapter.class, owner)) {
+            PartOfSpeechNodeAdapter pna = (PartOfSpeechNodeAdapter) owner;
+            builder.append(getLocationText((TerminalNodeAdapter) pna.getParent(), pna));
+        } else if (isGivenType(PhraseNodeAdapter.class, owner)) {
+            PhraseNodeAdapter pna = (PhraseNodeAdapter) owner;
+            builder.append(getPhraseText(pna.getFragments()));
+        }
+
+        builder.append(" ");
         return builder.toString();
     }
 }
