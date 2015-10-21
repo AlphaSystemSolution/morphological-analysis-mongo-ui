@@ -25,8 +25,7 @@ import javafx.scene.text.Text;
 
 import java.util.*;
 
-import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.PHRASE;
-import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.TERMINAL;
+import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.*;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.*;
 import static com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.CubicCurveHelper.arrowPoints;
 import static com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.DependencyGraphGraphicTool.DARK_GRAY_CLOUD;
@@ -532,8 +531,8 @@ public class CanvasPane extends Pane {
 
         TerminalNodeAdapter parent = (TerminalNodeAdapter) src.getParent();
         GraphNodeType parentNodeType = parent.getGraphNodeType();
-        // If current part of speech has parent which is Empty, Reference, or Hidden, we will not display menu
-        if (parentNodeType.equals(TERMINAL)) {
+        // If current part of speech has parent which is Reference, or Hidden, we will not display menu
+        if (parentNodeType.equals(TERMINAL) || parentNodeType.equals(IMPLIED)) {
             menu = new Menu("Make Phrase");
             addPhraseMenuItems(src, menu);
             menuItems.add(menu);
@@ -666,7 +665,8 @@ public class CanvasPane extends Pane {
         ObservableList<GraphNodeAdapter> graphNodes = copyGraphNodes();
         outer:
         for (GraphNodeAdapter graphNode : graphNodes) {
-            if (graphNode.getGraphNodeType().equals(TERMINAL)) {
+            GraphNodeType graphNodeType = graphNode.getGraphNodeType();
+            if (graphNodeType.equals(TERMINAL) || graphNodeType.equals(IMPLIED)) {
                 TerminalNodeAdapter node = (TerminalNodeAdapter) graphNode;
                 ObservableList<PartOfSpeechNodeAdapter> partOfSpeeches = copyPartOfSpeechNodes(node);
                 for (PartOfSpeechNodeAdapter partOfSpeech : partOfSpeeches) {
@@ -728,7 +728,6 @@ public class CanvasPane extends Pane {
             }
         });
     }
-
 
 
     private MenuItem createRelationshipMenuItem(final LinkSupportAdapter dependentNode,
