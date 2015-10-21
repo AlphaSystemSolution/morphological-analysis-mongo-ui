@@ -185,10 +185,8 @@ public class CanvasUtil {
     }
 
     public String getPhraseMenuItemText(PhraseNodeAdapter phraseNodeAdapter) {
-        StringBuilder builder = new StringBuilder();
-        builder.append(getPhraseText(phraseNodeAdapter.getFragments())).append(" (")
-                .append(phraseNodeAdapter.getRelationshipType().getLabel().toUnicode()).append(" )");
-        return builder.toString();
+        return new StringBuilder().append(getPhraseText(phraseNodeAdapter.getFragments())).append(" (")
+                .append(phraseNodeAdapter.getRelationshipType().getLabel().toUnicode()).append(" )").toString();
     }
 
     public String getRelationshipMenuItemText(final LinkSupportAdapter linkSupportAdapter) {
