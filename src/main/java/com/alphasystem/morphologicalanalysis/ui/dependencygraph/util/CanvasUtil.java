@@ -89,6 +89,7 @@ public class CanvasUtil {
         return text;
     }
 
+    @SuppressWarnings({"unchecked"})
     public LinkSupportAdapter createLinkSupportAdapter(LinkSupport linkSupport) {
         LinkSupportAdapter linkSupportAdapter = null;
         if (isGivenType(PartOfSpeechNode.class, linkSupport)) {
@@ -170,6 +171,9 @@ public class CanvasUtil {
     }
 
     public String getPhraseText(List<PartOfSpeechNodeAdapter> nodes) {
+        if (nodes == null || nodes.isEmpty()) {
+            throw new RuntimeException("Empty part of speech nodes while getting phrase text");
+        }
         StringBuilder text = new StringBuilder();
         int tokenNumber = nodes.get(0).getSrc().getLocation().getTokenNumber();
         for (PartOfSpeechNodeAdapter node : nodes) {
