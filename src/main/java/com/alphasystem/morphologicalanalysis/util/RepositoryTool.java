@@ -1,6 +1,5 @@
 package com.alphasystem.morphologicalanalysis.util;
 
-import com.alphasystem.arabic.model.ArabicWord;
 import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
 import com.alphasystem.morphologicalanalysis.graph.model.GraphMetaInfo;
 import com.alphasystem.morphologicalanalysis.graph.model.TerminalNode;
@@ -21,8 +20,6 @@ import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 
 import java.util.List;
-
-import static com.alphasystem.arabic.model.ArabicWord.getSubWord;
 
 /**
  * @author sali
@@ -202,17 +199,6 @@ public class RepositoryTool {
         if (!removalIds.isEmpty()) {
             removalIds.forEach(id -> partOfSpeechNodeRepository.delete(id));
         }
-    }
-
-    public ArabicWord getLocationWord(Location source) {
-        Token token = tokenRepository.findByChapterNumberAndVerseNumberAndTokenNumber(source.getChapterNumber(),
-                source.getVerseNumber(), source.getTokenNumber());
-        Integer startIndex = source.getStartIndex();
-        Integer endIndex = source.getEndIndex();
-        if (startIndex <= 0 && endIndex <= 0) {
-            return null;
-        }
-        return getSubWord(token.getTokenWord(), startIndex, endIndex);
     }
 
     public MorphologicalAnalysisRepositoryUtil getRepositoryUtil() {
