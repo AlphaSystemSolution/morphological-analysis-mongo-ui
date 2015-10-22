@@ -8,7 +8,6 @@ import com.alphasystem.morphologicalanalysis.graph.repository.DependencyGraphRep
 import com.alphasystem.morphologicalanalysis.graph.repository.PartOfSpeechNodeRepository;
 import com.alphasystem.morphologicalanalysis.graph.repository.TerminalNodeRepository;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.GraphBuilder;
-import com.alphasystem.morphologicalanalysis.wordbyword.model.AbstractProperties;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Chapter;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
@@ -127,10 +126,6 @@ public class RepositoryTool {
         return tokenRepository.findByDisplayName(displayName);
     }
 
-    public Location getLocation(String id) {
-        return locationRepository.findOne(id);
-    }
-
     public Token saveToken(Token token) {
         // A token contains one or more part of speeches and each part of speech has a location corresponding to it.
         // A location has "startIndex" and "endIndex" of letters from the parent token. At the time of initial data
@@ -147,7 +142,6 @@ public class RepositoryTool {
         Location lastLocation = locations.get(locationCount - 1);
         // save this location first
         lastLocation = locationRepository.save(lastLocation);
-        AbstractProperties properties = lastLocation.getProperties();
         int tokenLength = token.getTokenWord().getLength();
         if (!lastLocation.isTransient() && lastLocation.getEndIndex() < tokenLength) {
             // there are still some unselected letters, so create new location
@@ -197,7 +191,7 @@ public class RepositoryTool {
     public void saveDependencyGraph(DependencyGraph dependencyGraph, List<String> removalIds) {
         dependencyGraphRepository.save(dependencyGraph);
         if (!removalIds.isEmpty()) {
-            removalIds.forEach(id -> partOfSpeechNodeRepository.delete(id));
+            removalIds.forEach(partOfSpeechNodeRepository::delete);
         }
     }
 
