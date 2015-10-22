@@ -37,6 +37,10 @@ public class PhraseSelectionDialog extends Dialog<PhraseNode> {
         setResultConverter(param -> createResult(param));
     }
 
+    private static String getLabel(String label) {
+        return Global.getLabel(PhraseSelectionDialog.class, label);
+    }
+
     private PhraseNode createResult(ButtonType param) {
         ButtonBar.ButtonData buttonData = param.getButtonData();
         if (buttonData.isCancelButton()) {
@@ -45,11 +49,8 @@ public class PhraseSelectionDialog extends Dialog<PhraseNode> {
         PhraseNode phraseNode = new PhraseNode();
         phraseNode.setRelationshipType(relationshipTypeComboBox.getValue());
         phraseNode.setAlternateStatus(alternateStatusComboBox.getValue());
+        phraseNode.initDisplayName();
         return phraseNode;
-    }
-
-    private static String getLabel(String label) {
-        return Global.getLabel(PhraseSelectionDialog.class, label);
     }
 
     private void initDialog() {
