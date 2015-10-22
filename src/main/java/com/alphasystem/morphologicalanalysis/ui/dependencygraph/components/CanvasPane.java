@@ -777,13 +777,13 @@ public class CanvasPane extends Pane {
                                  LinkSupportAdapter ownerNode) {
         graphBuilder.set(getDependencyGraph().getGraphMetaInfo().getGraphMetaInfo());
         graphBuilder.buildRelationshipNode(relationshipNode, dependentNode, ownerNode);
-        RelationshipNodeAdapter relationshipNodeAdapter = new RelationshipNodeAdapter();
-        relationshipNodeAdapter.setSrc(relationshipNode);
-        getDependencyGraph().getDependencyGraph().getNodes().add(relationshipNode);
-        getDependencyGraph().getGraphNodes().add(relationshipNodeAdapter);
-        DependencyGraphAdapter dependencyGraph = getDependencyGraph();
+
+        DependencyGraph dependencyGraph = getDependencyGraph().getDependencyGraph();
+        dependencyGraph.getNodes().add(relationshipNode);
+
+        DependencyGraphAdapter dependencyGraphAdapter = new DependencyGraphAdapter(dependencyGraph);
         setDependencyGraph(null);
-        setDependencyGraph(dependencyGraph);
+        setDependencyGraph(dependencyGraphAdapter);
     }
 
     private MenuItem createAddImpliedNodeMenuItem(int index, PartOfSpeech partOfSpeech) {
