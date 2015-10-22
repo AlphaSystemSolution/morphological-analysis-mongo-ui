@@ -62,6 +62,9 @@ public class TreeBankPane extends BorderPane {
     }
 
     public TreeBankPane(DependencyGraphAdapter dependencyGraph) {
+        if (dependencyGraph == null) {
+            dependencyGraph = new DependencyGraphAdapter(new DependencyGraph());
+        }
         setTop(createMenuBar());
         dependencyGraphSelectionDialog = new DependencyGraphSelectionDialog();
         canvasPane = new CanvasPane(dependencyGraph);
@@ -137,11 +140,13 @@ public class TreeBankPane extends BorderPane {
 
     private void openAction() {
         Optional<DependencyGraph> result = dependencyGraphSelectionDialog.showAndWait();
-        result.ifPresent(dependencyGraph -> {
-            DependencyGraphAdapter dependencyGraphAdapter = new DependencyGraphAdapter(dependencyGraph);
-            canvasPane.setDependencyGraph(dependencyGraphAdapter);
-            canvasPane.getDependencyGraph().setSelectedNode(dependencyGraphAdapter.getGraphNodes().get(0));
-        });
+        result.ifPresent(this::updateCanvas);
+    }
+
+    private void updateCanvas(DependencyGraph dependencyGraph) {
+        DependencyGraphAdapter dependencyGraphAdapter = new DependencyGraphAdapter(dependencyGraph);
+        canvasPane.setDependencyGraph(dependencyGraphAdapter);
+        canvasPane.getDependencyGraph().setSelectedNode(dependencyGraphAdapter.getGraphNodes().get(0));
     }
 
     private void saveAction() {

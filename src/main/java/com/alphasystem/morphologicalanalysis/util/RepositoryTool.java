@@ -164,6 +164,10 @@ public class RepositoryTool {
         return token;
     }
 
+    public DependencyGraph getDependencyGraph(String displayName) {
+        return dependencyGraphRepository.findByDisplayName(displayName);
+    }
+
     public DependencyGraph createDependencyGraph(List<Token> tokens, GraphMetaInfo graphMetaInfo) {
         Token firstToken = tokens.get(0);
         Token lastToken = tokens.get(tokens.size() - 1);
