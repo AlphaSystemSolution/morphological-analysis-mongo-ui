@@ -195,17 +195,17 @@ public class WordByWordPane extends BorderPane {
                         tcm.setChecked(false);
                     }
                 });
-                Stage stage = new Stage();
-                Scene scene = new Scene(new TreeBankPane(dependencyGraphAdapter));
-                stage.setMaximized(true);
-                stage.setScene(scene);
-                stage.show();
+                openTreeBankApp(dependencyGraphAdapter);
             });
         });
+    }
 
-
-
-
+    private void openTreeBankApp(DependencyGraphAdapter dependencyGraphAdapter) {
+        Stage stage = new Stage();
+        Scene scene = new Scene(new TreeBankPane(dependencyGraphAdapter));
+        stage.setMaximized(true);
+        stage.setScene(scene);
+        stage.show();
     }
 
     public final void setAction(Action action) {
