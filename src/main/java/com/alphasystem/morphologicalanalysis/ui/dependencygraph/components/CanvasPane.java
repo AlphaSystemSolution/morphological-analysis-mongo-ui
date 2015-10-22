@@ -691,11 +691,9 @@ public class CanvasPane extends Pane {
     private void addPhraseNode(PhraseNode phraseNode, List<PartOfSpeechNodeAdapter> fragments) {
         graphBuilder.set(getDependencyGraph().getGraphMetaInfo().getGraphMetaInfo());
         graphBuilder.buildPhraseNode(phraseNode, fragments);
-        PhraseNodeAdapter phraseNodeAdapter = new PhraseNodeAdapter();
-        phraseNodeAdapter.setSrc(phraseNode);
-        getDependencyGraph().getDependencyGraph().getNodes().add(phraseNode);
-        getDependencyGraph().getGraphNodes().add(phraseNodeAdapter);
-        DependencyGraphAdapter dependencyGraph = getDependencyGraph();
+        DependencyGraph dg = getDependencyGraph().getDependencyGraph();
+        dg.getNodes().add(phraseNode);
+        DependencyGraphAdapter dependencyGraph = new DependencyGraphAdapter(dg);
         setDependencyGraph(null);
         setDependencyGraph(dependencyGraph);
     }
