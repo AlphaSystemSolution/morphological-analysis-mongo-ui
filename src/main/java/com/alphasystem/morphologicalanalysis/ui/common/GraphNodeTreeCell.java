@@ -36,8 +36,8 @@ public class GraphNodeTreeCell extends TreeCell<GraphNodeAdapter> {
             switch (nodeType) {
                 case PART_OF_SPEECH:
                     PartOfSpeechNodeAdapter posna = (PartOfSpeechNodeAdapter) item;
-                    builder.append(canvasUtil.getLocationText((TerminalNodeAdapter) posna.getParent(), posna))
-                            .append(" ").append(getText(item));
+                    TerminalNodeAdapter parent = (TerminalNodeAdapter) posna.getParent();
+                    builder.append(canvasUtil.getLocationText(parent, posna)).append(" ").append(getText(item));
                     break;
                 case PHRASE:
                     PhraseNodeAdapter pna = (PhraseNodeAdapter) item;
