@@ -51,7 +51,10 @@ public class CanvasUtil {
     }
 
     public String getLocationText(final TerminalNodeAdapter terminalNode,
-                                  final PartOfSpeechNodeAdapter partOfSpeechNodeAdapter) {
+                                  final PartOfSpeechNodeAdapter partOfSpeechNodeAdapter) throws RuntimeException {
+        if (terminalNode == null) {
+            throw new RuntimeException(format("Null terminal node for {%s}", partOfSpeechNodeAdapter));
+        }
         Location location = partOfSpeechNodeAdapter.getSrc().getLocation();
         Token token = terminalNode.getSrc().getToken();
         ArabicWord locationWord = getLocationWord(token, location);
@@ -189,8 +192,8 @@ public class CanvasUtil {
     }
 
     public String getPhraseMenuItemText(PhraseNodeAdapter phraseNodeAdapter) {
-        return new StringBuilder().append(getPhraseText(phraseNodeAdapter.getFragments())).append(" (")
-                .append(phraseNodeAdapter.getRelationshipType().getLabel().toUnicode()).append(" )").toString();
+        return format("%s (%s) ", getPhraseText(phraseNodeAdapter.getFragments()),
+                phraseNodeAdapter.getRelationshipType().getLabel().toUnicode());
     }
 
     public String getRelationshipMenuItemText(final LinkSupportAdapter linkSupportAdapter) {
