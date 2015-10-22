@@ -798,11 +798,6 @@ public class CanvasPane extends Pane {
         GraphMetaInfoAdapter graphMetaInfo = getDependencyGraph().getGraphMetaInfo();
         shiftNodes(index, graphMetaInfo);
         Node node = canvasPane.getChildren().get(index - 1);
-        if (!isGivenType(Group.class, node)) {
-            // this should not happen, but we still need to handle
-            //TODO:
-            return;
-        }
         Group group = (Group) node;
         Line referenceLine = getReferenceLine(group);
         graphBuilder.set(graphMetaInfo.getGraphMetaInfo());
@@ -825,11 +820,6 @@ public class CanvasPane extends Pane {
         GraphMetaInfoAdapter graphMetaInfo = getDependencyGraph().getGraphMetaInfo();
         shiftNodes(index, graphMetaInfo);
         Node node = canvasPane.getChildren().get(index - 1);
-        if (!isGivenType(Group.class, node)) {
-            // this should not happen, but we still need to handle
-            //TODO:
-            return;
-        }
         Group group = (Group) node;
         Line referenceLine = getReferenceLine(group);
         graphBuilder.set(graphMetaInfo.getGraphMetaInfo());
@@ -856,8 +846,8 @@ public class CanvasPane extends Pane {
      * node, move all nodes by {@link GraphMetaInfo#gapBetweenTokens} plus {@link GraphMetaInfo#tokenWidth} to
      * the right.
      *
-     * @param index
-     * @param graphMetaInfo
+     * @param index index of current node
+     * @param graphMetaInfo graph meta data
      */
     private void shiftNodes(int index, GraphMetaInfoAdapter graphMetaInfo) {
         ObservableList<GraphNodeAdapter> graphNodes = getDependencyGraph().getGraphNodes();
