@@ -32,6 +32,7 @@ public class PropertiesPane extends BorderPane {
     private final Spinner<Double> alignTranslationsY = new Spinner<>();
     private final Spinner<Double> alignPOSsYField = new Spinner<>();
     private final Spinner<Double> alignPOSControlYField = new Spinner<>();
+    private final Spinner<Double> alignGroupTranslateYField = new Spinner<>();
     private final ObjectProperty<DependencyGraphAdapter> dependencyGraph = new SimpleObjectProperty<>();
 
     public PropertiesPane(DependencyGraphAdapter dependencyGraph) {
@@ -55,7 +56,6 @@ public class PropertiesPane extends BorderPane {
         GraphMetaInfoAdapter graphMetaInfo = getDependencyGraph().getGraphMetaInfo();
         double width = graphMetaInfo.getWidth();
         double height = graphMetaInfo.getHeight();
-        double gapBetweenTokens = graphMetaInfo.getGapBetweenTokens();
 
         GridPane grid = new GridPane();
         grid.setAlignment(CENTER);
@@ -159,27 +159,19 @@ public class PropertiesPane extends BorderPane {
         alignPOSControlYField.setValueFactory(new DoubleSpinnerValueFactory(0, MAX_HEIGHT, 0, 0.5));
         grid.add(alignPOSControlYField, 0, rowIndex);
 
-        return grid;
-    }
+        rowIndex++;
+        label = new Label(RESOURCE_BUNDLE.getString("alignGroupTranslateY.label"));
+        grid.add(label, 0, rowIndex);
 
-    public final CheckBox getDebugModeCheckBox() {
-        return debugModeCheckBox;
+        rowIndex++;
+        alignGroupTranslateYField.setValueFactory(new DoubleSpinnerValueFactory(-1 * height, height, 0, 0.5));
+        grid.add(alignGroupTranslateYField, 0, rowIndex);
+
+        return grid;
     }
 
     public final Spinner<Double> getWidthField() {
         return widthField;
-    }
-
-    public final CheckBox getShowOutlineOnlyCheckBox() {
-        return showOutlineOnlyCheckBox;
-    }
-
-    public final CheckBox getShowGridLinesCheckBox() {
-        return showGridLinesCheckBox;
-    }
-
-    public final Spinner<Double> getGapBetweenTokens() {
-        return gapBetweenTokens;
     }
 
     public final Spinner<Double> getHeightField() {
@@ -202,6 +194,10 @@ public class PropertiesPane extends BorderPane {
         return alignTranslationsY;
     }
 
+    public Spinner<Double> getAlignGroupTranslateYField() {
+        return alignGroupTranslateYField;
+    }
+
     public final DependencyGraphAdapter getDependencyGraph() {
         return dependencyGraph.get();
     }
@@ -213,4 +209,5 @@ public class PropertiesPane extends BorderPane {
     public final ObjectProperty<DependencyGraphAdapter> dependencyGraphProperty() {
         return dependencyGraph;
     }
+
 }

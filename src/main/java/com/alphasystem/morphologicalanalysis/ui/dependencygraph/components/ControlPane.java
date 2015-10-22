@@ -80,6 +80,12 @@ public class ControlPane extends BorderPane {
                     }
                 });
             });
+            propertiesPane.getAlignGroupTranslateYField().getValueFactory().setValue(node.getTranslateY());
+            propertiesPane.getAlignGroupTranslateYField().valueProperty().addListener((observable1, oldValue1, newValue1) -> {
+                nodes.stream().filter(gn -> isGivenType(TerminalNodeAdapter.class, gn)).forEach(
+                        tn -> tn.setTranslateY(newValue1));
+            });
+
             // set null value first in order to listener to pick
             tree.setGraph(null);
             tree.setGraph(newValue);
