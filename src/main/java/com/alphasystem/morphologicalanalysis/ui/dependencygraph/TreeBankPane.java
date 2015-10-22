@@ -57,8 +57,9 @@ public class TreeBankPane extends BorderPane {
      */
     private CanvasPane canvasPane;
 
+    @SuppressWarnings({"unused"})
     public TreeBankPane() {
-        this(new DependencyGraphAdapter(new DependencyGraph()));
+        this(null);
     }
 
     public TreeBankPane(DependencyGraphAdapter dependencyGraph) {
