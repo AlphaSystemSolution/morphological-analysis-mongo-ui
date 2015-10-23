@@ -19,6 +19,7 @@ import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author sali
@@ -188,11 +189,17 @@ public class RepositoryTool {
         return dependencyGraph;
     }
 
-    public void saveDependencyGraph(DependencyGraph dependencyGraph, List<String> removalIds) {
+    public void saveDependencyGraph(DependencyGraph dependencyGraph, Map<GraphNodeType, String> removalIds) {
         dependencyGraphRepository.save(dependencyGraph);
         if (!removalIds.isEmpty()) {
-            removalIds.forEach(partOfSpeechNodeRepository::delete);
+            removalIds.entrySet().forEach(this::removeNode);
         }
+    }
+
+    private void removeNode(Map.Entry<GraphNodeType, String> entry) {
+        GraphNodeType key = entry.getKey();
+        String id = entry.getValue();
+        getRepository(key).delete(id);
     }
 
     public MorphologicalAnalysisRepositoryUtil getRepositoryUtil() {

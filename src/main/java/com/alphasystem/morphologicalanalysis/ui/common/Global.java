@@ -1,7 +1,9 @@
 package com.alphasystem.morphologicalanalysis.ui.common;
 
 import com.alphasystem.arabic.model.ArabicWord;
+import com.alphasystem.morphologicalanalysis.graph.model.GraphNode;
 import com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType;
+import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.GraphNodeAdapter;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.TerminalNodeAdapter;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech;
 import javafx.scene.text.Font;
@@ -81,4 +83,11 @@ public class Global {
         return graphNodeType.equals(IMPLIED) || graphNodeType.equals(HIDDEN) || graphNodeType.equals(REFERENCE);
     }
 
+    public static boolean isTerminal(GraphNodeAdapter src) {
+        return TERMINALS.contains(src.getGraphNodeType());
+    }
+
+    public static boolean isTerminal(GraphNode src) {
+        return TERMINALS.contains(src.getGraphNodeType());
+    }
 }

@@ -11,17 +11,25 @@ import com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpee
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.RelationshipType;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.VerbMode;
 import com.alphasystem.morphologicalanalysis.wordbyword.repository.LocationRepository;
+import javafx.collections.ObservableList;
+import javafx.scene.Group;
+import javafx.scene.Node;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 
 import java.util.List;
+import java.util.Optional;
 
 import static com.alphasystem.arabic.model.ArabicLetters.WORD_SPACE;
 import static com.alphasystem.arabic.model.ArabicWord.getSubWord;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.FI_MAHL;
 import static com.alphasystem.util.AppUtil.isGivenType;
 import static java.lang.String.format;
+import static javafx.scene.control.Alert.AlertType.INFORMATION;
 import static javafx.scene.text.Font.font;
 
 /**
@@ -48,6 +56,43 @@ public class CanvasUtil {
 
     public static ArabicWord getLocationWord(Token token, Location location) {
         return getSubWord(token.getTokenWord(), location.getStartIndex(), location.getEndIndex());
+    }
+
+    public static int getIndex(TerminalNodeAdapter src, ObservableList<GraphNodeAdapter> graphNodes) {
+        int index = -1;
+        for (int i = 0; i < graphNodes.size(); i++) {
+            GraphNodeAdapter node = graphNodes.get(i);
+            if (node.getId().equals(src.getId())) {
+                index = i;
+                break;
+            }
+        }
+        return index;
+    }
+
+    public static Line getReferenceLine(Group parent) {
+        ObservableList<Node> children = parent.getChildren();
+        Line line = null;
+        for (Node child : children) {
+            if (isGivenType(Line.class, child)) {
+                line = (Line) child;
+                break;
+            }
+        }
+        if (line == null) {
+            showAlert(INFORMATION, "No line found.", null);
+            return null;
+        }
+        return line;
+    }
+
+    private static Optional<ButtonType> showAlert(Alert.AlertType type, String contentText, String headerText) {
+        Alert alert = new Alert(type);
+        if (headerText != null) {
+            alert.setHeaderText(headerText);
+        }
+        alert.setContentText(contentText);
+        return alert.showAndWait();
     }
 
     public String getLocationText(final TerminalNodeAdapter terminalNode,

@@ -2,6 +2,7 @@ package com.alphasystem.morphologicalanalysis.ui.dependencygraph.components;
 
 import com.alphasystem.morphologicalanalysis.graph.model.*;
 import com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType;
+import com.alphasystem.morphologicalanalysis.ui.common.Global;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.*;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.CanvasUtil;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.DependencyGraphGraphicTool;
@@ -27,17 +28,17 @@ import java.util.*;
 
 import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.*;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.*;
+import static com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.CanvasUtil.getIndex;
+import static com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.CanvasUtil.getReferenceLine;
 import static com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.CubicCurveHelper.arrowPoints;
 import static com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.DependencyGraphGraphicTool.DARK_GRAY_CLOUD;
 import static com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.DependencyGraphGraphicTool.GRID_LINES;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.NOUN;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.VERB;
-import static com.alphasystem.util.AppUtil.isGivenType;
 import static java.lang.String.format;
 import static java.util.Collections.reverse;
 import static javafx.collections.FXCollections.observableArrayList;
 import static javafx.geometry.NodeOrientation.RIGHT_TO_LEFT;
-import static javafx.scene.control.Alert.AlertType.INFORMATION;
 import static javafx.scene.control.Alert.AlertType.WARNING;
 import static javafx.scene.control.ButtonType.NO;
 import static javafx.scene.control.ButtonType.YES;
@@ -65,7 +66,7 @@ public class CanvasPane extends Pane {
     private RelationshipSelectionDialog relationshipSelectionDialog;
     private PhraseSelectionDialog phraseSelectionDialog;
     private ReferenceSelectionDialog referenceSelectionDialog;
-    private List<String> removalIds = new ArrayList<>();
+    private Map<GraphNodeType, String> removalIdMap = new HashMap<>();
     private Pane canvasPane;
     private Node gridLines;
 
@@ -355,7 +356,8 @@ public class CanvasPane extends Pane {
         arabicText.fillProperty().bind(rn.strokeProperty());
         arabicText.setOnMouseClicked(event -> {
             if (event.isPopupTrigger()) {
-                // TODO: need to add remove functionality
+                initRelationshipContextMenu(rn);
+                contextMenu.show(arabicText, event.getScreenX(), event.getScreenY());
             } else {
                 getDependencyGraph().setSelectedNode(rn);
             }
@@ -493,7 +495,7 @@ public class CanvasPane extends Pane {
 
         Menu menu;
         MenuItem menuItem;
-        int index = getIndex(src);
+        int index = getIndex(src, getDependencyGraph().getGraphNodes());
 
         menu = new Menu("Add Implied Node to Left");
         menu.getItems().addAll(createAddImpliedNodeMenuItem(index, NOUN), createAddImpliedNodeMenuItem(index, VERB));
@@ -510,7 +512,7 @@ public class CanvasPane extends Pane {
             if (partOfSpeech.equals(VERB)) {
                 MenuItem mi = new MenuItem("Add Hidden Node");
                 mi.setOnAction(event -> addHiddenNode(index, location));
-                contextMenu.getItems().add(mi);
+                menuItems.add(mi);
             }
         });
 
@@ -539,7 +541,7 @@ public class CanvasPane extends Pane {
         }
 
         MenuItem menuItem = new MenuItem("Remove");
-        menuItem.setOnAction(event -> removePartOfSpeech(src.getId()));
+        menuItem.setOnAction(event -> removeNode(PART_OF_SPEECH, src.getId()));
         menuItems.add(menuItem);
 
         return menuItems;
@@ -554,6 +556,17 @@ public class CanvasPane extends Pane {
 
         return menuItems;
     }
+
+    private List<MenuItem> createRelationshipMenu(RelationshipNodeAdapter src) {
+        List<MenuItem> menuItems = new ArrayList<>();
+
+        MenuItem menuItem = new MenuItem("Remove");
+        menuItem.setOnAction(event -> removeNode(RELATIONSHIP, src.getId()));
+        menuItems.add(menuItem);
+
+        return menuItems;
+    }
+
 
     private void initTerminalContextMenu(Text source) {
         ObservableList<MenuItem> items = contextMenu.getItems();
@@ -570,7 +583,14 @@ public class CanvasPane extends Pane {
         items.addAll(createPartOfSpeechMenu(currentNode));
     }
 
-    private void removePartOfSpeech(String removalId) {
+    private void initRelationshipContextMenu(RelationshipNodeAdapter currentNode) {
+        ObservableList<MenuItem> items = contextMenu.getItems();
+        items.remove(0, items.size());
+
+        items.addAll(createRelationshipMenu(currentNode));
+    }
+
+    private void removeNode(GraphNodeType nodeType, String removalId) {
         Alert alert = new Alert(WARNING, "Are you sure?", YES, NO);
         Optional<ButtonType> result = alert.showAndWait();
         result.ifPresent(buttonType -> {
@@ -580,34 +600,41 @@ public class CanvasPane extends Pane {
 
                 // first remove it from UI Adapter
                 ObservableList<GraphNodeAdapter> graphNodes = dependencyGraphAdapter.getGraphNodes();
-                graphNodes.stream().filter(node -> node.getGraphNodeType().equals(TERMINAL)).forEach(node -> {
-                    TerminalNodeAdapter terminalNode = (TerminalNodeAdapter) node;
-                    ObservableList<PartOfSpeechNodeAdapter> partOfSpeeches = terminalNode.getPartOfSpeeches();
-                    ListIterator<PartOfSpeechNodeAdapter> posLi = partOfSpeeches.listIterator();
-                    while (posLi.hasNext()) {
-                        PartOfSpeechNodeAdapter next = posLi.next();
-                        if (next.getId().equals(removalId)) {
-                            posLi.remove();
-                            break;
-                        }
+                ListIterator<GraphNodeAdapter> listIterator = graphNodes.listIterator();
+                while (listIterator.hasNext()) {
+                    GraphNodeAdapter node = listIterator.next();
+                    if (nodeType.equals(PART_OF_SPEECH) && isTerminal(node)) {
+                        removePartOfSpeech(removalId, (TerminalNodeAdapter) node);
+                    } else if (nodeType.equals(RELATIONSHIP)) {
+                        removeRelationship(removalId, listIterator, (RelationshipNodeAdapter) node);
                     }
-                });
+                }
 
-                // now remove it from database
-                dependencyGraph.getNodes().stream().filter(graphNode -> graphNode.getGraphNodeType().equals(TERMINAL))
-                        .forEach(graphNode -> {
-                            TerminalNode terminalNode = (TerminalNode) graphNode;
-                            List<PartOfSpeechNode> partOfSpeechNodes = terminalNode.getPartOfSpeechNodes();
-                            ListIterator<PartOfSpeechNode> posLi = partOfSpeechNodes.listIterator();
-                            while (posLi.hasNext()) {
-                                PartOfSpeechNode next = posLi.next();
-                                if (next.getId().equals(removalId)) {
-                                    posLi.remove();
-                                    removalIds.add(removalId);
-                                    break;
-                                }
+                // now remove it from back end list so that when we can remove from database
+                if (nodeType.equals(PART_OF_SPEECH)) {
+                    dependencyGraph.getNodes().stream().filter(Global::isTerminal).forEach(graphNode -> {
+                        TerminalNode terminalNode = (TerminalNode) graphNode;
+                        List<PartOfSpeechNode> partOfSpeechNodes = terminalNode.getPartOfSpeechNodes();
+                        ListIterator<PartOfSpeechNode> posLi = partOfSpeechNodes.listIterator();
+                        while (posLi.hasNext()) {
+                            PartOfSpeechNode next = posLi.next();
+                            if (next.getId().equals(removalId)) {
+                                posLi.remove();
+                                removalIdMap.put(PART_OF_SPEECH, removalId);
+                                break;
                             }
-                        });
+                        }
+                    });
+                } else if (nodeType.equals(RELATIONSHIP)) {
+                    dependencyGraph.getNodes().stream().filter(graphNode ->
+                            graphNode.getGraphNodeType().equals(RELATIONSHIP))
+                            .forEach(graphNode -> {
+                                if (graphNode.getId().equals(removalId)) {
+                                    removalIdMap.put(RELATIONSHIP, removalId);
+                                }
+                            });
+                }
+
 
                 dependencyGraphAdapter = getDependencyGraph();
                 setDependencyGraph(null);
@@ -615,6 +642,25 @@ public class CanvasPane extends Pane {
             }
         });
 
+    }
+
+    private void removeRelationship(String removalId, ListIterator<GraphNodeAdapter> listIterator,
+                                    RelationshipNodeAdapter node) {
+        if (node.getId().equals(removalId)) {
+            listIterator.remove();
+        }
+    }
+
+    private void removePartOfSpeech(String removalId, TerminalNodeAdapter node) {
+        ObservableList<PartOfSpeechNodeAdapter> partOfSpeeches = node.getPartOfSpeeches();
+        ListIterator<PartOfSpeechNodeAdapter> posLi = partOfSpeeches.listIterator();
+        while (posLi.hasNext()) {
+            PartOfSpeechNodeAdapter next = posLi.next();
+            if (next.getId().equals(removalId)) {
+                posLi.remove();
+                break;
+            }
+        }
     }
 
     private void initPhraseNodeContextMenu(PhraseNodeAdapter currentNode) {
@@ -846,7 +892,7 @@ public class CanvasPane extends Pane {
      * node, move all nodes by {@link GraphMetaInfo#gapBetweenTokens} plus {@link GraphMetaInfo#tokenWidth} to
      * the right.
      *
-     * @param index index of current node
+     * @param index         index of current node
      * @param graphMetaInfo graph meta data
      */
     private void shiftNodes(int index, GraphMetaInfoAdapter graphMetaInfo) {
@@ -876,44 +922,6 @@ public class CanvasPane extends Pane {
         target.setAll(partOfSpeeches);
         reverse(target);
         return target;
-    }
-
-    private Line getReferenceLine(Group parent) {
-        ObservableList<Node> children = parent.getChildren();
-        Line line = null;
-        for (Node child : children) {
-            if (isGivenType(Line.class, child)) {
-                line = (Line) child;
-                break;
-            }
-        }
-        if (line == null) {
-            showAlert(INFORMATION, "No line found.", null);
-            return null;
-        }
-        return line;
-    }
-
-    private Optional<ButtonType> showAlert(Alert.AlertType type, String contentText, String headerText) {
-        Alert alert = new Alert(type);
-        if (headerText != null) {
-            alert.setHeaderText(headerText);
-        }
-        alert.setContentText(contentText);
-        return alert.showAndWait();
-    }
-
-    private int getIndex(TerminalNodeAdapter src) {
-        int index = -1;
-        ObservableList<GraphNodeAdapter> graphNodes = getDependencyGraph().getGraphNodes();
-        for (int i = 0; i < graphNodes.size(); i++) {
-            GraphNodeAdapter node = graphNodes.get(i);
-            if (node.getId().equals(src.getId())) {
-                index = i;
-                break;
-            }
-        }
-        return index;
     }
 
     public void updateOperations(GraphNodeAdapter src, Menu operationMenu) {
@@ -964,7 +972,7 @@ public class CanvasPane extends Pane {
         return canvasPane;
     }
 
-    public List<String> getRemovalIds() {
-        return removalIds;
+    public Map<GraphNodeType, String> getRemovalIdMap() {
+        return removalIdMap;
     }
 }
