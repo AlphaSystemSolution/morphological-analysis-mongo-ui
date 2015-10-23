@@ -5,9 +5,6 @@ import com.alphasystem.arabic.model.NamedTemplate;
 import com.alphasystem.morphologicalanalysis.ui.common.ArabicSupportEnumCellFactory.ListType;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.*;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
-import javafx.util.Callback;
 
 import static com.alphasystem.morphologicalanalysis.ui.common.ArabicSupportEnumCellFactory.ListType.LABEL_AND_CODE;
 import static com.alphasystem.morphologicalanalysis.ui.common.ArabicSupportEnumCellFactory.ListType.LABEL_ONLY;
@@ -33,6 +30,7 @@ public class ComboBoxFactory {
         return instance;
     }
 
+    @SafeVarargs
     private static <T extends ArabicSupportEnum> ComboBox<T> createComboBox(boolean addEmptyValue,
                                                                             ListType type, T... values) {
         ComboBox<T> comboBox = new ComboBox<>();
@@ -48,14 +46,17 @@ public class ComboBoxFactory {
         return comboBox;
     }
 
+    @SafeVarargs
     private static <T extends ArabicSupportEnum> ComboBox<T> createComboBox(boolean addEmptyValue, T... values) {
         return createComboBox(addEmptyValue, LABEL_AND_CODE, values);
     }
 
+    @SafeVarargs
     private static <T extends ArabicSupportEnum> ComboBox<T> createComboBox(ListType type, T... values) {
         return createComboBox(false, type, values);
     }
 
+    @SafeVarargs
     private static <T extends ArabicSupportEnum> ComboBox<T> createComboBox(T... values) {
         return createComboBox(LABEL_AND_CODE, values);
     }

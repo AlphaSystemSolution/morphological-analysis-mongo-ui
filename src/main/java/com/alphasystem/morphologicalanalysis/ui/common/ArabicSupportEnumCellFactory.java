@@ -5,8 +5,6 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.util.Callback;
 
-import static com.alphasystem.morphologicalanalysis.ui.common.ArabicSupportEnumCellFactory.ListType.LABEL_AND_CODE;
-
 /**
  * @author sali
  */
@@ -14,10 +12,6 @@ public class ArabicSupportEnumCellFactory<T extends ArabicSupportEnum> implement
         Callback<ListView<T>, ListCell<T>> {
 
     private final ListType type;
-
-    public ArabicSupportEnumCellFactory() {
-        this(LABEL_AND_CODE);
-    }
 
     public ArabicSupportEnumCellFactory(ListType type) {
         this.type = type;
@@ -29,6 +23,6 @@ public class ArabicSupportEnumCellFactory<T extends ArabicSupportEnum> implement
     }
 
     public enum ListType {
-        LABEL_ONLY, CODE_ONLY, LABEL_AND_CODE;
+        LABEL_ONLY, CODE_ONLY, LABEL_AND_CODE
     }
 }

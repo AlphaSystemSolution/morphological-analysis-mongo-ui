@@ -10,6 +10,7 @@ import javafx.scene.text.Text;
 import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.ROOT;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.ARABIC_FONT_SMALL;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.ENGLISH_FONT_SMALL;
+import static java.lang.String.format;
 import static javafx.scene.control.ContentDisplay.GRAPHIC_ONLY;
 
 /**
@@ -60,8 +61,6 @@ public class GraphNodeTreeCell extends TreeCell<GraphNodeAdapter> {
     }
 
     private String getText(GraphNodeAdapter item) {
-        StringBuilder builder = new StringBuilder();
-        builder.append("(").append(item.getText()).append(")");
-        return builder.toString();
+        return format("(%s)", item.getText());
     }
 }

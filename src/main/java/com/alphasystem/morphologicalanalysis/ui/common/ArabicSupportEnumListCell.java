@@ -9,7 +9,6 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
 import static com.alphasystem.morphologicalanalysis.ui.common.ArabicSupportEnumCellFactory.ListType.CODE_ONLY;
-import static com.alphasystem.morphologicalanalysis.ui.common.ArabicSupportEnumCellFactory.ListType.LABEL_AND_CODE;
 import static com.alphasystem.morphologicalanalysis.ui.common.ArabicSupportEnumCellFactory.ListType.LABEL_ONLY;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.ARABIC_FONT_SMALL;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.ENGLISH_FONT_SMALL;
@@ -24,10 +23,6 @@ public class ArabicSupportEnumListCell<T extends ArabicSupportEnum> extends List
     private final Text codeText;
     private final Text arabicText;
     private final ListType type;
-
-    public ArabicSupportEnumListCell() {
-        this(LABEL_AND_CODE);
-    }
 
     public ArabicSupportEnumListCell(ListType type) {
         this.type = type;
