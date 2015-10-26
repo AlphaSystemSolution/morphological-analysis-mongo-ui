@@ -48,7 +48,6 @@ public class GraphBuilder {
     private double tokenHeight = RECTANGLE_HEIGHT;
     private double gapBetweenTokens = GAP_BETWEEN_TOKENS;
     private double rectX;
-    private double rectY;
     private double textX;
     private double textY;
     private double x1;
@@ -71,8 +70,8 @@ public class GraphBuilder {
      * Build terminal nodes from given <code>tokens</code>. This method will be called when the
      * {@link com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph} was being created for the first time.
      *
-     * @param tokens
-     * @return
+     * @param tokens list source tokens
+     * @return list terminal nodes
      * @throws IllegalArgumentException
      */
     public List<TerminalNode> buildTerminalNodes(List<Token> tokens) throws IllegalArgumentException {
@@ -93,9 +92,9 @@ public class GraphBuilder {
     }
 
     /**
-     * @param token
-     * @param nodeType
-     * @return
+     * @param token source token
+     * @param nodeType graph node type
+     * @return terminal node
      * @throws IllegalArgumentException
      */
     public TerminalNode buildTerminalNode(Token token, GraphNodeType nodeType)
@@ -289,24 +288,12 @@ public class GraphBuilder {
         reset();
     }
 
-    public double getTokenWidth() {
-        return tokenWidth;
-    }
-
     public void setTokenWidth(double tokenWidth) {
         this.tokenWidth = tokenWidth;
     }
 
-    public double getTokenHeight() {
-        return tokenHeight;
-    }
-
     public void setTokenHeight(double tokenHeight) {
         this.tokenHeight = tokenHeight;
-    }
-
-    public double getGapBetweenTokens() {
-        return gapBetweenTokens;
     }
 
     public void setGapBetweenTokens(double gapBetweenTokens) {
@@ -315,7 +302,7 @@ public class GraphBuilder {
 
     private void reset() {
         rectX = INITIAL_X;
-        rectY = INITIAL_Y;
+        double rectY = INITIAL_Y;
         textX = rectX + 10;
         textY = 105;
         x1 = rectX;
