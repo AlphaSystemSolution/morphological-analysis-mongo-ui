@@ -273,10 +273,8 @@ public class GraphBuilder {
         partOfSpeechNode.setX(posX);
         partOfSpeechNode.setY(textY);
         double x = posX + 20;
-        // x = x + (x % 20);
         partOfSpeechNode.setCx(x);
         x = textY + 20;
-        // x = x + (x % 20);
         partOfSpeechNode.setCy(x);
         return partOfSpeechNode;
     }
