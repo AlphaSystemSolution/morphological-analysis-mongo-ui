@@ -124,7 +124,7 @@ public class GraphBuilder {
         Long count = repositoryUtil.getRepository(terminalNode.getGraphNodeType())
                 .countByChapterNumberAndVerseNumberAndTokenNumber(token.getChapterNumber(),
                         token.getVerseNumber(), token.getTokenNumber());
-        count = (count == null) ? 0L : count;
+        count = (count == null) ? 0L : count + 1;
         terminalNode.setVersion(count.intValue());
         terminalNode.setX(textX);
         terminalNode.setY(textY);
@@ -269,7 +269,7 @@ public class GraphBuilder {
                 .countByChapterNumberAndVerseNumberAndTokenNumberAndLocationNumber(
                         location.getChapterNumber(), location.getVerseNumber(), location.getTokenNumber(),
                         location.getLocationNumber());
-        count = (count == null) ? 0 : count;
+        count = (count == null) ? 0 : count + 1;
         partOfSpeechNode.setVersion(count.intValue());
         partOfSpeechNode.setX(posX);
         partOfSpeechNode.setY(textY);
