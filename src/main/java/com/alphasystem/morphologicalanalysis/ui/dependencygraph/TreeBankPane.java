@@ -7,11 +7,11 @@ import com.alphasystem.morphologicalanalysis.ui.dependencygraph.components.Depen
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.DependencyGraphAdapter;
 import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
 import javafx.scene.SnapshotParameters;
+import javafx.scene.control.*;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.*;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.layout.BorderPane;
@@ -29,6 +29,7 @@ import static javafx.application.Platform.runLater;
 import static javafx.embed.swing.SwingFXUtils.fromFXImage;
 import static javafx.scene.Cursor.DEFAULT;
 import static javafx.scene.Cursor.WAIT;
+import static javafx.scene.control.Alert.AlertType.ERROR;
 import static javafx.scene.control.ScrollPane.ScrollBarPolicy.AS_NEEDED;
 import static javafx.scene.input.KeyCode.*;
 import static javafx.scene.input.KeyCombination.*;
@@ -151,9 +152,15 @@ public class TreeBankPane extends BorderPane {
     }
 
     private void saveAction() {
-        repositoryTool.saveDependencyGraph(canvasPane.getDependencyGraph().getDependencyGraph(),
-                canvasPane.getRemovalIdMap());
-        canvasPane.getRemovalIdMap().clear();
+        try {
+            repositoryTool.saveDependencyGraph(canvasPane.getDependencyGraph().getDependencyGraph(),
+                    canvasPane.getRemovalIdMap());
+            canvasPane.getRemovalIdMap().clear();
+        } catch (Exception e) {
+            Alert alert = new Alert(ERROR);
+            alert.setContentText(e.getMessage());
+            alert.showAndWait();
+        }
     }
 
     private void exitAction() {
