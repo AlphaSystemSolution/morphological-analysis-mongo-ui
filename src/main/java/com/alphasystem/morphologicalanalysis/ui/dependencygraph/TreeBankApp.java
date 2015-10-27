@@ -86,9 +86,9 @@ public class TreeBankApp extends Application {
         primaryStage.show();
     }
 
-    private void open(Stage primaryStage, String value) {
+    private void open(Stage primaryStage, String displayName) {
         DependencyGraphAdapter dependencyGraphAdapter = null;
-        DependencyGraph dependencyGraph = repositoryTool.getDependencyGraph(value);
+        DependencyGraph dependencyGraph = repositoryTool.getDependencyGraph(displayName);
         if (dependencyGraph != null) {
             dependencyGraphAdapter = new DependencyGraphAdapter(dependencyGraph);
         }
