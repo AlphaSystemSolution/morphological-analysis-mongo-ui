@@ -10,6 +10,7 @@ import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.GraphBuilde
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.VerbProperties;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.support.ConversationType;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -33,6 +34,7 @@ import static com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.Canv
 import static com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.CubicCurveHelper.arrowPoints;
 import static com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.DependencyGraphGraphicTool.DARK_GRAY_CLOUD;
 import static com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.DependencyGraphGraphicTool.GRID_LINES;
+import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.ConversationType.FIRST_PERSON;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.NOUN;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.VERB;
 import static java.lang.String.format;
@@ -603,10 +605,15 @@ public class CanvasPane extends Pane {
                 ListIterator<GraphNodeAdapter> listIterator = graphNodes.listIterator();
                 while (listIterator.hasNext()) {
                     GraphNodeAdapter node = listIterator.next();
-                    if (nodeType.equals(PART_OF_SPEECH) && isTerminal(node)) {
+                    boolean terminal = isTerminal(node);
+                    if (nodeType.equals(TERMINAL) && terminal) {
+                        removePartOfSpeech(null, (TerminalNodeAdapter) node);
+                    } else if (nodeType.equals(PART_OF_SPEECH) && terminal) {
                         removePartOfSpeech(removalId, (TerminalNodeAdapter) node);
-                    } else if (nodeType.equals(RELATIONSHIP)) {
-                        removeRelationship(removalId, listIterator, (RelationshipNodeAdapter) node);
+                    } else {
+                        if (node.getId().equals(removalId)) {
+                            listIterator.remove();
+                        }
                     }
                 }
 
@@ -644,19 +651,14 @@ public class CanvasPane extends Pane {
 
     }
 
-    private void removeRelationship(String removalId, ListIterator<GraphNodeAdapter> listIterator,
-                                    RelationshipNodeAdapter node) {
-        if (node.getId().equals(removalId)) {
-            listIterator.remove();
-        }
-    }
-
     private void removePartOfSpeech(String removalId, TerminalNodeAdapter node) {
         ObservableList<PartOfSpeechNodeAdapter> partOfSpeeches = node.getPartOfSpeeches();
         ListIterator<PartOfSpeechNodeAdapter> posLi = partOfSpeeches.listIterator();
         while (posLi.hasNext()) {
             PartOfSpeechNodeAdapter next = posLi.next();
-            if (next.getId().equals(removalId)) {
+            if (removalId == null) {
+                posLi.remove();
+            } else if (next.getId().equals(removalId)) {
                 posLi.remove();
                 break;
             }
@@ -870,8 +872,10 @@ public class CanvasPane extends Pane {
         Line referenceLine = getReferenceLine(group);
         graphBuilder.set(graphMetaInfo.getGraphMetaInfo());
         VerbProperties vp = (VerbProperties) location.getProperties();
-        String pronounId = format("%s_%s_%s", vp.getConversationType().name(), vp.getGender().name(),
-                vp.getNumber().name());
+        String gender = vp.getGender().name();
+        ConversationType conversationType = vp.getConversationType();
+        gender = conversationType.equals(FIRST_PERSON) ? "" : format("_%s", gender);
+        String pronounId = format("%s%s_%s", conversationType.name(), gender, vp.getNumber().name());
         HiddenNodeAdapter hiddenNodeAdapter = createHiddenNodeAdapter(pronounId, referenceLine);
         getDependencyGraph().getDependencyGraph().getNodes().add(index, hiddenNodeAdapter.getSrc());
         getDependencyGraph().getGraphNodes().add(index, hiddenNodeAdapter);

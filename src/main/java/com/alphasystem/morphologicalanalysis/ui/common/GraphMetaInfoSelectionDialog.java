@@ -1,46 +1,74 @@
 package com.alphasystem.morphologicalanalysis.ui.common;
 
+import com.alphasystem.morphologicalanalysis.graph.model.FontMetaInfo;
 import com.alphasystem.morphologicalanalysis.graph.model.GraphMetaInfo;
+import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.GraphMetaInfoAdapter;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Insets;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.Label;
-import javafx.scene.control.Spinner;
+import javafx.scene.control.*;
 import javafx.scene.control.SpinnerValueFactory.DoubleSpinnerValueFactory;
 import javafx.scene.layout.GridPane;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
+import javafx.scene.text.FontWeight;
+import org.controlsfx.dialog.FontSelectorDialog;
+
+import java.util.Optional;
 
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.*;
+import static java.lang.String.format;
 import static javafx.geometry.Pos.CENTER;
 import static javafx.scene.control.ButtonType.CANCEL;
 import static javafx.scene.control.ButtonType.OK;
+import static javafx.scene.text.Font.font;
 
 /**
  * @author sali
  */
-public class GraphMetaInfoSelectionDialog extends Dialog<GraphMetaInfo> {
+public class GraphMetaInfoSelectionDialog extends Dialog<GraphMetaInfoAdapter> {
+
+    private static final int PREF_COLUMN_COUNT = 20;
 
     private final Spinner<Double> widthField;
     private final Spinner<Double> heightField;
-    private final Spinner<Double> tokenWidth;
-    private final Spinner<Double> tokenHeight;
-    private final Spinner<Double> gapBetweenTokens;
-    private final ObjectProperty<GraphMetaInfo> graphMetaInfo;
+    private final Spinner<Double> tokenWidthField;
+    private final Spinner<Double> tokenHeightField;
+    private final Spinner<Double> gapBetweenTokensField;
+    private final TextField terminalFontField;
+    private final TextField posFontField;
+    private final TextField translationFontField;
+    private final ObjectProperty<GraphMetaInfoAdapter> graphMetaInfo;
+    private FontSelectorDialog fontSelectorDialog;
 
     public GraphMetaInfoSelectionDialog() {
         setTitle("Select Canvas Meta Properties");
 
         widthField = new Spinner<>();
         heightField = new Spinner<>();
-        tokenWidth = new Spinner<>();
-        tokenHeight = new Spinner<>();
-        gapBetweenTokens = new Spinner<>();
-        graphMetaInfo = new SimpleObjectProperty<>(new GraphMetaInfo());
+        tokenWidthField = new Spinner<>();
+        tokenHeightField = new Spinner<>();
+        gapBetweenTokensField = new Spinner<>();
+
+        terminalFontField = new TextField();
+        terminalFontField.setEditable(false);
+        terminalFontField.setPrefColumnCount(PREF_COLUMN_COUNT);
+
+        posFontField = new TextField();
+        posFontField.setEditable(false);
+        posFontField.setPrefColumnCount(PREF_COLUMN_COUNT);
+
+        translationFontField = new TextField();
+        translationFontField.setEditable(false);
+        translationFontField.setPrefColumnCount(PREF_COLUMN_COUNT);
+
+        graphMetaInfo = new SimpleObjectProperty<>(new GraphMetaInfoAdapter(new GraphMetaInfo()));
 
         getDialogPane().setContent(createMainPanel());
         getDialogPane().getButtonTypes().addAll(OK, CANCEL);
         refreshDialog();
-        setGraphMetaInfo(new GraphMetaInfo());
+        setGraphMetaInfo(null);
+        fontSelectorDialog = new FontSelectorDialog(fromFontMetaInfo(getGraphMetaInfo().getTerminalFont()));
 
         setResultConverter(param -> {
             if (param.getButtonData().isCancelButton()) {
@@ -50,11 +78,25 @@ public class GraphMetaInfoSelectionDialog extends Dialog<GraphMetaInfo> {
         });
     }
 
-    public final GraphMetaInfo getGraphMetaInfo() {
+    private static Font fromFontMetaInfo(FontMetaInfo fmi) {
+        return font(fmi.getFamily(), FontWeight.valueOf(fmi.getWeight()),
+                FontPosture.valueOf(fmi.getPosture()), fmi.getSize());
+    }
+
+    private static FontMetaInfo fromFont(Font font) {
+        return new FontMetaInfo(font.getFamily(), "NORMAL", "REGULAR", font.getSize());
+    }
+
+    private static String getFontDisplayValue(FontMetaInfo fmi) {
+        return format("%s, %s", fmi.getFamily(), fmi.getSize());
+    }
+
+    public final GraphMetaInfoAdapter getGraphMetaInfo() {
         return graphMetaInfo.get();
     }
 
-    public final void setGraphMetaInfo(GraphMetaInfo graphMetaInfo) {
+    public final void setGraphMetaInfo(GraphMetaInfoAdapter graphMetaInfo) {
+        graphMetaInfo = graphMetaInfo == null ? new GraphMetaInfoAdapter(new GraphMetaInfo()) : graphMetaInfo;
         this.graphMetaInfo.set(graphMetaInfo);
     }
 
@@ -90,40 +132,92 @@ public class GraphMetaInfoSelectionDialog extends Dialog<GraphMetaInfo> {
         grid.add(heightField, 1, rowIndex);
 
         rowIndex++;
-        // sets up "tokenWidth" field
+        // sets up "tokenWidthField" field
         label = new Label(RESOURCE_BUNDLE.getString("tokenWidth.label"));
         grid.add(label, 0, rowIndex);
 
-        tokenWidth.setValueFactory(new DoubleSpinnerValueFactory(MIN_RECTANGLE_WIDTH, RECTANGLE_WIDTH,
+        tokenWidthField.setValueFactory(new DoubleSpinnerValueFactory(MIN_RECTANGLE_WIDTH, RECTANGLE_WIDTH,
                 graphMetaInfo.get().getTokenWidth(), 10));
-        tokenWidth.valueProperty().addListener((observable, oldValue, newValue) -> {
+        tokenWidthField.valueProperty().addListener((observable, oldValue, newValue) -> {
             graphMetaInfo.get().setTokenWidth(newValue);
         });
-        grid.add(tokenWidth, 1, rowIndex);
+        grid.add(tokenWidthField, 1, rowIndex);
 
         rowIndex++;
-        // sets up "tokenHeight" field
+        // sets up "tokenHeightField" field
         label = new Label(RESOURCE_BUNDLE.getString("tokenHeight.label"));
         grid.add(label, 0, rowIndex);
 
-        tokenHeight.setValueFactory(new DoubleSpinnerValueFactory(MIN_RECTANGLE_HEIGHT, RECTANGLE_HEIGHT,
+        tokenHeightField.setValueFactory(new DoubleSpinnerValueFactory(MIN_RECTANGLE_HEIGHT, RECTANGLE_HEIGHT,
                 graphMetaInfo.get().getTokenHeight(), 10));
-        tokenHeight.valueProperty().addListener((observable, oldValue, newValue) -> {
+        tokenHeightField.valueProperty().addListener((observable, oldValue, newValue) -> {
             graphMetaInfo.get().setTokenHeight(newValue);
         });
-        grid.add(tokenHeight, 1, rowIndex);
+        grid.add(tokenHeightField, 1, rowIndex);
 
         rowIndex++;
-        // sets up "gapBetweenTokens" field
+        // sets up "gapBetweenTokensField" field
         label = new Label(RESOURCE_BUNDLE.getString("gapBetweenTokens.label"));
         grid.add(label, 0, rowIndex);
 
-        gapBetweenTokens.setValueFactory(new DoubleSpinnerValueFactory(MIN_GAP_BETWEEN_TOKENS, GAP_BETWEEN_TOKENS,
+        gapBetweenTokensField.setValueFactory(new DoubleSpinnerValueFactory(MIN_GAP_BETWEEN_TOKENS, GAP_BETWEEN_TOKENS,
                 graphMetaInfo.get().getGapBetweenTokens(), 10));
-        this.gapBetweenTokens.valueProperty().addListener((observable, oldValue, newValue) -> {
+        this.gapBetweenTokensField.valueProperty().addListener((observable, oldValue, newValue) -> {
             graphMetaInfo.get().setGapBetweenTokens(newValue);
         });
-        grid.add(this.gapBetweenTokens, 1, rowIndex);
+        grid.add(this.gapBetweenTokensField, 1, rowIndex);
+
+        Button button;
+        rowIndex++;
+        // sets up "terminalFontField" field
+        label = new Label(RESOURCE_BUNDLE.getString("terminalFont.label"));
+        grid.add(label, 0, rowIndex);
+        grid.add(terminalFontField, 1, rowIndex);
+        button = new Button(" ... ");
+        button.setOnAction(event -> {
+            fontSelectorDialog = new FontSelectorDialog(fromFontMetaInfo(graphMetaInfo.get().getTerminalFont()));
+            Optional<Font> result = fontSelectorDialog.showAndWait();
+            result.ifPresent(font -> {
+                FontMetaInfo fmi = fromFont(font);
+                graphMetaInfo.get().setTerminalFont(fmi);
+                terminalFontField.setText(getFontDisplayValue(fmi));
+            });
+        });
+        grid.add(button, 2, rowIndex);
+
+        rowIndex++;
+        // sets up "posFontField" field
+        label = new Label(RESOURCE_BUNDLE.getString("partOfSpeechFont.label"));
+        grid.add(label, 0, rowIndex);
+        grid.add(posFontField, 1, rowIndex);
+        button = new Button(" ... ");
+        button.setOnAction(event -> {
+            fontSelectorDialog = new FontSelectorDialog(fromFontMetaInfo(graphMetaInfo.get().getPosFont()));
+            Optional<Font> result = fontSelectorDialog.showAndWait();
+            result.ifPresent(font -> {
+                FontMetaInfo fmi = fromFont(font);
+                graphMetaInfo.get().setPosFont(fmi);
+                posFontField.setText(getFontDisplayValue(fmi));
+            });
+        });
+        grid.add(button, 2, rowIndex);
+
+        rowIndex++;
+        // sets up "translationFontField" field
+        label = new Label(RESOURCE_BUNDLE.getString("translationFont.label"));
+        grid.add(label, 0, rowIndex);
+        grid.add(translationFontField, 1, rowIndex);
+        button = new Button(" ... ");
+        button.setOnAction(event -> {
+            fontSelectorDialog = new FontSelectorDialog(fromFontMetaInfo(graphMetaInfo.get().getTranslationFont()));
+            Optional<Font> result = fontSelectorDialog.showAndWait();
+            result.ifPresent(font -> {
+                FontMetaInfo fmi = fromFont(font);
+                graphMetaInfo.get().setTranslationFont(fmi);
+                translationFontField.setText(getFontDisplayValue(fmi));
+            });
+        });
+        grid.add(button, 2, rowIndex);
 
         return grid;
     }
@@ -133,9 +227,12 @@ public class GraphMetaInfoSelectionDialog extends Dialog<GraphMetaInfo> {
             if (newValue != null) {
                 widthField.getValueFactory().setValue(newValue.getWidth());
                 heightField.getValueFactory().setValue(newValue.getHeight());
-                tokenWidth.getValueFactory().setValue(newValue.getTokenWidth());
-                tokenHeight.getValueFactory().setValue(newValue.getTokenHeight());
-                gapBetweenTokens.getValueFactory().setValue(newValue.getGapBetweenTokens());
+                tokenWidthField.getValueFactory().setValue(newValue.getTokenWidth());
+                tokenHeightField.getValueFactory().setValue(newValue.getTokenHeight());
+                gapBetweenTokensField.getValueFactory().setValue(newValue.getGapBetweenTokens());
+                terminalFontField.setText(getFontDisplayValue(newValue.getTerminalFont()));
+                posFontField.setText(getFontDisplayValue(newValue.getPosFont()));
+                translationFontField.setText(getFontDisplayValue(newValue.getTranslationFont()));
             }
         });
     }

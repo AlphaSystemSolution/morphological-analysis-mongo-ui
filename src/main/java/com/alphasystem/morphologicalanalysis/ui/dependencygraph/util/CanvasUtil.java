@@ -3,6 +3,7 @@ package com.alphasystem.morphologicalanalysis.ui.dependencygraph.util;
 import com.alphasystem.arabic.model.ArabicWord;
 import com.alphasystem.morphologicalanalysis.common.model.Linkable;
 import com.alphasystem.morphologicalanalysis.graph.model.*;
+import com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.*;
 import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.*;
@@ -281,5 +282,30 @@ public class CanvasUtil {
 
         builder.append(" ");
         return builder.toString();
+    }
+
+    public DependencyGraph createDependencyGraph(List<Token> tokens, GraphMetaInfoAdapter adapterInfo) {
+        GraphMetaInfo gmi = adapterInfo.getGraphMetaInfo();
+        DependencyGraph dependencyGraph = repositoryTool.createDependencyGraph(tokens, gmi);
+        dependencyGraph.getNodes().forEach(graphNode -> {
+            GraphNodeType graphNodeType = graphNode.getGraphNodeType();
+            switch (graphNodeType) {
+                case TERMINAL:
+                case REFERENCE:
+                case HIDDEN:
+                case IMPLIED:
+                    TerminalNode terminalNode = (TerminalNode) graphNode;
+                    terminalNode.setFont(adapterInfo.getTerminalFont());
+                    terminalNode.setTranslationFont(adapterInfo.getTranslationFont());
+                    terminalNode.getPartOfSpeechNodes().forEach(partOfSpeechNode ->
+                            partOfSpeechNode.setFont(adapterInfo.getPosFont()));
+                    break;
+                default:
+                    graphNode.setFont(adapterInfo.getPosFont());
+                    break;
+            }
+        });
+
+        return dependencyGraph;
     }
 }

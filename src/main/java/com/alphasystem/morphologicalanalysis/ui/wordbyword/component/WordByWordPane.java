@@ -1,11 +1,12 @@
 package com.alphasystem.morphologicalanalysis.ui.wordbyword.component;
 
 import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
-import com.alphasystem.morphologicalanalysis.graph.model.GraphMetaInfo;
 import com.alphasystem.morphologicalanalysis.ui.common.ChapterVerseSelectionPane;
 import com.alphasystem.morphologicalanalysis.ui.common.GraphMetaInfoSelectionDialog;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.TreeBankPane;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.DependencyGraphAdapter;
+import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.GraphMetaInfoAdapter;
+import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.CanvasUtil;
 import com.alphasystem.morphologicalanalysis.ui.wordbyword.model.TableCellModel;
 import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
@@ -182,10 +183,10 @@ public class WordByWordPane extends BorderPane {
             return;
         }
 
-        graphMetaInfoSelectionDialog.setGraphMetaInfo(new GraphMetaInfo());
-        Optional<GraphMetaInfo> result = graphMetaInfoSelectionDialog.showAndWait();
+        graphMetaInfoSelectionDialog.setGraphMetaInfo(null);
+        Optional<GraphMetaInfoAdapter> result = graphMetaInfoSelectionDialog.showAndWait();
         result.ifPresent(graphMetaInfo -> {
-            DependencyGraph dependencyGraph = repositoryTool.createDependencyGraph(tokens, graphMetaInfo);
+            DependencyGraph dependencyGraph = CanvasUtil.getInstance().createDependencyGraph(tokens, graphMetaInfo);
             DependencyGraphAdapter dependencyGraphAdapter = new DependencyGraphAdapter(dependencyGraph);
             Alert alert = new Alert(INFORMATION);
             alert.setContentText(format("Graph Created {%s}", dependencyGraph.getDisplayName()));

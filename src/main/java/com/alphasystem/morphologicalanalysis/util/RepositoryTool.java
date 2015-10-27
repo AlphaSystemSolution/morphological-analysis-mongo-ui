@@ -2,6 +2,7 @@ package com.alphasystem.morphologicalanalysis.util;
 
 import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
 import com.alphasystem.morphologicalanalysis.graph.model.GraphMetaInfo;
+import com.alphasystem.morphologicalanalysis.graph.model.GraphNode;
 import com.alphasystem.morphologicalanalysis.graph.model.TerminalNode;
 import com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType;
 import com.alphasystem.morphologicalanalysis.graph.repository.DependencyGraphRepository;
@@ -18,8 +19,11 @@ import com.alphasystem.persistence.mongo.spring.support.ApplicationContextProvid
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * @author sali
@@ -119,6 +123,13 @@ public class RepositoryTool {
         }; // end of "new Service"
     }
 
+    public List<Token> getTokens(final int chapterNumber, final int verseNumber, final int firstTokenIndex,
+                                 final int lastTokenIndex) {
+        List<Token> result = new ArrayList<>();
+
+        return result;
+    }
+
     public Token getToken(String id) {
         return tokenRepository.findOne(id);
     }
@@ -190,13 +201,19 @@ public class RepositoryTool {
     }
 
     public void saveDependencyGraph(DependencyGraph dependencyGraph, Map<GraphNodeType, String> removalIds) {
+        ListIterator<GraphNode> listIterator = dependencyGraph.getNodes().listIterator();
+        while (listIterator.hasNext()) {
+            GraphNode next = listIterator.next();
+            // TODO: remove links
+
+        }
         dependencyGraphRepository.save(dependencyGraph);
         if (!removalIds.isEmpty()) {
             removalIds.entrySet().forEach(this::removeNode);
         }
     }
 
-    private void removeNode(Map.Entry<GraphNodeType, String> entry) {
+    private void removeNode(Entry<GraphNodeType, String> entry) {
         GraphNodeType key = entry.getKey();
         String id = entry.getValue();
         getRepository(key).delete(id);

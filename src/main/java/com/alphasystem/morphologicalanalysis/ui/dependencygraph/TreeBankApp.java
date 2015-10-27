@@ -1,9 +1,10 @@
 package com.alphasystem.morphologicalanalysis.ui.dependencygraph;
 
 import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
-import com.alphasystem.morphologicalanalysis.graph.model.GraphMetaInfo;
 import com.alphasystem.morphologicalanalysis.ui.common.GraphMetaInfoSelectionDialog;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.DependencyGraphAdapter;
+import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.GraphMetaInfoAdapter;
+import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.CanvasUtil;
 import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
 import com.alphasystem.morphologicalanalysis.util.SpringContextHelper;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
@@ -40,6 +41,7 @@ public class TreeBankApp extends Application {
     }
 
     private final RepositoryTool repositoryTool = RepositoryTool.getInstance();
+    private final CanvasUtil canvasUtil = CanvasUtil.getInstance();
     private GraphMetaInfoSelectionDialog graphMetaInfoSelectionDialog = new GraphMetaInfoSelectionDialog();
 
     public static void main(String[] args) {
@@ -50,7 +52,6 @@ public class TreeBankApp extends Application {
     public void start(Stage primaryStage) throws Exception {
         primaryStage.setTitle("Quranic Morphological Dependency Graph Builder");
 
-        DependencyGraphAdapter dependencyGraphAdapter = null;
         Parameters parameters = getParameters();
         if (parameters != null) {
             Map<String, String> namedParameters = parameters.getNamed();
@@ -62,16 +63,15 @@ public class TreeBankApp extends Application {
                     continue;
                 }
                 if (OPEN_ARG.equalsIgnoreCase(name)) {
-                    DependencyGraph dependencyGraph = repositoryTool.getDependencyGraph(value);
-                    if (dependencyGraph != null) {
-                        dependencyGraphAdapter = new DependencyGraphAdapter(dependencyGraph);
-                    }
+                    open(primaryStage, value);
                 } else if (CREATE_ARG.equalsIgnoreCase(name)) {
-                    dependencyGraphAdapter = createDependencyGraph(value);
+                    create(primaryStage, value);
                 }
             }
         }
+    }
 
+    private void showStage(Stage primaryStage, DependencyGraphAdapter dependencyGraphAdapter) {
         Screen screen = Screen.getPrimary();
         Rectangle2D bounds = screen.getVisualBounds();
 
@@ -86,8 +86,17 @@ public class TreeBankApp extends Application {
         primaryStage.show();
     }
 
-    private DependencyGraphAdapter createDependencyGraph(String value) {
-        DependencyGraphAdapter dependencyGraphAdapter = new DependencyGraphAdapter(null);
+    private void open(Stage primaryStage, String value) {
+        DependencyGraphAdapter dependencyGraphAdapter = null;
+        DependencyGraph dependencyGraph = repositoryTool.getDependencyGraph(value);
+        if (dependencyGraph != null) {
+            dependencyGraphAdapter = new DependencyGraphAdapter(dependencyGraph);
+        }
+        showStage(primaryStage, dependencyGraphAdapter);
+    }
+
+    private void create(Stage stage, String value) {
+        DependencyGraphAdapter dependencyGraphAdapter = new DependencyGraphAdapter(new DependencyGraph());
         String[] values = value.split("_");
         Integer chapterNumber;
         Integer verseNumber;
@@ -100,22 +109,22 @@ public class TreeBankApp extends Application {
             lastTokenIndex = parseInt(values[3]);
         } catch (NumberFormatException e) {
             e.printStackTrace();
-            return null;
+            return;
         }
 
         TokenRepository tokenRepository = repositoryTool.getRepositoryUtil().getTokenRepository();
         List<Token> tokens = tokenRepository.findByChapterNumberAndVerseNumberAndTokenNumberBetween(chapterNumber,
                 verseNumber, firstTokenIndex - 1, lastTokenIndex + 1);
-        graphMetaInfoSelectionDialog.setGraphMetaInfo(new GraphMetaInfo());
-        Optional<GraphMetaInfo> result = graphMetaInfoSelectionDialog.showAndWait();
-        result.ifPresent(graphMetaInfo -> {
-            DependencyGraph dependencyGraph = repositoryTool.createDependencyGraph(tokens, graphMetaInfo);
+        graphMetaInfoSelectionDialog.setGraphMetaInfo(null);
+        Optional<GraphMetaInfoAdapter> result = graphMetaInfoSelectionDialog.showAndWait();
+        result.ifPresent(adapterInfo -> {
+            DependencyGraph dependencyGraph = canvasUtil.createDependencyGraph(tokens, adapterInfo);
             Alert alert = new Alert(INFORMATION);
             alert.setContentText(format("Graph Created {%s}", dependencyGraph.getDisplayName()));
             alert.showAndWait().filter(response -> response == OK).ifPresent(response ->
                     dependencyGraphAdapter.setDependencyGraph(dependencyGraph));
+            showStage(stage, dependencyGraphAdapter);
         });
 
-        return dependencyGraphAdapter;
     }
 }
