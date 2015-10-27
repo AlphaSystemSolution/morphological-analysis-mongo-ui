@@ -287,25 +287,26 @@ public class CanvasUtil {
     public DependencyGraph createDependencyGraph(List<Token> tokens, GraphMetaInfoAdapter adapterInfo) {
         GraphMetaInfo gmi = adapterInfo.getGraphMetaInfo();
         DependencyGraph dependencyGraph = repositoryTool.createDependencyGraph(tokens, gmi);
-        dependencyGraph.getNodes().forEach(graphNode -> {
-            GraphNodeType graphNodeType = graphNode.getGraphNodeType();
-            switch (graphNodeType) {
-                case TERMINAL:
-                case REFERENCE:
-                case HIDDEN:
-                case IMPLIED:
-                    TerminalNode terminalNode = (TerminalNode) graphNode;
-                    terminalNode.setFont(adapterInfo.getTerminalFont());
-                    terminalNode.setTranslationFont(adapterInfo.getTranslationFont());
-                    terminalNode.getPartOfSpeechNodes().forEach(partOfSpeechNode ->
-                            partOfSpeechNode.setFont(adapterInfo.getPosFont()));
-                    break;
-                default:
-                    graphNode.setFont(adapterInfo.getPosFont());
-                    break;
-            }
-        });
-
+        dependencyGraph.getNodes().forEach(graphNode -> updateFonts(graphNode, adapterInfo));
         return dependencyGraph;
+    }
+
+    public void updateFonts(GraphNode graphNode, GraphMetaInfoAdapter adapterInfo) {
+        GraphNodeType graphNodeType = graphNode.getGraphNodeType();
+        switch (graphNodeType) {
+            case TERMINAL:
+            case REFERENCE:
+            case HIDDEN:
+            case IMPLIED:
+                TerminalNode terminalNode = (TerminalNode) graphNode;
+                terminalNode.setFont(adapterInfo.getTerminalFont());
+                terminalNode.setTranslationFont(adapterInfo.getTranslationFont());
+                terminalNode.getPartOfSpeechNodes().forEach(partOfSpeechNode ->
+                        partOfSpeechNode.setFont(adapterInfo.getPosFont()));
+                break;
+            default:
+                graphNode.setFont(adapterInfo.getPosFont());
+                break;
+        }
     }
 }

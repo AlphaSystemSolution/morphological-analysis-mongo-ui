@@ -737,7 +737,9 @@ public class CanvasPane extends Pane {
     }
 
     private void addPhraseNode(PhraseNode phraseNode, List<PartOfSpeechNodeAdapter> fragments) {
-        graphBuilder.set(getDependencyGraph().getGraphMetaInfo().getGraphMetaInfo());
+        GraphMetaInfoAdapter graphMetaInfoAdapter = getDependencyGraph().getGraphMetaInfo();
+        canvasUtil.updateFonts(phraseNode, graphMetaInfoAdapter);
+        graphBuilder.set(graphMetaInfoAdapter.getGraphMetaInfo());
         graphBuilder.buildPhraseNode(phraseNode, fragments);
         DependencyGraph dg = getDependencyGraph().getDependencyGraph();
         dg.getNodes().add(phraseNode);
@@ -800,10 +802,12 @@ public class CanvasPane extends Pane {
     }
 
     private void addReference(Token token, int index) {
-        graphBuilder.set(getDependencyGraph().getGraphMetaInfo().getGraphMetaInfo());
+        GraphMetaInfoAdapter graphMetaInfoAdapter = getDependencyGraph().getGraphMetaInfo();
+        graphBuilder.set(graphMetaInfoAdapter.getGraphMetaInfo());
         Group group = (Group) canvasPane.getChildren().get(index);
         Line referenceLine = getReferenceLine(group);
         ReferenceNode referenceNode = graphBuilder.buildReferenceNode(token, referenceLine);
+        canvasUtil.updateFonts(referenceNode, graphMetaInfoAdapter);
         ReferenceNodeAdapter referenceNodeAdapter = new ReferenceNodeAdapter();
         referenceNodeAdapter.setSrc(referenceNode);
         getDependencyGraph().getDependencyGraph().getNodes().add(referenceNode);
@@ -823,7 +827,9 @@ public class CanvasPane extends Pane {
     private void addRelationship(RelationshipNode relationshipNode,
                                  LinkSupportAdapter dependentNode,
                                  LinkSupportAdapter ownerNode) {
-        graphBuilder.set(getDependencyGraph().getGraphMetaInfo().getGraphMetaInfo());
+        GraphMetaInfoAdapter graphMetaInfoAdapter = getDependencyGraph().getGraphMetaInfo();
+        canvasUtil.updateFonts(relationshipNode, graphMetaInfoAdapter);
+        graphBuilder.set(graphMetaInfoAdapter.getGraphMetaInfo());
         graphBuilder.buildRelationshipNode(relationshipNode, dependentNode, ownerNode);
 
         DependencyGraph dependencyGraph = getDependencyGraph().getDependencyGraph();
@@ -843,13 +849,13 @@ public class CanvasPane extends Pane {
     }
 
     private void addImpliedNode(int index, PartOfSpeech partOfSpeech) {
-        GraphMetaInfoAdapter graphMetaInfo = getDependencyGraph().getGraphMetaInfo();
-        shiftNodes(index, graphMetaInfo);
+        GraphMetaInfoAdapter graphMetaInfoAdapter = getDependencyGraph().getGraphMetaInfo();
+        shiftNodes(index, graphMetaInfoAdapter);
         Node node = canvasPane.getChildren().get(index - 1);
         Group group = (Group) node;
         Line referenceLine = getReferenceLine(group);
-        graphBuilder.set(graphMetaInfo.getGraphMetaInfo());
-        ImpliedNodeAdapter impliedNodeAdapter = createImpliedNodeAdapter(partOfSpeech, referenceLine);
+        graphBuilder.set(graphMetaInfoAdapter.getGraphMetaInfo());
+        ImpliedNodeAdapter impliedNodeAdapter = createImpliedNodeAdapter(partOfSpeech, referenceLine, graphMetaInfoAdapter);
         getDependencyGraph().getDependencyGraph().getNodes().add(index, impliedNodeAdapter.getSrc());
         getDependencyGraph().getGraphNodes().add(index, impliedNodeAdapter);
         DependencyGraphAdapter dependencyGraph = getDependencyGraph();
@@ -857,26 +863,29 @@ public class CanvasPane extends Pane {
         setDependencyGraph(dependencyGraph);
     }
 
-    private ImpliedNodeAdapter createImpliedNodeAdapter(PartOfSpeech partOfSpeech, Line referenceLine) {
+    private ImpliedNodeAdapter createImpliedNodeAdapter(PartOfSpeech partOfSpeech, Line referenceLine,
+                                                        GraphMetaInfoAdapter graphMetaInfoAdapter) {
         ImpliedNodeAdapter impliedNodeAdapter = new ImpliedNodeAdapter();
         ImpliedNode impliedNode = graphBuilder.buildEmptyNode(partOfSpeech, referenceLine);
+        canvasUtil.updateFonts(impliedNode, graphMetaInfoAdapter);
         impliedNodeAdapter.setSrc(impliedNode);
         return impliedNodeAdapter;
     }
 
     private void addHiddenNode(int index, Location location) {
-        GraphMetaInfoAdapter graphMetaInfo = getDependencyGraph().getGraphMetaInfo();
-        shiftNodes(index, graphMetaInfo);
+        GraphMetaInfoAdapter graphMetaInfoAdapter = getDependencyGraph().getGraphMetaInfo();
+        shiftNodes(index, graphMetaInfoAdapter);
         Node node = canvasPane.getChildren().get(index - 1);
         Group group = (Group) node;
         Line referenceLine = getReferenceLine(group);
-        graphBuilder.set(graphMetaInfo.getGraphMetaInfo());
+        GraphMetaInfo graphMetaInfo = graphMetaInfoAdapter.getGraphMetaInfo();
+        graphBuilder.set(graphMetaInfo);
         VerbProperties vp = (VerbProperties) location.getProperties();
         String gender = vp.getGender().name();
         ConversationType conversationType = vp.getConversationType();
         gender = conversationType.equals(FIRST_PERSON) ? "" : format("_%s", gender);
         String pronounId = format("%s%s_%s", conversationType.name(), gender, vp.getNumber().name());
-        HiddenNodeAdapter hiddenNodeAdapter = createHiddenNodeAdapter(pronounId, referenceLine);
+        HiddenNodeAdapter hiddenNodeAdapter = createHiddenNodeAdapter(pronounId, referenceLine, graphMetaInfoAdapter);
         getDependencyGraph().getDependencyGraph().getNodes().add(index, hiddenNodeAdapter.getSrc());
         getDependencyGraph().getGraphNodes().add(index, hiddenNodeAdapter);
         DependencyGraphAdapter dependencyGraph = getDependencyGraph();
@@ -884,9 +893,11 @@ public class CanvasPane extends Pane {
         setDependencyGraph(dependencyGraph);
     }
 
-    private HiddenNodeAdapter createHiddenNodeAdapter(String pronounId, Line referenceLine) {
+    private HiddenNodeAdapter createHiddenNodeAdapter(String pronounId, Line referenceLine,
+                                                      GraphMetaInfoAdapter graphMetaInfoAdapter) {
         HiddenNodeAdapter hiddenNodeAdapter = new HiddenNodeAdapter();
         HiddenNode hiddenNode = graphBuilder.buildHiddenNode(pronounId, referenceLine);
+        canvasUtil.updateFonts(hiddenNode, graphMetaInfoAdapter);
         hiddenNodeAdapter.setSrc(hiddenNode);
         return hiddenNodeAdapter;
     }

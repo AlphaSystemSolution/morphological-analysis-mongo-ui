@@ -121,8 +121,10 @@ public class TreeBankApp extends Application {
             DependencyGraph dependencyGraph = canvasUtil.createDependencyGraph(tokens, adapterInfo);
             Alert alert = new Alert(INFORMATION);
             alert.setContentText(format("Graph Created {%s}", dependencyGraph.getDisplayName()));
-            alert.showAndWait().filter(response -> response == OK).ifPresent(response ->
-                    dependencyGraphAdapter.setDependencyGraph(dependencyGraph));
+            alert.showAndWait().filter(response -> response == OK).ifPresent(response -> {
+                dependencyGraphAdapter.setDependencyGraph(dependencyGraph);
+                dependencyGraphAdapter.setGraphMetaInfo(adapterInfo);
+            });
             showStage(stage, dependencyGraphAdapter);
         });
 

@@ -188,6 +188,7 @@ public class WordByWordPane extends BorderPane {
         result.ifPresent(graphMetaInfo -> {
             DependencyGraph dependencyGraph = CanvasUtil.getInstance().createDependencyGraph(tokens, graphMetaInfo);
             DependencyGraphAdapter dependencyGraphAdapter = new DependencyGraphAdapter(dependencyGraph);
+            dependencyGraphAdapter.setGraphMetaInfo(graphMetaInfo);
             Alert alert = new Alert(INFORMATION);
             alert.setContentText(format("Graph Created {%s}", dependencyGraph.getDisplayName()));
             alert.showAndWait().filter(response -> response == OK).ifPresent(response -> {
