@@ -5,7 +5,9 @@ import com.alphasystem.morphologicalanalysis.ui.dependencygraph.components.Canva
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.components.ControlPane;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.components.DependencyGraphSelectionDialog;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.DependencyGraphAdapter;
+import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.GraphNodeAdapter;
 import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
+import javafx.collections.ObservableList;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.control.*;
 import javafx.scene.control.Menu;
@@ -153,7 +155,10 @@ public class TreeBankPane extends BorderPane {
     private void updateCanvas(DependencyGraph dependencyGraph) {
         DependencyGraphAdapter dependencyGraphAdapter = new DependencyGraphAdapter(dependencyGraph);
         canvasPane.setDependencyGraph(dependencyGraphAdapter);
-        canvasPane.getDependencyGraph().setSelectedNode(dependencyGraphAdapter.getGraphNodes().get(0));
+        ObservableList<GraphNodeAdapter> graphNodes = dependencyGraphAdapter.getGraphNodes();
+        if (!graphNodes.isEmpty()) {
+            canvasPane.getDependencyGraph().setSelectedNode(graphNodes.get(0));
+        }
     }
 
     private void saveAction() {
@@ -170,7 +175,9 @@ public class TreeBankPane extends BorderPane {
 
     private void deleteAction() {
         DependencyGraph dependencyGraph = canvasPane.getDependencyGraph().getDependencyGraph();
-
+        canvasPane.removeAll();
+        repositoryTool.deleteDependencyGraph(dependencyGraph.getId(), canvasPane.getRemovalIdMap());
+        canvasPane.getRemovalIdMap().clear();
         updateCanvas(new DependencyGraph());
     }
 

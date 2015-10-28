@@ -205,6 +205,13 @@ public class RepositoryTool {
         }
     }
 
+    public void deleteDependencyGraph(String id, Map<GraphNodeType, List<String>> removalIds) {
+        if (!removalIds.isEmpty()) {
+            removalIds.entrySet().forEach(this::removeNode);
+        }
+        dependencyGraphRepository.delete(id);
+    }
+
     private void removeNode(Entry<GraphNodeType, List<String>> entry) {
         GraphNodeType key = entry.getKey();
         List<String> ids = entry.getValue();

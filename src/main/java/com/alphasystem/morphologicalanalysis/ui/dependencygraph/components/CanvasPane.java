@@ -120,6 +120,15 @@ public class CanvasPane extends Pane {
         setPrefSize(canvasWidth + 200, canvasHeight + 200);
     }
 
+    private static void put(Map<GraphNodeType, List<String>> map, GraphNodeType key, String id) {
+        List<String> list = map.get(key);
+        if (list == null) {
+            list = new ArrayList<>();
+            map.put(key, list);
+        }
+        list.add(id);
+    }
+
     private void initListeners() {
         dependencyGraphProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
@@ -573,7 +582,6 @@ public class CanvasPane extends Pane {
         return menuItems;
     }
 
-
     private void initTerminalContextMenu(Text source) {
         ObservableList<MenuItem> items = contextMenu.getItems();
         items.remove(0, items.size());
@@ -594,6 +602,29 @@ public class CanvasPane extends Pane {
         items.remove(0, items.size());
 
         items.addAll(createRelationshipMenu(currentNode));
+    }
+
+    public void removeAll() {
+        Alert alert = new Alert(WARNING, "Are you sure?", YES, NO);
+        Optional<ButtonType> result = alert.showAndWait();
+        result.ifPresent(buttonType -> {
+            if (buttonType.getButtonData().isDefaultButton()) {
+                ListIterator<GraphNodeAdapter> listIterator = getDependencyGraph().getGraphNodes().listIterator();
+                while (listIterator.hasNext()) {
+                    GraphNodeAdapter node = listIterator.next();
+                    boolean terminal = isTerminal(node);
+                    if (terminal) {
+                        TerminalNodeAdapter terminalNodeAdapter = (TerminalNodeAdapter) node;
+                        removePartOfSpeech(null, terminalNodeAdapter);
+                        listIterator.remove();
+                    } else {
+                        put(removalIdMap, node.getGraphNodeType(), node.getId());
+                        listIterator.remove();
+                    }
+                }
+            }
+        });
+
     }
 
     private void removeNode(GraphNodeType nodeType, String removalId) {
@@ -619,22 +650,15 @@ public class CanvasPane extends Pane {
                         listIterator.remove();
                         canvasUtil.shiftLeft(index, dependencyGraphAdapter);
                         break;
+                    } else if (nodeType.equals(PART_OF_SPEECH) && terminal) {
+                        TerminalNodeAdapter terminalNodeAdapter = (TerminalNodeAdapter) node;
+                        removePartOfSpeech(removalId, terminalNodeAdapter);
+                        break;
                     } else {
-                        if (nodeType.equals(PART_OF_SPEECH) && terminal) {
-                            TerminalNodeAdapter terminalNodeAdapter = (TerminalNodeAdapter) node;
-                            removePartOfSpeech(removalId, terminalNodeAdapter);
+                        if (current) {
+                            put(removalIdMap, nodeType, removalId);
+                            listIterator.remove();
                             break;
-                        } else {
-                            if (current) {
-                                listIterator.remove();
-                                List<String> list = removalIdMap.get(nodeType);
-                                if (list == null) {
-                                    list = new ArrayList<>();
-                                    removalIdMap.put(nodeType, list);
-                                }
-                                list.add(removalId);
-                                break;
-                            }
                         }
                     }
                 }
@@ -681,24 +705,14 @@ public class CanvasPane extends Pane {
             boolean removeSingle = currentId.equals(removalId);
             if (removeAll || removeSingle) {
                 posLi.remove();
-                List<String> list = removalIdMap.get(PART_OF_SPEECH);
-                if (list == null) {
-                    list = new ArrayList<>();
-                    removalIdMap.put(PART_OF_SPEECH, list);
-                }
-                list.add(currentId);
+                put(removalIdMap, PART_OF_SPEECH, currentId);
             }
             if (removeSingle) {
                 break;
             }
         }
         if (removeAll) {
-            List<String> list = removalIdMap.get(TERMINAL);
-            if (list == null) {
-                list = new ArrayList<>();
-                removalIdMap.put(TERMINAL, list);
-            }
-            list.add(node.getId());
+            put(removalIdMap, TERMINAL, node.getId());
         }
     }
 
@@ -830,7 +844,6 @@ public class CanvasPane extends Pane {
             }
         });
     }
-
 
     private MenuItem createRelationshipMenuItem(final LinkSupportAdapter dependentNode,
                                                 final LinkSupportAdapter currentNode) {
