@@ -188,8 +188,7 @@ public class CanvasUtil {
                 /*builder.append(SPACE).append(pp.getProNounType().getLabel().toUnicode()).append(NEW_LINE)
                         .append(SPACE).append(FI_MAHL.toUnicode()).append(SPACE)
                         .append(getFromNounStatus(pp.getStatus()).getLabel().toUnicode());*/
-                builder.append(SPACE).append(pp.getProNounType().getLabel().toUnicode()).append(SPACE)
-                        .append(pp.getStatus().getLabel().toUnicode());
+                builder.append(SPACE).append("(").append(pp.getStatus().getLabel().toUnicode()).append(")");
                 break;
         }
         return builder.toString();
