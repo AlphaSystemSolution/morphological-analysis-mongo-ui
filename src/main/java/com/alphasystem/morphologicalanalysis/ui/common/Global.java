@@ -5,6 +5,8 @@ import com.alphasystem.morphologicalanalysis.graph.model.GraphNode;
 import com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.GraphNodeAdapter;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.TerminalNodeAdapter;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.support.AlternateStatus;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.support.NounStatus;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech;
 import javafx.scene.text.Font;
 
@@ -89,5 +91,9 @@ public class Global {
 
     public static boolean isTerminal(GraphNode src) {
         return TERMINALS.contains(src.getGraphNodeType());
+    }
+
+    public static AlternateStatus getFromNounStatus(NounStatus nounStatus) {
+        return AlternateStatus.valueOf(nounStatus.name());
     }
 }

@@ -27,8 +27,7 @@ import java.util.Optional;
 
 import static com.alphasystem.arabic.model.ArabicLetters.WORD_SPACE;
 import static com.alphasystem.arabic.model.ArabicWord.getSubWord;
-import static com.alphasystem.morphologicalanalysis.ui.common.Global.FI_MAHL;
-import static com.alphasystem.morphologicalanalysis.ui.common.Global.isTerminal;
+import static com.alphasystem.morphologicalanalysis.ui.common.Global.*;
 import static com.alphasystem.util.AppUtil.NEW_LINE;
 import static com.alphasystem.util.AppUtil.isGivenType;
 import static java.lang.String.format;
@@ -188,7 +187,7 @@ public class CanvasUtil {
                 ProNounProperties pp = (ProNounProperties) properties;
                 builder.append(SPACE).append(pp.getProNounType().getLabel().toUnicode()).append(NEW_LINE)
                         .append(SPACE).append(FI_MAHL.toUnicode()).append(SPACE)
-                        .append(AlternateStatus.valueOf(pp.getStatus().name()).getLabel().toUnicode());
+                        .append(getFromNounStatus(pp.getStatus()).getLabel().toUnicode());
                 break;
         }
         return builder.toString();
