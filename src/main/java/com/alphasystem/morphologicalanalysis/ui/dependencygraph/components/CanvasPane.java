@@ -68,7 +68,7 @@ public class CanvasPane extends Pane {
     private RelationshipSelectionDialog relationshipSelectionDialog;
     private PhraseSelectionDialog phraseSelectionDialog;
     private ReferenceSelectionDialog referenceSelectionDialog;
-    private Map<GraphNodeType, String> removalIdMap = new HashMap<>();
+    private Map<GraphNodeType, List<String>> removalIdMap = new HashMap<>();
     private Pane canvasPane;
     private Node gridLines;
 
@@ -520,6 +520,10 @@ public class CanvasPane extends Pane {
 
         menuItem = new MenuItem("Add Reference Node ...");
         menuItem.setOnAction(event -> makeReference(index));
+        menuItems.add(menuItem);
+
+        menuItem = new MenuItem("Remove");
+        menuItem.setOnAction(event -> removeNode(TERMINAL, src.getId()));
 
         menuItems.add(menuItem);
 
@@ -593,6 +597,7 @@ public class CanvasPane extends Pane {
     }
 
     private void removeNode(GraphNodeType nodeType, String removalId) {
+        System.out.println(format("Removing node of type {%s} with ID {%s}", nodeType, removalId));
         Alert alert = new Alert(WARNING, "Are you sure?", YES, NO);
         Optional<ButtonType> result = alert.showAndWait();
         result.ifPresent(buttonType -> {
@@ -605,20 +610,33 @@ public class CanvasPane extends Pane {
                 ListIterator<GraphNodeAdapter> listIterator = graphNodes.listIterator();
                 while (listIterator.hasNext()) {
                     GraphNodeAdapter node = listIterator.next();
+                    boolean current = node.getId().equals(removalId);
                     boolean terminal = isTerminal(node);
-                    if (nodeType.equals(TERMINAL) && terminal) {
-                        removePartOfSpeech(null, (TerminalNodeAdapter) node);
-                    } else if (nodeType.equals(PART_OF_SPEECH) && terminal) {
-                        removePartOfSpeech(removalId, (TerminalNodeAdapter) node);
+                    if (nodeType.equals(TERMINAL) && terminal && current) {
+                        TerminalNodeAdapter terminalNodeAdapter = (TerminalNodeAdapter) node;
+                        int index = getIndex(terminalNodeAdapter, graphNodes);
+                        removePartOfSpeech(null, terminalNodeAdapter);
+                        listIterator.remove();
+                        canvasUtil.shiftLeft(index, dependencyGraphAdapter);
+                    } else if (nodeType.equals(PART_OF_SPEECH) && terminal && current) {
+                        TerminalNodeAdapter terminalNodeAdapter = (TerminalNodeAdapter) node;
+                        removePartOfSpeech(removalId, terminalNodeAdapter);
                     } else {
-                        if (node.getId().equals(removalId)) {
+                        if (current) {
                             listIterator.remove();
+                            List<String> list = removalIdMap.get(nodeType);
+                            if (list == null) {
+                                list = new ArrayList<String>();
+                                removalIdMap.put(nodeType, list);
+                            }
+                            list.add(removalId);
                         }
                     }
                 }
 
+                System.out.println(format("Removing: {%s}", removalIdMap));
                 // now remove it from back end list so that when we can remove from database
-                if (nodeType.equals(PART_OF_SPEECH)) {
+                /*if (nodeType.equals(PART_OF_SPEECH)) {
                     dependencyGraph.getNodes().stream().filter(Global::isTerminal).forEach(graphNode -> {
                         TerminalNode terminalNode = (TerminalNode) graphNode;
                         List<PartOfSpeechNode> partOfSpeechNodes = terminalNode.getPartOfSpeechNodes();
@@ -640,7 +658,7 @@ public class CanvasPane extends Pane {
                                     removalIdMap.put(RELATIONSHIP, removalId);
                                 }
                             });
-                }
+                }*/
 
 
                 dependencyGraphAdapter = getDependencyGraph();
@@ -654,14 +672,31 @@ public class CanvasPane extends Pane {
     private void removePartOfSpeech(String removalId, TerminalNodeAdapter node) {
         ObservableList<PartOfSpeechNodeAdapter> partOfSpeeches = node.getPartOfSpeeches();
         ListIterator<PartOfSpeechNodeAdapter> posLi = partOfSpeeches.listIterator();
+        boolean removeAll = removalId == null;
         while (posLi.hasNext()) {
             PartOfSpeechNodeAdapter next = posLi.next();
-            if (removalId == null) {
+            String currentId = next.getId();
+            boolean removeSingle = currentId.equals(removalId);
+            if (removeAll || removeSingle) {
                 posLi.remove();
-            } else if (next.getId().equals(removalId)) {
-                posLi.remove();
+                List<String> list = removalIdMap.get(PART_OF_SPEECH);
+                if (list == null) {
+                    list = new ArrayList<>();
+                    removalIdMap.put(PART_OF_SPEECH, list);
+                }
+                list.add(currentId);
+            }
+            if (removeSingle) {
                 break;
             }
+        }
+        if (removeAll) {
+            List<String> list = removalIdMap.get(TERMINAL);
+            if (list == null) {
+                list = new ArrayList<>();
+                removalIdMap.put(TERMINAL, list);
+            }
+            list.add(node.getId());
         }
     }
 
@@ -850,7 +885,7 @@ public class CanvasPane extends Pane {
 
     private void addImpliedNode(int index, PartOfSpeech partOfSpeech) {
         GraphMetaInfoAdapter graphMetaInfoAdapter = getDependencyGraph().getGraphMetaInfo();
-        shiftNodes(index, graphMetaInfoAdapter);
+        canvasUtil.shiftRight(index, getDependencyGraph());
         Node node = canvasPane.getChildren().get(index - 1);
         Group group = (Group) node;
         Line referenceLine = getReferenceLine(group);
@@ -874,7 +909,7 @@ public class CanvasPane extends Pane {
 
     private void addHiddenNode(int index, Location location) {
         GraphMetaInfoAdapter graphMetaInfoAdapter = getDependencyGraph().getGraphMetaInfo();
-        shiftNodes(index, graphMetaInfoAdapter);
+        canvasUtil.shiftRight(index, getDependencyGraph());
         Node node = canvasPane.getChildren().get(index - 1);
         Group group = (Group) node;
         Line referenceLine = getReferenceLine(group);
@@ -902,30 +937,10 @@ public class CanvasPane extends Pane {
         return hiddenNodeAdapter;
     }
 
-    /**
-     * When adding an {@link GraphNodeType#IMPLIED}, {@link GraphNodeType#HIDDEN}, or {@link GraphNodeType#REFERENCE}
-     * node, move all nodes by {@link GraphMetaInfo#gapBetweenTokens} plus {@link GraphMetaInfo#tokenWidth} to
-     * the right.
-     *
-     * @param index         index of current node
-     * @param graphMetaInfo graph meta data
-     */
-    private void shiftNodes(int index, GraphMetaInfoAdapter graphMetaInfo) {
-        ObservableList<GraphNodeAdapter> graphNodes = getDependencyGraph().getGraphNodes();
-        for (int i = index; i < graphNodes.size(); i++) {
-            GraphNodeAdapter node = graphNodes.get(i);
-            if (TERMINALS.contains(node.getGraphNodeType())) {
-                double translateX = graphMetaInfo.getGapBetweenTokens() + graphMetaInfo.getTokenWidth()
-                        + node.getTranslateX();
-                node.setTranslateX(translateX);
-            }
-        }
-    }
-
     private ObservableList<GraphNodeAdapter> copyGraphNodes() {
         ObservableList<GraphNodeAdapter> nodes = getDependencyGraph().getGraphNodes();
         ObservableList<GraphNodeAdapter> target = observableArrayList();
-        nodes.stream().filter(node -> TERMINALS.contains(node.getGraphNodeType())).forEach(target::add);
+        nodes.stream().filter(Global::isTerminal).forEach(target::add);
         reverse(target);
         nodes.stream().filter(node -> node.getGraphNodeType().equals(PHRASE)).forEach(target::add);
         return target;
@@ -987,7 +1002,7 @@ public class CanvasPane extends Pane {
         return canvasPane;
     }
 
-    public Map<GraphNodeType, String> getRemovalIdMap() {
+    public Map<GraphNodeType, List<String>> getRemovalIdMap() {
         return removalIdMap;
     }
 }

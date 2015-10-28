@@ -122,6 +122,11 @@ public class TreeBankPane extends BorderPane {
         menuItem.setOnAction(event -> saveAction());
         menu.getItems().add(menuItem);
 
+        menuItem = new MenuItem("Delete");
+        menuItem.setAccelerator(new KeyCodeCombination(D, CONTROL_DOWN));
+        menuItem.setOnAction(event -> deleteAction());
+        menu.getItems().add(menuItem);
+
         menu.getItems().add(new SeparatorMenuItem());
 
         Menu exportMenu = new Menu("Export");
@@ -161,6 +166,12 @@ public class TreeBankPane extends BorderPane {
             alert.setContentText(e.getMessage());
             alert.showAndWait();
         }
+    }
+
+    private void deleteAction() {
+        DependencyGraph dependencyGraph = canvasPane.getDependencyGraph().getDependencyGraph();
+
+        updateCanvas(new DependencyGraph());
     }
 
     private void exitAction() {

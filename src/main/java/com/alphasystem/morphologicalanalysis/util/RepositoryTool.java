@@ -2,7 +2,6 @@ package com.alphasystem.morphologicalanalysis.util;
 
 import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
 import com.alphasystem.morphologicalanalysis.graph.model.GraphMetaInfo;
-import com.alphasystem.morphologicalanalysis.graph.model.GraphNode;
 import com.alphasystem.morphologicalanalysis.graph.model.TerminalNode;
 import com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType;
 import com.alphasystem.morphologicalanalysis.graph.repository.DependencyGraphRepository;
@@ -21,7 +20,6 @@ import javafx.concurrent.Task;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -200,23 +198,18 @@ public class RepositoryTool {
         return dependencyGraph;
     }
 
-    public void saveDependencyGraph(DependencyGraph dependencyGraph, Map<GraphNodeType, String> removalIds) {
-        ListIterator<GraphNode> listIterator = dependencyGraph.getNodes().listIterator();
-        while (listIterator.hasNext()) {
-            GraphNode next = listIterator.next();
-            // TODO: remove links
-
-        }
+    public void saveDependencyGraph(DependencyGraph dependencyGraph, Map<GraphNodeType, List<String>> removalIds) {
         dependencyGraphRepository.save(dependencyGraph);
         if (!removalIds.isEmpty()) {
             removalIds.entrySet().forEach(this::removeNode);
         }
     }
 
-    private void removeNode(Entry<GraphNodeType, String> entry) {
+    private void removeNode(Entry<GraphNodeType, List<String>> entry) {
         GraphNodeType key = entry.getKey();
-        String id = entry.getValue();
-        getRepository(key).delete(id);
+        List<String> ids = entry.getValue();
+        BaseRepository repository = getRepository(key);
+        ids.forEach(repository::delete);
     }
 
     public MorphologicalAnalysisRepositoryUtil getRepositoryUtil() {

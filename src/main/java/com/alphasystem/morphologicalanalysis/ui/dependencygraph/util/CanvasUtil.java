@@ -28,6 +28,7 @@ import java.util.Optional;
 import static com.alphasystem.arabic.model.ArabicLetters.WORD_SPACE;
 import static com.alphasystem.arabic.model.ArabicWord.getSubWord;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.FI_MAHL;
+import static com.alphasystem.morphologicalanalysis.ui.common.Global.isTerminal;
 import static com.alphasystem.util.AppUtil.isGivenType;
 import static java.lang.String.format;
 import static javafx.scene.control.Alert.AlertType.INFORMATION;
@@ -307,6 +308,50 @@ public class CanvasUtil {
             default:
                 graphNode.setFont(adapterInfo.getPosFont());
                 break;
+        }
+    }
+
+    /**
+     * Shift nodes to the right. The calculation of shifting right is:
+     * <div>
+     * <code>{@link GraphMetaInfoAdapter#getGapBetweenTokens()} + {@link GraphMetaInfoAdapter#getTokenWidth()} + {@link GraphNodeAdapter#getTranslateX()}</code>
+     * </div>
+     *
+     * @param index                  index of current node
+     * @param dependencyGraphAdapter dependency graph
+     */
+    public void shiftRight(int index, DependencyGraphAdapter dependencyGraphAdapter) {
+        shiftNodes(index, false, dependencyGraphAdapter);
+    }
+
+    /**
+     * Shift nodes to the right. The calculation of shifting right is:
+     * <div>
+     * <code>{@link GraphNodeAdapter#getTranslateX()} - {@link GraphMetaInfoAdapter#getTokenWidth()}</code>
+     * </div>
+     *
+     * @param index                  index of current node
+     * @param dependencyGraphAdapter dependency graph
+     */
+    public void shiftLeft(int index, DependencyGraphAdapter dependencyGraphAdapter) {
+        shiftNodes(index, true, dependencyGraphAdapter);
+    }
+
+    /**
+     * @param index                  index of current node
+     * @param left                   flag to shift nodes left or right, true if shift nodes left false otherwise
+     * @param dependencyGraphAdapter dependency graph
+     */
+    private void shiftNodes(int index, boolean left, DependencyGraphAdapter dependencyGraphAdapter) {
+        ObservableList<GraphNodeAdapter> graphNodes = dependencyGraphAdapter.getGraphNodes();
+        GraphMetaInfoAdapter graphMetaInfo = dependencyGraphAdapter.getGraphMetaInfo();
+        for (int i = index; i < graphNodes.size(); i++) {
+            GraphNodeAdapter node = graphNodes.get(i);
+            if (isTerminal(node)) {
+                double shiftLeft = node.getTranslateX() - graphMetaInfo.getTokenWidth();
+                double shiftRight = graphMetaInfo.getGapBetweenTokens() + graphMetaInfo.getTokenWidth() + node.getTranslateX();
+                node.setTranslateX(left ? shiftLeft : shiftRight);
+            }
         }
     }
 }
