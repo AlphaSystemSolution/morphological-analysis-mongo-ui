@@ -61,42 +61,6 @@
             <artifactId>controlsfx</artifactId>
             <version>8.40.9</version>
         </dependency>
-        <dependency>
-            <groupId>org.jdom</groupId>
-            <artifactId>jdom2</artifactId>
-            <version>2.0.6</version>
-        </dependency>
-		<!-- Batik dependencies -->
-		<!--dependency>
-			<groupId>org.apache.xmlgraphics</groupId>
-			<artifactId>batik-svg-dom</artifactId>
-			<version>${batik.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.xmlgraphics</groupId>
-			<artifactId>batik-transcoder</artifactId>
-			<version>${batik.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.xmlgraphics</groupId>
-			<artifactId>batik-codec</artifactId>
-			<version>${batik.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.xmlgraphics</groupId>
-			<artifactId>batik-dom</artifactId>
-			<version>${batik.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.xmlgraphics</groupId>
-			<artifactId>batik-xml</artifactId>
-			<version>${batik.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.xmlgraphics</groupId>
-			<artifactId>batik-swing</artifactId>
-			<version>${batik.version}</version>
-		</dependency-->
 		<dependency>
 			<groupId>com.alphasystem.svg</groupId>
 			<artifactId>svg-model</artifactId>
@@ -116,7 +80,6 @@
 		</dependency>
 	</dependencies>
 	<properties>
-		<batik.version>1.7</batik.version>
 		<svg-model.version>${project.version}</svg-model.version>
 		<ma-repository.version>${project.version}</ma-repository.version>
 		<commons-ui.version>${project.version}</commons-ui.version>
