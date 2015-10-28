@@ -618,48 +618,50 @@ public class CanvasPane extends Pane {
                         removePartOfSpeech(null, terminalNodeAdapter);
                         listIterator.remove();
                         canvasUtil.shiftLeft(index, dependencyGraphAdapter);
-                    } else if (nodeType.equals(PART_OF_SPEECH) && terminal && current) {
-                        TerminalNodeAdapter terminalNodeAdapter = (TerminalNodeAdapter) node;
-                        removePartOfSpeech(removalId, terminalNodeAdapter);
+                        break;
                     } else {
-                        if (current) {
-                            listIterator.remove();
-                            List<String> list = removalIdMap.get(nodeType);
-                            if (list == null) {
-                                list = new ArrayList<String>();
-                                removalIdMap.put(nodeType, list);
+                        if (nodeType.equals(PART_OF_SPEECH) && terminal) {
+                            TerminalNodeAdapter terminalNodeAdapter = (TerminalNodeAdapter) node;
+                            removePartOfSpeech(removalId, terminalNodeAdapter);
+                            break;
+                        } else {
+                            if (current) {
+                                listIterator.remove();
+                                List<String> list = removalIdMap.get(nodeType);
+                                if (list == null) {
+                                    list = new ArrayList<>();
+                                    removalIdMap.put(nodeType, list);
+                                }
+                                list.add(removalId);
+                                break;
                             }
-                            list.add(removalId);
                         }
                     }
                 }
 
                 System.out.println(format("Removing: {%s}", removalIdMap));
                 // now remove it from back end list so that when we can remove from database
-                /*if (nodeType.equals(PART_OF_SPEECH)) {
-                    dependencyGraph.getNodes().stream().filter(Global::isTerminal).forEach(graphNode -> {
-                        TerminalNode terminalNode = (TerminalNode) graphNode;
-                        List<PartOfSpeechNode> partOfSpeechNodes = terminalNode.getPartOfSpeechNodes();
-                        ListIterator<PartOfSpeechNode> posLi = partOfSpeechNodes.listIterator();
-                        while (posLi.hasNext()) {
-                            PartOfSpeechNode next = posLi.next();
-                            if (next.getId().equals(removalId)) {
-                                posLi.remove();
-                                removalIdMap.put(PART_OF_SPEECH, removalId);
-                                break;
-                            }
+                ListIterator<GraphNode> iterator = dependencyGraph.getNodes().listIterator();
+                while (iterator.hasNext()) {
+                    GraphNode node = iterator.next();
+                    boolean current = node.getId().equals(removalId);
+                    boolean terminal = isTerminal(node);
+                    if (nodeType.equals(TERMINAL) && terminal && current) {
+                        TerminalNode terminalNode = (TerminalNode) node;
+                        removePartOfSpeech(null, terminalNode);
+                        iterator.remove();
+                        break;
+                    } else if (nodeType.equals(PART_OF_SPEECH) && terminal) {
+                        TerminalNode terminalNode = (TerminalNode) node;
+                        removePartOfSpeech(removalId, terminalNode);
+                        break;
+                    } else {
+                        if (current) {
+                            iterator.remove();
+                            break;
                         }
-                    });
-                } else if (nodeType.equals(RELATIONSHIP)) {
-                    dependencyGraph.getNodes().stream().filter(graphNode ->
-                            graphNode.getGraphNodeType().equals(RELATIONSHIP))
-                            .forEach(graphNode -> {
-                                if (graphNode.getId().equals(removalId)) {
-                                    removalIdMap.put(RELATIONSHIP, removalId);
-                                }
-                            });
-                }*/
-
+                    }
+                }
 
                 dependencyGraphAdapter = getDependencyGraph();
                 setDependencyGraph(null);
@@ -697,6 +699,23 @@ public class CanvasPane extends Pane {
                 removalIdMap.put(TERMINAL, list);
             }
             list.add(node.getId());
+        }
+    }
+
+    private void removePartOfSpeech(String removalId, TerminalNode node) {
+        List<PartOfSpeechNode> partOfSpeeches = node.getPartOfSpeechNodes();
+        ListIterator<PartOfSpeechNode> posLi = partOfSpeeches.listIterator();
+        boolean removeAll = removalId == null;
+        while (posLi.hasNext()) {
+            PartOfSpeechNode next = posLi.next();
+            String currentId = next.getId();
+            boolean removeSingle = currentId.equals(removalId);
+            if (removeAll || removeSingle) {
+                posLi.remove();
+            }
+            if (removeSingle) {
+                break;
+            }
         }
     }
 

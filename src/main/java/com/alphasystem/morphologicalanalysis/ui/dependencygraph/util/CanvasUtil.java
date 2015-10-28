@@ -27,8 +27,8 @@ import java.util.Optional;
 
 import static com.alphasystem.arabic.model.ArabicLetters.WORD_SPACE;
 import static com.alphasystem.arabic.model.ArabicWord.getSubWord;
-import static com.alphasystem.morphologicalanalysis.ui.common.Global.*;
-import static com.alphasystem.util.AppUtil.NEW_LINE;
+import static com.alphasystem.morphologicalanalysis.ui.common.Global.FI_MAHL;
+import static com.alphasystem.morphologicalanalysis.ui.common.Global.isTerminal;
 import static com.alphasystem.util.AppUtil.isGivenType;
 import static java.lang.String.format;
 import static javafx.scene.control.Alert.AlertType.INFORMATION;
@@ -185,9 +185,11 @@ public class CanvasUtil {
                 break;
             case PRONOUN:
                 ProNounProperties pp = (ProNounProperties) properties;
-                builder.append(SPACE).append(pp.getProNounType().getLabel().toUnicode()).append(NEW_LINE)
+                /*builder.append(SPACE).append(pp.getProNounType().getLabel().toUnicode()).append(NEW_LINE)
                         .append(SPACE).append(FI_MAHL.toUnicode()).append(SPACE)
-                        .append(getFromNounStatus(pp.getStatus()).getLabel().toUnicode());
+                        .append(getFromNounStatus(pp.getStatus()).getLabel().toUnicode());*/
+                builder.append(SPACE).append(pp.getProNounType().getLabel().toUnicode()).append(SPACE)
+                        .append(pp.getStatus().getLabel().toUnicode());
                 break;
         }
         return builder.toString();
@@ -356,7 +358,11 @@ public class CanvasUtil {
             if (isTerminal(node)) {
                 double shiftLeft = node.getTranslateX() - graphMetaInfo.getTokenWidth();
                 double shiftRight = graphMetaInfo.getGapBetweenTokens() + graphMetaInfo.getTokenWidth() + node.getTranslateX();
-                node.setTranslateX(left ? shiftLeft : shiftRight);
+                double translateX = left ? shiftLeft : shiftRight;
+                node.setTranslateX(translateX);
+                // update pos translateX
+                TerminalNodeAdapter terminalNodeAdapter = (TerminalNodeAdapter) node;
+                terminalNodeAdapter.getPartOfSpeeches().forEach(posAdapter -> posAdapter.setTranslateX(translateX));
             }
         }
     }
