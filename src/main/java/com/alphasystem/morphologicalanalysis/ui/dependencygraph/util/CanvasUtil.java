@@ -29,6 +29,7 @@ import static com.alphasystem.arabic.model.ArabicLetters.WORD_SPACE;
 import static com.alphasystem.arabic.model.ArabicWord.getSubWord;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.FI_MAHL;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.isTerminal;
+import static com.alphasystem.util.AppUtil.NEW_LINE;
 import static com.alphasystem.util.AppUtil.isGivenType;
 import static java.lang.String.format;
 import static javafx.scene.control.Alert.AlertType.INFORMATION;
@@ -39,8 +40,8 @@ import static javafx.scene.text.Font.font;
  */
 public class CanvasUtil {
 
+    private static final String SPACE = WORD_SPACE.toUnicode();
     private static final char LEFT_POINTING_DOUBLE_ANGLE_QUOTATION_MARK = '\u00AB';
-
     private static final char RIGHT_POINTING_DOUBLE_ANGLE_QUOTATION_MARK = '\u00BB';
 
     private static CanvasUtil instance = new CanvasUtil();
@@ -173,15 +174,21 @@ public class CanvasUtil {
         switch (partOfSpeech) {
             case NOUN:
                 NounProperties np = (NounProperties) properties;
-                builder.append(WORD_SPACE.toUnicode()).append(np.getStatus().getLabel().toUnicode());
+                builder.append(SPACE).append(np.getStatus().getLabel().toUnicode());
                 break;
             case VERB:
                 VerbProperties vp = (VerbProperties) properties;
-                builder.append(WORD_SPACE.toUnicode()).append(vp.getVerbType().getLabel().toUnicode());
+                builder.append(SPACE).append(vp.getVerbType().getLabel().toUnicode());
                 final VerbMode mode = vp.getMode();
                 if (mode != null) {
-                    builder.append(WORD_SPACE.toUnicode()).append(mode.getLabel().toUnicode());
+                    builder.append(SPACE).append(mode.getLabel().toUnicode());
                 }
+                break;
+            case PRONOUN:
+                ProNounProperties pp = (ProNounProperties) properties;
+                builder.append(SPACE).append(pp.getProNounType().getLabel().toUnicode()).append(NEW_LINE)
+                        .append(SPACE).append(FI_MAHL.toUnicode()).append(SPACE)
+                        .append(AlternateStatus.valueOf(pp.getStatus().name()).getLabel().toUnicode());
                 break;
         }
         return builder.toString();
