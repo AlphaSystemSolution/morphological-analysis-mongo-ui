@@ -4,6 +4,8 @@ import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
 import com.alphasystem.morphologicalanalysis.ui.common.GraphMetaInfoSelectionDialog;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.DependencyGraphAdapter;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.GraphMetaInfoAdapter;
+import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.GraphNodeAdapter;
+import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.TerminalNodeAdapter;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.CanvasUtil;
 import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
 import com.alphasystem.morphologicalanalysis.util.SpringContextHelper;
@@ -22,6 +24,8 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 
+import static com.alphasystem.morphologicalanalysis.ui.common.Global.fromFont;
+import static com.alphasystem.morphologicalanalysis.ui.common.Global.isTerminal;
 import static java.lang.Integer.parseInt;
 import static java.lang.String.format;
 import static javafx.scene.control.Alert.AlertType.INFORMATION;
@@ -91,6 +95,16 @@ public class TreeBankApp extends Application {
         DependencyGraph dependencyGraph = repositoryTool.getDependencyGraph(displayName);
         if (dependencyGraph != null) {
             dependencyGraphAdapter = new DependencyGraphAdapter(dependencyGraph);
+            GraphMetaInfoAdapter graphMetaInfo = dependencyGraphAdapter.getGraphMetaInfo();
+            for (GraphNodeAdapter nodeAdapter : dependencyGraphAdapter.getGraphNodes()) {
+                if (isTerminal(nodeAdapter)) {
+                    TerminalNodeAdapter terminalNodeAdapter = (TerminalNodeAdapter) nodeAdapter;
+                    graphMetaInfo.setTerminalFont(fromFont(terminalNodeAdapter.getFont()));
+                    graphMetaInfo.setTranslationFont(fromFont(terminalNodeAdapter.getTranslationFont()));
+                    graphMetaInfo.setPosFont(fromFont(terminalNodeAdapter.getPartOfSpeeches().get(0).getFont()));
+                    break;
+                }
+            }
         }
         showStage(primaryStage, dependencyGraphAdapter);
     }

@@ -653,7 +653,10 @@ public class CanvasPane extends Pane {
                     } else if (nodeType.equals(PART_OF_SPEECH) && terminal) {
                         TerminalNodeAdapter terminalNodeAdapter = (TerminalNodeAdapter) node;
                         removePartOfSpeech(removalId, terminalNodeAdapter);
-                        break;
+                        List<String> list = removalIdMap.get(PART_OF_SPEECH);
+                        if (list != null && list.contains(removalId)) {
+                            break;
+                        }
                     } else {
                         if (current) {
                             put(removalIdMap, nodeType, removalId);
@@ -678,7 +681,6 @@ public class CanvasPane extends Pane {
                     } else if (nodeType.equals(PART_OF_SPEECH) && terminal) {
                         TerminalNode terminalNode = (TerminalNode) node;
                         removePartOfSpeech(removalId, terminalNode);
-                        break;
                     } else {
                         if (current) {
                             iterator.remove();

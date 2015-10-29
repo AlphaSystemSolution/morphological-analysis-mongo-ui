@@ -1,6 +1,7 @@
 package com.alphasystem.morphologicalanalysis.ui.common;
 
 import com.alphasystem.arabic.model.ArabicWord;
+import com.alphasystem.morphologicalanalysis.graph.model.FontMetaInfo;
 import com.alphasystem.morphologicalanalysis.graph.model.GraphNode;
 import com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.GraphNodeAdapter;
@@ -9,6 +10,8 @@ import com.alphasystem.morphologicalanalysis.wordbyword.model.support.AlternateS
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.NounStatus;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech;
 import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
+import javafx.scene.text.FontWeight;
 
 import java.util.List;
 import java.util.ResourceBundle;
@@ -95,5 +98,14 @@ public class Global {
 
     public static AlternateStatus getFromNounStatus(NounStatus nounStatus) {
         return AlternateStatus.valueOf(nounStatus.name());
+    }
+
+    public static Font fromFontMetaInfo(FontMetaInfo fmi) {
+        return font(fmi.getFamily(), FontWeight.valueOf(fmi.getWeight()),
+                FontPosture.valueOf(fmi.getPosture()), fmi.getSize());
+    }
+
+    public static FontMetaInfo fromFont(Font font) {
+        return new FontMetaInfo(font.getFamily(), "NORMAL", "REGULAR", font.getSize());
     }
 }

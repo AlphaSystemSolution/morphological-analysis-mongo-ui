@@ -10,8 +10,6 @@ import javafx.scene.control.*;
 import javafx.scene.control.SpinnerValueFactory.DoubleSpinnerValueFactory;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
-import javafx.scene.text.FontPosture;
-import javafx.scene.text.FontWeight;
 import org.controlsfx.dialog.FontSelectorDialog;
 
 import java.util.Optional;
@@ -21,7 +19,6 @@ import static java.lang.String.format;
 import static javafx.geometry.Pos.CENTER;
 import static javafx.scene.control.ButtonType.CANCEL;
 import static javafx.scene.control.ButtonType.OK;
-import static javafx.scene.text.Font.font;
 
 /**
  * @author sali
@@ -76,15 +73,6 @@ public class GraphMetaInfoSelectionDialog extends Dialog<GraphMetaInfoAdapter> {
             }
             return getGraphMetaInfo();
         });
-    }
-
-    private static Font fromFontMetaInfo(FontMetaInfo fmi) {
-        return font(fmi.getFamily(), FontWeight.valueOf(fmi.getWeight()),
-                FontPosture.valueOf(fmi.getPosture()), fmi.getSize());
-    }
-
-    private static FontMetaInfo fromFont(Font font) {
-        return new FontMetaInfo(font.getFamily(), "NORMAL", "REGULAR", font.getSize());
     }
 
     private static String getFontDisplayValue(FontMetaInfo fmi) {

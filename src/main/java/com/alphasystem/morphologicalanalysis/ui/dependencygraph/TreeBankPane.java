@@ -5,7 +5,9 @@ import com.alphasystem.morphologicalanalysis.ui.dependencygraph.components.Canva
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.components.ControlPane;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.components.DependencyGraphSelectionDialog;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.DependencyGraphAdapter;
+import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.GraphMetaInfoAdapter;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.GraphNodeAdapter;
+import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.TerminalNodeAdapter;
 import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
 import javafx.collections.ObservableList;
 import javafx.scene.SnapshotParameters;
@@ -25,6 +27,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
 
+import static com.alphasystem.morphologicalanalysis.ui.common.Global.fromFont;
+import static com.alphasystem.morphologicalanalysis.ui.common.Global.isTerminal;
 import static com.alphasystem.util.AppUtil.USER_HOME_DIR;
 import static java.lang.String.format;
 import static javafx.application.Platform.runLater;
@@ -154,6 +158,16 @@ public class TreeBankPane extends BorderPane {
 
     private void updateCanvas(DependencyGraph dependencyGraph) {
         DependencyGraphAdapter dependencyGraphAdapter = new DependencyGraphAdapter(dependencyGraph);
+        GraphMetaInfoAdapter graphMetaInfo = dependencyGraphAdapter.getGraphMetaInfo();
+        for (GraphNodeAdapter nodeAdapter : dependencyGraphAdapter.getGraphNodes()) {
+            if (isTerminal(nodeAdapter)) {
+                TerminalNodeAdapter terminalNodeAdapter = (TerminalNodeAdapter) nodeAdapter;
+                graphMetaInfo.setTerminalFont(fromFont(terminalNodeAdapter.getFont()));
+                graphMetaInfo.setTranslationFont(fromFont(terminalNodeAdapter.getTranslationFont()));
+                graphMetaInfo.setPosFont(fromFont(terminalNodeAdapter.getPartOfSpeeches().get(0).getFont()));
+                break;
+            }
+        }
         canvasPane.setDependencyGraph(dependencyGraphAdapter);
         ObservableList<GraphNodeAdapter> graphNodes = dependencyGraphAdapter.getGraphNodes();
         if (!graphNodes.isEmpty()) {
