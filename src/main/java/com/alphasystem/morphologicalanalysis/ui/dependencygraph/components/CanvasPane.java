@@ -298,26 +298,27 @@ public class CanvasPane extends Pane {
 
     private void drawPartOfSpeechNodes(TerminalNodeAdapter tn, Group group, boolean nonTerminal) {
         tn.getPartOfSpeeches().forEach(pn -> {
-            pn.setTranslateX(tn.getTranslateX());
-            pn.setTranslateY(tn.getTranslateY());
-            PartOfSpeech partOfSpeech = pn.getSrc().getLocation().getPartOfSpeech();
-            Color color = nonTerminal ? NON_TERMINAL_COLOR :
-                    web(partOfSpeech.getColorCode());
-            Text posArabicText = drawText(pn, color);
-            posArabicText.setOnMouseClicked(event -> {
-                if (event.isPopupTrigger()) {
-                    initPartOfSpeechContextMenu(pn);
-                    contextMenu.show(posArabicText, event.getScreenX(), event.getScreenY());
-                } else {
-                    getDependencyGraph().setSelectedNode(pn);
-                }
-            });
-            String id = format("c_%s", pn.getSrc().getDisplayName());
-            Circle circle = tool.drawCircle(id, color, pn.getCx(), pn.getCy(), RADIUS);
-            // bind coordinates
-            circle.centerXProperty().bind(pn.cxProperty());
-            circle.centerYProperty().bind(pn.cyProperty());
-            group.getChildren().addAll(posArabicText, circle);
+            if (!pn.isHidden()) {
+                pn.setTranslateX(tn.getTranslateX());
+                pn.setTranslateY(tn.getTranslateY());
+                PartOfSpeech partOfSpeech = pn.getSrc().getLocation().getPartOfSpeech();
+                Color color = nonTerminal ? NON_TERMINAL_COLOR : web(partOfSpeech.getColorCode());
+                Text posArabicText = drawText(pn, color);
+                posArabicText.setOnMouseClicked(event -> {
+                    if (event.isPopupTrigger()) {
+                        initPartOfSpeechContextMenu(pn);
+                        contextMenu.show(posArabicText, event.getScreenX(), event.getScreenY());
+                    } else {
+                        getDependencyGraph().setSelectedNode(pn);
+                    }
+                });
+                String id = format("c_%s", pn.getSrc().getDisplayName());
+                Circle circle = tool.drawCircle(id, color, pn.getCx(), pn.getCy(), RADIUS);
+                // bind coordinates
+                circle.centerXProperty().bind(pn.cxProperty());
+                circle.centerYProperty().bind(pn.cyProperty());
+                group.getChildren().addAll(posArabicText, circle);
+            }
         });
     }
 
@@ -559,6 +560,12 @@ public class CanvasPane extends Pane {
         menuItem.setOnAction(event -> removeNode(PART_OF_SPEECH, src.getId()));
         menuItems.add(menuItem);
 
+        menuItem = new MenuItem("Hide");
+        menuItem.setOnAction(event -> {
+            hidePosNode(src);
+        });
+        menuItems.add(menuItem);
+
         return menuItems;
     }
 
@@ -602,6 +609,13 @@ public class CanvasPane extends Pane {
         items.remove(0, items.size());
 
         items.addAll(createRelationshipMenu(currentNode));
+    }
+
+    private void hidePosNode(PartOfSpeechNodeAdapter src) {
+        src.setHidden(true);
+        DependencyGraphAdapter dependencyGraph = getDependencyGraph();
+        setDependencyGraph(null);
+        setDependencyGraph(dependencyGraph);
     }
 
     public void removeAll() {
