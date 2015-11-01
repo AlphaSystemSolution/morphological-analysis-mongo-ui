@@ -9,6 +9,7 @@ import javafx.scene.control.ComboBox;
 import static com.alphasystem.morphologicalanalysis.ui.common.ArabicSupportEnumCellFactory.ListType.LABEL_AND_CODE;
 import static com.alphasystem.morphologicalanalysis.ui.common.ArabicSupportEnumCellFactory.ListType.LABEL_ONLY;
 import static java.lang.Double.MAX_VALUE;
+import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 
 /**
  * @author sali
@@ -81,9 +82,10 @@ public class ComboBoxFactory {
         return createComboBox(NounStatus.values());
     }
 
-    public ComboBox<AlternateStatus> getAlternateStatusComboBox(){
+    public ComboBox<AlternateStatus> getAlternateStatusComboBox() {
         return createComboBox(true, AlternateStatus.values());
     }
+
     public ComboBox<NumberType> getNumberTypeComboBox() {
         return createComboBox(NumberType.values());
     }
@@ -115,4 +117,15 @@ public class ComboBoxFactory {
     public ComboBox<VerbMode> getVerbModeComboBox() {
         return createComboBox(true, LABEL_AND_CODE, VerbMode.values());
     }
+
+    public ComboBox<IncompleteVerbCategory> getIncompleteVerbCategoryComboBox() {
+        return createComboBox(true, LABEL_ONLY, IncompleteVerbCategory.values());
+    }
+
+    public ComboBox<IncompleteVerbType> getIncompleteVerbTypeComboBox(IncompleteVerbType[] values) {
+        boolean addEmptyValue = isEmpty(values);
+        values = addEmptyValue ? new IncompleteVerbType[0] : values;
+        return createComboBox(addEmptyValue, LABEL_ONLY, values);
+    }
+
 }

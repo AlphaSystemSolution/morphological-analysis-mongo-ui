@@ -20,6 +20,8 @@ public class VerbPropertiesPane extends AbstractPropertiesPane {
     private ComboBox<ConversationType> conversationTypeComboBox;
     private ComboBox<VerbType> verbTypeComboBox;
     private ComboBox<VerbMode> verbModeComboBox;
+    private ComboBox<IncompleteVerbCategory> incompleteVerbCategoryComboBox;
+    private ComboBox<IncompleteVerbType> incompleteVerbTypeComboBox;
 
     public VerbPropertiesPane(final TokenAdapter tokenAdapter) {
         super(tokenAdapter);
@@ -32,6 +34,9 @@ public class VerbPropertiesPane extends AbstractPropertiesPane {
         conversationTypeComboBox = instance.getConversationTypeComboBox();
         verbTypeComboBox = instance.getVerbTypeComboBox();
         verbModeComboBox = instance.getVerbModeComboBox();
+        incompleteVerbCategoryComboBox = instance.getIncompleteVerbCategoryComboBox();
+        incompleteVerbTypeComboBox = instance.getIncompleteVerbTypeComboBox(null);
+        incompleteVerbTypeComboBox.setDisable(true);
     }
 
     @Override
@@ -66,6 +71,21 @@ public class VerbPropertiesPane extends AbstractPropertiesPane {
         add(genderTypeComboBox, 1, 3);
         add(new Pane(), 2, 3);
 
+
+        label = new Label(RESOURCE_BUNDLE.getString("incompleteVerbCategory.label"));
+        add(label, 0, 4);
+        label.setLabelFor(incompleteVerbCategoryComboBox);
+
+        label = new Label(RESOURCE_BUNDLE.getString("incompleteVerbType.label"));
+        add(label, 1, 4);
+        label.setLabelFor(incompleteVerbTypeComboBox);
+
+        add(new Pane(), 2, 4);
+
+        add(incompleteVerbCategoryComboBox, 0, 5);
+        add(incompleteVerbTypeComboBox, 1, 5);
+        add(new Pane(), 2, 5);
+
     }
 
     @Override
@@ -90,6 +110,17 @@ public class VerbPropertiesPane extends AbstractPropertiesPane {
                 (observable, oldValue, newValue) -> {
                     tokenAdapter.setVerbMode(newValue);
                 });
+        incompleteVerbCategoryComboBox.getSelectionModel().selectedItemProperty().addListener(
+                (observable, oldValue, newValue) -> {
+                    tokenAdapter.setIncompleteVerbCategory(newValue);
+                    boolean disable = newValue == null;
+                    incompleteVerbTypeComboBox.setDisable(disable);
+                    if (!disable) {
+                        incompleteVerbTypeComboBox.getItems().remove(0, incompleteVerbTypeComboBox.getItems().size());
+                        incompleteVerbTypeComboBox.getItems().addAll(newValue.getMembers());
+                        requestLayout();
+                    }
+                });
     }
 
     @Override
@@ -102,6 +133,12 @@ public class VerbPropertiesPane extends AbstractPropertiesPane {
             verbModeComboBox.getSelectionModel().select(properties.getMode());
             verbTypeComboBox.getSelectionModel().select(properties.getVerbType());
             conversationTypeComboBox.getSelectionModel().select(properties.getConversationType());
+            IncompleteVerb incompleteVerb = properties.getIncompleteVerb();
+            if (incompleteVerb == null) {
+                incompleteVerbCategoryComboBox.getSelectionModel().selectFirst();
+            } else {
+                incompleteVerbCategoryComboBox.getSelectionModel().select(incompleteVerb.getCategory());
+            }
         }
     }
 }

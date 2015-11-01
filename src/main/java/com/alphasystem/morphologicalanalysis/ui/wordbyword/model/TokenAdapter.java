@@ -38,6 +38,8 @@ public final class TokenAdapter {
     // verb properties
     private final ObjectProperty<VerbType> verbType = new SimpleObjectProperty<>();
     private final ObjectProperty<VerbMode> verbMode = new SimpleObjectProperty<>();
+    private final ObjectProperty<IncompleteVerbCategory> incompleteVerbCategory = new SimpleObjectProperty<>();
+    private final ObjectProperty<IncompleteVerbType> incompleteVerbType = new SimpleObjectProperty<>();
     private Token token;
     private Location location;
 
@@ -47,6 +49,30 @@ public final class TokenAdapter {
 
     public void setVerbMode(VerbMode verbMode) {
         this.verbMode.set(verbMode);
+    }
+
+    public IncompleteVerbType getIncompleteVerbType() {
+        return incompleteVerbType.get();
+    }
+
+    public void setIncompleteVerbType(IncompleteVerbType incompleteVerbType) {
+        this.incompleteVerbType.set(incompleteVerbType);
+    }
+
+    public IncompleteVerbCategory getIncompleteVerbCategory() {
+        return incompleteVerbCategory.get();
+    }
+
+    public void setIncompleteVerbCategory(IncompleteVerbCategory incompleteVerbCategory) {
+        this.incompleteVerbCategory.set(incompleteVerbCategory);
+    }
+
+    public ObjectProperty<IncompleteVerbCategory> incompleteVerbCategoryProperty() {
+        return incompleteVerbCategory;
+    }
+
+    public ObjectProperty<IncompleteVerbType> incompleteVerbTypeProperty() {
+        return incompleteVerbType;
     }
 
     public final ObjectProperty<VerbMode> verbModeProperty() {
@@ -229,6 +255,11 @@ public final class TokenAdapter {
             setConversationType(vp.getConversationType());
             setVerbMode(vp.getMode());
             setVerbType(vp.getVerbType());
+            IncompleteVerb incompleteVerb = vp.getIncompleteVerb();
+            if (incompleteVerb != null) {
+                setIncompleteVerbCategory(incompleteVerb.getCategory());
+                setIncompleteVerbType(incompleteVerb.getType());
+            }
         }
     }
 
@@ -341,5 +372,41 @@ public final class TokenAdapter {
                 vp.setMode(newValue);
             }
         });
+        incompleteVerbCategoryProperty().addListener((observable, oldValue, newValue) -> {
+            AbstractProperties properties = (location == null) ? null : location.getProperties();
+            if (isVerb(properties)) {
+                VerbProperties vp = (VerbProperties) properties;
+                IncompleteVerb incompleteVerb = createIncompleteVerb(newValue);
+                vp.setIncompleteVerb(incompleteVerb);
+            }
+        });
+        incompleteVerbTypeProperty().addListener((observable, oldValue, newValue) -> {
+            AbstractProperties properties = (location == null) ? null : location.getProperties();
+            if (isVerb(properties)) {
+                VerbProperties vp = (VerbProperties) properties;
+                IncompleteVerb incompleteVerb = vp.getIncompleteVerb();
+                if (incompleteVerb == null) {
+                    incompleteVerb = createIncompleteVerb(getIncompleteVerbCategory());
+                    vp.setIncompleteVerb(incompleteVerb);
+                }
+                incompleteVerb.setType(newValue);
+            }
+        });
+    }
+
+    private IncompleteVerb createIncompleteVerb(IncompleteVerbCategory incompleteVerbCategory) {
+        IncompleteVerb incompleteVerb = null;
+        if (incompleteVerbCategory == null) {
+            return null;
+        }
+        Class<? extends IncompleteVerb> categoryClassName = incompleteVerbCategory.getCategoryClassName();
+        try {
+            incompleteVerb = categoryClassName.newInstance();
+            incompleteVerb.setCategory(incompleteVerbCategory);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return incompleteVerb;
     }
 }
