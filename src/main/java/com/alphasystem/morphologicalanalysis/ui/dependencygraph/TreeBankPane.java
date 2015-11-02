@@ -36,6 +36,9 @@ import static javafx.embed.swing.SwingFXUtils.fromFXImage;
 import static javafx.scene.Cursor.DEFAULT;
 import static javafx.scene.Cursor.WAIT;
 import static javafx.scene.control.Alert.AlertType.ERROR;
+import static javafx.scene.control.Alert.AlertType.WARNING;
+import static javafx.scene.control.ButtonType.NO;
+import static javafx.scene.control.ButtonType.YES;
 import static javafx.scene.control.ScrollPane.ScrollBarPolicy.AS_NEEDED;
 import static javafx.scene.input.KeyCode.*;
 import static javafx.scene.input.KeyCombination.*;
@@ -188,11 +191,18 @@ public class TreeBankPane extends BorderPane {
     }
 
     private void deleteAction() {
-        DependencyGraph dependencyGraph = canvasPane.getDependencyGraph().getDependencyGraph();
-        canvasPane.removeAll();
-        repositoryTool.deleteDependencyGraph(dependencyGraph.getId(), canvasPane.getRemovalIdMap());
-        canvasPane.getRemovalIdMap().clear();
-        updateCanvas(new DependencyGraph());
+        Alert alert = new Alert(WARNING, "Are you sure?", YES, NO);
+        Optional<ButtonType> result = alert.showAndWait();
+        result.ifPresent(buttonType -> {
+            if (buttonType.getButtonData().isDefaultButton()) {
+                DependencyGraph dependencyGraph = canvasPane.getDependencyGraph().getDependencyGraph();
+                canvasPane.removeAll();
+                repositoryTool.deleteDependencyGraph(dependencyGraph.getId(), canvasPane.getRemovalIdMap());
+                canvasPane.getRemovalIdMap().clear();
+                updateCanvas(new DependencyGraph());
+            }
+        });
+
     }
 
     private void exitAction() {

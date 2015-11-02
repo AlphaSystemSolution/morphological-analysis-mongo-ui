@@ -619,26 +619,19 @@ public class CanvasPane extends Pane {
     }
 
     public void removeAll() {
-        Alert alert = new Alert(WARNING, "Are you sure?", YES, NO);
-        Optional<ButtonType> result = alert.showAndWait();
-        result.ifPresent(buttonType -> {
-            if (buttonType.getButtonData().isDefaultButton()) {
-                ListIterator<GraphNodeAdapter> listIterator = getDependencyGraph().getGraphNodes().listIterator();
-                while (listIterator.hasNext()) {
-                    GraphNodeAdapter node = listIterator.next();
-                    boolean terminal = isTerminal(node);
-                    if (terminal) {
-                        TerminalNodeAdapter terminalNodeAdapter = (TerminalNodeAdapter) node;
-                        removePartOfSpeech(null, terminalNodeAdapter);
-                        listIterator.remove();
-                    } else {
-                        put(removalIdMap, node.getGraphNodeType(), node.getId());
-                        listIterator.remove();
-                    }
-                }
+        ListIterator<GraphNodeAdapter> listIterator = getDependencyGraph().getGraphNodes().listIterator();
+        while (listIterator.hasNext()) {
+            GraphNodeAdapter node = listIterator.next();
+            boolean terminal = isTerminal(node);
+            if (terminal) {
+                TerminalNodeAdapter terminalNodeAdapter = (TerminalNodeAdapter) node;
+                removePartOfSpeech(null, terminalNodeAdapter);
+                listIterator.remove();
+            } else {
+                put(removalIdMap, node.getGraphNodeType(), node.getId());
+                listIterator.remove();
             }
-        });
-
+        }
     }
 
     private void removeNode(GraphNodeType nodeType, String removalId) {
