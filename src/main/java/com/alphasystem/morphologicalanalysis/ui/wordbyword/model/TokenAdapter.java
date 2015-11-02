@@ -394,6 +394,7 @@ public final class TokenAdapter {
         });
     }
 
+    @SuppressWarnings({"unchecked"})
     private IncompleteVerb createIncompleteVerb(IncompleteVerbCategory incompleteVerbCategory) {
         IncompleteVerb incompleteVerb = null;
         if (incompleteVerbCategory == null) {
@@ -403,6 +404,7 @@ public final class TokenAdapter {
         try {
             incompleteVerb = categoryClassName.newInstance();
             incompleteVerb.setCategory(incompleteVerbCategory);
+            incompleteVerb.setType(incompleteVerbCategory.getMembers()[0]);
         } catch (Exception e) {
             e.printStackTrace();
         }
