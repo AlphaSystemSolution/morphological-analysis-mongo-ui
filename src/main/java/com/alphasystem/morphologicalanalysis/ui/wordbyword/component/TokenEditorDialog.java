@@ -111,6 +111,18 @@ public class TokenEditorDialog extends Dialog<Token> {
         return format("Edit token %s", displayName);
     }
 
+    private static void changePropertiesPaneTitle(AbstractProperties properties, TitledPane propertiesPane) {
+        if (isNoun(properties)) {
+            propertiesPane.setText("Noun Properties");
+        } else if (isPronoun(properties)) {
+            propertiesPane.setText("ProNoun Properties");
+        } else if (isVerb(properties)) {
+            propertiesPane.setText("Verb Properties");
+        } else {
+            propertiesPane.setText("Properties");
+        }
+    }
+
     private Token updateToken() {
         tokenAdapter.updateLocationStartAndEndIndices();
         return repositoryTool.saveToken(tokenAdapter.getToken());
@@ -142,15 +154,7 @@ public class TokenEditorDialog extends Dialog<Token> {
             AbstractPropertiesPane pp = getPropertiesPane(properties);
             this.propertiesPane.setContent(pp);
             pp.updateComboBoxes();
-            if (isNoun(properties)) {
-                this.propertiesPane.setText("Noun Properties");
-            } else if (isPronoun(properties)) {
-                this.propertiesPane.setText("ProNoun Properties");
-            } else if (isVerb(properties)) {
-                this.propertiesPane.setText("Verb Properties");
-            } else {
-                this.propertiesPane.setText("Properties");
-            }
+            changePropertiesPaneTitle(properties, this.propertiesPane);
         }
     }
 
@@ -296,22 +300,13 @@ public class TokenEditorDialog extends Dialog<Token> {
         getDialogPane().requestLayout();
     }
 
-
     private void initListeners() {
         partOfSpeechComboBox.getSelectionModel().selectedItemProperty().addListener(
                 (observable, oldValue, newValue) -> {
                     tokenAdapter.setPartOfSpeech(newValue);
                     AbstractProperties properties = tokenAdapter.getLocation().getProperties();
                     propertiesPane.setContent(getPropertiesPane(properties));
-                    if (isNoun(properties)) {
-                        this.propertiesPane.setText("Noun Properties");
-                    } else if (isPronoun(properties)) {
-                        this.propertiesPane.setText("ProNoun Properties");
-                    } else if (isVerb(properties)) {
-                        this.propertiesPane.setText("Verb Properties");
-                    } else {
-                        this.propertiesPane.setText("Properties");
-                    }
+                    changePropertiesPaneTitle(properties, propertiesPane);
                 });
         namedTemplateComboBox.getSelectionModel().selectedItemProperty().addListener(
                 (observable, oldValue, newValue) -> {
