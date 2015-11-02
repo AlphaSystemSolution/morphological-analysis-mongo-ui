@@ -303,6 +303,15 @@ public class TokenEditorDialog extends Dialog<Token> {
                     tokenAdapter.setPartOfSpeech(newValue);
                     AbstractProperties properties = tokenAdapter.getLocation().getProperties();
                     propertiesPane.setContent(getPropertiesPane(properties));
+                    if (isNoun(properties)) {
+                        this.propertiesPane.setText("Noun Properties");
+                    } else if (isPronoun(properties)) {
+                        this.propertiesPane.setText("ProNoun Properties");
+                    } else if (isVerb(properties)) {
+                        this.propertiesPane.setText("Verb Properties");
+                    } else {
+                        this.propertiesPane.setText("Properties");
+                    }
                 });
         namedTemplateComboBox.getSelectionModel().selectedItemProperty().addListener(
                 (observable, oldValue, newValue) -> {
