@@ -111,7 +111,7 @@ public class TreeBankApp extends Application {
 
     private void create(Stage stage, String value) {
         DependencyGraphAdapter dependencyGraphAdapter = new DependencyGraphAdapter(new DependencyGraph());
-        String[] values = value.split("_");
+        String[] values = value.split(":");
         Integer chapterNumber;
         Integer verseNumber;
         Integer firstTokenIndex;
