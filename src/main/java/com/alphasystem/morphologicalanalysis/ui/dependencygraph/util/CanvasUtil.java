@@ -7,10 +7,7 @@ import com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.*;
 import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.*;
-import com.alphasystem.morphologicalanalysis.wordbyword.model.support.AlternateStatus;
-import com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech;
-import com.alphasystem.morphologicalanalysis.wordbyword.model.support.RelationshipType;
-import com.alphasystem.morphologicalanalysis.wordbyword.model.support.VerbMode;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.support.*;
 import com.alphasystem.morphologicalanalysis.wordbyword.repository.LocationRepository;
 import javafx.collections.ObservableList;
 import javafx.scene.Group;
@@ -29,6 +26,7 @@ import static com.alphasystem.arabic.model.ArabicLetters.WORD_SPACE;
 import static com.alphasystem.arabic.model.ArabicWord.getSubWord;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.FI_MAHL;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.isTerminal;
+import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.IncompleteVerbCategory.KANA_AND_ITS_SISTERS;
 import static com.alphasystem.util.AppUtil.isGivenType;
 import static java.lang.String.format;
 import static javafx.scene.control.Alert.AlertType.INFORMATION;
@@ -190,6 +188,11 @@ public class CanvasUtil {
                         .append(getFromNounStatus(pp.getStatus()).getLabel().toUnicode());*/
                 builder.append(SPACE).append("(").append(pp.getStatus().getLabel().toUnicode()).append(")");
                 break;
+            case LOCATION_ADVERB:
+            case TIME_ADVERB:
+                np = (NounProperties) properties;
+                builder.append(SPACE).append(np.getStatus().getLabel().toUnicode());
+                break;
         }
         return builder.toString();
     }
@@ -206,6 +209,19 @@ public class CanvasUtil {
                     text = format("%s %s %s %s", type.getLabel().toUnicode(),
                             LEFT_POINTING_DOUBLE_ANGLE_QUOTATION_MARK, ol.getLocationWord().toUnicode(),
                             RIGHT_POINTING_DOUBLE_ANGLE_QUOTATION_MARK);
+                    break;
+                case VERB:
+                    VerbProperties vp = (VerbProperties) ol.getProperties();
+                    IncompleteVerb incompleteVerb = vp.getIncompleteVerb();
+                    if (incompleteVerb != null) {
+                        IncompleteVerbCategory category = incompleteVerb.getCategory();
+                        IncompleteVerbType incompleteVerbType = incompleteVerb.getType();
+                        if (category.equals(KANA_AND_ITS_SISTERS)) {
+                            text = format("%s %s %s %s", type.getLabel().toUnicode(),
+                                    LEFT_POINTING_DOUBLE_ANGLE_QUOTATION_MARK, incompleteVerbType.getLabel().toUnicode(),
+                                    RIGHT_POINTING_DOUBLE_ANGLE_QUOTATION_MARK);
+                        }
+                    }
                     break;
             }
         }
