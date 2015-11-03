@@ -57,8 +57,10 @@ public class TreeBankApp extends Application {
         primaryStage.setTitle("Quranic Morphological Dependency Graph Builder");
 
         Parameters parameters = getParameters();
-        if (parameters != null) {
+        boolean noArg = parameters == null;
+        if (!noArg) {
             Map<String, String> namedParameters = parameters.getNamed();
+            noArg = namedParameters.isEmpty();
             Set<Entry<String, String>> entries = namedParameters.entrySet();
             for (Entry<String, String> parameter : entries) {
                 String name = parameter.getKey();
@@ -72,6 +74,10 @@ public class TreeBankApp extends Application {
                     create(primaryStage, value);
                 }
             }
+        }
+
+        if (noArg) {
+            showStage(primaryStage, null);
         }
     }
 
