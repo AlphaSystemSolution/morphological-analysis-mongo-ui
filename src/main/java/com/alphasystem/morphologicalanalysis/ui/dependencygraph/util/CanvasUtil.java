@@ -170,6 +170,9 @@ public class CanvasUtil {
         StringBuilder builder = new StringBuilder(partOfSpeech.getLabel().toUnicode());
         switch (partOfSpeech) {
             case NOUN:
+            case DEMONSTRATIVE_PRONOUN:
+            case LOCATION_ADVERB:
+            case TIME_ADVERB:
                 NounProperties np = (NounProperties) properties;
                 builder.append(SPACE).append(np.getStatus().getLabel().toUnicode());
                 break;
@@ -187,11 +190,6 @@ public class CanvasUtil {
                         .append(SPACE).append(FI_MAHL.toUnicode()).append(SPACE)
                         .append(getFromNounStatus(pp.getStatus()).getLabel().toUnicode());*/
                 builder.append(SPACE).append("(").append(pp.getStatus().getLabel().toUnicode()).append(")");
-                break;
-            case LOCATION_ADVERB:
-            case TIME_ADVERB:
-                np = (NounProperties) properties;
-                builder.append(SPACE).append(np.getStatus().getLabel().toUnicode());
                 break;
         }
         return builder.toString();
