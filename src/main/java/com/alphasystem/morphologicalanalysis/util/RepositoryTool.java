@@ -185,7 +185,6 @@ public class RepositoryTool {
         if (dependencyGraph == null) {
             dependencyGraph = new DependencyGraph(chapterNumber, verseNumber, firstTokenIndex, lastTokenIndex);
             dependencyGraph.initDisplayName();
-            dependencyGraph.setId(dependencyGraph.getDisplayName());
             dependencyGraph.setMetaInfo(graphMetaInfo);
             graphBuilder.set(graphMetaInfo);
             List<TerminalNode> terminalNodes = graphBuilder.buildTerminalNodes(tokens);
