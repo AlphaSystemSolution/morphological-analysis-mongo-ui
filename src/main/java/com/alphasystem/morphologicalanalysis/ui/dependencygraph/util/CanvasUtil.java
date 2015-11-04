@@ -1,5 +1,6 @@
 package com.alphasystem.morphologicalanalysis.ui.dependencygraph.util;
 
+import com.alphasystem.arabic.model.ArabicLetterType;
 import com.alphasystem.arabic.model.ArabicWord;
 import com.alphasystem.morphologicalanalysis.common.model.Linkable;
 import com.alphasystem.morphologicalanalysis.graph.model.*;
@@ -233,7 +234,16 @@ public class CanvasUtil {
     }
 
     private String getPhraseNodeText(PhraseNode phraseNode) {
-        String text = phraseNode.getRelationshipType().getLabel().toUnicode();
+        StringBuilder builder = new StringBuilder("");
+        List<RelationshipType> relationships = phraseNode.getRelationships();
+        if (relationships != null && !relationships.isEmpty()) {
+            builder.append(relationships.get(0).getLabel().toUnicode());
+            for (int i = 1; i < relationships.size(); i++) {
+                builder.append(SPACE).append(ArabicLetterType.WAW.toUnicode()).append(SPACE)
+                        .append(relationships.get(i).getLabel().toUnicode());
+            }
+        }
+        String text = builder.toString();
         AlternateStatus alternateStatus = phraseNode.getAlternateStatus();
         if (alternateStatus != null) {
             text = format("%s %s %s", text, FI_MAHL.toUnicode(), alternateStatus.getLabel().toUnicode());
@@ -260,8 +270,16 @@ public class CanvasUtil {
     }
 
     public String getPhraseMenuItemText(PhraseNodeAdapter phraseNodeAdapter) {
-        return format("%s (%s) ", getPhraseText(phraseNodeAdapter.getFragments()),
-                phraseNodeAdapter.getRelationshipType().getLabel().toUnicode());
+        ObservableList<RelationshipType> relationships = phraseNodeAdapter.getRelationships();
+        StringBuilder builder = new StringBuilder("");
+        if (relationships != null && !relationships.isEmpty()) {
+            builder.append(relationships.get(0).getLabel().toUnicode());
+            for (int i = 1; i < relationships.size(); i++) {
+                builder.append(SPACE).append(ArabicLetterType.WAW.toUnicode()).append(SPACE)
+                        .append(relationships.get(i).getLabel().toUnicode());
+            }
+        }
+        return format("%s (%s) ", getPhraseText(phraseNodeAdapter.getFragments()), builder.toString());
     }
 
     public String getRelationshipMenuItemText(final LinkSupportAdapter linkSupportAdapter) {
@@ -379,4 +397,5 @@ public class CanvasUtil {
             }
         }
     }
+
 }

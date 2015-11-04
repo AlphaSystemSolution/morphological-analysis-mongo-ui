@@ -12,6 +12,7 @@ import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.VerbProperties;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.ConversationType;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.support.RelationshipType;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
@@ -323,7 +324,10 @@ public class CanvasPane extends Pane {
     }
 
     private void drawPhraseNode(PhraseNodeAdapter pn) {
-        Color color = web(pn.getRelationshipType().getColorCode());
+        ObservableList<RelationshipType> relationships = pn.getRelationships();
+        RelationshipType relationshipType = relationships != null && !relationships.isEmpty() ? relationships.get(0) : null;
+        String colorCode = relationshipType == null ? "#000000" : relationshipType.getColorCode();
+        Color color = web(colorCode);
         Line line = drawLine(pn);
         Text arabicText = drawText(pn, color);
         arabicText.setUserData(pn);
@@ -575,6 +579,10 @@ public class CanvasPane extends Pane {
         Menu menu = new Menu("Make Relationship");
         addRelationMenuItems(src, menu);
         menuItems.add(menu);
+
+        MenuItem menuItem = new MenuItem("Remove");
+        menuItem.setOnAction(event -> removeNode(PHRASE, src.getId()));
+        menuItems.add(menuItem);
 
         return menuItems;
     }

@@ -61,6 +61,7 @@ public class TreeBankPane extends BorderPane {
     private RepositoryTool repositoryTool = RepositoryTool.getInstance();
     private DependencyGraphSelectionDialog dependencyGraphSelectionDialog;
     private Menu operationMenu;
+    private Menu dependencyGraphTreeMenu;
 
     /**
      * pane for canvas
@@ -111,7 +112,8 @@ public class TreeBankPane extends BorderPane {
         menuBar.getMenus().add(createFileMenu());
 
         operationMenu = new Menu("Operation");
-        menuBar.getMenus().add(operationMenu);
+        dependencyGraphTreeMenu = new Menu("Dependency Graph Tree");
+        menuBar.getMenus().addAll(operationMenu, dependencyGraphTreeMenu);
 
         return menuBar;
     }
