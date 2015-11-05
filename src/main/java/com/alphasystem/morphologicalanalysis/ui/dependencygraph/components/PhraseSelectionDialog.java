@@ -38,6 +38,7 @@ public class PhraseSelectionDialog extends Dialog<PhraseNode> {
         relationshipsListView = new ListSelectionView<>();
         relationshipsListView.setCellFactory(new ArabicSupportEnumCellFactory<>(LABEL_ONLY));
         relationshipsListView.setMinHeight(5);
+        relationshipsListView.setRetainSourceValue(true);
         relationshipsListView.getSourceItems().addAll(RelationshipType.values());
         phraseLabel = new Label();
         phraseLabel.setFont(ARABIC_FONT_MEDIUM_BOLD);
