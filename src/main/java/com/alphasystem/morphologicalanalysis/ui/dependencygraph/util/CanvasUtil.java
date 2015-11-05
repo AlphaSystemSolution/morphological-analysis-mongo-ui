@@ -172,8 +172,10 @@ public class CanvasUtil {
         switch (partOfSpeech) {
             case NOUN:
             case DEMONSTRATIVE_PRONOUN:
+            case RELATIVE_PRONOUN:
             case LOCATION_ADVERB:
             case TIME_ADVERB:
+            case PROPER_NOUN:
                 NounProperties np = (NounProperties) properties;
                 builder.append(SPACE).append(np.getStatus().getLabel().toUnicode());
                 break;
