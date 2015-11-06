@@ -15,18 +15,20 @@ import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
 
 import java.util.List;
 import java.util.Optional;
 
-import static com.alphasystem.arabic.model.ArabicLetters.WORD_SPACE;
 import static com.alphasystem.arabic.model.ArabicWord.getSubWord;
-import static com.alphasystem.morphologicalanalysis.ui.common.Global.FI_MAHL;
-import static com.alphasystem.morphologicalanalysis.ui.common.Global.isTerminal;
+import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.ROOT;
+import static com.alphasystem.morphologicalanalysis.ui.common.Global.*;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.IncompleteVerbCategory.KANA_AND_ITS_SISTERS;
 import static com.alphasystem.util.AppUtil.isGivenType;
 import static java.lang.String.format;
@@ -38,7 +40,6 @@ import static javafx.scene.text.Font.font;
  */
 public class CanvasUtil {
 
-    private static final String SPACE = WORD_SPACE.toUnicode();
     private static final char LEFT_POINTING_DOUBLE_ANGLE_QUOTATION_MARK = '\u00AB';
     private static final char RIGHT_POINTING_DOUBLE_ANGLE_QUOTATION_MARK = '\u00BB';
 
@@ -94,6 +95,10 @@ public class CanvasUtil {
         }
         alert.setContentText(contentText);
         return alert.showAndWait();
+    }
+
+    private static String getText(GraphNodeAdapter item) {
+        return format("(%s)", item.getText());
     }
 
     public String getLocationText(final TerminalNodeAdapter terminalNode,
@@ -177,14 +182,14 @@ public class CanvasUtil {
             case TIME_ADVERB:
             case PROPER_NOUN:
                 NounProperties np = (NounProperties) properties;
-                builder.append(SPACE).append(np.getStatus().getLabel().toUnicode());
+                builder.append(SPACE_STR).append(np.getStatus().getLabel().toUnicode());
                 break;
             case VERB:
                 VerbProperties vp = (VerbProperties) properties;
-                builder.append(SPACE).append(vp.getVerbType().getLabel().toUnicode());
+                builder.append(SPACE_STR).append(vp.getVerbType().getLabel().toUnicode());
                 final VerbMode mode = vp.getMode();
                 if (mode != null) {
-                    builder.append(SPACE).append(mode.getLabel().toUnicode());
+                    builder.append(SPACE_STR).append(mode.getLabel().toUnicode());
                 }
                 break;
             case PRONOUN:
@@ -192,7 +197,7 @@ public class CanvasUtil {
                 /*builder.append(SPACE).append(pp.getProNounType().getLabel().toUnicode()).append(NEW_LINE)
                         .append(SPACE).append(FI_MAHL.toUnicode()).append(SPACE)
                         .append(getFromNounStatus(pp.getStatus()).getLabel().toUnicode());*/
-                builder.append(SPACE).append("(").append(pp.getStatus().getLabel().toUnicode()).append(")");
+                builder.append(SPACE_STR).append("(").append(pp.getStatus().getLabel().toUnicode()).append(")");
                 break;
         }
         return builder.toString();
@@ -241,7 +246,7 @@ public class CanvasUtil {
         if (relationships != null && !relationships.isEmpty()) {
             builder.append(relationships.get(0).getLabel().toUnicode());
             for (int i = 1; i < relationships.size(); i++) {
-                builder.append(SPACE).append(ArabicLetterType.WAW.toUnicode()).append(SPACE)
+                builder.append(SPACE_STR).append(ArabicLetterType.WAW.toUnicode()).append(SPACE_STR)
                         .append(relationships.get(i).getLabel().toUnicode());
             }
         }
@@ -277,7 +282,7 @@ public class CanvasUtil {
         if (relationships != null && !relationships.isEmpty()) {
             builder.append(relationships.get(0).getLabel().toUnicode());
             for (int i = 1; i < relationships.size(); i++) {
-                builder.append(SPACE).append(ArabicLetterType.WAW.toUnicode()).append(SPACE)
+                builder.append(SPACE_STR).append(ArabicLetterType.WAW.toUnicode()).append(SPACE_STR)
                         .append(relationships.get(i).getLabel().toUnicode());
             }
         }
@@ -352,6 +357,25 @@ public class CanvasUtil {
         }
     }
 
+    public void updateDependencyGraphTree(DependencyGraphAdapter graph, Menu menu) {
+        menu.getItems().remove(0, menu.getItems().size());
+        if (graph == null) {
+            MenuItem menuItem = new MenuItem("Graph is empty");
+            menuItem.setDisable(true);
+            menu.getItems().add(menuItem);
+        } else {
+            ObservableList<GraphNodeAdapter> graphNodes = graph.getGraphNodes();
+            if (graphNodes != null && !graphNodes.isEmpty()) {
+                graphNodes.forEach(node -> {
+                    menu.getItems().add(createMenuItem(node));
+                    if (isTerminal(node)) {
+
+                    }
+                });
+            }
+        }
+    }
+
     /**
      * Shift nodes to the right. The calculation of shifting right is:
      * <div>
@@ -400,4 +424,39 @@ public class CanvasUtil {
         }
     }
 
+    private Text getItemGraphic(GraphNodeAdapter item) {
+        Text label = new Text();
+        StringBuilder builder = new StringBuilder();
+        if (item != null) {
+            GraphNodeType nodeType = item.getGraphNodeType();
+            label.setFont(nodeType.equals(ROOT) ? ENGLISH_FONT_SMALL : ARABIC_FONT_SMALL);
+            String text = item.getText();
+            switch (nodeType) {
+                case PART_OF_SPEECH:
+                    PartOfSpeechNodeAdapter posna = (PartOfSpeechNodeAdapter) item;
+                    TerminalNodeAdapter parent = (TerminalNodeAdapter) posna.getParent();
+                    builder.append(getLocationText(parent, posna)).append(" ").append(getText(item));
+                    break;
+                case PHRASE:
+                    PhraseNodeAdapter pna = (PhraseNodeAdapter) item;
+                    builder.append(getPhraseText(pna.getFragments())).append(" ").append(getText(item));
+                    break;
+                case RELATIONSHIP:
+                    RelationshipNodeAdapter rna = (RelationshipNodeAdapter) item;
+                    builder.append(getRelationshipText(rna)).append(getText(item));
+                    break;
+                default:
+                    builder.append(text);
+                    break;
+            }
+        }
+        label.setText(builder.toString());
+        return label;
+    }
+
+    private MenuItem createMenuItem(GraphNodeAdapter graphNode) {
+        MenuItem menuItem = new MenuItem();
+        menuItem.setGraphic(getItemGraphic(graphNode));
+        return menuItem;
+    }
 }

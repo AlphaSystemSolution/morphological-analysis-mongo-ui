@@ -1,6 +1,7 @@
 package com.alphasystem.morphologicalanalysis.ui.dependencygraph;
 
 import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
+import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraphTokenInfo;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.components.CanvasPane;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.components.ControlPane;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.components.DependencyGraphSelectionDialog;
@@ -230,13 +231,14 @@ public class TreeBankPane extends BorderPane {
     private File getExportFile(String format) {
         DependencyGraph dependencyGraph = canvasPane.getDependencyGraph().getDependencyGraph();
         File parent = new File(WORKING_DIRECTORY, getFileNameWithPadding(dependencyGraph.getChapterNumber()));
-        parent = new File(parent, getFileNameWithPadding(dependencyGraph.getVerseNumber()));
+        java.util.List<DependencyGraphTokenInfo> tokens = dependencyGraph.getTokens();
+        DependencyGraphTokenInfo tokenInfo = tokens.get(0);
+        parent = new File(parent, getFileNameWithPadding(tokenInfo.getVerseNumber()));
         if (!parent.exists()) {
-            @SuppressWarnings("unused")
-            boolean mkdirs = parent.mkdirs();
+            parent.mkdirs();
         }
-        return new File(parent, format("%s_%s.%s", getFileNameWithPadding(dependencyGraph.getFirstTokenIndex()),
-                getFileNameWithPadding(dependencyGraph.getLastTokenIndex()), format));
+        return new File(parent, format("%s_%s.%s", getFileNameWithPadding(tokenInfo.getFirstTokenIndex()),
+                getFileNameWithPadding(tokenInfo.getLastTokenIndex()), format));
     }
 
 }

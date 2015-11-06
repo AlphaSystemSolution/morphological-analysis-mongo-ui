@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 import static com.alphasystem.arabic.model.ArabicLetterType.*;
-import static com.alphasystem.arabic.model.ArabicWord.getWord;
+import static com.alphasystem.arabic.model.ArabicLetters.WORD_SPACE;
 import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.*;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.*;
 import static java.lang.String.format;
@@ -31,7 +31,8 @@ import static javafx.scene.text.FontWeight.BOLD;
  */
 public class Global {
 
-    public static final ArabicWord FI_MAHL = getWord(FA, YA, SPACE, MEEM, HHA, LAM);
+    public static final String SPACE_STR = WORD_SPACE.toUnicode();
+    public static final ArabicWord FI_MAHL = ArabicWord.getWord(FA, YA, SPACE, MEEM, HHA, LAM);
     public static final List<GraphNodeType> TERMINALS = asList(TERMINAL, IMPLIED, HIDDEN, REFERENCE);
     public static final List<GraphNodeType> NON_TERMINALS = asList(IMPLIED, HIDDEN, REFERENCE);
     public static final List<PartOfSpeech> PART_OF_SPEECH_EXCLUDE_LIST = asList(

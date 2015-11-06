@@ -1,11 +1,11 @@
 package com.alphasystem.morphologicalanalysis.util;
 
 import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
+import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraphTokenInfo;
 import com.alphasystem.morphologicalanalysis.graph.model.GraphMetaInfo;
 import com.alphasystem.morphologicalanalysis.graph.model.TerminalNode;
 import com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType;
 import com.alphasystem.morphologicalanalysis.graph.repository.DependencyGraphRepository;
-import com.alphasystem.morphologicalanalysis.graph.repository.PartOfSpeechNodeRepository;
 import com.alphasystem.morphologicalanalysis.graph.repository.TerminalNodeRepository;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.GraphBuilder;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Chapter;
@@ -17,11 +17,15 @@ import com.alphasystem.persistence.mongo.repository.BaseRepository;
 import com.alphasystem.persistence.mongo.spring.support.ApplicationContextProvider;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import static org.springframework.data.mongodb.core.query.Criteria.where;
 
 /**
  * @author sali
@@ -36,7 +40,7 @@ public class RepositoryTool {
     private LocationRepository locationRepository;
     private DependencyGraphRepository dependencyGraphRepository;
     private TerminalNodeRepository terminalNodeRepository;
-    private PartOfSpeechNodeRepository partOfSpeechNodeRepository;
+    private MongoTemplate mongoTemplate;
 
     /**
      * do not let anyone instantiate this class
@@ -48,7 +52,7 @@ public class RepositoryTool {
         locationRepository = repositoryUtil.getLocationRepository();
         dependencyGraphRepository = repositoryUtil.getDependencyGraphRepository();
         terminalNodeRepository = repositoryUtil.getTerminalNodeRepository();
-        partOfSpeechNodeRepository = repositoryUtil.getPartOfSpeechNodeRepository();
+        mongoTemplate = repositoryUtil.getMongoTemplate();
         graphBuilder = GraphBuilder.getInstance();
 
     }
@@ -121,13 +125,6 @@ public class RepositoryTool {
         }; // end of "new Service"
     }
 
-    public List<Token> getTokens(final int chapterNumber, final int verseNumber, final int firstTokenIndex,
-                                 final int lastTokenIndex) {
-        List<Token> result = new ArrayList<>();
-
-        return result;
-    }
-
     public Token getToken(String id) {
         return tokenRepository.findOne(id);
     }
@@ -169,6 +166,12 @@ public class RepositoryTool {
         return dependencyGraphRepository.findByDisplayName(displayName);
     }
 
+    public List<DependencyGraph> dependencyGraphs(Integer chapterNumber, Integer verseNumber) {
+        Criteria criteria1 = where("chapterNumber").is(chapterNumber);
+        Criteria criteria2 = where("tokens").elemMatch(where("verseNumber").is(verseNumber));
+        return mongoTemplate.find(new Query(new Criteria().andOperator(criteria1, criteria2)), DependencyGraph.class);
+    }
+
     public DependencyGraph createDependencyGraph(List<Token> tokens, GraphMetaInfo graphMetaInfo) {
         Token firstToken = tokens.get(0);
         Token lastToken = tokens.get(tokens.size() - 1);
@@ -177,13 +180,18 @@ public class RepositoryTool {
         Integer verseNumber = firstToken.getVerseNumber();
         Integer firstTokenIndex = firstToken.getTokenNumber();
         Integer lastTokenIndex = lastToken.getTokenNumber();
+        DependencyGraphTokenInfo tokenInfo = new DependencyGraphTokenInfo(verseNumber, firstTokenIndex, lastTokenIndex);
 
-        DependencyGraph dependencyGraph = dependencyGraphRepository.
-                findByChapterNumberAndVerseNumberAndFirstTokenIndexAndLastTokenIndex(
-                        chapterNumber, verseNumber, firstTokenIndex, lastTokenIndex);
+        Criteria criteria1 = where("chapterNumber").is(chapterNumber);
+        Criteria criteria2 = where("tokens").elemMatch(where("verseNumber").is(verseNumber).and("firstTokenIndex")
+                .is(firstTokenIndex).and("lastTokenIndex").is(lastTokenIndex));
+        Query query = new Query(new Criteria().andOperator(criteria1, criteria2));
+
+        DependencyGraph dependencyGraph = mongoTemplate.findOne(query, DependencyGraph.class);
 
         if (dependencyGraph == null) {
-            dependencyGraph = new DependencyGraph(chapterNumber, verseNumber, firstTokenIndex, lastTokenIndex);
+            dependencyGraph = new DependencyGraph(chapterNumber);
+            dependencyGraph.getTokens().add(tokenInfo);
             dependencyGraph.initDisplayName();
             dependencyGraph.setMetaInfo(graphMetaInfo);
             graphBuilder.set(graphMetaInfo);

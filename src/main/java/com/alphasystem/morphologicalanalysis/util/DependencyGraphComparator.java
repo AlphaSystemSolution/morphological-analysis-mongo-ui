@@ -1,8 +1,11 @@
 package com.alphasystem.morphologicalanalysis.util;
 
 import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
+import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraphTokenInfo;
 
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 
 /**
  * @author sali
@@ -13,11 +16,13 @@ public class DependencyGraphComparator implements Comparator<DependencyGraph> {
     public int compare(DependencyGraph o1, DependencyGraph o2) {
         int result = o1.getChapterNumber().compareTo(o2.getChapterNumber());
         if (result == 0) {
-            result = o1.getVerseNumber().compareTo(o2.getVerseNumber());
-            if (result == 0) {
-                result = o1.getFirstTokenIndex().compareTo(o2.getFirstTokenIndex());
-                if (result == 0) {
-                    result = o1.getLastTokenIndex().compareTo(o2.getLastTokenIndex());
+            List<DependencyGraphTokenInfo> l1 = new ArrayList<>(o1.getTokens());
+            List<DependencyGraphTokenInfo> l2 = new ArrayList<>(o2.getTokens());
+            if (l1.size() == l2.size()) {
+                for (int i = 0; i < l1.size(); i++) {
+                    DependencyGraphTokenInfo t1 = l1.get(i);
+                    DependencyGraphTokenInfo t2 = l2.get(i);
+                    result = t1.compareTo(t2);
                 }
             }
         }

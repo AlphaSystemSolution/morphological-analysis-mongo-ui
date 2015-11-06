@@ -10,9 +10,7 @@ import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.GraphBuilde
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.VerbProperties;
-import com.alphasystem.morphologicalanalysis.wordbyword.model.support.ConversationType;
-import com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech;
-import com.alphasystem.morphologicalanalysis.wordbyword.model.support.RelationshipType;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.support.*;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
@@ -38,6 +36,8 @@ import static com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.Depe
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.ConversationType.FIRST_PERSON;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.NOUN;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.VERB;
+import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.VerbType.IMPERFECT;
+import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.VerbType.PERFECT;
 import static java.lang.String.format;
 import static java.util.Collections.reverse;
 import static javafx.collections.FXCollections.observableArrayList;
@@ -514,11 +514,11 @@ public class CanvasPane extends Pane {
         int index = getIndex(src, getDependencyGraph().getGraphNodes());
 
         menu = new Menu("Add Implied Node to Left");
-        menu.getItems().addAll(createAddImpliedNodeMenuItem(index, NOUN), createAddImpliedNodeMenuItem(index, VERB));
+        menu.getItems().addAll(createNounAddImpliedNodeMenu(index), createVerbAddImpliedNodeMenu(index));
         menuItems.add(menu);
 
         menu = new Menu("Add Implied Node to Right");
-        menu.getItems().addAll(createAddImpliedNodeMenuItem(index + 1, NOUN), createAddImpliedNodeMenuItem(index + 1, VERB));
+        menu.getItems().addAll(createNounAddImpliedNodeMenu(index + 1), createVerbAddImpliedNodeMenu(index + 1));
         menuItems.add(menu);
 
         // add "Hidden" pronoun if applicable (only for verb)
@@ -565,9 +565,7 @@ public class CanvasPane extends Pane {
         menuItems.add(menuItem);
 
         menuItem = new MenuItem("Hide");
-        menuItem.setOnAction(event -> {
-            hidePosNode(src);
-        });
+        menuItem.setOnAction(event -> hidePosNode(src));
         menuItems.add(menuItem);
 
         return menuItems;
@@ -880,7 +878,8 @@ public class CanvasPane extends Pane {
 
     private void makeReference(int index) {
         DependencyGraph dependencyGraph = getDependencyGraph().getDependencyGraph();
-        referenceSelectionDialog.reset(dependencyGraph.getChapterNumber(), dependencyGraph.getVerseNumber());
+        List<DependencyGraphTokenInfo> tokens = dependencyGraph.getTokens();
+        referenceSelectionDialog.reset(dependencyGraph.getChapterNumber(), tokens.get(0).getVerseNumber());
         Optional<Token> result = referenceSelectionDialog.showAndWait();
         result.ifPresent(token -> addReference(token, index));
     }
@@ -924,22 +923,51 @@ public class CanvasPane extends Pane {
         setDependencyGraph(dependencyGraphAdapter);
     }
 
-    private MenuItem createAddImpliedNodeMenuItem(int index, PartOfSpeech partOfSpeech) {
-        Text text = new Text(partOfSpeech.getLabel().toUnicode());
+    private Menu createNounAddImpliedNodeMenu(int index) {
+        Text text = new Text(NOUN.getLabel().toUnicode());
+        text.setFont(ARABIC_FONT_SMALL_BOLD);
+        Menu menu = new Menu("", text);
+
+        for (NounStatus nounStatus : NounStatus.values()) {
+            menu.getItems().add(createNounAddImpliedNodeMenuItem(index, nounStatus));
+        }
+        return menu;
+    }
+
+    private Menu createVerbAddImpliedNodeMenu(int index) {
+        Text text = new Text(VERB.getLabel().toUnicode());
+        text.setFont(ARABIC_FONT_SMALL_BOLD);
+        Menu menu = new Menu("", text);
+
+        menu.getItems().addAll(createVerbAddImpliedNodeMenuItem(index, PERFECT),
+                createVerbAddImpliedNodeMenuItem(index, IMPERFECT));
+        return menu;
+    }
+
+    private MenuItem createNounAddImpliedNodeMenuItem(int index, NounStatus nounStatus) {
+        Text text = new Text(nounStatus.getLabel().toUnicode());
         text.setFont(ARABIC_FONT_SMALL_BOLD);
         MenuItem menuItem = new MenuItem("", text);
-        menuItem.setOnAction(event -> addImpliedNode(index, partOfSpeech));
+        menuItem.setOnAction(event -> addImpliedNode(index, format("%s_%s", NOUN.name(), nounStatus.name())));
         return menuItem;
     }
 
-    private void addImpliedNode(int index, PartOfSpeech partOfSpeech) {
+    private MenuItem createVerbAddImpliedNodeMenuItem(int index, VerbType verbType) {
+        Text text = new Text(verbType.getLabel().toUnicode());
+        text.setFont(ARABIC_FONT_SMALL_BOLD);
+        MenuItem menuItem = new MenuItem("", text);
+        menuItem.setOnAction(event -> addImpliedNode(index, format("%s_%s", VERB.name(), verbType.name())));
+        return menuItem;
+    }
+
+    private void addImpliedNode(int index, String id) {
         GraphMetaInfoAdapter graphMetaInfoAdapter = getDependencyGraph().getGraphMetaInfo();
         canvasUtil.shiftRight(index, getDependencyGraph());
         Node node = canvasPane.getChildren().get(index - 1);
         Group group = (Group) node;
         Line referenceLine = getReferenceLine(group);
         graphBuilder.set(graphMetaInfoAdapter.getGraphMetaInfo());
-        ImpliedNodeAdapter impliedNodeAdapter = createImpliedNodeAdapter(partOfSpeech, referenceLine, graphMetaInfoAdapter);
+        ImpliedNodeAdapter impliedNodeAdapter = createImpliedNodeAdapter(id, referenceLine, graphMetaInfoAdapter);
         getDependencyGraph().getDependencyGraph().getNodes().add(index, impliedNodeAdapter.getSrc());
         getDependencyGraph().getGraphNodes().add(index, impliedNodeAdapter);
         DependencyGraphAdapter dependencyGraph = getDependencyGraph();
@@ -947,10 +975,10 @@ public class CanvasPane extends Pane {
         setDependencyGraph(dependencyGraph);
     }
 
-    private ImpliedNodeAdapter createImpliedNodeAdapter(PartOfSpeech partOfSpeech, Line referenceLine,
+    private ImpliedNodeAdapter createImpliedNodeAdapter(String partOfSpeech, Line referenceLine,
                                                         GraphMetaInfoAdapter graphMetaInfoAdapter) {
         ImpliedNodeAdapter impliedNodeAdapter = new ImpliedNodeAdapter();
-        ImpliedNode impliedNode = graphBuilder.buildEmptyNode(partOfSpeech, referenceLine);
+        ImpliedNode impliedNode = graphBuilder.buildImpliedNode(partOfSpeech, referenceLine);
         canvasUtil.updateFonts(impliedNode, graphMetaInfoAdapter);
         impliedNodeAdapter.setSrc(impliedNode);
         return impliedNodeAdapter;

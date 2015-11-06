@@ -1,7 +1,6 @@
 package com.alphasystem.morphologicalanalysis.ui.dependencygraph.components;
 
 import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
-import com.alphasystem.morphologicalanalysis.graph.repository.DependencyGraphRepository;
 import com.alphasystem.morphologicalanalysis.ui.common.ChapterVerseSelectionPane;
 import com.alphasystem.morphologicalanalysis.ui.common.DependencyGraphListCell;
 import com.alphasystem.morphologicalanalysis.ui.common.Global;
@@ -24,10 +23,9 @@ import static javafx.scene.control.ButtonType.OK;
  */
 public class DependencyGraphSelectionDialog extends Dialog<DependencyGraph> {
 
+    private final RepositoryTool repositoryTool = RepositoryTool.getInstance();
     private ChapterVerseSelectionPane chapterVerseSelectionPane;
     private ComboBox<DependencyGraph> dependencyGraphComboBox;
-    private DependencyGraphRepository dependencyGraphRepository = RepositoryTool.getInstance().getRepositoryUtil().
-            getDependencyGraphRepository();
 
     public DependencyGraphSelectionDialog() {
         setTitle(getLabel("title"));
@@ -58,8 +56,8 @@ public class DependencyGraphSelectionDialog extends Dialog<DependencyGraph> {
 
     private void updateTokens() {
         Verse selectedVerse = chapterVerseSelectionPane.getSelectedVerse();
-        List<DependencyGraph> dependencyGraphs = dependencyGraphRepository.findByChapterNumberAndVerseNumber(
-                selectedVerse.getChapterNumber(), selectedVerse.getVerseNumber());
+        List<DependencyGraph> dependencyGraphs = repositoryTool.dependencyGraphs(selectedVerse.getChapterNumber(),
+                selectedVerse.getVerseNumber());
         sort(dependencyGraphs, new DependencyGraphComparator());
         dependencyGraphComboBox.getItems().remove(0, dependencyGraphComboBox.getItems().size());
         dependencyGraphComboBox.getItems().addAll(dependencyGraphs);

@@ -9,7 +9,6 @@ import com.alphasystem.morphologicalanalysis.util.MorphologicalAnalysisRepositor
 import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
-import com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech;
 import com.alphasystem.morphologicalanalysis.wordbyword.repository.TokenRepository;
 import javafx.scene.shape.Line;
 
@@ -21,8 +20,6 @@ import java.util.stream.Collectors;
 
 import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.*;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.*;
-import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.NOUN;
-import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.VERB;
 import static java.lang.String.format;
 import static java.util.Collections.reverse;
 import static java.util.Collections.singletonList;
@@ -32,16 +29,9 @@ import static java.util.Collections.singletonList;
  */
 public class GraphBuilder {
 
-    private static final String NOUN_IMPLIED_TOKEN_DISPLAY_NAME = "0:1:1:1";
-    private static final String VERB_IMPLIED_TOKEN_DISPLAY_NAME = "0:1:2:1";
     private static GraphBuilder instance = new GraphBuilder();
-    private static Map<PartOfSpeech, String> impliedTokenMap = new LinkedHashMap<>();
 
-    static {
-        impliedTokenMap.put(NOUN, NOUN_IMPLIED_TOKEN_DISPLAY_NAME);
-        impliedTokenMap.put(VERB, VERB_IMPLIED_TOKEN_DISPLAY_NAME);
-    }
-
+    private Map<String, Token> impliedTokenMap = new LinkedHashMap<>();
     private MorphologicalAnalysisRepositoryUtil repositoryUtil = RepositoryTool.getInstance().getRepositoryUtil();
     private TokenRepository tokenRepository = repositoryUtil.getTokenRepository();
     private double tokenWidth = RECTANGLE_WIDTH;
@@ -88,11 +78,13 @@ public class GraphBuilder {
         // populate part of speeches
         buildPartOfSpeechNodes(terminalNodes);
 
+        terminalNodes.forEach(terminalNode -> terminalNode.setTranslateY(-85.0));
+
         return terminalNodes;
     }
 
     /**
-     * @param token source token
+     * @param token    source token
      * @param nodeType graph node type
      * @return terminal node
      * @throws IllegalArgumentException
@@ -146,7 +138,7 @@ public class GraphBuilder {
 
     public void buildPartOfSpeechNodes(List<TerminalNode> terminalNodes) {
         reset();
-        textY = 160;
+        textY = 150;
 
         for (TerminalNode terminalNode : terminalNodes) {
             List<PartOfSpeechNode> partOfSpeechNodes = buildPartOfSpeechNodes(terminalNode);
@@ -169,14 +161,18 @@ public class GraphBuilder {
         return partOfSpeechNodes;
     }
 
-    public ImpliedNode buildEmptyNode(PartOfSpeech partOfSpeech, Line referenceLine) {
+    public ImpliedNode buildImpliedNode(String id, Line referenceLine) {
         rectX = gapBetweenTokens + referenceLine.getEndX();
         textX = rectX + 30;
         x1 = rectX;
         x2 = tokenWidth + rectX;
         x3 = rectX + 30;
 
-        Token token = tokenRepository.findByDisplayName(impliedTokenMap.get(partOfSpeech));
+        Token token = impliedTokenMap.get(id);
+        if (token == null) {
+            token = tokenRepository.findOne(id);
+            impliedTokenMap.put(id, token);
+        }
         ImpliedNode impliedNode = (ImpliedNode) buildTerminalNode(token, IMPLIED);
         buildPartOfSpeechNodes(singletonList(impliedNode));
 
@@ -274,7 +270,7 @@ public class GraphBuilder {
         partOfSpeechNode.setY(textY);
         double x = posX + 20;
         partOfSpeechNode.setCx(x);
-        x = textY + 20;
+        x = textY + 15;
         partOfSpeechNode.setCy(x);
         return partOfSpeechNode;
     }
@@ -302,12 +298,12 @@ public class GraphBuilder {
         rectX = INITIAL_X;
         double rectY = INITIAL_Y;
         textX = rectX + 10;
-        textY = 105;
+        textY = 125;
         x1 = rectX;
         y1 = tokenHeight + rectY;
         x2 = tokenWidth + rectX;
         y2 = y1;
         x3 = rectX + 30;
-        y3 = 50;
+        y3 = 100;
     }
 }

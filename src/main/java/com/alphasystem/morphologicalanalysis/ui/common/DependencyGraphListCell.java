@@ -2,6 +2,7 @@ package com.alphasystem.morphologicalanalysis.ui.common;
 
 import com.alphasystem.arabic.model.ArabicWord;
 import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
+import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraphTokenInfo;
 import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Verse;
@@ -13,7 +14,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.alphasystem.arabic.model.ArabicLetters.WORD_SPACE;
+import static com.alphasystem.arabic.model.ArabicWord.getVerseNumber;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.ARABIC_FONT_MEDIUM_BOLD;
+import static com.alphasystem.morphologicalanalysis.ui.common.Global.SPACE_STR;
 import static javafx.scene.control.ContentDisplay.GRAPHIC_ONLY;
 
 /**
@@ -35,13 +38,27 @@ public class DependencyGraphListCell extends ListCell<DependencyGraph> {
         super.updateItem(item, empty);
 
         if (item != null && !empty) {
-            Verse verse = verseRepository.findByChapterNumberAndVerseNumber(item.getChapterNumber(),
-                    item.getVerseNumber());
-            List<Token> tokens = getGraphTokens(verse, item.getFirstTokenIndex(), item.getLastTokenIndex());
-            label.setText(getArabicWord(tokens).toUnicode());
+            List<DependencyGraphTokenInfo> tokenInfoList = item.getTokens();
+            DependencyGraphTokenInfo tokenInfo = tokenInfoList.get(0);
+            Integer chapterNumber = item.getChapterNumber();
+            StringBuilder builder = new StringBuilder();
+            builder.append(getTokensText(chapterNumber, tokenInfo));
+            for (int i = 1; i < tokenInfoList.size(); i++) {
+                tokenInfo = tokenInfoList.get(i);
+                builder.append(SPACE_STR).append(getVerseNumber(chapterNumber, tokenInfo.getVerseNumber(), false))
+                        .append(SPACE_STR).append(getTokensText(chapterNumber, tokenInfo));
+            }
+
+            label.setText(builder.toString());
         }
 
         setGraphic(label);
+    }
+
+    private String getTokensText(Integer chapterNumber, DependencyGraphTokenInfo tokenInfo) {
+        Verse verse = verseRepository.findByChapterNumberAndVerseNumber(chapterNumber, tokenInfo.getVerseNumber());
+        List<Token> tokens = getGraphTokens(verse, tokenInfo.getFirstTokenIndex(), tokenInfo.getLastTokenIndex());
+        return getArabicWord(tokens).toUnicode();
     }
 
     private ArabicWord getArabicWord(List<Token> tokens) {
