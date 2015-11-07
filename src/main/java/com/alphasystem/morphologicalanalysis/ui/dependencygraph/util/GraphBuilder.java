@@ -78,8 +78,6 @@ public class GraphBuilder {
         // populate part of speeches
         buildPartOfSpeechNodes(terminalNodes);
 
-        terminalNodes.forEach(terminalNode -> terminalNode.setTranslateY(-85.0));
-
         return terminalNodes;
     }
 
@@ -125,6 +123,7 @@ public class GraphBuilder {
         terminalNode.setY2(y2);
         terminalNode.setTranslationX(x3);
         terminalNode.setTranslationY(y3);
+        terminalNode.setTranslateY(-85.0);
 
         // update counters
         rectX = x2 + gapBetweenTokens;
