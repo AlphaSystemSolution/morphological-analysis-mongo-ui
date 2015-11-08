@@ -27,8 +27,6 @@ import static com.alphasystem.morphologicalanalysis.ui.common.Global.RESOURCE_BU
  */
 public class ChapterVerseSelectionPane extends BorderPane {
 
-
-    // other elements
     Map<Integer, List<VerseTokenPairGroup>> groupMap;
     private Label chapterNameLabel;
     private ComboBox<Chapter> chapterNameComboBox;

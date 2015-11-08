@@ -13,6 +13,7 @@ import com.alphasystem.morphologicalanalysis.ui.wordbyword.model.TableCellModel;
 import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Verse;
+import com.alphasystem.morphologicalanalysis.wordbyword.repository.VerseRepository;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
@@ -27,9 +28,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.ARABIC_FONT_MEDIUM_BOLD;
@@ -48,8 +47,8 @@ import static javafx.scene.text.TextAlignment.CENTER;
  */
 public class WordByWordPane extends BorderPane {
 
+    private static Map<String, List<Token>> cache = new LinkedHashMap<>();
     private final ObjectProperty<Action> action = new SimpleObjectProperty<>();
-    private RepositoryTool repositoryTool = RepositoryTool.getInstance();
     private ChapterVerseSelectionPane chapterVerseSelectionPane;
     private TokenEditorDialog tokenEditorDialog;
     private GraphMetaInfoSelectionDialog graphMetaInfoSelectionDialog;
@@ -57,7 +56,7 @@ public class WordByWordPane extends BorderPane {
 
     @SuppressWarnings({"unchecked"})
     public WordByWordPane() {
-        tokenEditorDialog = new TokenEditorDialog(repositoryTool.getTokenByDisplayName("1:1:1"));
+        tokenEditorDialog = new TokenEditorDialog(RepositoryTool.getInstance().getTokenByDisplayName("1:1:1"));
         chapterVerseSelectionPane = new ChapterVerseSelectionPane();
         chapterVerseSelectionPane.availableProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue) {
@@ -159,6 +158,23 @@ public class WordByWordPane extends BorderPane {
         setCenter(scrollPane);
     }
 
+    private static List<Token> getTokens(VerseTokenPairGroup group) {
+        Integer chapterNumber = group.getChapterNumber();
+        String key = group.toString();
+        List<Token> tokens = cache.get(key);
+        if (tokens == null || tokens.isEmpty()) {
+            tokens = new ArrayList<>();
+            VerseRepository verseRepository = RepositoryTool.getInstance().getRepositoryUtil().getVerseRepository();
+            for (VerseTokensPair pair : group.getPairs()) {
+                Verse verse = verseRepository.findByChapterNumberAndVerseNumber(chapterNumber,
+                        pair.getVerseNumber());
+                tokens.addAll(verse.getTokens());
+            }
+            cache.put(key, tokens);
+        }
+        return tokens;
+    }
+
     private void performAction(Action action) {
         if (action == null) {
             return;
@@ -241,27 +257,14 @@ public class WordByWordPane extends BorderPane {
 
     @SuppressWarnings({"unchecked"})
     private void refreshTable() {
-        VerseTokenPairGroup selectedVerse = chapterVerseSelectionPane.getSelectedVerse();
-        if (selectedVerse == null) {
+        VerseTokenPairGroup selectedGrroup = chapterVerseSelectionPane.getSelectedVerse();
+        if (selectedGrroup == null) {
             return;
         }
         ObservableList items = tableView.getItems();
         items.remove(0, items.size());
 
-        List<Token> tokens = new ArrayList<>();
-        int chapterNumber = selectedVerse.getChapterNumber();
-        List<VerseTokensPair> pairs = selectedVerse.getPairs();
-        VerseTokensPair verseTokensPair = pairs.get(0);
-        Verse verse = repositoryTool.getRepositoryUtil().getVerseRepository().
-                findByChapterNumberAndVerseNumber(chapterNumber, verseTokensPair.getVerseNumber());
-        tokens.addAll(verse.getTokens());
-        for (int i = 1; i < pairs.size(); i++) {
-            verseTokensPair = pairs.get(i);
-            verse = repositoryTool.getRepositoryUtil().getVerseRepository().
-                    findByChapterNumberAndVerseNumber(chapterNumber, verseTokensPair.getVerseNumber());
-            tokens.addAll(verse.getTokens());
-        }
-        System.out.println();
+        List<Token> tokens = getTokens(selectedGrroup);
 
         items.addAll(tokens.stream().map(TableCellModel::new).collect(Collectors.toList()));
 

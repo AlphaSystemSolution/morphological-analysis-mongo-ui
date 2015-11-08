@@ -41,7 +41,6 @@ public class VerseTokensPairsReader {
                 }
 
                 String[] pairs = line.split("\\|");
-                //System.out.println(format("Number of pairs found %s", pairs.length));
                 VerseTokenPairGroup currentGroup = new VerseTokenPairGroup();
                 currentGroup.setChapterNumber(chapterNumber);
                 currentGroupList.add(currentGroup);
