@@ -1,5 +1,6 @@
 package com.alphasystem.morphologicalanalysis.ui.dependencygraph.components;
 
+import com.alphasystem.morphologicalanalysis.common.model.VerseTokensPair;
 import com.alphasystem.morphologicalanalysis.graph.model.*;
 import com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType;
 import com.alphasystem.morphologicalanalysis.ui.common.Global;
@@ -878,7 +879,7 @@ public class CanvasPane extends Pane {
 
     private void makeReference(int index) {
         DependencyGraph dependencyGraph = getDependencyGraph().getDependencyGraph();
-        List<DependencyGraphTokenInfo> tokens = dependencyGraph.getTokens();
+        List<VerseTokensPair> tokens = dependencyGraph.getTokens();
         referenceSelectionDialog.reset(dependencyGraph.getChapterNumber(), tokens.get(0).getVerseNumber());
         Optional<Token> result = referenceSelectionDialog.showAndWait();
         result.ifPresent(token -> addReference(token, index));

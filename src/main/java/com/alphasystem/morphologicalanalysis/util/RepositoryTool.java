@@ -1,7 +1,7 @@
 package com.alphasystem.morphologicalanalysis.util;
 
+import com.alphasystem.morphologicalanalysis.common.model.VerseTokensPair;
 import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
-import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraphTokenInfo;
 import com.alphasystem.morphologicalanalysis.graph.model.GraphMetaInfo;
 import com.alphasystem.morphologicalanalysis.graph.model.TerminalNode;
 import com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType;
@@ -180,7 +180,7 @@ public class RepositoryTool {
         Integer verseNumber = firstToken.getVerseNumber();
         Integer firstTokenIndex = firstToken.getTokenNumber();
         Integer lastTokenIndex = lastToken.getTokenNumber();
-        DependencyGraphTokenInfo tokenInfo = new DependencyGraphTokenInfo(verseNumber, firstTokenIndex, lastTokenIndex);
+        VerseTokensPair tokenInfo = new VerseTokensPair(verseNumber, firstTokenIndex, lastTokenIndex);
 
         Criteria criteria1 = where("chapterNumber").is(chapterNumber);
         Criteria criteria2 = where("tokens").elemMatch(where("verseNumber").is(verseNumber).and("firstTokenIndex")

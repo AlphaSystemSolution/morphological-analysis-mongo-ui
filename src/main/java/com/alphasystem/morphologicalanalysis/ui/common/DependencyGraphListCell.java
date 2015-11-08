@@ -1,8 +1,8 @@
 package com.alphasystem.morphologicalanalysis.ui.common;
 
 import com.alphasystem.arabic.model.ArabicWord;
+import com.alphasystem.morphologicalanalysis.common.model.VerseTokensPair;
 import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
-import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraphTokenInfo;
 import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Verse;
@@ -38,8 +38,8 @@ public class DependencyGraphListCell extends ListCell<DependencyGraph> {
         super.updateItem(item, empty);
 
         if (item != null && !empty) {
-            List<DependencyGraphTokenInfo> tokenInfoList = item.getTokens();
-            DependencyGraphTokenInfo tokenInfo = tokenInfoList.get(0);
+            List<VerseTokensPair> tokenInfoList = item.getTokens();
+            VerseTokensPair tokenInfo = tokenInfoList.get(0);
             Integer chapterNumber = item.getChapterNumber();
             StringBuilder builder = new StringBuilder();
             builder.append(getTokensText(chapterNumber, tokenInfo));
@@ -55,7 +55,7 @@ public class DependencyGraphListCell extends ListCell<DependencyGraph> {
         setGraphic(label);
     }
 
-    private String getTokensText(Integer chapterNumber, DependencyGraphTokenInfo tokenInfo) {
+    private String getTokensText(Integer chapterNumber, VerseTokensPair tokenInfo) {
         Verse verse = verseRepository.findByChapterNumberAndVerseNumber(chapterNumber, tokenInfo.getVerseNumber());
         List<Token> tokens = getGraphTokens(verse, tokenInfo.getFirstTokenIndex(), tokenInfo.getLastTokenIndex());
         return getArabicWord(tokens).toUnicode();
