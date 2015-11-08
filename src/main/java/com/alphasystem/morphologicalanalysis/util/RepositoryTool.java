@@ -7,6 +7,7 @@ import com.alphasystem.morphologicalanalysis.graph.model.TerminalNode;
 import com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType;
 import com.alphasystem.morphologicalanalysis.graph.repository.DependencyGraphRepository;
 import com.alphasystem.morphologicalanalysis.graph.repository.TerminalNodeRepository;
+import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.VerseTokenPairGroup;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.GraphBuilder;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Chapter;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
@@ -21,8 +22,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
 import static org.springframework.data.mongodb.core.query.Criteria.where;
@@ -166,10 +166,25 @@ public class RepositoryTool {
         return dependencyGraphRepository.findByDisplayName(displayName);
     }
 
-    public List<DependencyGraph> dependencyGraphs(Integer chapterNumber, Integer verseNumber) {
-        Criteria criteria1 = where("chapterNumber").is(chapterNumber);
-        Criteria criteria2 = where("tokens").elemMatch(where("verseNumber").is(verseNumber));
-        return mongoTemplate.find(new Query(new Criteria().andOperator(criteria1, criteria2)), DependencyGraph.class);
+    public List<DependencyGraph> getDependencyGraphs(VerseTokenPairGroup group) {
+        Set<DependencyGraph> dependencyGraphs = new LinkedHashSet<>();
+        Integer chapterNumber = group.getChapterNumber();
+        List<VerseTokensPair> pairs = group.getPairs();
+        pairs.forEach(pair -> {
+            List<DependencyGraph> result = getDependencyGraphs(chapterNumber, pair);
+            if (result != null && !result.isEmpty()) {
+                dependencyGraphs.addAll(result);
+            }
+        });
+
+        return new ArrayList<>(dependencyGraphs);
+    }
+
+    private List<DependencyGraph> getDependencyGraphs(Integer chapterNumber, VerseTokensPair pair) {
+        Query query = new Query(where("chapterNumber").is(chapterNumber));
+        Criteria criteria = where("tokens").elemMatch(where("verseNumber").is(pair.getVerseNumber()));
+        query.addCriteria(criteria);
+        return mongoTemplate.find(query, DependencyGraph.class);
     }
 
     public DependencyGraph createDependencyGraph(List<Token> tokens, GraphMetaInfo graphMetaInfo) {

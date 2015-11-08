@@ -1,8 +1,9 @@
 package com.alphasystem.morphologicalanalysis.ui.common;
 
+import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.VerseTokenPairGroup;
 import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
+import com.alphasystem.morphologicalanalysis.util.VerseTokensPairsReader;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Chapter;
-import com.alphasystem.morphologicalanalysis.wordbyword.model.Verse;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -17,6 +18,7 @@ import javafx.scene.layout.HBox;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.RESOURCE_BUNDLE;
 
@@ -25,17 +27,20 @@ import static com.alphasystem.morphologicalanalysis.ui.common.Global.RESOURCE_BU
  */
 public class ChapterVerseSelectionPane extends BorderPane {
 
+
+    // other elements
+    Map<Integer, List<VerseTokenPairGroup>> groupMap;
     private Label chapterNameLabel;
     private ComboBox<Chapter> chapterNameComboBox;
     private Label verseNumberLabel;
-    private ComboBox<Verse> verseComboBox;
-
-    // other elements
+    private ComboBox<VerseTokenPairGroup> verseComboBox;
     private List<Chapter> chapters;
     private BooleanProperty available = new SimpleBooleanProperty(false);
 
     @SuppressWarnings({"unchecked"})
     public ChapterVerseSelectionPane() {
+        groupMap = VerseTokensPairsReader.read();
+
         Service<List<Chapter>> service = RepositoryTool.getInstance().getAllChapters();
         service.start();
         service.setOnSucceeded(event -> {
@@ -56,8 +61,8 @@ public class ChapterVerseSelectionPane extends BorderPane {
         grid.setPadding(new Insets(25, 25, 25, 25));
 
         verseComboBox = new ComboBox<>();
-        verseComboBox.setButtonCell(new VerseListCell());
-        verseComboBox.setCellFactory(param -> new VerseListCell());
+        verseComboBox.setButtonCell(new VerseTokenPairGroupListCell());
+        verseComboBox.setCellFactory(param -> new VerseTokenPairGroupListCell());
 
         chapterNameLabel = new Label(RESOURCE_BUNDLE.getString("chapterName.label"));
         grid.add(chapterNameLabel, 0, 0);
@@ -86,29 +91,27 @@ public class ChapterVerseSelectionPane extends BorderPane {
     }
 
     private void initVerseComboBox(Chapter chapter) {
-        ObservableList<Verse> items = verseComboBox.getItems();
+        ObservableList<VerseTokenPairGroup> items = verseComboBox.getItems();
         items.remove(0, items.size());
 
-        List<Verse> verseNumbers = new ArrayList<>();
+        List<VerseTokenPairGroup> verseNumbers = new ArrayList<>();
         if (chapter != null) {
-            int verseCount = chapter.getVerseCount();
-            for (int i = 1; i <= verseCount; i++) {
-                verseNumbers.add(new Verse(chapter.getChapterNumber(), i));
-            }
+            verseNumbers.addAll(groupMap.get(chapter.getChapterNumber()));
+
         }
         int size = verseNumbers.size();
-        verseComboBox.getItems().addAll(verseNumbers.toArray(new Verse[size]));
+        verseComboBox.getItems().addAll(verseNumbers.toArray(new VerseTokenPairGroup[size]));
         if (size > 0) {
             verseComboBox.getSelectionModel().selectFirst();
         }
         verseComboBox.requestLayout();
     }
 
-    public ReadOnlyObjectProperty<Verse> selectedVerseProperty() {
+    public ReadOnlyObjectProperty<VerseTokenPairGroup> selectedVerseProperty() {
         return verseComboBox.getSelectionModel().selectedItemProperty();
     }
 
-    public Verse getSelectedVerse() {
+    public VerseTokenPairGroup getSelectedVerse() {
         return selectedVerseProperty().get();
     }
 
@@ -124,7 +127,7 @@ public class ChapterVerseSelectionPane extends BorderPane {
         return verseNumberLabel;
     }
 
-    public ComboBox<Verse> getVerseComboBox() {
+    public ComboBox<VerseTokenPairGroup> getVerseComboBox() {
         return verseComboBox;
     }
 }

@@ -1,11 +1,13 @@
 package com.alphasystem.morphologicalanalysis.ui.wordbyword.component;
 
+import com.alphasystem.morphologicalanalysis.common.model.VerseTokensPair;
 import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
 import com.alphasystem.morphologicalanalysis.ui.common.ChapterVerseSelectionPane;
 import com.alphasystem.morphologicalanalysis.ui.common.GraphMetaInfoSelectionDialog;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.TreeBankPane;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.DependencyGraphAdapter;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.GraphMetaInfoAdapter;
+import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.VerseTokenPairGroup;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.CanvasUtil;
 import com.alphasystem.morphologicalanalysis.ui.wordbyword.model.TableCellModel;
 import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
@@ -239,19 +241,29 @@ public class WordByWordPane extends BorderPane {
 
     @SuppressWarnings({"unchecked"})
     private void refreshTable() {
-        Verse selectedVerse = chapterVerseSelectionPane.getSelectedVerse();
+        VerseTokenPairGroup selectedVerse = chapterVerseSelectionPane.getSelectedVerse();
         if (selectedVerse == null) {
             return;
         }
-        int chapterNumber = selectedVerse.getChapterNumber();
-        int verseNumber = selectedVerse.getVerseNumber();
-        Verse verse = repositoryTool.getRepositoryUtil().getVerseRepository().
-                findByChapterNumberAndVerseNumber(chapterNumber, verseNumber);
-
         ObservableList items = tableView.getItems();
         items.remove(0, items.size());
 
-        items.addAll(verse.getTokens().stream().map(TableCellModel::new).collect(Collectors.toList()));
+        List<Token> tokens = new ArrayList<>();
+        int chapterNumber = selectedVerse.getChapterNumber();
+        List<VerseTokensPair> pairs = selectedVerse.getPairs();
+        VerseTokensPair verseTokensPair = pairs.get(0);
+        Verse verse = repositoryTool.getRepositoryUtil().getVerseRepository().
+                findByChapterNumberAndVerseNumber(chapterNumber, verseTokensPair.getVerseNumber());
+        tokens.addAll(verse.getTokens());
+        for (int i = 1; i < pairs.size(); i++) {
+            verseTokensPair = pairs.get(i);
+            verse = repositoryTool.getRepositoryUtil().getVerseRepository().
+                    findByChapterNumberAndVerseNumber(chapterNumber, verseTokensPair.getVerseNumber());
+            tokens.addAll(verse.getTokens());
+        }
+        System.out.println();
+
+        items.addAll(tokens.stream().map(TableCellModel::new).collect(Collectors.toList()));
 
         tableView.requestLayout();
     }
