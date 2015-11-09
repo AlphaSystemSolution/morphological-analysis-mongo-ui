@@ -160,6 +160,19 @@ public class GraphBuilder {
         return partOfSpeechNodes;
     }
 
+    public ImpliedNode buildImpliedNode(Token token, Line referenceLine) {
+        rectX = gapBetweenTokens + referenceLine.getEndX();
+        textX = rectX + 30;
+        x1 = rectX;
+        x2 = tokenWidth + rectX;
+        x3 = rectX + 30;
+
+        ImpliedNode impliedNode = (ImpliedNode) buildTerminalNode(token, IMPLIED);
+        buildPartOfSpeechNodes(singletonList(impliedNode));
+
+        return impliedNode;
+    }
+
     public ImpliedNode buildImpliedNode(String id, Line referenceLine) {
         rectX = gapBetweenTokens + referenceLine.getEndX();
         textX = rectX + 30;

@@ -8,6 +8,7 @@ import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.*;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.CanvasUtil;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.DependencyGraphGraphicTool;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.GraphBuilder;
+import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.VerbProperties;
@@ -43,6 +44,7 @@ import static java.lang.String.format;
 import static java.util.Collections.reverse;
 import static javafx.collections.FXCollections.observableArrayList;
 import static javafx.geometry.NodeOrientation.RIGHT_TO_LEFT;
+import static javafx.scene.control.Alert.AlertType.ERROR;
 import static javafx.scene.control.Alert.AlertType.WARNING;
 import static javafx.scene.control.ButtonType.NO;
 import static javafx.scene.control.ButtonType.YES;
@@ -65,12 +67,14 @@ public class CanvasPane extends Pane {
 
     private GraphMetaInfoAdapter metaInfo = new GraphMetaInfoAdapter(new GraphMetaInfo());
     private DependencyGraphGraphicTool tool = DependencyGraphGraphicTool.getInstance();
+    private RepositoryTool repositoryTool = RepositoryTool.getInstance();
     private CanvasUtil canvasUtil = CanvasUtil.getInstance();
     private GraphBuilder graphBuilder = GraphBuilder.getInstance();
     private RelationshipSelectionDialog relationshipSelectionDialog;
     private PhraseSelectionDialog phraseSelectionDialog;
     private ReferenceSelectionDialog referenceSelectionDialog;
     private Map<GraphNodeType, List<String>> removalIdMap = new HashMap<>();
+    private List<Token> impliedOrHiddenTokens = new ArrayList<>();
     private Pane canvasPane;
     private Node gridLines;
 
@@ -263,6 +267,7 @@ public class CanvasPane extends Pane {
         final Text arabicText = drawText(tn, color);
         arabicText.setOnMouseClicked(event -> {
             if (event.isPopupTrigger()) {
+                getDependencyGraph().setSelectedNode(tn);
                 initTerminalContextMenu(arabicText);
                 contextMenu.show(arabicText, event.getScreenX(), event.getScreenY());
             } else {
@@ -949,7 +954,7 @@ public class CanvasPane extends Pane {
         Text text = new Text(nounStatus.getLabel().toUnicode());
         text.setFont(ARABIC_FONT_SMALL_BOLD);
         MenuItem menuItem = new MenuItem("", text);
-        menuItem.setOnAction(event -> addImpliedNode(index, format("%s_%s", NOUN.name(), nounStatus.name())));
+        menuItem.setOnAction(event -> addImpliedNode(index, NOUN, nounStatus));
         return menuItem;
     }
 
@@ -957,18 +962,39 @@ public class CanvasPane extends Pane {
         Text text = new Text(verbType.getLabel().toUnicode());
         text.setFont(ARABIC_FONT_SMALL_BOLD);
         MenuItem menuItem = new MenuItem("", text);
-        menuItem.setOnAction(event -> addImpliedNode(index, format("%s_%s", VERB.name(), verbType.name())));
+        menuItem.setOnAction(event -> addImpliedNode(index, VERB, verbType));
         return menuItem;
     }
 
-    private void addImpliedNode(int index, String id) {
+    private void addImpliedNode(int index, PartOfSpeech partOfSpeech, Object type) {
+        GraphNodeAdapter selectedNode = getDependencyGraph().getSelectedNode();
+        if (!isTerminal(selectedNode)) {
+            Alert alert = new Alert(ERROR);
+            alert.setContentText(format("Expected to have %s node instead found %s", TERMINAL
+                    , selectedNode.getGraphNodeType()));
+            alert.showAndWait();
+            return;
+        }
+        TerminalNode terminalNode = (TerminalNode) selectedNode.getSrc();
+        System.out.println(">>>>>>>>>>>>>>>> " + terminalNode.getToken());
+        Token impliedToken = repositoryTool.createImpliedNode(terminalNode.getToken(), partOfSpeech, type);
+        System.out.println(">>>>>>>>>>>>>>>> " + impliedToken);
+        if (impliedToken == null) {
+            Alert alert = new Alert(ERROR);
+            alert.setContentText(format("Unsupported part of speech %s", partOfSpeech));
+            alert.showAndWait();
+            return;
+        }
+        impliedOrHiddenTokens.add(impliedToken);
+
         GraphMetaInfoAdapter graphMetaInfoAdapter = getDependencyGraph().getGraphMetaInfo();
         canvasUtil.shiftRight(index, getDependencyGraph());
         Node node = canvasPane.getChildren().get(index - 1);
         Group group = (Group) node;
         Line referenceLine = getReferenceLine(group);
         graphBuilder.set(graphMetaInfoAdapter.getGraphMetaInfo());
-        ImpliedNodeAdapter impliedNodeAdapter = createImpliedNodeAdapter(id, referenceLine, graphMetaInfoAdapter);
+        ImpliedNodeAdapter impliedNodeAdapter = createImpliedNodeAdapter(impliedToken,
+                referenceLine, graphMetaInfoAdapter);
         getDependencyGraph().getDependencyGraph().getNodes().add(index, impliedNodeAdapter.getSrc());
         getDependencyGraph().getGraphNodes().add(index, impliedNodeAdapter);
         DependencyGraphAdapter dependencyGraph = getDependencyGraph();
@@ -976,10 +1002,10 @@ public class CanvasPane extends Pane {
         setDependencyGraph(dependencyGraph);
     }
 
-    private ImpliedNodeAdapter createImpliedNodeAdapter(String partOfSpeech, Line referenceLine,
+    private ImpliedNodeAdapter createImpliedNodeAdapter(Token token, Line referenceLine,
                                                         GraphMetaInfoAdapter graphMetaInfoAdapter) {
         ImpliedNodeAdapter impliedNodeAdapter = new ImpliedNodeAdapter();
-        ImpliedNode impliedNode = graphBuilder.buildImpliedNode(partOfSpeech, referenceLine);
+        ImpliedNode impliedNode = graphBuilder.buildImpliedNode(token, referenceLine);
         canvasUtil.updateFonts(impliedNode, graphMetaInfoAdapter);
         impliedNodeAdapter.setSrc(impliedNode);
         return impliedNodeAdapter;
@@ -1082,5 +1108,9 @@ public class CanvasPane extends Pane {
 
     public Map<GraphNodeType, List<String>> getRemovalIdMap() {
         return removalIdMap;
+    }
+
+    public List<Token> getImpliedOrHiddenTokens() {
+        return impliedOrHiddenTokens;
     }
 }

@@ -8,9 +8,10 @@ import com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType;
 import com.alphasystem.morphologicalanalysis.graph.repository.DependencyGraphRepository;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.VerseTokenPairGroup;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.GraphBuilder;
-import com.alphasystem.morphologicalanalysis.wordbyword.model.Chapter;
-import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
-import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.*;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.support.NounStatus;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.support.VerbType;
 import com.alphasystem.morphologicalanalysis.wordbyword.repository.LocationRepository;
 import com.alphasystem.morphologicalanalysis.wordbyword.repository.TokenRepository;
 import com.alphasystem.persistence.mongo.repository.BaseRepository;
@@ -21,9 +22,15 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
+import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.NOUN;
+import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.VERB;
+import static java.lang.String.format;
+import static java.util.Collections.singletonList;
 import static org.springframework.data.mongodb.core.query.Criteria.where;
 
 /**
@@ -145,24 +152,53 @@ public class RepositoryTool {
     }
 
     public List<DependencyGraph> getDependencyGraphs(VerseTokenPairGroup group) {
-        Set<DependencyGraph> dependencyGraphs = new LinkedHashSet<>();
         Integer chapterNumber = group.getChapterNumber();
+
+        List<Criteria> criterion = new ArrayList<>();
         List<VerseTokensPair> pairs = group.getPairs();
         pairs.forEach(pair -> {
-            List<DependencyGraph> result = getDependencyGraphs(chapterNumber, pair);
-            if (result != null && !result.isEmpty()) {
-                dependencyGraphs.addAll(result);
-            }
+            criterion.add(where("tokens").elemMatch(where("verseNumber").is(pair.getVerseNumber())));
         });
-
-        return new ArrayList<>(dependencyGraphs);
+        Criteria criteria = where("chapterNumber").is(chapterNumber).orOperator(
+                criterion.toArray(new Criteria[criterion.size()]));
+        Query query = new Query(criteria);
+        return mongoTemplate.find(query, DependencyGraph.class);
     }
 
-    private List<DependencyGraph> getDependencyGraphs(Integer chapterNumber, VerseTokensPair pair) {
-        Query query = new Query(where("chapterNumber").is(chapterNumber));
-        Criteria criteria = where("tokens").elemMatch(where("verseNumber").is(pair.getVerseNumber()));
-        query.addCriteria(criteria);
-        return mongoTemplate.find(query, DependencyGraph.class);
+    public DependencyGraph createDependencyGraph(VerseTokenPairGroup group, GraphMetaInfo graphMetaInfo)
+            throws RuntimeException {
+        Integer chapterNumber = group.getChapterNumber();
+        String displayName = format("%s|%s", chapterNumber, group.toString());
+        DependencyGraph dependencyGraph = dependencyGraphRepository.findByDisplayName(displayName);
+        if (dependencyGraph == null) {
+            List<Criteria> criterion = new ArrayList<>();
+            List<VerseTokensPair> pairs = group.getPairs();
+            pairs.forEach(pair -> {
+                criterion.add(where("verseNumber").is(pair.getVerseNumber())
+                        .andOperator(where("tokenNumber").gte(pair.getFirstTokenIndex()),
+                                where("tokenNumber").lte(pair.getLastTokenIndex())));
+            });
+            Criteria criteria = where("chapterNumber").is(chapterNumber).orOperator(
+                    criterion.toArray(new Criteria[criterion.size()]));
+            Query query = new Query(criteria);
+            System.out.println(">>>>>>>>>>> " + query);
+            List<Token> tokens = mongoTemplate.find(query, Token.class);
+            if (tokens == null || tokens.isEmpty()) {
+                throw new RuntimeException(format("Unable to create dependency graph for %s", displayName));
+            }
+            dependencyGraph = new DependencyGraph(chapterNumber);
+            dependencyGraph.getTokens().addAll(pairs);
+            dependencyGraph.initDisplayName();
+            dependencyGraph.setMetaInfo(graphMetaInfo);
+            graphBuilder.set(graphMetaInfo);
+            List<TerminalNode> terminalNodes = graphBuilder.buildTerminalNodes(tokens);
+            for (TerminalNode terminalNode : terminalNodes) {
+                terminalNode.initDisplayName();
+                dependencyGraph.addNode(terminalNode);
+            }
+        }
+
+        return dependencyGraph;
     }
 
     public DependencyGraph createDependencyGraph(List<Token> tokens, GraphMetaInfo graphMetaInfo) {
@@ -198,7 +234,11 @@ public class RepositoryTool {
         return dependencyGraph;
     }
 
-    public void saveDependencyGraph(DependencyGraph dependencyGraph, Map<GraphNodeType, List<String>> removalIds) {
+    public void saveDependencyGraph(DependencyGraph dependencyGraph, List<Token> impliedOrHiddenTokens,
+                                    Map<GraphNodeType, List<String>> removalIds) {
+        if (impliedOrHiddenTokens != null && !impliedOrHiddenTokens.isEmpty()) {
+            impliedOrHiddenTokens.forEach(token -> tokenRepository.save(token));
+        }
         dependencyGraphRepository.save(dependencyGraph);
         if (!removalIds.isEmpty()) {
             removalIds.entrySet().forEach(this::removeNode);
@@ -218,6 +258,29 @@ public class RepositoryTool {
         List<String> ids = entry.getValue();
         BaseRepository repository = getRepository(key);
         ids.forEach(repository::delete);
+    }
+
+    public Token createImpliedNode(Token srcToken, PartOfSpeech partOfSpeech, Object type) {
+        Token token = null;
+        if (NOUN.equals(partOfSpeech)) {
+            token = createToken(srcToken, partOfSpeech, new NounProperties().withNounStatus((NounStatus) type));
+        } else if (VERB.equals(partOfSpeech)) {
+            token = createToken(srcToken, VERB, new VerbProperties().withVerbType((VerbType) type));
+        }
+        return token;
+    }
+
+    private Token createToken(Token srcToken, PartOfSpeech partOfSpeech, AbstractProperties properties) {
+        Token token = new Token().withHidden(true).withToken("(*)").withChapterNumber(srcToken.getChapterNumber())
+                .withVerseNumber(srcToken.getVerseNumber()).withTokenNumber(srcToken.getTokenNumber());
+
+        Location location = new Location().withHidden(true).withChapterNumber(token.getChapterNumber())
+                .withVerseNumber(token.getVerseNumber()).withTokenNumber(token.getTokenNumber())
+                .withLocationIndex(1).withPartOfSpeech(partOfSpeech).withStartIndex(0)
+                .withEndIndex(token.getTokenWord().getLength()).withProperties(properties);
+
+        token.setLocations(singletonList(location));
+        return token;
     }
 
     public MorphologicalAnalysisRepositoryUtil getRepositoryUtil() {

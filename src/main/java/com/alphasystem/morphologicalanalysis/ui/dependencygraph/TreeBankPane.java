@@ -184,7 +184,8 @@ public class TreeBankPane extends BorderPane {
     private void saveAction() {
         try {
             repositoryTool.saveDependencyGraph(canvasPane.getDependencyGraph().getDependencyGraph(),
-                    canvasPane.getRemovalIdMap());
+                    canvasPane.getImpliedOrHiddenTokens(), canvasPane.getRemovalIdMap());
+            canvasPane.getImpliedOrHiddenTokens().clear();
             canvasPane.getRemovalIdMap().clear();
         } catch (Exception e) {
             Alert alert = new Alert(ERROR);

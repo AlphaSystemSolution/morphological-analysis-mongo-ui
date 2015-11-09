@@ -338,6 +338,13 @@ public class CanvasUtil {
         return dependencyGraph;
     }
 
+    public DependencyGraph createDependencyGraph(VerseTokenPairGroup group, GraphMetaInfoAdapter adapterInfo) {
+        GraphMetaInfo gmi = adapterInfo.getGraphMetaInfo();
+        DependencyGraph dependencyGraph = repositoryTool.createDependencyGraph(group, gmi);
+        dependencyGraph.getNodes().forEach(graphNode -> updateFonts(graphNode, adapterInfo));
+        return dependencyGraph;
+    }
+
     public void updateFonts(GraphNode graphNode, GraphMetaInfoAdapter adapterInfo) {
         GraphNodeType graphNodeType = graphNode.getGraphNodeType();
         switch (graphNodeType) {

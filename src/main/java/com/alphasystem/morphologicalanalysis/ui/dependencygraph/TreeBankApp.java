@@ -2,15 +2,10 @@ package com.alphasystem.morphologicalanalysis.ui.dependencygraph;
 
 import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
 import com.alphasystem.morphologicalanalysis.ui.common.GraphMetaInfoSelectionDialog;
-import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.DependencyGraphAdapter;
-import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.GraphMetaInfoAdapter;
-import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.GraphNodeAdapter;
-import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.TerminalNodeAdapter;
+import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.*;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.CanvasUtil;
 import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
 import com.alphasystem.morphologicalanalysis.util.SpringContextHelper;
-import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
-import com.alphasystem.morphologicalanalysis.wordbyword.repository.TokenRepository;
 import javafx.application.Application;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
@@ -18,7 +13,6 @@ import javafx.scene.control.Alert;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -26,6 +20,7 @@ import java.util.Set;
 
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.fromFont;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.isTerminal;
+import static com.alphasystem.morphologicalanalysis.util.VerseTokensPairsReader.createGroup;
 import static java.lang.Integer.parseInt;
 import static java.lang.String.format;
 import static javafx.scene.control.Alert.AlertType.INFORMATION;
@@ -115,30 +110,15 @@ public class TreeBankApp extends Application {
         showStage(primaryStage, dependencyGraphAdapter);
     }
 
-    private void create(Stage stage, String value) {
-        DependencyGraphAdapter dependencyGraphAdapter = new DependencyGraphAdapter(new DependencyGraph());
-        String[] values = value.split(":");
-        Integer chapterNumber;
-        Integer verseNumber;
-        Integer firstTokenIndex;
-        Integer lastTokenIndex;
-        try {
-            chapterNumber = parseInt(values[0]);
-            verseNumber = parseInt(values[1]);
-            firstTokenIndex = parseInt(values[2]);
-            lastTokenIndex = parseInt(values[3]);
-        } catch (NumberFormatException e) {
-            e.printStackTrace();
-            return;
-        }
-
-        TokenRepository tokenRepository = repositoryTool.getRepositoryUtil().getTokenRepository();
-        List<Token> tokens = tokenRepository.findByChapterNumberAndVerseNumberAndTokenNumberBetween(chapterNumber,
-                verseNumber, firstTokenIndex - 1, lastTokenIndex + 1);
+    private void create(Stage stage, String displayName) {
         graphMetaInfoSelectionDialog.setGraphMetaInfo(null);
         Optional<GraphMetaInfoAdapter> result = graphMetaInfoSelectionDialog.showAndWait();
         result.ifPresent(adapterInfo -> {
-            DependencyGraph dependencyGraph = canvasUtil.createDependencyGraph(tokens, adapterInfo);
+            int i = displayName.indexOf('|');
+            Integer chapterNumber = parseInt(displayName.substring(0, i));
+            VerseTokenPairGroup group = createGroup(chapterNumber, displayName.substring(i + 1));
+            DependencyGraph dependencyGraph = canvasUtil.createDependencyGraph(group, adapterInfo);
+            DependencyGraphAdapter dependencyGraphAdapter = new DependencyGraphAdapter(new DependencyGraph());
             Alert alert = new Alert(INFORMATION);
             alert.setContentText(format("Graph Created {%s}", dependencyGraph.getDisplayName()));
             alert.showAndWait().filter(response -> response == OK).ifPresent(response -> {

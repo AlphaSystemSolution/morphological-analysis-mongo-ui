@@ -40,14 +40,7 @@ public class VerseTokensPairsReader {
                 } catch (NumberFormatException e) {
                 }
 
-                String[] pairs = line.split("\\|");
-                VerseTokenPairGroup currentGroup = new VerseTokenPairGroup();
-                currentGroup.setChapterNumber(chapterNumber);
-                currentGroupList.add(currentGroup);
-                for (String pair : pairs) {
-                    currentGroup.getPairs().add(createPair(pair));
-                }
-
+                currentGroupList.add(createGroup(chapterNumber, line));
                 listIterator.remove();
             }
         } catch (IOException e) {
@@ -57,6 +50,16 @@ public class VerseTokensPairsReader {
         }
 
         return resultMap;
+    }
+
+    public static VerseTokenPairGroup createGroup(Integer chapterNumber, String line) {
+        VerseTokenPairGroup group = new VerseTokenPairGroup();
+        String[] pairs = line.split("\\|");
+        group.setChapterNumber(chapterNumber);
+        for (String pair : pairs) {
+            group.getPairs().add(createPair(pair));
+        }
+        return group;
     }
 
     private static VerseTokensPair createPair(String line) {
