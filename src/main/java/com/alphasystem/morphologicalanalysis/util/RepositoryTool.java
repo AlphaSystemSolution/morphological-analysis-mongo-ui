@@ -211,8 +211,8 @@ public class RepositoryTool {
             dependencyGraph.setMetaInfo(graphMetaInfo);
             graphBuilder.set(graphMetaInfo);
             List<TerminalNode> terminalNodes = graphBuilder.buildTerminalNodes(tokens);
-            terminalNodeRepository.save(terminalNodes);
             for (TerminalNode terminalNode : terminalNodes) {
+                terminalNode.initDisplayName();
                 dependencyGraph.addNode(terminalNode);
             }
         }
