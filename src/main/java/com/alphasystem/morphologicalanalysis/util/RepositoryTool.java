@@ -6,7 +6,6 @@ import com.alphasystem.morphologicalanalysis.graph.model.GraphMetaInfo;
 import com.alphasystem.morphologicalanalysis.graph.model.TerminalNode;
 import com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType;
 import com.alphasystem.morphologicalanalysis.graph.repository.DependencyGraphRepository;
-import com.alphasystem.morphologicalanalysis.graph.repository.TerminalNodeRepository;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.VerseTokenPairGroup;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.GraphBuilder;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Chapter;
@@ -39,7 +38,6 @@ public class RepositoryTool {
     private TokenRepository tokenRepository;
     private LocationRepository locationRepository;
     private DependencyGraphRepository dependencyGraphRepository;
-    private TerminalNodeRepository terminalNodeRepository;
     private MongoTemplate mongoTemplate;
 
     /**
@@ -51,7 +49,6 @@ public class RepositoryTool {
         tokenRepository = repositoryUtil.getTokenRepository();
         locationRepository = repositoryUtil.getLocationRepository();
         dependencyGraphRepository = repositoryUtil.getDependencyGraphRepository();
-        terminalNodeRepository = repositoryUtil.getTerminalNodeRepository();
         mongoTemplate = repositoryUtil.getMongoTemplate();
         graphBuilder = GraphBuilder.getInstance();
 
@@ -108,25 +105,6 @@ public class RepositoryTool {
                 }; // end of new "Task"
             } // end of "createTask"
         }; // end of new "Service"
-    }
-
-    public Service<List<Token>> getTokens(final int chapterNumber, final int verseNumber) {
-        return new Service<List<Token>>() {
-            @Override
-            protected Task<List<Token>> createTask() {
-                return new Task<List<Token>>() {
-                    @Override
-                    protected List<Token> call() throws Exception {
-                        return tokenRepository.findByChapterNumberAndVerseNumber(
-                                chapterNumber, verseNumber);
-                    } // end of call
-                }; // end of "new task"
-            } // end of createTask
-        }; // end of "new Service"
-    }
-
-    public Token getToken(String id) {
-        return tokenRepository.findOne(id);
     }
 
     public Token getTokenByDisplayName(String displayName) {
@@ -234,6 +212,7 @@ public class RepositoryTool {
         dependencyGraphRepository.delete(id);
     }
 
+    @SuppressWarnings({"unchecked"})
     private void removeNode(Entry<GraphNodeType, List<String>> entry) {
         GraphNodeType key = entry.getKey();
         List<String> ids = entry.getValue();
