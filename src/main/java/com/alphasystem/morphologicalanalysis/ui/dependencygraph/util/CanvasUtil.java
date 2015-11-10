@@ -357,25 +357,6 @@ public class CanvasUtil {
         }
     }
 
-    public void updateDependencyGraphTree(DependencyGraphAdapter graph, Menu menu) {
-        menu.getItems().remove(0, menu.getItems().size());
-        if (graph == null) {
-            MenuItem menuItem = new MenuItem("Graph is empty");
-            menuItem.setDisable(true);
-            menu.getItems().add(menuItem);
-        } else {
-            ObservableList<GraphNodeAdapter> graphNodes = graph.getGraphNodes();
-            if (graphNodes != null && !graphNodes.isEmpty()) {
-                graphNodes.forEach(node -> {
-                    menu.getItems().add(createMenuItem(node));
-                    if (isTerminal(node)) {
-
-                    }
-                });
-            }
-        }
-    }
-
     /**
      * Shift nodes to the right. The calculation of shifting right is:
      * <div>
@@ -454,8 +435,8 @@ public class CanvasUtil {
         return label;
     }
 
-    private MenuItem createMenuItem(GraphNodeAdapter graphNode) {
-        MenuItem menuItem = new MenuItem();
+    public MenuItem createMenuItem(GraphNodeAdapter graphNode) {
+        MenuItem menuItem = isTerminal(graphNode) ? new Menu() : new MenuItem();
         menuItem.setGraphic(getItemGraphic(graphNode));
         return menuItem;
     }

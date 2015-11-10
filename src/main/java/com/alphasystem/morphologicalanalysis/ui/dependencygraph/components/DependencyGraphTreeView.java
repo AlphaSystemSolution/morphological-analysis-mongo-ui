@@ -15,6 +15,7 @@ import static javafx.scene.control.SelectionMode.SINGLE;
 /**
  * @author sali
  */
+@Deprecated
 public class DependencyGraphTreeView extends TreeView<GraphNodeAdapter> {
 
     private final ObjectProperty<GraphNodeAdapter> selectedNode = new SimpleObjectProperty<>();

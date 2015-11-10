@@ -5,6 +5,7 @@ import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.components.CanvasPane;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.components.ControlPane;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.components.DependencyGraphSelectionDialog;
+import com.alphasystem.morphologicalanalysis.ui.dependencygraph.components.DependencyGraphTreeMenu;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.DependencyGraphAdapter;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.GraphMetaInfoAdapter;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.GraphNodeAdapter;
@@ -79,6 +80,7 @@ public class TreeBankPane extends BorderPane {
             dependencyGraph = new DependencyGraphAdapter(new DependencyGraph());
         }
         setTop(createMenuBar());
+        DependencyGraphTreeMenu treeMenu = new DependencyGraphTreeMenu(dependencyGraph, dependencyGraphTreeMenu);
         dependencyGraphSelectionDialog = new DependencyGraphSelectionDialog();
         canvasPane = new CanvasPane(dependencyGraph);
         ScrollPane scrollPane = new ScrollPane(canvasPane);
@@ -92,6 +94,9 @@ public class TreeBankPane extends BorderPane {
         // connection between Canvas pane and Control pane
         controlPane.dependencyGraphProperty().bind(canvasPane.dependencyGraphProperty());
         canvasPane.dependencyGraphProperty().addListener((observable, oldValue, newValue) -> {
+            // set null value first in order to listener to pick
+            treeMenu.setGraph(null);
+            treeMenu.setGraph(newValue);
             if (newValue != null) {
                 canvasPane.dependencyGraphProperty().get().selectedNodeProperty().addListener(
                         (observable1, oldValue1, newValue1) -> {
@@ -99,7 +104,9 @@ public class TreeBankPane extends BorderPane {
                         });
             }
         });
-
+        treeMenu.selectedNodeProperty().addListener((observable, oldValue, newValue) -> {
+            canvasPane.dependencyGraphProperty().get().setSelectedNode(newValue);
+        });
     }
 
     private static String getFileNameWithPadding(int value) {

@@ -4,14 +4,12 @@ import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.*;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.BorderPane;
 
 import static com.alphasystem.util.AppUtil.isGivenType;
 import static javafx.geometry.Side.TOP;
-import static javafx.scene.control.ScrollPane.ScrollBarPolicy.AS_NEEDED;
 import static javafx.scene.control.TabPane.TabClosingPolicy.UNAVAILABLE;
 
 /**
@@ -20,13 +18,9 @@ import static javafx.scene.control.TabPane.TabClosingPolicy.UNAVAILABLE;
 public class ControlPane extends BorderPane {
 
     private final ObjectProperty<DependencyGraphAdapter> dependencyGraph = new SimpleObjectProperty<>();
-    private DependencyGraphTreeView tree;
     private DependencyGraphBuilderEditorPane editorPane;
 
     public ControlPane(DependencyGraphAdapter dependencyGraph) {
-        // init tree
-        tree = new DependencyGraphTreeView(dependencyGraph);
-
         editorPane = new DependencyGraphBuilderEditorPane(null, 0, 0);
         PropertiesPane propertiesPane = new PropertiesPane(dependencyGraph);
         propertiesPane.getWidthField().valueProperty().addListener((observable, oldValue, newValue) -> {
@@ -86,14 +80,8 @@ public class ControlPane extends BorderPane {
                         tn -> tn.setTranslateY(newValue1));
             });
 
-            // set null value first in order to listener to pick
-            tree.setGraph(null);
-            tree.setGraph(newValue);
         });
 
-        tree.selectedNodeProperty().addListener((observable, oldValue, newValue) -> {
-            getDependencyGraph().setSelectedNode(newValue);
-        });
         TabPane tabPane = new TabPane();
         tabPane.setRotateGraphic(false);
         tabPane.setTabClosingPolicy(UNAVAILABLE);
@@ -104,21 +92,10 @@ public class ControlPane extends BorderPane {
 
         tabPane.getTabs().addAll(
                 new Tab(" Properties ", propertiesPane),
-                new Tab("    Tree    ", initTreePane()),
                 new Tab("   Editor   ", borderPane));
 
         setCenter(tabPane);
         setDependencyGraph(dependencyGraph);
-    }
-
-    private BorderPane initTreePane() {
-        BorderPane borderPane = new BorderPane();
-        ScrollPane scrollPane = new ScrollPane();
-        scrollPane.setHbarPolicy(AS_NEEDED);
-        scrollPane.setVbarPolicy(AS_NEEDED);
-        scrollPane.setContent(tree);
-        borderPane.setCenter(scrollPane);
-        return borderPane;
     }
 
     private void refreshPanel(DependencyGraphAdapter dependencyGraph) {
