@@ -1,5 +1,6 @@
 package com.alphasystem.morphologicalanalysis.util;
 
+import com.alphasystem.arabic.model.ProNoun;
 import com.alphasystem.morphologicalanalysis.common.model.VerseTokensPair;
 import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
 import com.alphasystem.morphologicalanalysis.graph.model.GraphMetaInfo;
@@ -9,9 +10,7 @@ import com.alphasystem.morphologicalanalysis.graph.repository.DependencyGraphRep
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.VerseTokenPairGroup;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.GraphBuilder;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.*;
-import com.alphasystem.morphologicalanalysis.wordbyword.model.support.NounStatus;
-import com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech;
-import com.alphasystem.morphologicalanalysis.wordbyword.model.support.VerbType;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.support.*;
 import com.alphasystem.morphologicalanalysis.wordbyword.repository.LocationRepository;
 import com.alphasystem.morphologicalanalysis.wordbyword.repository.TokenRepository;
 import com.alphasystem.persistence.mongo.repository.BaseRepository;
@@ -27,8 +26,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.NOUN;
-import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.VERB;
+import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.ConversationType.FIRST_PERSON;
+import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.NounStatus.NOMINATIVE;
+import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.*;
+import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.ProNounType.DETACHED;
 import static java.lang.String.format;
 import static java.util.Collections.singletonList;
 import static org.springframework.data.mongodb.core.query.Criteria.where;
@@ -169,6 +170,7 @@ public class RepositoryTool {
             throws RuntimeException {
         Integer chapterNumber = group.getChapterNumber();
         String displayName = format("%s|%s", chapterNumber, group.toString());
+        System.out.println(">>>>>>>>>>>>>>>> " + displayName);
         DependencyGraph dependencyGraph = dependencyGraphRepository.findByDisplayName(displayName);
         if (dependencyGraph == null) {
             List<Criteria> criterion = new ArrayList<>();
@@ -263,15 +265,27 @@ public class RepositoryTool {
     public Token createImpliedNode(Token srcToken, PartOfSpeech partOfSpeech, Object type) {
         Token token = null;
         if (NOUN.equals(partOfSpeech)) {
-            token = createToken(srcToken, partOfSpeech, new NounProperties().withNounStatus((NounStatus) type));
+            token = createToken(srcToken, "(*)", partOfSpeech, new NounProperties().withNounStatus((NounStatus) type));
         } else if (VERB.equals(partOfSpeech)) {
-            token = createToken(srcToken, VERB, new VerbProperties().withVerbType((VerbType) type));
+            token = createToken(srcToken, "(*)", VERB, new VerbProperties().withVerbType((VerbType) type));
         }
         return token;
     }
 
-    private Token createToken(Token srcToken, PartOfSpeech partOfSpeech, AbstractProperties properties) {
-        Token token = new Token().withHidden(true).withToken("(*)").withChapterNumber(srcToken.getChapterNumber())
+    public Token createHiddenNode(Token srcToken, GenderType genderType, NumberType numberType,
+                                  ConversationType conversationType) {
+        String genderAndType = genderType.name();
+        genderAndType = conversationType.equals(FIRST_PERSON) ? "" : format("_%s", genderAndType);
+        String pronounId = format("%s%s_%s", conversationType.name(), genderAndType, numberType.name());
+        ProNoun proNoun = ProNoun.valueOf(pronounId);
+        ProNounProperties proNounProperties = (ProNounProperties) new ProNounProperties().withProNounType(DETACHED)
+                .withConversationType(conversationType).withNounStatus(NOMINATIVE).withGenderType(genderType)
+                .withNumberType(numberType);
+        return createToken(srcToken, proNoun.getLabel().toUnicode(), PRONOUN, proNounProperties);
+    }
+
+    private Token createToken(Token srcToken, String tokenText, PartOfSpeech partOfSpeech, AbstractProperties properties) {
+        Token token = new Token().withHidden(true).withToken(tokenText).withChapterNumber(srcToken.getChapterNumber())
                 .withVerseNumber(srcToken.getVerseNumber()).withTokenNumber(srcToken.getTokenNumber());
 
         Location location = new Location().withHidden(true).withChapterNumber(token.getChapterNumber())

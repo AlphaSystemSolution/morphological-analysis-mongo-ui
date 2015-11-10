@@ -12,7 +12,10 @@ import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.VerbProperties;
-import com.alphasystem.morphologicalanalysis.wordbyword.model.support.*;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.support.NounStatus;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.support.RelationshipType;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.support.VerbType;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
@@ -35,7 +38,6 @@ import static com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.Canv
 import static com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.CubicCurveHelper.arrowPoints;
 import static com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.DependencyGraphGraphicTool.DARK_GRAY_CLOUD;
 import static com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.DependencyGraphGraphicTool.GRID_LINES;
-import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.ConversationType.FIRST_PERSON;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.NOUN;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.VERB;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.VerbType.IMPERFECT;
@@ -976,9 +978,7 @@ public class CanvasPane extends Pane {
             return;
         }
         TerminalNode terminalNode = (TerminalNode) selectedNode.getSrc();
-        System.out.println(">>>>>>>>>>>>>>>> " + terminalNode.getToken());
         Token impliedToken = repositoryTool.createImpliedNode(terminalNode.getToken(), partOfSpeech, type);
-        System.out.println(">>>>>>>>>>>>>>>> " + impliedToken);
         if (impliedToken == null) {
             Alert alert = new Alert(ERROR);
             alert.setContentText(format("Unsupported part of speech %s", partOfSpeech));
@@ -1012,6 +1012,19 @@ public class CanvasPane extends Pane {
     }
 
     private void addHiddenNode(int index, Location location) {
+        GraphNodeAdapter selectedNode = getDependencyGraph().getSelectedNode();
+        if (!isTerminal(selectedNode)) {
+            Alert alert = new Alert(ERROR);
+            alert.setContentText(format("Expected to have %s node instead found %s", TERMINAL
+                    , selectedNode.getGraphNodeType()));
+            alert.showAndWait();
+            return;
+        }
+        TerminalNode terminalNode = (TerminalNode) selectedNode.getSrc();
+        VerbProperties vp = (VerbProperties) location.getProperties();
+        Token hiddenToken = repositoryTool.createHiddenNode(terminalNode.getToken(), vp.getGender(), vp.getNumber(),
+                vp.getConversationType());
+        impliedOrHiddenTokens.add(hiddenToken);
         GraphMetaInfoAdapter graphMetaInfoAdapter = getDependencyGraph().getGraphMetaInfo();
         canvasUtil.shiftRight(index, getDependencyGraph());
         Node node = canvasPane.getChildren().get(index - 1);
@@ -1019,12 +1032,7 @@ public class CanvasPane extends Pane {
         Line referenceLine = getReferenceLine(group);
         GraphMetaInfo graphMetaInfo = graphMetaInfoAdapter.getGraphMetaInfo();
         graphBuilder.set(graphMetaInfo);
-        VerbProperties vp = (VerbProperties) location.getProperties();
-        String gender = vp.getGender().name();
-        ConversationType conversationType = vp.getConversationType();
-        gender = conversationType.equals(FIRST_PERSON) ? "" : format("_%s", gender);
-        String pronounId = format("%s%s_%s", conversationType.name(), gender, vp.getNumber().name());
-        HiddenNodeAdapter hiddenNodeAdapter = createHiddenNodeAdapter(pronounId, referenceLine, graphMetaInfoAdapter);
+        HiddenNodeAdapter hiddenNodeAdapter = createHiddenNodeAdapter(hiddenToken, referenceLine, graphMetaInfoAdapter);
         getDependencyGraph().getDependencyGraph().getNodes().add(index, hiddenNodeAdapter.getSrc());
         getDependencyGraph().getGraphNodes().add(index, hiddenNodeAdapter);
         DependencyGraphAdapter dependencyGraph = getDependencyGraph();
@@ -1032,10 +1040,10 @@ public class CanvasPane extends Pane {
         setDependencyGraph(dependencyGraph);
     }
 
-    private HiddenNodeAdapter createHiddenNodeAdapter(String pronounId, Line referenceLine,
+    private HiddenNodeAdapter createHiddenNodeAdapter(Token token, Line referenceLine,
                                                       GraphMetaInfoAdapter graphMetaInfoAdapter) {
         HiddenNodeAdapter hiddenNodeAdapter = new HiddenNodeAdapter();
-        HiddenNode hiddenNode = graphBuilder.buildHiddenNode(pronounId, referenceLine);
+        HiddenNode hiddenNode = graphBuilder.buildHiddenNode(token, referenceLine);
         canvasUtil.updateFonts(hiddenNode, graphMetaInfoAdapter);
         hiddenNodeAdapter.setSrc(hiddenNode);
         return hiddenNodeAdapter;

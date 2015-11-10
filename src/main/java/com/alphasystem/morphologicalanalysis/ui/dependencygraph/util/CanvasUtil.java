@@ -331,13 +331,6 @@ public class CanvasUtil {
         return builder.toString();
     }
 
-    public DependencyGraph createDependencyGraph(List<Token> tokens, GraphMetaInfoAdapter adapterInfo) {
-        GraphMetaInfo gmi = adapterInfo.getGraphMetaInfo();
-        DependencyGraph dependencyGraph = repositoryTool.createDependencyGraph(tokens, gmi);
-        dependencyGraph.getNodes().forEach(graphNode -> updateFonts(graphNode, adapterInfo));
-        return dependencyGraph;
-    }
-
     public DependencyGraph createDependencyGraph(VerseTokenPairGroup group, GraphMetaInfoAdapter adapterInfo) {
         GraphMetaInfo gmi = adapterInfo.getGraphMetaInfo();
         DependencyGraph dependencyGraph = repositoryTool.createDependencyGraph(group, gmi);

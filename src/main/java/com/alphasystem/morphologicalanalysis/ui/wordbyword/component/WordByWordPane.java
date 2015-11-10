@@ -201,10 +201,31 @@ public class WordByWordPane extends BorderPane {
             return;
         }
 
+        Token token = tokens.get(0);
+        VerseTokenPairGroup group = new VerseTokenPairGroup();
+        group.setChapterNumber(token.getChapterNumber());
+        Integer verseNumber = token.getVerseNumber();
+        VerseTokensPair pair = new VerseTokensPair(verseNumber);
+        pair.setFirstTokenIndex(token.getTokenNumber());
+        group.getPairs().add(pair);
+        for (int i = 1; i < tokens.size(); i++) {
+            token = tokens.get(i);
+            if (verseNumber.equals(token.getVerseNumber())) {
+                pair.setLastTokenIndex(token.getTokenNumber());
+            } else {
+                pair.initDisplayName();
+                verseNumber = token.getVerseNumber();
+                pair = new VerseTokensPair(verseNumber);
+                pair.setFirstTokenIndex(token.getTokenNumber());
+                group.getPairs().add(pair);
+            }
+        }
+        pair.initDisplayName();
+
         graphMetaInfoSelectionDialog.setGraphMetaInfo(null);
         Optional<GraphMetaInfoAdapter> result = graphMetaInfoSelectionDialog.showAndWait();
         result.ifPresent(graphMetaInfo -> {
-            DependencyGraph dependencyGraph = CanvasUtil.getInstance().createDependencyGraph(tokens, graphMetaInfo);
+            DependencyGraph dependencyGraph = CanvasUtil.getInstance().createDependencyGraph(group, graphMetaInfo);
             DependencyGraphAdapter dependencyGraphAdapter = new DependencyGraphAdapter(dependencyGraph);
             dependencyGraphAdapter.setGraphMetaInfo(graphMetaInfo);
             Alert alert = new Alert(INFORMATION);

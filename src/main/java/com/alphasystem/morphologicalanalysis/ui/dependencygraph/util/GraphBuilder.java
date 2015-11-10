@@ -9,13 +9,10 @@ import com.alphasystem.morphologicalanalysis.util.MorphologicalAnalysisRepositor
 import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
-import com.alphasystem.morphologicalanalysis.wordbyword.repository.TokenRepository;
 import javafx.scene.shape.Line;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.*;
@@ -31,9 +28,7 @@ public class GraphBuilder {
 
     private static GraphBuilder instance = new GraphBuilder();
 
-    private Map<String, Token> impliedTokenMap = new LinkedHashMap<>();
     private MorphologicalAnalysisRepositoryUtil repositoryUtil = RepositoryTool.getInstance().getRepositoryUtil();
-    private TokenRepository tokenRepository = repositoryUtil.getTokenRepository();
     private double tokenWidth = RECTANGLE_WIDTH;
     private double tokenHeight = RECTANGLE_HEIGHT;
     private double gapBetweenTokens = GAP_BETWEEN_TOKENS;
@@ -173,32 +168,13 @@ public class GraphBuilder {
         return impliedNode;
     }
 
-    public ImpliedNode buildImpliedNode(String id, Line referenceLine) {
+    public HiddenNode buildHiddenNode(Token token, Line referenceLine) {
         rectX = gapBetweenTokens + referenceLine.getEndX();
         textX = rectX + 30;
         x1 = rectX;
         x2 = tokenWidth + rectX;
         x3 = rectX + 30;
 
-        Token token = impliedTokenMap.get(id);
-        if (token == null) {
-            token = tokenRepository.findOne(id);
-            impliedTokenMap.put(id, token);
-        }
-        ImpliedNode impliedNode = (ImpliedNode) buildTerminalNode(token, IMPLIED);
-        buildPartOfSpeechNodes(singletonList(impliedNode));
-
-        return impliedNode;
-    }
-
-    public HiddenNode buildHiddenNode(String pronounId, Line referenceLine) {
-        rectX = gapBetweenTokens + referenceLine.getEndX();
-        textX = rectX + 30;
-        x1 = rectX;
-        x2 = tokenWidth + rectX;
-        x3 = rectX + 30;
-
-        Token token = tokenRepository.findOne(pronounId);
         HiddenNode hiddenNode = (HiddenNode) buildTerminalNode(token, HIDDEN);
         buildPartOfSpeechNodes(singletonList(hiddenNode));
 
