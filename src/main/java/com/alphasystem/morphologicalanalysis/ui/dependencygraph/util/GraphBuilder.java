@@ -181,8 +181,8 @@ public class GraphBuilder {
         return hiddenNode;
     }
 
-    public void buildRelationshipNode(RelationshipNode relationshipNode,
-                                      LinkSupportAdapter dependentNode, LinkSupportAdapter ownerNode) {
+    public void buildRelationshipNode(RelationshipNode relationshipNode, LinkSupportAdapter dependentNode,
+                                      LinkSupportAdapter ownerNode) {
         LinkSupport dependent = (LinkSupport) dependentNode.getSrc();
         relationshipNode.setDependent(dependent);
         LinkSupport owner = (LinkSupport) ownerNode.getSrc();
@@ -191,8 +191,13 @@ public class GraphBuilder {
         double startY = dependent.getCy() + dependent.getTranslateY();
         double endX = owner.getCx() + owner.getTranslateX();
         double endY = owner.getCy() + owner.getTranslateY();
-        double controlY1 = startY + 100d;
-        double controlY2 = endY + 100d;
+        double controlY1 = startY + 80d;
+        double controlY2 = endY + 80d;
+        if (controlY1 != controlY2) {
+            Double max = StrictMath.max(controlY1, controlY2);
+            controlY1 = max;
+            controlY2 = max;
+        }
         relationshipNode.setControlX1(startX);
         relationshipNode.setControlY1(controlY1);
         relationshipNode.setControlX2(endX);

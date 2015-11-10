@@ -1030,8 +1030,7 @@ public class CanvasPane extends Pane {
         Node node = canvasPane.getChildren().get(index - 1);
         Group group = (Group) node;
         Line referenceLine = getReferenceLine(group);
-        GraphMetaInfo graphMetaInfo = graphMetaInfoAdapter.getGraphMetaInfo();
-        graphBuilder.set(graphMetaInfo);
+        graphBuilder.set(graphMetaInfoAdapter.getGraphMetaInfo());
         HiddenNodeAdapter hiddenNodeAdapter = createHiddenNodeAdapter(hiddenToken, referenceLine, graphMetaInfoAdapter);
         getDependencyGraph().getDependencyGraph().getNodes().add(index, hiddenNodeAdapter.getSrc());
         getDependencyGraph().getGraphNodes().add(index, hiddenNodeAdapter);
