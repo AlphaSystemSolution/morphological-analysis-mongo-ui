@@ -30,6 +30,7 @@ import static com.alphasystem.arabic.model.ArabicWord.getSubWord;
 import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.ROOT;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.*;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.IncompleteVerbCategory.KANA_AND_ITS_SISTERS;
+import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.RelationshipType._KAF;
 import static com.alphasystem.util.AppUtil.isGivenType;
 import static java.lang.String.format;
 import static javafx.scene.control.Alert.AlertType.INFORMATION;
@@ -212,9 +213,11 @@ public class CanvasUtil {
             PartOfSpeech pos = ol.getPartOfSpeech();
             switch (pos) {
                 case ACCUSSATIVE_PARTICLE:
-                    text = format("%s %s %s %s", type.getLabel().toUnicode(),
-                            LEFT_POINTING_DOUBLE_ANGLE_QUOTATION_MARK, ol.getLocationWord().toUnicode(),
-                            RIGHT_POINTING_DOUBLE_ANGLE_QUOTATION_MARK);
+                    if (!type.equals(_KAF)) {
+                        text = format("%s %s %s %s", type.getLabel().toUnicode(),
+                                LEFT_POINTING_DOUBLE_ANGLE_QUOTATION_MARK, ol.getLocationWord().toUnicode(),
+                                RIGHT_POINTING_DOUBLE_ANGLE_QUOTATION_MARK);
+                    }
                     break;
                 case VERB:
                     VerbProperties vp = (VerbProperties) ol.getProperties();
