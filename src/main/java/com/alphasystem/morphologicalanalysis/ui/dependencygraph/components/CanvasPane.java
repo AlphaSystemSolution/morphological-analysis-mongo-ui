@@ -1,5 +1,6 @@
 package com.alphasystem.morphologicalanalysis.ui.dependencygraph.components;
 
+import com.alphasystem.arabic.model.ProNoun;
 import com.alphasystem.morphologicalanalysis.common.model.VerseTokensPair;
 import com.alphasystem.morphologicalanalysis.graph.model.*;
 import com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType;
@@ -38,8 +39,7 @@ import static com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.Canv
 import static com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.CubicCurveHelper.arrowPoints;
 import static com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.DependencyGraphGraphicTool.DARK_GRAY_CLOUD;
 import static com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.DependencyGraphGraphicTool.GRID_LINES;
-import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.NOUN;
-import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.VERB;
+import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.*;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.VerbType.IMPERFECT;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.VerbType.PERFECT;
 import static java.lang.String.format;
@@ -522,11 +522,13 @@ public class CanvasPane extends Pane {
         int index = getIndex(src, getDependencyGraph().getGraphNodes());
 
         menu = new Menu("Add Implied Node to Left");
-        menu.getItems().addAll(createNounAddImpliedNodeMenu(index), createVerbAddImpliedNodeMenu(index));
+        menu.getItems().addAll(createNounAddImpliedNodeMenu(index), createProNounAddImpliedNodeMenu(index),
+                createVerbAddImpliedNodeMenu(index));
         menuItems.add(menu);
 
         menu = new Menu("Add Implied Node to Right");
-        menu.getItems().addAll(createNounAddImpliedNodeMenu(index + 1), createVerbAddImpliedNodeMenu(index + 1));
+        menu.getItems().addAll(createNounAddImpliedNodeMenu(index + 1), createProNounAddImpliedNodeMenu(index + 1),
+                createVerbAddImpliedNodeMenu(index + 1));
         menuItems.add(menu);
 
         // add "Hidden" pronoun if applicable (only for verb)
@@ -952,6 +954,18 @@ public class CanvasPane extends Pane {
         return menu;
     }
 
+    private Menu createProNounAddImpliedNodeMenu(int index) {
+        Text text = new Text(PRONOUN.getLabel().toUnicode());
+        text.setFont(ARABIC_FONT_SMALL_BOLD);
+        Menu menu = new Menu("", text);
+
+        for (ProNoun proNoun : ProNoun.values()) {
+            menu.getItems().add(createProNounAddImpliedNodeMenuItem(index, proNoun));
+        }
+
+        return menu;
+    }
+
     private MenuItem createNounAddImpliedNodeMenuItem(int index, NounStatus nounStatus) {
         Text text = new Text(nounStatus.getLabel().toUnicode());
         text.setFont(ARABIC_FONT_SMALL_BOLD);
@@ -965,6 +979,14 @@ public class CanvasPane extends Pane {
         text.setFont(ARABIC_FONT_SMALL_BOLD);
         MenuItem menuItem = new MenuItem("", text);
         menuItem.setOnAction(event -> addImpliedNode(index, VERB, verbType));
+        return menuItem;
+    }
+
+    private MenuItem createProNounAddImpliedNodeMenuItem(int index, ProNoun proNoun) {
+        Text text = new Text(proNoun.getLabel().toUnicode());
+        text.setFont(ARABIC_FONT_SMALL_BOLD);
+        MenuItem menuItem = new MenuItem("", text);
+        menuItem.setOnAction(event -> addImpliedNode(index, PRONOUN, proNoun));
         return menuItem;
     }
 

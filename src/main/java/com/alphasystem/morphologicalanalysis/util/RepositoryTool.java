@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.ConversationType.FIRST_PERSON;
+import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.GenderType.MASCULINE;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.NounStatus.NOMINATIVE;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.*;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.ProNounType.DETACHED;
@@ -231,6 +232,9 @@ public class RepositoryTool {
             token = createToken(srcToken, "(*)", partOfSpeech, new NounProperties().withNounStatus((NounStatus) type));
         } else if (VERB.equals(partOfSpeech)) {
             token = createToken(srcToken, "(*)", VERB, new VerbProperties().withVerbType((VerbType) type));
+        } else if (PRONOUN.equals(partOfSpeech)) {
+            ProNoun proNoun = (ProNoun) type;
+            token = createToken(srcToken, proNoun.getLabel().toUnicode(), PRONOUN, createProNounProperties(proNoun));
         }
         return token;
     }
@@ -241,10 +245,29 @@ public class RepositoryTool {
         genderAndType = conversationType.equals(FIRST_PERSON) ? "" : format("_%s", genderAndType);
         String pronounId = format("%s%s_%s", conversationType.name(), genderAndType, numberType.name());
         ProNoun proNoun = ProNoun.valueOf(pronounId);
-        ProNounProperties proNounProperties = (ProNounProperties) new ProNounProperties().withProNounType(DETACHED)
+        return createToken(srcToken, proNoun.getLabel().toUnicode(), PRONOUN,
+                createProNounProperties(genderType, numberType, conversationType));
+    }
+
+    private ProNounProperties createProNounProperties(GenderType genderType, NumberType numberType,
+                                                      ConversationType conversationType) {
+        return (ProNounProperties) new ProNounProperties().withProNounType(DETACHED)
                 .withConversationType(conversationType).withNounStatus(NOMINATIVE).withGenderType(genderType)
                 .withNumberType(numberType);
-        return createToken(srcToken, proNoun.getLabel().toUnicode(), PRONOUN, proNounProperties);
+    }
+
+    private ProNounProperties createProNounProperties(ProNoun proNoun) {
+        String name = proNoun.name();
+        int index = name.indexOf('_');
+        int secondIndex = name.indexOf('_', index + 1);
+        ConversationType conversationType = ConversationType.valueOf(name.substring(0, secondIndex));
+        index = name.lastIndexOf('_');
+        NumberType numberType = NumberType.valueOf(name.substring(index + 1));
+        GenderType genderType = MASCULINE;
+        if (!FIRST_PERSON.equals(conversationType)) {
+            genderType = GenderType.valueOf(name.substring(secondIndex + 1, index));
+        }
+        return createProNounProperties(genderType, numberType, conversationType);
     }
 
     private Token createToken(Token srcToken, String tokenText, PartOfSpeech partOfSpeech, AbstractProperties properties) {
