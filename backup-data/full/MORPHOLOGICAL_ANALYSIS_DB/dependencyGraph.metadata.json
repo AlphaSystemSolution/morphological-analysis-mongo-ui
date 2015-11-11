@@ -16,6 +16,15 @@
       },
       "name": "dis_name",
       "ns": "MORPHOLOGICAL_ANALYSIS_DB.dependencyGraph"
+    },
+    {
+      "v": 1,
+      "unique": true,
+      "key": {
+        "tokens.displayName": 1
+      },
+      "name": "tokens.dis_name",
+      "ns": "MORPHOLOGICAL_ANALYSIS_DB.dependencyGraph"
     }
   ]
 }
