@@ -243,6 +243,7 @@ public class WordByWordPane extends BorderPane {
 
     private void openTreeBankApp(DependencyGraphAdapter dependencyGraphAdapter) {
         Stage stage = new Stage();
+        stage.setTitle("Quranic Morphological Dependency Graph Builder");
         Scene scene = new Scene(new TreeBankPane(dependencyGraphAdapter));
         stage.setMaximized(true);
         stage.setScene(scene);
