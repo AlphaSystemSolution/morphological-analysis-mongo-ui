@@ -1011,9 +1011,23 @@ public class CanvasPane extends Pane {
 
         GraphMetaInfoAdapter graphMetaInfoAdapter = getDependencyGraph().getGraphMetaInfo();
         canvasUtil.shiftRight(index, getDependencyGraph());
-        Node node = canvasPane.getChildren().get(index - 1);
+        // a flag to represents that node is to be added left to first node
+        boolean leftToFirst = index <= 0;
+        index = leftToFirst ? 0 : index - 1;
+        Node node = canvasPane.getChildren().get(index);
         Group group = (Group) node;
         Line referenceLine = getReferenceLine(group);
+        if (leftToFirst) {
+            // if we are adding node at the left to first node then make reference line to go to negative
+            // we will adjust it later
+            Line line = new Line();
+            double offset = graphMetaInfoAdapter.getGapBetweenTokens() + graphMetaInfoAdapter.getTokenWidth();
+            line.setStartX(referenceLine.getStartX() - offset);
+            line.setEndX(referenceLine.getEndX() - offset);
+            line.setStartY(referenceLine.getStartY());
+            line.setEndY(referenceLine.getEndY());
+            referenceLine = line;
+        }
         graphBuilder.set(graphMetaInfoAdapter.getGraphMetaInfo());
         ImpliedNodeAdapter impliedNodeAdapter = createImpliedNodeAdapter(impliedToken,
                 referenceLine, graphMetaInfoAdapter);
@@ -1049,9 +1063,23 @@ public class CanvasPane extends Pane {
         impliedOrHiddenTokens.add(hiddenToken);
         GraphMetaInfoAdapter graphMetaInfoAdapter = getDependencyGraph().getGraphMetaInfo();
         canvasUtil.shiftRight(index, getDependencyGraph());
-        Node node = canvasPane.getChildren().get(index - 1);
+        // a flag to represents that node is to be added left to first node
+        boolean leftToFirst = index <= 0;
+        index = leftToFirst ? 0 : index - 1;
+        Node node = canvasPane.getChildren().get(index);
         Group group = (Group) node;
         Line referenceLine = getReferenceLine(group);
+        if (leftToFirst) {
+            // if we are adding node at the left to first node then make reference line to go to negative
+            // we will adjust it later
+            Line line = new Line();
+            double offset = graphMetaInfoAdapter.getGapBetweenTokens() + graphMetaInfoAdapter.getTokenWidth();
+            line.setStartX(referenceLine.getStartX() - offset);
+            line.setEndX(referenceLine.getEndX() - offset);
+            line.setStartY(referenceLine.getStartY());
+            line.setEndY(referenceLine.getEndY());
+            referenceLine = line;
+        }
         graphBuilder.set(graphMetaInfoAdapter.getGraphMetaInfo());
         HiddenNodeAdapter hiddenNodeAdapter = createHiddenNodeAdapter(hiddenToken, referenceLine, graphMetaInfoAdapter);
         getDependencyGraph().getDependencyGraph().getNodes().add(index, hiddenNodeAdapter.getSrc());
