@@ -149,6 +149,33 @@ public class RepositoryTool {
         return token;
     }
 
+    public List<Token> getTokens(VerseTokenPairGroup group) {
+        return getTokens(group, false, false);
+    }
+
+    public List<Token> getHiddenTokens(VerseTokenPairGroup group) {
+        return getTokens(group, true, true);
+    }
+
+    private List<Token> getTokens(VerseTokenPairGroup group, boolean includeHidden, boolean hiddenValue) {
+        List<Criteria> list = new ArrayList<>();
+        List<VerseTokensPair> pairs = group.getPairs();
+        pairs.forEach(pair -> list.add(where("verseNumber").is(pair.getVerseNumber())
+                .andOperator(where("tokenNumber").gte(pair.getFirstTokenIndex()),
+                        where("tokenNumber").lte(pair.getLastTokenIndex()))));
+        Criteria criteria;
+        Criteria[] criterion = list.toArray(new Criteria[list.size()]);
+        if (includeHidden) {
+            criteria = where("chapterNumber").is(group.getChapterNumber()).and("hidden").is(hiddenValue)
+                    .orOperator(criterion);
+        } else {
+            criteria = where("chapterNumber").is(group.getChapterNumber()).orOperator(criterion);
+        }
+        Query query = new Query(criteria);
+        System.out.println(">>>>>>>>>>> " + query);
+        return mongoTemplate.find(query, Token.class);
+    }
+
     public DependencyGraph getDependencyGraph(String displayName) {
         return dependencyGraphRepository.findByDisplayName(displayName);
     }
@@ -172,21 +199,12 @@ public class RepositoryTool {
         System.out.println(">>>>>>>>>>>>>>>> " + displayName);
         DependencyGraph dependencyGraph = dependencyGraphRepository.findByDisplayName(displayName);
         if (dependencyGraph == null) {
-            List<Criteria> criterion = new ArrayList<>();
-            List<VerseTokensPair> pairs = group.getPairs();
-            pairs.forEach(pair -> criterion.add(where("verseNumber").is(pair.getVerseNumber())
-                    .andOperator(where("tokenNumber").gte(pair.getFirstTokenIndex()),
-                            where("tokenNumber").lte(pair.getLastTokenIndex()))));
-            Criteria criteria = where("chapterNumber").is(chapterNumber).orOperator(
-                    criterion.toArray(new Criteria[criterion.size()]));
-            Query query = new Query(criteria);
-            System.out.println(">>>>>>>>>>> " + query);
-            List<Token> tokens = mongoTemplate.find(query, Token.class);
+            List<Token> tokens = getTokens(group);
             if (tokens == null || tokens.isEmpty()) {
                 throw new RuntimeException(format("Unable to create dependency graph for %s", displayName));
             }
             dependencyGraph = new DependencyGraph(chapterNumber);
-            dependencyGraph.getTokens().addAll(pairs);
+            dependencyGraph.getTokens().addAll(group.getPairs());
             dependencyGraph.initDisplayName();
             dependencyGraph.setMetaInfo(graphMetaInfo);
             graphBuilder.set(graphMetaInfo);
@@ -214,6 +232,15 @@ public class RepositoryTool {
     public void deleteDependencyGraph(String id, Map<GraphNodeType, List<String>> removalIds) {
         if (!removalIds.isEmpty()) {
             removalIds.entrySet().forEach(this::removeNode);
+        }
+        DependencyGraph dependencyGraph = dependencyGraphRepository.findOne(id);
+        VerseTokenPairGroup group = new VerseTokenPairGroup();
+        group.setChapterNumber(dependencyGraph.getChapterNumber());
+        group.getPairs().addAll(dependencyGraph.getTokens());
+        List<Token> hiddenTokens = getHiddenTokens(group);
+        if (hiddenTokens != null && !hiddenTokens.isEmpty()) {
+            hiddenTokens.forEach(token -> locationRepository.delete(token.getLocations()));
+            tokenRepository.delete(hiddenTokens);
         }
         dependencyGraphRepository.delete(id);
     }
