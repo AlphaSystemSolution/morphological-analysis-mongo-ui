@@ -1,9 +1,7 @@
 package com.alphasystem.morphologicalanalysis.util;
 
-import com.alphasystem.morphologicalanalysis.spring.support.GraphConfig;
 import com.alphasystem.morphologicalanalysis.spring.support.MongoConfig;
 import com.alphasystem.morphologicalanalysis.spring.support.MorphologicalAnalysisSpringConfiguration;
-import com.alphasystem.morphologicalanalysis.spring.support.WordByWordConfig;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import static java.lang.Runtime.getRuntime;
@@ -28,7 +26,7 @@ public final class SpringContextHelper {
     private final AnnotationConfigApplicationContext context;
 
     private SpringContextHelper() {
-        context = new AnnotationConfigApplicationContext(MongoConfig.class, WordByWordConfig.class, GraphConfig.class,
+        context = new AnnotationConfigApplicationContext(MongoConfig.class,
                 MorphologicalAnalysisSpringConfiguration.class);
     }
 
