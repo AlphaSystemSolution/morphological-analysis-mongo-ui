@@ -1,6 +1,7 @@
 package com.alphasystem.morphologicalanalysis.ui.wordbyword.component;
 
 import com.alphasystem.arabic.model.ArabicLetterType;
+import com.alphasystem.arabic.model.NamedTemplate;
 import com.alphasystem.arabickeyboard.ui.Keyboard;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.RootWord;
 import javafx.beans.property.ObjectProperty;
@@ -30,7 +31,9 @@ public class RootWordPane extends HBox {
     private static final String MAWRID_READER_URL = System.getProperty("mawrid-reader.url");
     final Browser browser = new Browser();
     private final ObjectProperty<RootWord> rootWord;
+    private final ObjectProperty<NamedTemplate> namedTemplate;
     private final Button dictionaryButton;
+    private final Button sarfButton;
     private RootLetterPane currentPane;
 
     public RootWordPane(RootWord rootWord) {
@@ -38,6 +41,10 @@ public class RootWordPane extends HBox {
         setPadding(new Insets(10));
 
         this.rootWord = new SimpleObjectProperty<>();
+        this.namedTemplate = new SimpleObjectProperty<>();
+        namedTemplateProperty().addListener((observable, oldValue, newValue) -> {
+            enableSarfButton();
+        });
         HBox lettersPane = createLettersPane();
 
         final Popup keyboardPopup = new Popup();
@@ -78,9 +85,12 @@ public class RootWordPane extends HBox {
         dictionaryButton.setGraphic(new ImageView(new Image(getResourceAsStream("images.dictionary-icon.png"))));
         dictionaryButton.setOnAction(event -> showBrowser(browserPopup));
 
+        sarfButton = new Button();
+        sarfButton.setGraphic(new ImageView(new Image(getResourceAsStream("images.sarf-icon.png"))));
+
         setRootWord(rootWord);
 
-        getChildren().addAll(lettersPane, keyboardButton, dictionaryButton);
+        getChildren().addAll(lettersPane, keyboardButton, dictionaryButton, sarfButton);
     }
 
     private void enableDictionaryButton() {
@@ -88,6 +98,14 @@ public class RootWordPane extends HBox {
         boolean enable = !isBlank(MAWRID_READER_URL) && rootWord != null && rootWord.getFirstRadical() != null &&
                 rootWord.getSecondRadical() != null && rootWord.getThirdRadical() != null;
         dictionaryButton.setDisable(!enable);
+    }
+
+    private void enableSarfButton() {
+        RootWord rootWord = getRootWord();
+        NamedTemplate namedTemplate = getNamedTemplate();
+        boolean enable = rootWord != null && rootWord.getFirstRadical() != null &&
+                rootWord.getSecondRadical() != null && rootWord.getThirdRadical() != null && namedTemplate != null;
+        sarfButton.setDisable(!enable);
     }
 
     private void showPopup(Popup popup, Button button, double anchorX, double anchorY) {
@@ -135,6 +153,7 @@ public class RootWordPane extends HBox {
             thirdRadicalPane.setLetter(getRootWord().getThirdRadical());
             fourthRadicalPane.setLetter(getRootWord().getFourthRadical());
             enableDictionaryButton();
+            enableSarfButton();
         });
 
         firstRadicalPane.letterProperty().addListener((observable, oldValue, newValue) ->
@@ -178,6 +197,7 @@ public class RootWordPane extends HBox {
         newPane.setSelected(true);
         this.currentPane = newPane;
         enableDictionaryButton();
+        enableSarfButton();
     }
 
     private void selectPane(RootLetterPane currentPane, RootLetterPane newPane) {
@@ -195,5 +215,17 @@ public class RootWordPane extends HBox {
 
     public final ObjectProperty<RootWord> rootWordProperty() {
         return rootWord;
+    }
+
+    public NamedTemplate getNamedTemplate() {
+        return namedTemplate.get();
+    }
+
+    public void setNamedTemplate(NamedTemplate namedTemplate) {
+        this.namedTemplate.set(namedTemplate);
+    }
+
+    public ObjectProperty<NamedTemplate> namedTemplateProperty() {
+        return namedTemplate;
     }
 }

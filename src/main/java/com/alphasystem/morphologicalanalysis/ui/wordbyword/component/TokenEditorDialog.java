@@ -149,6 +149,7 @@ public class TokenEditorDialog extends Dialog<Token> {
             partOfSpeechComboBox.getSelectionModel().select(location.getPartOfSpeech());
             namedTemplateComboBox.getSelectionModel().select(location.getFormTemplate());
             namedTagComboBox.getSelectionModel().select(location.getNamedTag());
+            rootWordPane.setNamedTemplate(location.getFormTemplate());
 
             AbstractProperties properties = location.getProperties();
             AbstractPropertiesPane pp = getPropertiesPane(properties);
@@ -311,6 +312,7 @@ public class TokenEditorDialog extends Dialog<Token> {
         namedTemplateComboBox.getSelectionModel().selectedItemProperty().addListener(
                 (observable, oldValue, newValue) -> {
                     tokenAdapter.setNamedTemplate(newValue);
+                    rootWordPane.setNamedTemplate(newValue);
                 });
         namedTagComboBox.getSelectionModel().selectedItemProperty().addListener(
                 (observable, oldValue, newValue) -> {
