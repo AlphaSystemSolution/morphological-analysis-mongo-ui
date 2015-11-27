@@ -1,16 +1,12 @@
 package com.alphasystem.morphologicalanalysis.ui.common;
 
-import com.alphasystem.arabic.model.ArabicSupportEnum;
 import com.alphasystem.arabic.model.NamedTemplate;
-import com.alphasystem.arabic.ui.ArabicSupportEnumCellFactory;
-import com.alphasystem.arabic.ui.ArabicSupportEnumListCell;
-import com.alphasystem.arabic.ui.ListType;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.*;
 import javafx.scene.control.ComboBox;
 
+import static com.alphasystem.arabic.ui.ComboBoxHelper.createComboBox;
 import static com.alphasystem.arabic.ui.ListType.LABEL_AND_CODE;
 import static com.alphasystem.arabic.ui.ListType.LABEL_ONLY;
-import static java.lang.Double.MAX_VALUE;
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 
 /**
@@ -31,37 +27,6 @@ public class ComboBoxFactory {
             instance = new ComboBoxFactory();
         }
         return instance;
-    }
-
-    @SafeVarargs
-    private static <T extends ArabicSupportEnum> ComboBox<T> createComboBox(boolean addEmptyValue,
-                                                                            ListType type, T... values) {
-        ComboBox<T> comboBox = new ComboBox<>();
-        if (addEmptyValue) {
-            comboBox.getItems().add(null);
-        }
-        comboBox.getItems().addAll(values);
-        comboBox.setCellFactory(new ArabicSupportEnumCellFactory<>(type));
-        comboBox.setButtonCell(new ArabicSupportEnumListCell<>(type));
-        comboBox.getSelectionModel().select(0);
-        comboBox.setMaxWidth(MAX_VALUE);
-        comboBox.setMaxHeight(MAX_VALUE);
-        return comboBox;
-    }
-
-    @SafeVarargs
-    private static <T extends ArabicSupportEnum> ComboBox<T> createComboBox(boolean addEmptyValue, T... values) {
-        return createComboBox(addEmptyValue, LABEL_AND_CODE, values);
-    }
-
-    @SafeVarargs
-    private static <T extends ArabicSupportEnum> ComboBox<T> createComboBox(ListType type, T... values) {
-        return createComboBox(false, type, values);
-    }
-
-    @SafeVarargs
-    private static <T extends ArabicSupportEnum> ComboBox<T> createComboBox(T... values) {
-        return createComboBox(LABEL_AND_CODE, values);
     }
 
     public ComboBox<RelationshipType> getRelationshipTypeComboBox() {
