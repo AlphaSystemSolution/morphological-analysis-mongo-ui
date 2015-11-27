@@ -2,12 +2,14 @@ package com.alphasystem.morphologicalanalysis.ui.common;
 
 import com.alphasystem.arabic.model.ArabicSupportEnum;
 import com.alphasystem.arabic.model.NamedTemplate;
-import com.alphasystem.morphologicalanalysis.ui.common.ArabicSupportEnumCellFactory.ListType;
+import com.alphasystem.arabic.ui.ArabicSupportEnumCellFactory;
+import com.alphasystem.arabic.ui.ArabicSupportEnumListCell;
+import com.alphasystem.arabic.ui.ListType;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.*;
 import javafx.scene.control.ComboBox;
 
-import static com.alphasystem.morphologicalanalysis.ui.common.ArabicSupportEnumCellFactory.ListType.LABEL_AND_CODE;
-import static com.alphasystem.morphologicalanalysis.ui.common.ArabicSupportEnumCellFactory.ListType.LABEL_ONLY;
+import static com.alphasystem.arabic.ui.ListType.LABEL_AND_CODE;
+import static com.alphasystem.arabic.ui.ListType.LABEL_ONLY;
 import static java.lang.Double.MAX_VALUE;
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 
