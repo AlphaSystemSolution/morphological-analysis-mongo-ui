@@ -1,7 +1,7 @@
 package com.alphasystem.morphologicalanalysis.ui.dependencygraph.components;
 
+import com.alphasystem.arabic.ui.ArabicSupportEnumCellFactory;
 import com.alphasystem.morphologicalanalysis.graph.model.PhraseNode;
-import com.alphasystem.morphologicalanalysis.ui.common.ArabicSupportEnumCellFactory;
 import com.alphasystem.morphologicalanalysis.ui.common.ComboBoxFactory;
 import com.alphasystem.morphologicalanalysis.ui.common.Global;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.AlternateStatus;
@@ -15,7 +15,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
 import org.controlsfx.control.ListSelectionView;
 
-import static com.alphasystem.morphologicalanalysis.ui.common.ArabicSupportEnumCellFactory.ListType.LABEL_ONLY;
+import static com.alphasystem.arabic.ui.ListType.LABEL_ONLY;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.ARABIC_FONT_MEDIUM_BOLD;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.FI_MAHL;
 import static javafx.scene.control.ButtonType.CANCEL;
