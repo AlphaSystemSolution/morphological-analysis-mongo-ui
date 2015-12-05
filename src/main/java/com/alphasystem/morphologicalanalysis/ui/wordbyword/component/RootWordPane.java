@@ -26,6 +26,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 /**
  * @author sali
  */
+@Deprecated
 public class RootWordPane extends HBox {
 
     private static final String MAWRID_READER_URL = System.getProperty("mawrid-reader.url");
@@ -55,7 +56,6 @@ public class RootWordPane extends HBox {
         final VBox keyboardView = keyboard.view();
         keyboardView.setBackground(new Background(new BackgroundFill(LAVENDER, new CornerRadii(1.0), new Insets(10))));
         keyboardPopup.getContent().add(keyboardView);
-
 
         final Button keyboardButton = new Button();
         keyboardButton.setGraphic(new ImageView(new Image(getResourceAsStream("images.keyboard-icon.png"))));

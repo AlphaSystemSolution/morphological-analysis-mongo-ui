@@ -1,7 +1,9 @@
 package com.alphasystem.morphologicalanalysis.ui.wordbyword.component;
 
 import com.alphasystem.arabic.model.ArabicLetter;
+import com.alphasystem.arabic.model.ArabicLetterType;
 import com.alphasystem.arabic.model.NamedTemplate;
+import com.alphasystem.arabic.ui.RootLettersPicker;
 import com.alphasystem.morphologicalanalysis.ui.common.ComboBoxFactory;
 import com.alphasystem.morphologicalanalysis.ui.common.LocationListCell;
 import com.alphasystem.morphologicalanalysis.ui.wordbyword.model.TokenAdapter;
@@ -47,7 +49,7 @@ public class TokenEditorDialog extends Dialog<Token> {
     private final ComboBox<PartOfSpeech> partOfSpeechComboBox = instance.getPartOfSpeechComboBox();
     private final ComboBox<NamedTemplate> namedTemplateComboBox = instance.getNamedTemplateComboBox();
     private final ComboBox<NamedTag> namedTagComboBox = instance.getNamedTagComboBox();
-    private final RootWordPane rootWordPane = new RootWordPane(null);
+    private final RootLettersPicker rootLettersPicker = new RootLettersPicker();
     private BorderPane lettersPane;
     private TitledPane propertiesPane;
     private AbstractPropertiesPane particlePropertiesPane;
@@ -67,10 +69,18 @@ public class TokenEditorDialog extends Dialog<Token> {
         proNounPropertiesPane = new ProNounPropertiesPane(tokenAdapter);
         verbPropertiesPane = new VerbPropertiesPane(tokenAdapter);
         propertiesPane = new TitledPane("Noun Properties", nounPropertiesPane);
+        // rootLettersPicker.setAlignment(Pos.CENTER_LEFT);
 
         this.token = new SimpleObjectProperty<>(token);
         tokenAdapter.updateToken(token, 0);
-        rootWordPane.rootWordProperty().bind(tokenAdapter.rootWordProperty());
+
+        tokenAdapter.rootWordProperty().addListener((o, ov, nv) -> {
+            ArabicLetterType firstRadical = nv == null ? null : nv.getFirstRadical();
+            ArabicLetterType secondRadical = nv == null ? null : nv.getSecondRadical();
+            ArabicLetterType thirdRadical = nv == null ? null : nv.getThirdRadical();
+            ArabicLetterType fourthRadical = nv == null ? null : nv.getFourthRadical();
+            rootLettersPicker.setRootLetters(firstRadical, secondRadical, thirdRadical, fourthRadical);
+        });
 
         // initialize initial dialog
         setup();
@@ -149,7 +159,8 @@ public class TokenEditorDialog extends Dialog<Token> {
             partOfSpeechComboBox.getSelectionModel().select(location.getPartOfSpeech());
             namedTemplateComboBox.getSelectionModel().select(location.getFormTemplate());
             namedTagComboBox.getSelectionModel().select(location.getNamedTag());
-            rootWordPane.setNamedTemplate(location.getFormTemplate());
+            // TODO: this was done for dictionary , figure out where put this
+            // rootWordPane.setNamedTemplate(location.getFormTemplate());
 
             AbstractProperties properties = location.getProperties();
             AbstractPropertiesPane pp = getPropertiesPane(properties);
@@ -219,7 +230,7 @@ public class TokenEditorDialog extends Dialog<Token> {
         label = new Label(RESOURCE_BUNDLE.getString("rootWords.label"));
         gp.add(label, 1, 0);
 
-        gp.add(rootWordPane, 1, 1);
+        gp.add(rootLettersPicker, 1, 1);
 
         label = new Label(RESOURCE_BUNDLE.getString("form.label"));
         gp.add(label, 0, 2);
@@ -312,7 +323,8 @@ public class TokenEditorDialog extends Dialog<Token> {
         namedTemplateComboBox.getSelectionModel().selectedItemProperty().addListener(
                 (observable, oldValue, newValue) -> {
                     tokenAdapter.setNamedTemplate(newValue);
-                    rootWordPane.setNamedTemplate(newValue);
+                    // TODO: this was done for dictionary , figure out where put this
+                    // rootWordPane.setNamedTemplate(newValue);
                 });
         namedTagComboBox.getSelectionModel().selectedItemProperty().addListener(
                 (observable, oldValue, newValue) -> {

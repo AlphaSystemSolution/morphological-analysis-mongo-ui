@@ -172,7 +172,6 @@ public class RepositoryTool {
             criteria = where("chapterNumber").is(group.getChapterNumber()).orOperator(criterion);
         }
         Query query = new Query(criteria);
-        System.out.println(">>>>>>>>>>> " + query);
         return mongoTemplate.find(query, Token.class);
     }
 

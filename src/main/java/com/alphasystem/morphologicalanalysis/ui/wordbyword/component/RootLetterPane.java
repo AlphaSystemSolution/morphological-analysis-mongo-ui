@@ -17,6 +17,7 @@ import static javafx.scene.text.FontWeight.BOLD;
 /**
  * @author sali
  */
+@Deprecated
 public class RootLetterPane extends StackPane {
 
     private final ObjectProperty<ArabicLetterType> letter;
