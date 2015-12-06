@@ -73,11 +73,6 @@
     <dependencies>
         <dependency>
             <groupId>com.alphasystem.arabic</groupId>
-            <artifactId>arabic-keyboard-ui</artifactId>
-            <version>${keyboard-ui.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.alphasystem.arabic</groupId>
             <artifactId>morphological-analysis-mongo-repository</artifactId>
             <version>${ma-repository.version}</version>
         </dependency>

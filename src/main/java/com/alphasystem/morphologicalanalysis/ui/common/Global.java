@@ -63,6 +63,7 @@ public class Global {
     public static final double INITIAL_X = 0;
     public static final double INITIAL_Y = 40;
     public static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("resources");
+    public static final String MAWRID_READER_URL = System.getProperty("mawrid-reader.url");
     private static Global instance;
 
     private Global() {

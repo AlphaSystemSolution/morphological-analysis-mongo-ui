@@ -3,6 +3,7 @@ package com.alphasystem.morphologicalanalysis.ui.wordbyword.component;
 import com.alphasystem.arabic.model.ArabicLetter;
 import com.alphasystem.arabic.model.ArabicLetterType;
 import com.alphasystem.arabic.model.NamedTemplate;
+import com.alphasystem.arabic.ui.Browser;
 import com.alphasystem.arabic.ui.RootLettersPicker;
 import com.alphasystem.morphologicalanalysis.ui.common.ComboBoxFactory;
 import com.alphasystem.morphologicalanalysis.ui.common.LocationListCell;
@@ -20,14 +21,14 @@ import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 
-import static com.alphasystem.morphologicalanalysis.ui.common.Global.ARABIC_FONT_MEDIUM;
-import static com.alphasystem.morphologicalanalysis.ui.common.Global.RESOURCE_BUNDLE;
+import static com.alphasystem.morphologicalanalysis.ui.common.Global.*;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.AbstractProperties.*;
 import static java.lang.String.format;
 import static javafx.event.ActionEvent.ACTION;
 import static javafx.geometry.NodeOrientation.RIGHT_TO_LEFT;
 import static javafx.geometry.Pos.CENTER;
 import static javafx.scene.control.ButtonType.*;
+import static javafx.scene.control.TabPane.TabClosingPolicy.UNAVAILABLE;
 import static javafx.scene.layout.BorderStroke.THIN;
 import static javafx.scene.layout.BorderStrokeStyle.SOLID;
 import static javafx.scene.layout.CornerRadii.EMPTY;
@@ -42,6 +43,7 @@ public class TokenEditorDialog extends Dialog<Token> {
     private final static double TOGGLE_BUTTON_WIDTH = 72;
     private final static double TOGGLE_BUTTON_HEIGHT = 72;
     private static final Border BORDER = new Border(new BorderStroke(LIGHTGREY, SOLID, EMPTY, THIN));
+    private static final int GAP = 5;
     private final ObjectProperty<Token> token;
     private final TokenAdapter tokenAdapter = new TokenAdapter();
     private final ComboBoxFactory instance = ComboBoxFactory.getInstance();
@@ -50,6 +52,8 @@ public class TokenEditorDialog extends Dialog<Token> {
     private final ComboBox<NamedTemplate> namedTemplateComboBox = instance.getNamedTemplateComboBox();
     private final ComboBox<NamedTag> namedTagComboBox = instance.getNamedTagComboBox();
     private final RootLettersPicker rootLettersPicker = new RootLettersPicker();
+    private final TabPane tabPane = new TabPane();
+    private final Browser browser = new Browser();
     private BorderPane lettersPane;
     private TitledPane propertiesPane;
     private AbstractPropertiesPane particlePropertiesPane;
@@ -57,10 +61,17 @@ public class TokenEditorDialog extends Dialog<Token> {
     private AbstractPropertiesPane proNounPropertiesPane;
     private AbstractPropertiesPane verbPropertiesPane;
     private ComboBox<Location> locationComboBox;
+    private Tab browseDictionaryTab;
 
     public TokenEditorDialog(Token token) {
         setTitle(getTitle(token));
         setResizable(true);
+
+        tabPane.setTabClosingPolicy(UNAVAILABLE);
+        tabPane.setBorder(BORDER);
+        browseDictionaryTab = new Tab("Browse Dictionary", browser);
+        browseDictionaryTab.setDisable(true);
+
         lettersPane = new BorderPane();
         lettersPane.setBorder(BORDER);
         particlePropertiesPane = new ParticlePropertiesPane(tokenAdapter);
@@ -69,17 +80,26 @@ public class TokenEditorDialog extends Dialog<Token> {
         proNounPropertiesPane = new ProNounPropertiesPane(tokenAdapter);
         verbPropertiesPane = new VerbPropertiesPane(tokenAdapter);
         propertiesPane = new TitledPane("Noun Properties", nounPropertiesPane);
-        // rootLettersPicker.setAlignment(Pos.CENTER_LEFT);
 
         this.token = new SimpleObjectProperty<>(token);
         tokenAdapter.updateToken(token, 0);
 
         tokenAdapter.rootWordProperty().addListener((o, ov, nv) -> {
-            ArabicLetterType firstRadical = nv == null ? null : nv.getFirstRadical();
-            ArabicLetterType secondRadical = nv == null ? null : nv.getSecondRadical();
-            ArabicLetterType thirdRadical = nv == null ? null : nv.getThirdRadical();
-            ArabicLetterType fourthRadical = nv == null ? null : nv.getFourthRadical();
+            ArabicLetterType firstRadical = (nv == null) ? null : nv.getFirstRadical();
+            ArabicLetterType secondRadical = (nv == null) ? null : nv.getSecondRadical();
+            ArabicLetterType thirdRadical = (nv == null) ? null : nv.getThirdRadical();
+            ArabicLetterType fourthRadical = (nv == null) ? null : nv.getFourthRadical();
             rootLettersPicker.setRootLetters(firstRadical, secondRadical, thirdRadical, fourthRadical);
+
+            boolean disable = firstRadical == null || secondRadical == null || thirdRadical == null;
+            browseDictionaryTab.setDisable(disable);
+
+            if (!disable) {
+                String fr = fourthRadical == null ? "" : fourthRadical.toCode();
+                String url = format("%s%s%s%s%s", MAWRID_READER_URL, firstRadical.toCode(), secondRadical.toCode(),
+                        thirdRadical.toCode(), fr);
+                browser.loadUrl(url);
+            }
         });
 
         // initialize initial dialog
@@ -143,6 +163,7 @@ public class TokenEditorDialog extends Dialog<Token> {
     }
 
     public void setToken(Token token) {
+        tabPane.getSelectionModel().select(0);
         this.token.set(token);
     }
 
@@ -187,9 +208,9 @@ public class TokenEditorDialog extends Dialog<Token> {
 
     private GridPane createLocationsPane() {
         GridPane gridPane = new GridPane();
-        gridPane.setHgap(10);
-        gridPane.setVgap(10);
-        gridPane.setPadding(new Insets(25, 25, 25, 25));
+        gridPane.setHgap(GAP);
+        gridPane.setVgap(GAP);
+        gridPane.setPadding(DEFAULT_PADDING);
 
         Label label = new Label(RESOURCE_BUNDLE.getString("locations.label"));
         gridPane.add(label, 0, 0);
@@ -217,8 +238,8 @@ public class TokenEditorDialog extends Dialog<Token> {
 
     private GridPane createCommonPropertiesPane() {
         GridPane gp = new GridPane();
-        gp.setHgap(10);
-        gp.setVgap(10);
+        gp.setHgap(GAP);
+        gp.setVgap(GAP);
         gp.setPadding(DEFAULT_PADDING);
 
         Label label = new Label(RESOURCE_BUNDLE.getString("partOfSpeech.label"));
@@ -240,7 +261,6 @@ public class TokenEditorDialog extends Dialog<Token> {
         label = new Label(RESOURCE_BUNDLE.getString("namedTag.label"));
         gp.add(label, 1, 2);
 
-
         gp.add(namedTagComboBox, 1, 3);
 
         return gp;
@@ -249,20 +269,30 @@ public class TokenEditorDialog extends Dialog<Token> {
     private void setup() {
         createLettersPane(tokenAdapter.getLetters());
 
-        VBox vBox = new VBox(10);
-        vBox.setPadding(new Insets(25, 25, 25, 25));
+        BorderPane borderPane = new BorderPane();
 
-        TitledPane locationPane = new TitledPane("Location", createLocationsPane());
-        TitledPane commonPropertiesPane = new TitledPane("Common Properties", createCommonPropertiesPane());
+        VBox vBox = new VBox(5);
+        vBox.setPadding(DEFAULT_PADDING);
+        vBox.getChildren().addAll(lettersPane, createTranslationPane(), createLocationsPane());
+        TitledPane titledPane = new TitledPane("Letters, Translation, & Locations", vBox);
 
-        VBox vBox1 = new VBox(5);
-        vBox1.setPadding(DEFAULT_PADDING);
-        vBox1.getChildren().addAll(lettersPane, createTranslationPane());
-        TitledPane lettersAndTranslationPane = new TitledPane("Letters & Translation", vBox1);
+        GridPane commonPropertiesPane = createCommonPropertiesPane();
+        commonPropertiesPane.setBorder(BORDER);
 
-        vBox.getChildren().addAll(lettersAndTranslationPane, locationPane, commonPropertiesPane, propertiesPane);
+        Tab tab = new Tab("Letters, Translation, & Locations", vBox);
+        tabPane.getTabs().add(tab);
 
-        getDialogPane().setContent(vBox);
+        tab = new Tab("Common Properties", commonPropertiesPane);
+        tabPane.getTabs().add(tab);
+
+        tab = new Tab("Part of Speech Properties", propertiesPane);
+        tabPane.getTabs().add(tab);
+
+        tabPane.getTabs().add(browseDictionaryTab);
+
+        borderPane.setCenter(tabPane);
+
+        getDialogPane().setContent(borderPane);
     }
 
     private void initLocations() {
@@ -285,7 +315,7 @@ public class TokenEditorDialog extends Dialog<Token> {
             return;
         }
         HBox hBox = new HBox();
-        hBox.setSpacing(10);
+        hBox.setSpacing(GAP);
         hBox.setPadding(DEFAULT_PADDING);
         hBox.setAlignment(CENTER);
         hBox.setNodeOrientation(RIGHT_TO_LEFT);
