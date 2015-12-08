@@ -9,6 +9,8 @@ import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.TerminalNo
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.AlternateStatus;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.NounStatus;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.BorderStroke;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
@@ -22,6 +24,10 @@ import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNod
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.*;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
+import static javafx.scene.layout.BorderStroke.THIN;
+import static javafx.scene.layout.BorderStrokeStyle.SOLID;
+import static javafx.scene.layout.CornerRadii.EMPTY;
+import static javafx.scene.paint.Color.LIGHTGREY;
 import static javafx.scene.text.Font.font;
 import static javafx.scene.text.FontPosture.REGULAR;
 import static javafx.scene.text.FontWeight.BOLD;
@@ -63,6 +69,7 @@ public class Global {
     public static final double INITIAL_X = 0;
     public static final double INITIAL_Y = 40;
     public static final int GAP = 10;
+    public static final Border BORDER = new Border(new BorderStroke(LIGHTGREY, SOLID, EMPTY, THIN));
     public static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("resources");
     public static final String MAWRID_READER_URL = System.getProperty("mawrid-reader.url");
     private static Global instance;
