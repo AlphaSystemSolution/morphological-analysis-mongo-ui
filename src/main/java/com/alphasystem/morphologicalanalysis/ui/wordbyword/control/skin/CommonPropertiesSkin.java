@@ -79,8 +79,10 @@ public class CommonPropertiesSkin extends SkinBase<CommonPropertiesView> {
 
         RootLettersPicker rootLettersPicker = new RootLettersPicker();
         RootWord rootWord = view.getRootWord();
-        rootLettersPicker.setRootLetters(rootWord.getFirstRadical(), rootWord.getSecondRadical(),
-                rootWord.getThirdRadical(), rootWord.getFourthRadical());
+        if (rootWord != null) {
+            rootLettersPicker.setRootLetters(rootWord.getFirstRadical(), rootWord.getSecondRadical(),
+                    rootWord.getThirdRadical(), rootWord.getFourthRadical());
+        }
         label.setLabelFor(rootLettersPicker);
         view.rootWordProperty().addListener((o, ov, nv) -> {
             ArabicLetterType firstRadical = (nv == null) ? null : nv.getFirstRadical();

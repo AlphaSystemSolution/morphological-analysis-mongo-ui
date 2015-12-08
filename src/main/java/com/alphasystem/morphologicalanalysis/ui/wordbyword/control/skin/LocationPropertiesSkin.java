@@ -80,7 +80,7 @@ public class LocationPropertiesSkin extends SkinBase<LocationPropertiesView> {
         TitledPane titledPane = new TitledPane("Location's Common Properties", createScrollPane(commonPropertiesView));
         hBox.getChildren().add(titledPane);
 
-        AbstractProperties properties = location.getProperties();
+        AbstractProperties properties = (location == null) ? null : location.getProperties();
         propertiesTitledPane = new TitledPane(getPropertiesPaneTitle(properties), getPropertiesView(properties));
         hBox.getChildren().add(propertiesTitledPane);
 
