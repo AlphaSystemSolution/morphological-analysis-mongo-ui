@@ -23,6 +23,7 @@ public class CommonPropertiesView extends Control {
     private final ObjectProperty<NamedTag> namedTag = new SimpleObjectProperty<>(null, "namedTag");
     private final ObjectProperty<NamedTemplate> namedTemplate = new SimpleObjectProperty<>(null, "namedTemplate");
     private final ObjectProperty<RootWord> rootWord = new SimpleObjectProperty<>(null, "rootWord");
+    private final ObjectProperty<String> translation = new SimpleObjectProperty<>(null, "translation");
 
     public CommonPropertiesView() {
         locationProperty().addListener((o, ov, nv) -> setValues(nv));
@@ -31,6 +32,7 @@ public class CommonPropertiesView extends Control {
         namedTemplateProperty().addListener((o, ov, nv) ->
                 getLocation().setFormTemplate((nv == null) ? null : nv));
         rootWordProperty().addListener((o, ov, nv) -> getLocation().setRootWord((nv == null) ? new RootWord() : nv));
+        translationProperty().addListener((o, ov, nv) -> getLocation().setTranslation(nv));
     }
 
     private void setValues(Location location) {
@@ -38,6 +40,7 @@ public class CommonPropertiesView extends Control {
         setNamedTag((location == null) ? null : location.getNamedTag());
         setNamedTemplate((location == null) ? null : location.getFormTemplate());
         setRootWord((location == null) ? new RootWord() : location.getRootWord());
+        setTranslation(location == null ? null : location.getTranslation());
     }
 
     public final Location getLocation() {
@@ -98,6 +101,18 @@ public class CommonPropertiesView extends Control {
 
     public final ObjectProperty<RootWord> rootWordProperty() {
         return rootWord;
+    }
+
+    public final String getTranslation() {
+        return translation.get();
+    }
+
+    public final void setTranslation(String translation) {
+        this.translation.set(translation);
+    }
+
+    public final ObjectProperty<String> translationProperty() {
+        return translation;
     }
 
     @Override
