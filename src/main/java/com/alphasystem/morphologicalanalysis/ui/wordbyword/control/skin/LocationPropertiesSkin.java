@@ -10,6 +10,7 @@ import javafx.scene.control.TitledPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 
+import static com.alphasystem.morphologicalanalysis.ui.common.Global.GAP;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.AbstractProperties.*;
 import static javafx.scene.control.ScrollPane.ScrollBarPolicy.AS_NEEDED;
 
@@ -69,7 +70,7 @@ public class LocationPropertiesSkin extends SkinBase<LocationPropertiesView> {
 
     private void initializeSkin() {
         HBox hBox = new HBox();
-        hBox.setSpacing(10);
+        hBox.setSpacing(GAP);
 
         LocationPropertiesView view = getSkinnable();
         Location location = view.getLocation();
@@ -96,7 +97,7 @@ public class LocationPropertiesSkin extends SkinBase<LocationPropertiesView> {
                 nounPropertiesView = new NounPropertiesView();
             }
             propertiesView = nounPropertiesView;
-        } else if (AbstractProperties.isPronoun(properties)) {
+        } else if (isPronoun(properties)) {
             if (proNounPropertiesView == null) {
                 proNounPropertiesView = new ProNounPropertiesView();
             }
