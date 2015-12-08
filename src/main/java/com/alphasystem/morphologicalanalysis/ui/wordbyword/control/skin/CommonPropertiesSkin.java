@@ -91,8 +91,44 @@ public class CommonPropertiesSkin extends SkinBase<CommonPropertiesView> {
             ArabicLetterType fourthRadical = (nv == null) ? null : nv.getFourthRadical();
             rootLettersPicker.setRootLetters(firstRadical, secondRadical, thirdRadical, fourthRadical);
         });
+        updateRootWord(view, rootLettersPicker);
         gridPane.add(rootLettersPicker, 1, row);
 
         getChildren().add(gridPane);
+    }
+
+    private void updateRootWord(CommonPropertiesView view, RootLettersPicker rootLettersPicker) {
+        rootLettersPicker.firstRadicalProperty().addListener((o, ov, nv) -> {
+            RootWord rw = view.getRootWord();
+            if (rw == null) {
+                rw = new RootWord();
+                view.setRootWord(rw);
+            }
+            rw.setFirstRadical(nv);
+        });
+        rootLettersPicker.secondRadicalProperty().addListener((o, ov, nv) -> {
+            RootWord rw = view.getRootWord();
+            if (rw == null) {
+                rw = new RootWord();
+                view.setRootWord(rw);
+            }
+            rw.setSecondRadical(nv);
+        });
+        rootLettersPicker.thirdRadicalProperty().addListener((o, ov, nv) -> {
+            RootWord rw = view.getRootWord();
+            if (rw == null) {
+                rw = new RootWord();
+                view.setRootWord(rw);
+            }
+            rw.setThirdRadical(nv);
+        });
+        rootLettersPicker.fourthRadicalProperty().addListener((o, ov, nv) -> {
+            RootWord rw = view.getRootWord();
+            if (rw == null) {
+                rw = new RootWord();
+                view.setRootWord(rw);
+            }
+            rw.setFourthRadical(nv);
+        });
     }
 }
