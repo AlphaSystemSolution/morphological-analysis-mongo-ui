@@ -62,6 +62,7 @@ public class Global {
     public static final double MIN_GAP_BETWEEN_TOKENS = 10;
     public static final double INITIAL_X = 0;
     public static final double INITIAL_Y = 40;
+    public static final int GAP = 10;
     public static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("resources");
     public static final String MAWRID_READER_URL = System.getProperty("mawrid-reader.url");
     private static Global instance;
