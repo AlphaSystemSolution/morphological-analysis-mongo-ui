@@ -1,6 +1,5 @@
 package com.alphasystem.morphologicalanalysis.ui.wordbyword;
 
-import com.alphasystem.arabic.model.ArabicLetterType;
 import com.alphasystem.morphologicalanalysis.ui.wordbyword.control.TokenPropertiesView;
 import com.alphasystem.morphologicalanalysis.util.MorphologicalAnalysisRepositoryUtil;
 import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
@@ -20,7 +19,6 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.text.StrBuilder;
 
 import java.util.List;
 
@@ -61,7 +59,7 @@ public class ViewTestApp extends Application {
         TokenPropertiesView root = new TokenPropertiesView();
 
         ComboBox<String> displayNameComboBox = new ComboBox<>();
-        displayNameComboBox.getItems().addAll("18:1:1", "18:1:4", "18:1:5", "18:1:6");
+        displayNameComboBox.getItems().addAll("18:1:1", "18:1:4", "18:1:5", "18:1:6", "18:2:8");
         displayNameComboBox.valueProperty().addListener((o, ov, nv) -> {
             Token token = tokenRepository.findByDisplayName(nv);
             primaryStage.setTitle(format("View Test {%s}", token.getDisplayName()));
@@ -71,7 +69,6 @@ public class ViewTestApp extends Application {
         FlowPane flowPane = new FlowPane();
         flowPane.setHgap(10);
         flowPane.setAlignment(CENTER);
-
         TextArea textArea = new TextArea();
 
         Button button = new Button("          Get Data          ");
@@ -90,7 +87,7 @@ public class ViewTestApp extends Application {
         flowPane.getChildren().addAll(displayNameComboBox, button);
 
 
-        vBox.getChildren().addAll(root, flowPane, textArea);
+        vBox.getChildren().addAll(flowPane, root, textArea);
 
         Scene scene = new Scene(vBox);
         primaryStage.setMaximized(true);
@@ -102,16 +99,7 @@ public class ViewTestApp extends Application {
         if (rootWord == null) {
             return "No Root Word";
         }
-        StrBuilder builder = new StrBuilder();
-        ArabicLetterType radical = rootWord.getFirstRadical();
-        builder.append((radical == null) ? "" : radical.name()).append(" ");
-        radical = rootWord.getSecondRadical();
-        builder.append((radical == null) ? "" : radical.name()).append(" ");
-        radical = rootWord.getThirdRadical();
-        builder.append((radical == null) ? "" : radical.name()).append(" ");
-        radical = rootWord.getFourthRadical();
-        builder.append((radical == null) ? "" : radical.name());
-        String s = builder.toString();
+        String s = rootWord.toCode();
         return StringUtils.isBlank(s) ? "No Root Word" : s;
     }
 }

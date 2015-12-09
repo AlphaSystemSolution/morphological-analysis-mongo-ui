@@ -1,5 +1,7 @@
 package com.alphasystem.morphologicalanalysis.ui.wordbyword.control.skin;
 
+import com.alphasystem.arabic.ui.ArabicLabelToggleGroup;
+import com.alphasystem.arabic.ui.ArabicLabelView;
 import com.alphasystem.arabic.ui.Browser;
 import com.alphasystem.morphologicalanalysis.ui.common.LocationListCell;
 import com.alphasystem.morphologicalanalysis.ui.wordbyword.control.LocationPropertiesView;
@@ -7,15 +9,20 @@ import com.alphasystem.morphologicalanalysis.ui.wordbyword.control.TokenProperti
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.RootWord;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 import java.util.List;
 
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.*;
+import static com.alphasystem.morphologicalanalysis.ui.wordbyword.control.TokenPropertiesView.SelectionStatus.*;
 import static java.lang.String.format;
+import static javafx.geometry.NodeOrientation.RIGHT_TO_LEFT;
 import static javafx.geometry.Pos.CENTER;
 import static javafx.scene.control.TabPane.TabClosingPolicy.UNAVAILABLE;
 
@@ -25,7 +32,9 @@ import static javafx.scene.control.TabPane.TabClosingPolicy.UNAVAILABLE;
 public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
 
     private final ComboBox<Location> locationComboBox;
+    private final ArabicLabelToggleGroup group;
     private final LocationPropertiesView locationPropertiesView;
+    private final BorderPane lettersPane;
     private final TabPane tabPane;
     private final Browser browser;
     private Tab browseDictionaryTab;
@@ -33,16 +42,56 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
     public TokenPropertiesSkin(TokenPropertiesView control) {
         super(control);
 
+        lettersPane = new BorderPane();
+        lettersPane.setBorder(BORDER);
+
+        browser = new Browser();
+
         tabPane = new TabPane();
         tabPane.setTabClosingPolicy(UNAVAILABLE);
         tabPane.setBorder(BORDER);
-        locationComboBox = new ComboBox<>();
-        locationPropertiesView = new LocationPropertiesView();
-        browser = new Browser();
         browseDictionaryTab = new Tab("Browse Dictionary", browser);
         browseDictionaryTab.setDisable(true);
 
+        locationComboBox = new ComboBox<>();
+        locationPropertiesView = new LocationPropertiesView();
+
+        group = new ArabicLabelToggleGroup();
+        group.setWidth(64);
+        group.setHeight(64);
+        group.setFont(ARABIC_FONT_MEDIUM);
+
         initializeSkin();
+    }
+
+    private void createLettersPane() {
+        lettersPane.setCenter(null);
+
+        HBox hBox = new HBox();
+        hBox.setSpacing(GAP);
+        hBox.setPadding(new Insets(GAP));
+        hBox.setAlignment(CENTER);
+        hBox.setNodeOrientation(RIGHT_TO_LEFT);
+
+        TokenPropertiesView view = getSkinnable();
+        final ObservableList<TokenPropertiesView.LocationLabel> labels = view.getLabels();
+        labels.forEach(locationLabel -> {
+            ArabicLabelView labelView = new ArabicLabelView();
+            labelView.setLabel(locationLabel);
+            labelView.setGroup(group);
+            // final int index = locationLabel.getIndex();
+            labelView.selectedProperty().addListener((o, ov, nv) -> {
+                TokenPropertiesView.SelectionStatus status = nv ? SELECTED : AVAILABLE;
+                // replace element at "index" this will fire change event in the "labels" list
+                // labels.set(index, new TokenPropertiesView.LocationLabel(status, locationLabel.getLetter(), index));
+                locationLabel.setStatus(status);
+            });
+            labelView.setSelect(locationLabel.getStatus().equals(SELECTED));
+            labelView.setDisable(locationLabel.getStatus().equals(NOT_AVAILABLE));
+            hBox.getChildren().add(labelView);
+        });
+
+        lettersPane.setCenter(hBox);
     }
 
     private GridPane createLocationsPane() {
@@ -67,7 +116,9 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
                 locationPropertiesView.setLocation(nv);
                 tabPane.getSelectionModel().select(0);
                 loadDictionary(nv);
+                view.changeStatuses(nv);
             }
+            createLettersPane();
         });
         gridPane.setBorder(BORDER);
         return gridPane;
@@ -111,7 +162,8 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
         tabPane.getTabs().addAll(new Tab(RESOURCE_BUNDLE.getString("locationProperties.label"), locationPropertiesView),
                 browseDictionaryTab);
 
-        vBox.getChildren().addAll(createLocationsPane(), tabPane);
+        createLettersPane();
+        vBox.getChildren().addAll(lettersPane, createLocationsPane(), tabPane);
         getChildren().add(vBox);
     }
 }
