@@ -29,8 +29,6 @@ public class TokenPropertiesView extends Control {
     public TokenPropertiesView() {
         tokenProperty().addListener((o, ov, nv) -> {
             Location selectedLocation = this.selectedLocation.get();
-            System.out.println("OV: " + ov + " >>>>>>>>>>>>>>> " + labels + " : " + selectedLocation);
-            System.out.println("NV: " + nv);
             updateStartAndEndIndex(selectedLocation);
             labels.clear();
             if (nv != null) {
@@ -79,7 +77,6 @@ public class TokenPropertiesView extends Control {
         // make sure we saves values in old location before resetting vales
         updateStartAndEndIndex(oldLocation);
         selectedLocation.setValue(newLocation);
-        System.out.println(format("Selected Location: " + newLocation));
 
         // first reset all the label status to available
         labels.forEach(locationLabel -> locationLabel.setStatus(SelectionStatus.AVAILABLE));
@@ -112,8 +109,6 @@ public class TokenPropertiesView extends Control {
 
     private void updateStartAndEndIndex(Location oldLocation) {
         if (oldLocation != null) {
-            System.out.println(format("%s: Start Index: %s, End Index: %s", oldLocation, oldLocation.getStartIndex(),
-                    oldLocation.getEndIndex()));
             int startIndex = -1;
             int endIndex = -1;
             for (int i = 0; i < labels.size(); i++) {
@@ -129,8 +124,6 @@ public class TokenPropertiesView extends Control {
             endIndex++;
             oldLocation.setStartIndex(startIndex);
             oldLocation.setEndIndex(endIndex);
-            System.out.println(format("%s: Start Index: %s, End Index: %s", oldLocation, oldLocation.getStartIndex(),
-                    oldLocation.getEndIndex()));
         }
     }
 

@@ -28,9 +28,8 @@ public class TokenEditorDialog extends Dialog<Token> {
 
         Rectangle2D visualBounds = Screen.getPrimary().getVisualBounds();
         double offset = 50.0;
-        double margin = 2 * offset;
-        setWidth(visualBounds.getWidth() - margin);
-        setHeight(visualBounds.getHeight() - margin);
+        setWidth(visualBounds.getWidth() - offset);
+        setHeight(visualBounds.getHeight() - offset);
         setX(offset);
         setY(offset);
 
