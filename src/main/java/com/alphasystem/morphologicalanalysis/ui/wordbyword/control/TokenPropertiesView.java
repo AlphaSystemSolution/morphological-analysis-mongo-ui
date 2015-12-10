@@ -28,8 +28,12 @@ public class TokenPropertiesView extends Control {
 
     public TokenPropertiesView() {
         tokenProperty().addListener((o, ov, nv) -> {
-            Location selectedLocation = this.selectedLocation.get();
-            updateStartAndEndIndex(selectedLocation);
+            // Following code was trying to update start and end indices upon changing the token, but this was
+            // changing the actual data
+
+            // TODO: find out implications
+            // Location selectedLocation = this.selectedLocation.get();
+            // updateStartAndEndIndex(selectedLocation);
             labels.clear();
             if (nv != null) {
                 ArabicWord tokenWord = nv.getTokenWord();
