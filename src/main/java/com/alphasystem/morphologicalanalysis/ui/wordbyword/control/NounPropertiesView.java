@@ -36,7 +36,7 @@ public class NounPropertiesView extends AbstractNounPropertiesView<NounPropertie
     protected void setValues(NounProperties nv) {
         super.setValues(nv);
         setNounKind((nv == null) ? null : nv.getNounKind());
-        setNounType(nv == null ? null : nv.getNounType());
+        setNounType((nv == null) ? null : nv.getNounType());
     }
 
     public final NounKind getNounKind() {
