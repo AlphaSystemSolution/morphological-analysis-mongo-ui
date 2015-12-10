@@ -1,6 +1,5 @@
 package com.alphasystem.morphologicalanalysis.ui.wordbyword;
 
-import com.alphasystem.morphologicalanalysis.ui.wordbyword.component.WordByWordPane;
 import com.alphasystem.morphologicalanalysis.util.SpringContextHelper;
 import javafx.application.Application;
 import javafx.geometry.Rectangle2D;
@@ -14,7 +13,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
-import static com.alphasystem.morphologicalanalysis.ui.wordbyword.component.WordByWordPane.Action.CREATE_DEPENDENCY_GRAPH;
+import static com.alphasystem.morphologicalanalysis.ui.wordbyword.WordByWordPane.Action.CREATE_DEPENDENCY_GRAPH;
 import static javafx.scene.input.KeyCode.*;
 import static javafx.scene.input.KeyCombination.ALT_DOWN;
 import static javafx.scene.input.KeyCombination.CONTROL_DOWN;

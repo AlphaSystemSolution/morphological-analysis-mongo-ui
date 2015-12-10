@@ -7,10 +7,7 @@ import com.alphasystem.morphologicalanalysis.ui.wordbyword.control.skin.TokenPro
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.ReadOnlyIntegerWrapper;
-import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
@@ -26,13 +23,15 @@ import static javafx.collections.FXCollections.observableArrayList;
 public class TokenPropertiesView extends Control {
 
     private final ObjectProperty<Token> token = new SimpleObjectProperty<>(null, "token");
+    private final ObjectProperty<Location> selectedLocation = new SimpleObjectProperty<>(null, "selectedLocation");
     private final ObservableList<LocationLabel> labels = observableArrayList();
-    private final ReadOnlyIntegerWrapper from = new ReadOnlyIntegerWrapper(-1, "from");
-    private final ReadOnlyIntegerWrapper to = new ReadOnlyIntegerWrapper(-1, "to");
-    private final ReadOnlyObjectWrapper<SelectionStatus> newStatus = new ReadOnlyObjectWrapper<>(null, "newStatus");
 
     public TokenPropertiesView() {
         tokenProperty().addListener((o, ov, nv) -> {
+            Location selectedLocation = this.selectedLocation.get();
+            System.out.println("OV: " + ov + " >>>>>>>>>>>>>>> " + labels + " : " + selectedLocation);
+            System.out.println("NV: " + nv);
+            updateStartAndEndIndex(selectedLocation);
             labels.clear();
             if (nv != null) {
                 ArabicWord tokenWord = nv.getTokenWord();
@@ -42,34 +41,6 @@ public class TokenPropertiesView extends Control {
                 for (ArabicLetter letter : letters) {
                     labels.add(new LocationLabel(letter, index++));
                 }
-            }
-        });
-        labels.addListener((ListChangeListener<LocationLabel>) c -> {
-            while (c.next()) {
-                int addedSize = c.getAddedSize();
-                // if something added in the list that becuase user has selected / un-selected label
-                // now if it was the "selected" action then start from index of selected label going backward and make
-                // all labels selected as long as the status is not "NOT_AVAILABLE", do similar action for "un-select
-                // this will allow user to select entire labels by selecting last label.
-                if (addedSize > 0) {
-                    List<LocationLabel> addedSubList = (List<LocationLabel>) c.getAddedSubList();
-                    int index = addedSize - 1;
-                    LocationLabel locationLabel = addedSubList.get(index);
-                    SelectionStatus status = locationLabel.getStatus();
-                    index = locationLabel.getIndex();
-                    to.setValue(index + 1);
-                    newStatus.setValue(status);
-                    setStatus:
-                    for (int i = index - 1; i >= 0; i--) {
-                        LocationLabel ll = labels.get(i);
-                        if (ll.getStatus().equals(SelectionStatus.NOT_AVAILABLE)) {
-                            break setStatus;
-                        }
-                        from.setValue(i);
-                        ll.setStatus(status);
-                    }
-                }
-
             }
         });
     }
@@ -90,24 +61,31 @@ public class TokenPropertiesView extends Control {
         return labels;
     }
 
-    public final Integer getFrom() {
-        return from.get();
+    /**
+     * Updates the current token and selected location for start and end indices.
+     * <div></div>
+     * <div>
+     * <strong>Implementation Note:-</strong> Upon selecting token letters thr start and end indices doesn't get
+     * updated, if we change the location or token then last selected location will get updated but from UI when
+     * user is clicking "OK" or "Apply" button there is no way to update location, this method will get called from UI
+     * to update selected location.
+     * </div>
+     */
+    public void updateToken() {
+        updateStartAndEndIndex(selectedLocation.get());
     }
 
-    public final Integer getTo() {
-        return to.get();
-    }
+    public void changeStatuses(Location oldLocation, Location newLocation) {
+        // make sure we saves values in old location before resetting vales
+        updateStartAndEndIndex(oldLocation);
+        selectedLocation.setValue(newLocation);
+        System.out.println(format("Selected Location: " + newLocation));
 
-    public final SelectionStatus getNewStatus() {
-        return newStatus.get();
-    }
-
-    public void changeStatuses(Location currentLocation) {
         // first reset all the label status to available
         labels.forEach(locationLabel -> locationLabel.setStatus(SelectionStatus.AVAILABLE));
 
         Token token = getToken();
-        if (token == null || currentLocation == null) {
+        if (token == null || newLocation == null) {
             return;
         }
         // next pass go though locations of this token make labels either "SELECTED" or "NOT_AVAILABLE" based on
@@ -124,11 +102,35 @@ public class TokenPropertiesView extends Control {
             // if this location is our current location then make status "SELECTED" of letters in the range of
             // startIndex (inclusive) and endIndex (exclusive), otherwise should be part of other locations
             // make them "NOT_AVAILABLE"
-            SelectionStatus status = location.equals(currentLocation) ? SelectionStatus.SELECTED :
+            SelectionStatus status = location.equals(newLocation) ? SelectionStatus.SELECTED :
                     SelectionStatus.NOT_AVAILABLE;
             for (int i = startIndex; i < endIndex; i++) {
                 labels.get(i).setStatus(status);
             }
+        }
+    }
+
+    private void updateStartAndEndIndex(Location oldLocation) {
+        if (oldLocation != null) {
+            System.out.println(format("%s: Start Index: %s, End Index: %s", oldLocation, oldLocation.getStartIndex(),
+                    oldLocation.getEndIndex()));
+            int startIndex = -1;
+            int endIndex = -1;
+            for (int i = 0; i < labels.size(); i++) {
+                LocationLabel locationLabel = labels.get(i);
+                if (locationLabel.getStatus().equals(SelectionStatus.SELECTED)) {
+                    if (startIndex <= -1) {
+                        startIndex = i;
+                    }
+                    endIndex = i;
+                } // end of if
+            } // end of for
+            // endIndex in exclusive
+            endIndex++;
+            oldLocation.setStartIndex(startIndex);
+            oldLocation.setEndIndex(endIndex);
+            System.out.println(format("%s: Start Index: %s, End Index: %s", oldLocation, oldLocation.getStartIndex(),
+                    oldLocation.getEndIndex()));
         }
     }
 
@@ -213,7 +215,7 @@ public class TokenPropertiesView extends Control {
 
         @Override
         public String toString() {
-            return format("%s: %s : %s", getLabel().toBuckWalter(), getStatus(), getIndex());
+            return format("{'label': '%s', 'status': '%s', 'index': %s}", getLabel().toBuckWalter(), getStatus(), getIndex());
         }
     }
 }

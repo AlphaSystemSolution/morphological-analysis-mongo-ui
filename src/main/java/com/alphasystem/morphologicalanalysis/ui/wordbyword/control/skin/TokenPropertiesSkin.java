@@ -116,7 +116,7 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
                 locationPropertiesView.setLocation(nv);
                 tabPane.getSelectionModel().select(0);
                 loadDictionary(nv);
-                view.changeStatuses(nv);
+                view.changeStatuses(ov, nv);
             }
             createLettersPane();
         });
@@ -163,7 +163,15 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
                 browseDictionaryTab);
 
         createLettersPane();
-        vBox.getChildren().addAll(lettersPane, createLocationsPane(), tabPane);
+
+        VBox subBox = new VBox();
+        subBox.setSpacing(GAP);
+        subBox.getChildren().addAll(lettersPane, createLocationsPane());
+
+        TitledPane titledPane = new TitledPane("Token Letters and Locations", subBox);
+
+        vBox.getChildren().addAll(titledPane, tabPane);
         getChildren().add(vBox);
+        updateLocations(getSkinnable().getToken());
     }
 }

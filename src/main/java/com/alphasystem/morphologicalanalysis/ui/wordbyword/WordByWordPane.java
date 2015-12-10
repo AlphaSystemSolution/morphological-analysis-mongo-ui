@@ -1,4 +1,4 @@
-package com.alphasystem.morphologicalanalysis.ui.wordbyword.component;
+package com.alphasystem.morphologicalanalysis.ui.wordbyword;
 
 import com.alphasystem.morphologicalanalysis.common.model.VerseTokensPair;
 import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
@@ -9,6 +9,7 @@ import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.Dependency
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.GraphMetaInfoAdapter;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.VerseTokenPairGroup;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.CanvasUtil;
+import com.alphasystem.morphologicalanalysis.ui.wordbyword.control.TokenEditorDialog;
 import com.alphasystem.morphologicalanalysis.ui.wordbyword.model.TableCellModel;
 import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
@@ -56,7 +57,8 @@ public class WordByWordPane extends BorderPane {
 
     @SuppressWarnings({"unchecked"})
     public WordByWordPane() {
-        tokenEditorDialog = new TokenEditorDialog(RepositoryTool.getInstance().getTokenByDisplayName("1:1:1"));
+        tokenEditorDialog = new TokenEditorDialog();
+        tokenEditorDialog.setToken(RepositoryTool.getInstance().getTokenByDisplayName("1:1:1"));
         chapterVerseSelectionPane = new ChapterVerseSelectionPane();
         chapterVerseSelectionPane.availableProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue) {
@@ -139,7 +141,6 @@ public class WordByWordPane extends BorderPane {
                 if (event.getClickCount() == 2) {
                     TableCellModel model = tableView.getItems().get(row.getIndex());
                     Token token = model.getToken();
-                    tokenEditorDialog.setToken(null);
                     tokenEditorDialog.setToken(token);
                     Optional<Token> result = tokenEditorDialog.showAndWait();
                     result.ifPresent(model::setToken);
