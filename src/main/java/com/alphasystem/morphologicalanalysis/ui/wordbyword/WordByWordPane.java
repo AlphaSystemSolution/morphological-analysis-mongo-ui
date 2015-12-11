@@ -142,8 +142,12 @@ public class WordByWordPane extends BorderPane {
                     TableCellModel model = tableView.getItems().get(row.getIndex());
                     Token token = model.getToken();
                     tokenEditorDialog.setToken(token);
-                    Optional<Token> result = tokenEditorDialog.showAndWait();
-                    result.ifPresent(model::setToken);
+                    try {
+                        Optional<Token> result = tokenEditorDialog.showAndWait();
+                        result.ifPresent(model::setToken);
+                    } catch (Exception e) {
+                        // do nothing
+                    }
                 }
             });
             return row;
