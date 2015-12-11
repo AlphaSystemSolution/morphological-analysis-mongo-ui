@@ -61,6 +61,12 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
         group.setHeight(64);
         group.setFont(ARABIC_FONT_MEDIUM);
 
+        locationPropertiesView.locationUpdatedProperty().addListener((o, ov, nv) -> {
+            Location location = locationPropertiesView.getLocation();
+            RootWord rootWord = location.getRootWord();
+            loadDictionary(rootWord);
+        });
+
         initializeSkin();
     }
 
@@ -115,7 +121,7 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
             if (nv != null) {
                 locationPropertiesView.setLocation(nv);
                 tabPane.getSelectionModel().select(0);
-                loadDictionary(nv);
+                loadDictionary(nv.getRootWord());
                 view.changeLocation(ov, nv);
             }
             createLettersPane();
@@ -124,8 +130,7 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
         return gridPane;
     }
 
-    private void loadDictionary(Location nv) {
-        RootWord rootWord = nv.getRootWord();
+    private void loadDictionary(RootWord rootWord) {
         String searchString = null;
         boolean disableDictionaryTab = rootWord == null;
         if (!disableDictionaryTab) {
