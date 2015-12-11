@@ -70,29 +70,35 @@ public class ViewTestApp extends Application {
         flowPane.setHgap(10);
         flowPane.setAlignment(CENTER);
         TextArea textArea = new TextArea();
-
+        textArea.setPrefRowCount(20);
         Button button = new Button("          Get Data          ");
         button.setOnAction(event -> {
-            Token token = root.getToken();
-            List<Location> locations = token.getLocations();
-            StringBuilder builder = new StringBuilder();
-            locations.forEach(location -> {
-                final RootWord rootWord = location.getRootWord();
-                builder.append(location.getDisplayName()).append(": ").append(getRootWord(rootWord)).append(NEW_LINE);
-            });
-            textArea.appendText(format("%s%sToken: %s%s%s", NEW_LINE, NEW_LINE, token.getDisplayName(), NEW_LINE, builder.toString()));
+            textArea.appendText(getTokenInfo(root));
 
         });
 
         flowPane.getChildren().addAll(displayNameComboBox, button);
 
-
-        vBox.getChildren().addAll(flowPane, root, textArea);
+        vBox.getChildren().addAll(flowPane, textArea, root);
 
         Scene scene = new Scene(vBox);
         primaryStage.setMaximized(true);
         primaryStage.setScene(scene);
         primaryStage.show();
+    }
+
+    private String getTokenInfo(TokenPropertiesView root) {
+        root.updateToken();
+        Token token = root.getToken();
+        List<Location> locations = token.getLocations();
+        StringBuilder builder = new StringBuilder();
+        locations.forEach(location -> {
+            final RootWord rootWord = location.getRootWord();
+            builder.append(location.getDisplayName()).append(": ").append(getRootWord(rootWord)).append(" : ")
+                    .append(location.getStartIndex()).append(" : ").append(location.getEndIndex()).append(NEW_LINE);
+        });
+        return format("%s%sToken: %s%s%s", NEW_LINE, NEW_LINE, token.getDisplayName(),
+                NEW_LINE, builder.toString());
     }
 
     private String getRootWord(RootWord rootWord) {
