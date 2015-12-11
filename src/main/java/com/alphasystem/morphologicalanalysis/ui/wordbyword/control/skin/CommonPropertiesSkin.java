@@ -99,36 +99,34 @@ public class CommonPropertiesSkin extends SkinBase<CommonPropertiesView> {
 
     private void updateRootWord(CommonPropertiesView view, RootLettersPicker rootLettersPicker) {
         rootLettersPicker.firstRadicalProperty().addListener((o, ov, nv) -> {
-            RootWord rw = view.getRootWord();
-            if (rw == null) {
-                rw = new RootWord();
-                view.setRootWord(rw);
-            }
+            RootWord rw = getRootWord();
             rw.setFirstRadical(nv);
+            view.setRootWord(rw);
         });
         rootLettersPicker.secondRadicalProperty().addListener((o, ov, nv) -> {
-            RootWord rw = view.getRootWord();
-            if (rw == null) {
-                rw = new RootWord();
-                view.setRootWord(rw);
-            }
+            RootWord rw = getRootWord();
             rw.setSecondRadical(nv);
+            view.setRootWord(rw);
         });
         rootLettersPicker.thirdRadicalProperty().addListener((o, ov, nv) -> {
-            RootWord rw = view.getRootWord();
-            if (rw == null) {
-                rw = new RootWord();
-                view.setRootWord(rw);
-            }
+            RootWord rw = getRootWord();
             rw.setThirdRadical(nv);
+            view.setRootWord(rw);
         });
         rootLettersPicker.fourthRadicalProperty().addListener((o, ov, nv) -> {
-            RootWord rw = view.getRootWord();
-            if (rw == null) {
-                rw = new RootWord();
-                view.setRootWord(rw);
-            }
+            RootWord rw = getRootWord();
             rw.setFourthRadical(nv);
+            view.setRootWord(rw);
         });
+    }
+
+    private RootWord getRootWord() {
+        RootWord rw = getSkinnable().getRootWord();
+        if (rw == null) {
+            rw = new RootWord();
+        } else {
+            rw = new RootWord(rw);
+        }
+        return rw;
     }
 }
