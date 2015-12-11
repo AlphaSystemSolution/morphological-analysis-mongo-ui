@@ -38,6 +38,10 @@ public class LocationPropertiesSkin extends SkinBase<LocationPropertiesView> {
         commonPropertiesView.partOfSpeechProperty().addListener((o, ov, nv) -> {
             changePropertiesView(commonPropertiesView.getLocation());
         });
+        commonPropertiesView.rootWordProperty().addListener((o, ov, nv) -> {
+            view.setLocationUpdated(false);
+            view.setLocationUpdated(true);
+        });
     }
 
     private static String getPropertiesPaneTitle(AbstractProperties properties) {
