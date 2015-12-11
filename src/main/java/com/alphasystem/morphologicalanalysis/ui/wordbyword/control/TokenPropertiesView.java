@@ -77,7 +77,7 @@ public class TokenPropertiesView extends Control {
         updateStartAndEndIndex(selectedLocation.get());
     }
 
-    public void changeStatuses(Location oldLocation, Location newLocation) {
+    public void changeLocation(Location oldLocation, Location newLocation) {
         // make sure we saves values in old location before resetting vales
         updateStartAndEndIndex(oldLocation);
         selectedLocation.setValue(newLocation);

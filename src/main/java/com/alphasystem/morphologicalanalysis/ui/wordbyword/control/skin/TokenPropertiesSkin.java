@@ -116,7 +116,7 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
                 locationPropertiesView.setLocation(nv);
                 tabPane.getSelectionModel().select(0);
                 loadDictionary(nv);
-                view.changeStatuses(ov, nv);
+                view.changeLocation(ov, nv);
             }
             createLettersPane();
         });
