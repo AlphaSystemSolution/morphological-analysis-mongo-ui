@@ -77,6 +77,11 @@
             <version>${ma-repository.version}</version>
         </dependency>
         <dependency>
+            <groupId>com.alphasystem.sarf-engine</groupId>
+            <artifactId>sarf-engine-ui</artifactId>
+            <version>${sarf-engine-ui.version}</version>
+        </dependency>
+        <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>1.1.2</version>
@@ -112,9 +117,7 @@
     <properties>
         <svg-model.version>${project.version}</svg-model.version>
         <ma-repository.version>${project.version}</ma-repository.version>
-        <commons-ui.version>${project.version}</commons-ui.version>
-        <keyboard-ui.version>${project.version}</keyboard-ui.version>
-        <xml-model.version>${project.version}</xml-model.version>
+        <sarf-engine-ui.version>${project.version}</sarf-engine-ui.version>
         <maven.test.skip>true</maven.test.skip>
         <genOutputDirectory>${project.build.directory}/generated/src/main/java</genOutputDirectory>
     </properties>
