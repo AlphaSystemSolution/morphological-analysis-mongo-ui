@@ -7,7 +7,7 @@
         <version>3.0.0-SNAPSHOT</version>
     </parent>
     <groupId>com.alphasystem.arabic</groupId>
-    <artifactId>morphological-analysis-mongo-ui</artifactId>
+    <artifactId>morphological-analysis-ui</artifactId>
     <build>
         <plugins>
             <plugin>
@@ -73,7 +73,7 @@
     <dependencies>
         <dependency>
             <groupId>com.alphasystem.arabic</groupId>
-            <artifactId>morphological-analysis-mongo-repository</artifactId>
+            <artifactId>morphological-analysis-repository</artifactId>
             <version>${ma-repository.version}</version>
         </dependency>
         <dependency>
