@@ -82,6 +82,11 @@
             <version>${sarf-engine-ui.version}</version>
         </dependency>
         <dependency>
+            <groupId>com.alphasystem.arabic</groupId>
+            <artifactId>arabic-ui-support</artifactId>
+            <version>${arabic-ui-support.version}</version>
+        </dependency>
+        <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>1.1.2</version>
@@ -118,6 +123,7 @@
         <svg-model.version>${project.version}</svg-model.version>
         <ma-repository.version>${project.version}</ma-repository.version>
         <sarf-engine-ui.version>${project.version}</sarf-engine-ui.version>
+        <arabic-ui-support.version>${project.version}</arabic-ui-support.version>
         <maven.test.skip>true</maven.test.skip>
         <genOutputDirectory>${project.build.directory}/generated/src/main/java</genOutputDirectory>
     </properties>
