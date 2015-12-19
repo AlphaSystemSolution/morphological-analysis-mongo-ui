@@ -1,6 +1,5 @@
 package com.alphasystem.morphologicalanalysis.ui.wordbyword.control.skin;
 
-import com.alphasystem.arabic.model.NamedTemplate;
 import com.alphasystem.arabic.ui.ArabicLabelToggleGroup;
 import com.alphasystem.arabic.ui.ArabicLabelView;
 import com.alphasystem.arabic.ui.Browser;
@@ -9,17 +8,18 @@ import com.alphasystem.morphologicalanalysis.ui.wordbyword.control.LocationPrope
 import com.alphasystem.morphologicalanalysis.ui.wordbyword.control.TokenPropertiesView;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
-import com.alphasystem.morphologicalanalysis.wordbyword.model.support.RootWord;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
-import javafx.scene.layout.*;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 
 import java.util.List;
 
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.*;
 import static com.alphasystem.morphologicalanalysis.ui.wordbyword.control.TokenPropertiesView.SelectionStatus.*;
-import static java.lang.String.format;
 import static javafx.geometry.NodeOrientation.RIGHT_TO_LEFT;
 import static javafx.geometry.Pos.CENTER;
 import static javafx.scene.control.TabPane.TabClosingPolicy.UNAVAILABLE;
@@ -36,7 +36,6 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
     private final TabPane tabPane;
     private final Browser browser;
     private Tab browseDictionaryTab;
-    private Tab rootWordsAnalysisTab;
 
     public TokenPropertiesSkin(TokenPropertiesView control) {
         super(control);
@@ -51,8 +50,6 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
         tabPane.setBorder(BORDER);
         browseDictionaryTab = new Tab("Browse Dictionary", browser);
         browseDictionaryTab.setDisable(true);
-        rootWordsAnalysisTab = new Tab("Root Words Analysis", new Pane());
-        rootWordsAnalysisTab.setDisable(true);
 
         locationComboBox = new ComboBox<>();
         locationPropertiesView = new LocationPropertiesView();
@@ -64,9 +61,7 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
 
         locationPropertiesView.locationUpdatedProperty().addListener((o, ov, nv) -> {
             Location location = locationPropertiesView.getLocation();
-            RootWord rootWord = location.getRootWord();
-            loadDictionary(rootWord);
-            loadRootWordAnalysis(rootWord, location.getFormTemplate());
+            //TODO:
         });
 
         initializeSkin();
@@ -123,7 +118,8 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
             if (nv != null) {
                 locationPropertiesView.setLocation(nv);
                 tabPane.getSelectionModel().select(0);
-                loadDictionary(nv.getRootWord());
+                //TODO:
+                // loadDictionary();
                 view.changeLocation(ov, nv);
             }
             createLettersPane();
@@ -132,7 +128,7 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
         return gridPane;
     }
 
-    private void loadDictionary(RootWord rootWord) {
+    /*private void loadDictionary(RootWord rootWord) {
         String searchString = null;
         boolean disableDictionaryTab = (rootWord == null);
         if (!disableDictionaryTab) {
@@ -144,15 +140,7 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
             String url = format("%s%s", MAWRID_READER_URL, searchString);
             browser.loadUrl(url);
         }
-    }
-
-    private void loadRootWordAnalysis(RootWord rootWord, NamedTemplate template) {
-        String s = (rootWord == null) ? "No Root Word defined" : rootWord.toCode();
-        System.out.println(format("Root Word: %s, Form: %s", s, template));
-        boolean disable = (rootWord == null) || (template == null);
-
-        rootWordsAnalysisTab.setDisable(disable);
-    }
+    }*/
 
     private void updateLocations(Token token) {
         tabPane.getSelectionModel().select(0);
@@ -175,7 +163,7 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
         vBox.setSpacing(GAP);
 
         tabPane.getTabs().addAll(new Tab(RESOURCE_BUNDLE.getString("locationProperties.label"), locationPropertiesView),
-                browseDictionaryTab, rootWordsAnalysisTab);
+                browseDictionaryTab);
 
         createLettersPane();
 

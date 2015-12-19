@@ -6,7 +6,6 @@ import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
 import com.alphasystem.morphologicalanalysis.util.SpringContextHelper;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
-import com.alphasystem.morphologicalanalysis.wordbyword.model.support.RootWord;
 import com.alphasystem.morphologicalanalysis.wordbyword.repository.TokenRepository;
 import javafx.application.Application;
 import javafx.geometry.Rectangle2D;
@@ -18,7 +17,6 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 
@@ -72,10 +70,7 @@ public class ViewTestApp extends Application {
         TextArea textArea = new TextArea();
         textArea.setPrefRowCount(20);
         Button button = new Button("          Get Data          ");
-        button.setOnAction(event -> {
-            textArea.appendText(getTokenInfo(root));
-
-        });
+        button.setOnAction(event -> textArea.appendText(getTokenInfo(root)));
 
         flowPane.getChildren().addAll(displayNameComboBox, button);
 
@@ -92,20 +87,9 @@ public class ViewTestApp extends Application {
         Token token = root.getToken();
         List<Location> locations = token.getLocations();
         StringBuilder builder = new StringBuilder();
-        locations.forEach(location -> {
-            final RootWord rootWord = location.getRootWord();
-            builder.append(location.getDisplayName()).append(": ").append(getRootWord(rootWord)).append(" : ")
-                    .append(location.getStartIndex()).append(" : ").append(location.getEndIndex()).append(NEW_LINE);
-        });
+        locations.forEach(location -> builder.append(location.getDisplayName()).append(": ").append(location.getStartIndex())
+                .append(" : ").append(location.getEndIndex()).append(NEW_LINE));
         return format("%s%sToken: %s%s%s", NEW_LINE, NEW_LINE, token.getDisplayName(),
                 NEW_LINE, builder.toString());
-    }
-
-    private String getRootWord(RootWord rootWord) {
-        if (rootWord == null) {
-            return "No Root Word";
-        }
-        String s = rootWord.toCode();
-        return StringUtils.isBlank(s) ? "No Root Word" : s;
     }
 }

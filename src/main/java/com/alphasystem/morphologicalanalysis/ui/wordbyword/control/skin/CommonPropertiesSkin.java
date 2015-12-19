@@ -1,10 +1,7 @@
 package com.alphasystem.morphologicalanalysis.ui.wordbyword.control.skin;
 
-import com.alphasystem.arabic.model.ArabicLetterType;
-import com.alphasystem.arabic.ui.RootLettersPicker;
 import com.alphasystem.morphologicalanalysis.ui.common.ComboBoxFactory;
 import com.alphasystem.morphologicalanalysis.ui.wordbyword.control.CommonPropertiesView;
-import com.alphasystem.morphologicalanalysis.wordbyword.model.support.RootWord;
 import javafx.geometry.Insets;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -63,70 +60,7 @@ public class CommonPropertiesSkin extends SkinBase<CommonPropertiesView> {
         label.setLabelFor(comboBox);
         comboBox.valueProperty().bindBidirectional(view.namedTagProperty());
         gridPane.add(comboBox, 1, row);
-
-        row++;
-        label = new Label(RESOURCE_BUNDLE.getString("form.label"));
-        gridPane.add(label, 0, row);
-
-        comboBox = COMBO_BOX_FACTORY.getNamedTemplateComboBox();
-        label.setLabelFor(comboBox);
-        comboBox.valueProperty().bindBidirectional(view.namedTemplateProperty());
-        gridPane.add(comboBox, 1, row);
-
-        row++;
-        label = new Label(RESOURCE_BUNDLE.getString("rootWords.label"));
-        gridPane.add(label, 0, row);
-
-        RootLettersPicker rootLettersPicker = new RootLettersPicker();
-        RootWord rootWord = view.getRootWord();
-        if (rootWord != null) {
-            rootLettersPicker.setRootLetters(rootWord.getFirstRadical(), rootWord.getSecondRadical(),
-                    rootWord.getThirdRadical(), rootWord.getFourthRadical());
-        }
-        label.setLabelFor(rootLettersPicker);
-        view.rootWordProperty().addListener((o, ov, nv) -> {
-            ArabicLetterType firstRadical = (nv == null) ? null : nv.getFirstRadical();
-            ArabicLetterType secondRadical = (nv == null) ? null : nv.getSecondRadical();
-            ArabicLetterType thirdRadical = (nv == null) ? null : nv.getThirdRadical();
-            ArabicLetterType fourthRadical = (nv == null) ? null : nv.getFourthRadical();
-            rootLettersPicker.setRootLetters(firstRadical, secondRadical, thirdRadical, fourthRadical);
-        });
-        updateRootWord(view, rootLettersPicker);
-        gridPane.add(rootLettersPicker, 1, row);
-
         getChildren().add(gridPane);
     }
 
-    private void updateRootWord(CommonPropertiesView view, RootLettersPicker rootLettersPicker) {
-        rootLettersPicker.firstRadicalProperty().addListener((o, ov, nv) -> {
-            RootWord rw = getRootWord();
-            rw.setFirstRadical(nv);
-            view.setRootWord(rw);
-        });
-        rootLettersPicker.secondRadicalProperty().addListener((o, ov, nv) -> {
-            RootWord rw = getRootWord();
-            rw.setSecondRadical(nv);
-            view.setRootWord(rw);
-        });
-        rootLettersPicker.thirdRadicalProperty().addListener((o, ov, nv) -> {
-            RootWord rw = getRootWord();
-            rw.setThirdRadical(nv);
-            view.setRootWord(rw);
-        });
-        rootLettersPicker.fourthRadicalProperty().addListener((o, ov, nv) -> {
-            RootWord rw = getRootWord();
-            rw.setFourthRadical(nv);
-            view.setRootWord(rw);
-        });
-    }
-
-    private RootWord getRootWord() {
-        RootWord rw = getSkinnable().getRootWord();
-        if (rw == null) {
-            rw = new RootWord();
-        } else {
-            rw = new RootWord(rw);
-        }
-        return rw;
-    }
 }

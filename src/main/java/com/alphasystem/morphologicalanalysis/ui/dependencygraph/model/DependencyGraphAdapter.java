@@ -21,6 +21,7 @@ public class DependencyGraphAdapter {
     private final ObservableList<GraphNodeAdapter> graphNodes = observableArrayList();
     private final ObjectProperty<GraphNodeAdapter> selectedNode = new SimpleObjectProperty<>();
 
+    @SuppressWarnings({"unchecked"})
     public DependencyGraphAdapter(DependencyGraph src) {
         dependencyGraphProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue == null) {
