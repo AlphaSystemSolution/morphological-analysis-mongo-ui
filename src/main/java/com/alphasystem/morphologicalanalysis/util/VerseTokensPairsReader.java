@@ -1,7 +1,7 @@
 package com.alphasystem.morphologicalanalysis.util;
 
+import com.alphasystem.morphologicalanalysis.common.model.VerseTokenPairGroup;
 import com.alphasystem.morphologicalanalysis.common.model.VerseTokensPair;
-import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.VerseTokenPairGroup;
 
 import java.io.IOException;
 import java.net.URI;

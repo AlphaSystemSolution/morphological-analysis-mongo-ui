@@ -1,7 +1,7 @@
 package com.alphasystem.morphologicalanalysis.ui.common;
 
+import com.alphasystem.morphologicalanalysis.common.model.VerseTokenPairGroup;
 import com.alphasystem.morphologicalanalysis.common.model.VerseTokensPair;
-import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.VerseTokenPairGroup;
 import javafx.scene.control.ListCell;
 import javafx.scene.text.Text;
 

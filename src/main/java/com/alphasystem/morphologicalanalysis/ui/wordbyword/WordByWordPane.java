@@ -1,5 +1,6 @@
 package com.alphasystem.morphologicalanalysis.ui.wordbyword;
 
+import com.alphasystem.morphologicalanalysis.common.model.VerseTokenPairGroup;
 import com.alphasystem.morphologicalanalysis.common.model.VerseTokensPair;
 import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
 import com.alphasystem.morphologicalanalysis.ui.common.ChapterVerseSelectionPane;
@@ -7,7 +8,6 @@ import com.alphasystem.morphologicalanalysis.ui.common.GraphMetaInfoSelectionDia
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.TreeBankPane;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.DependencyGraphAdapter;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.GraphMetaInfoAdapter;
-import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.VerseTokenPairGroup;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.CanvasUtil;
 import com.alphasystem.morphologicalanalysis.ui.wordbyword.control.TokenEditorDialog;
 import com.alphasystem.morphologicalanalysis.ui.wordbyword.model.TableCellModel;

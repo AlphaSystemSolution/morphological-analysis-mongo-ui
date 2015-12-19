@@ -1,6 +1,6 @@
 package com.alphasystem.morphologicalanalysis.ui.test;
 
-import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.VerseTokenPairGroup;
+import com.alphasystem.morphologicalanalysis.common.model.VerseTokenPairGroup;
 import com.alphasystem.morphologicalanalysis.util.VerseTokensPairsReader;
 import org.testng.annotations.Test;
 

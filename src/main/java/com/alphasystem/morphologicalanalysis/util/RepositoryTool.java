@@ -1,13 +1,13 @@
 package com.alphasystem.morphologicalanalysis.util;
 
 import com.alphasystem.arabic.model.ProNoun;
+import com.alphasystem.morphologicalanalysis.common.model.VerseTokenPairGroup;
 import com.alphasystem.morphologicalanalysis.common.model.VerseTokensPair;
 import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
 import com.alphasystem.morphologicalanalysis.graph.model.GraphMetaInfo;
 import com.alphasystem.morphologicalanalysis.graph.model.TerminalNode;
 import com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType;
 import com.alphasystem.morphologicalanalysis.graph.repository.DependencyGraphRepository;
-import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.VerseTokenPairGroup;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.GraphBuilder;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.*;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.*;

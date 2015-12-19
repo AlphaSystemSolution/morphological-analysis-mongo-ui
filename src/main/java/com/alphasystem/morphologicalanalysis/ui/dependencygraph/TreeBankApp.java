@@ -1,8 +1,12 @@
 package com.alphasystem.morphologicalanalysis.ui.dependencygraph;
 
+import com.alphasystem.morphologicalanalysis.common.model.VerseTokenPairGroup;
 import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
 import com.alphasystem.morphologicalanalysis.ui.common.GraphMetaInfoSelectionDialog;
-import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.*;
+import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.DependencyGraphAdapter;
+import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.GraphMetaInfoAdapter;
+import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.GraphNodeAdapter;
+import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.TerminalNodeAdapter;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.CanvasUtil;
 import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
 import com.alphasystem.morphologicalanalysis.util.SpringContextHelper;

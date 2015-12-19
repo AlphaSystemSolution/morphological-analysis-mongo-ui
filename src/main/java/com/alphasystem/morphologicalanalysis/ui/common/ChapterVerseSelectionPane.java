@@ -1,6 +1,6 @@
 package com.alphasystem.morphologicalanalysis.ui.common;
 
-import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.VerseTokenPairGroup;
+import com.alphasystem.morphologicalanalysis.common.model.VerseTokenPairGroup;
 import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
 import com.alphasystem.morphologicalanalysis.util.VerseTokensPairsReader;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Chapter;

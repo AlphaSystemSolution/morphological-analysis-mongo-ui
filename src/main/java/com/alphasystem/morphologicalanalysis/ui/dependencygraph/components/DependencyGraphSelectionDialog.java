@@ -1,10 +1,10 @@
 package com.alphasystem.morphologicalanalysis.ui.dependencygraph.components;
 
+import com.alphasystem.morphologicalanalysis.common.model.VerseTokenPairGroup;
 import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
 import com.alphasystem.morphologicalanalysis.ui.common.ChapterVerseSelectionPane;
 import com.alphasystem.morphologicalanalysis.ui.common.DependencyGraphListCell;
 import com.alphasystem.morphologicalanalysis.ui.common.Global;
-import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.VerseTokenPairGroup;
 import com.alphasystem.morphologicalanalysis.util.DependencyGraphComparator;
 import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
 import javafx.geometry.Insets;
