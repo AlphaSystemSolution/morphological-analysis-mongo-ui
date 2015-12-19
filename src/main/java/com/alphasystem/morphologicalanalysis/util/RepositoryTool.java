@@ -2,26 +2,21 @@ package com.alphasystem.morphologicalanalysis.util;
 
 import com.alphasystem.arabic.model.ProNoun;
 import com.alphasystem.morphologicalanalysis.common.model.VerseTokenPairGroup;
-import com.alphasystem.morphologicalanalysis.common.model.VerseTokensPair;
 import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
 import com.alphasystem.morphologicalanalysis.graph.model.GraphMetaInfo;
 import com.alphasystem.morphologicalanalysis.graph.model.TerminalNode;
 import com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType;
 import com.alphasystem.morphologicalanalysis.graph.repository.DependencyGraphRepository;
+import com.alphasystem.morphologicalanalysis.graph.repository.GraphNodeRepository;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.GraphBuilder;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.*;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.*;
 import com.alphasystem.morphologicalanalysis.wordbyword.repository.LocationRepository;
 import com.alphasystem.morphologicalanalysis.wordbyword.repository.TokenRepository;
-import com.alphasystem.persistence.mongo.repository.BaseRepository;
 import com.alphasystem.persistence.mongo.spring.support.ApplicationContextProvider;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -33,7 +28,6 @@ import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.Par
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.ProNounType.DETACHED;
 import static java.lang.String.format;
 import static java.util.Collections.singletonList;
-import static org.springframework.data.mongodb.core.query.Criteria.where;
 
 /**
  * @author sali
@@ -47,7 +41,6 @@ public class RepositoryTool {
     private TokenRepository tokenRepository;
     private LocationRepository locationRepository;
     private DependencyGraphRepository dependencyGraphRepository;
-    private MongoTemplate mongoTemplate;
 
     /**
      * do not let anyone instantiate this class
@@ -58,7 +51,6 @@ public class RepositoryTool {
         tokenRepository = repositoryUtil.getTokenRepository();
         locationRepository = repositoryUtil.getLocationRepository();
         dependencyGraphRepository = repositoryUtil.getDependencyGraphRepository();
-        mongoTemplate = repositoryUtil.getMongoTemplate();
         graphBuilder = GraphBuilder.getInstance();
 
     }
@@ -68,36 +60,6 @@ public class RepositoryTool {
             instance = new RepositoryTool();
         }
         return instance;
-    }
-
-    public BaseRepository getRepository(GraphNodeType nodeType) {
-        BaseRepository repository = null;
-        switch (nodeType) {
-            case TERMINAL:
-                repository = repositoryUtil.getTerminalNodeRepository();
-                break;
-            case PART_OF_SPEECH:
-                repository = repositoryUtil.getPartOfSpeechNodeRepository();
-                break;
-            case PHRASE:
-                repository = repositoryUtil.getPhraseNodeRepository();
-                break;
-            case RELATIONSHIP:
-                repository = repositoryUtil.getRelationshipNodeRepository();
-                break;
-            case REFERENCE:
-                repository = repositoryUtil.getReferenceNodeRepository();
-                break;
-            case HIDDEN:
-                repository = repositoryUtil.getHiddenNodeRepository();
-                break;
-            case IMPLIED:
-                repository = repositoryUtil.getImpliedNodeRepository();
-                break;
-            default:
-                break;
-        }
-        return repository;
     }
 
     public Service<List<Chapter>> getAllChapters() {
@@ -149,48 +111,6 @@ public class RepositoryTool {
         return token;
     }
 
-    public List<Token> getTokens(VerseTokenPairGroup group) {
-        return getTokens(group, false, false);
-    }
-
-    public List<Token> getHiddenTokens(VerseTokenPairGroup group) {
-        return getTokens(group, true, true);
-    }
-
-    private List<Token> getTokens(VerseTokenPairGroup group, boolean includeHidden, boolean hiddenValue) {
-        List<Criteria> list = new ArrayList<>();
-        List<VerseTokensPair> pairs = group.getPairs();
-        pairs.forEach(pair -> list.add(where("verseNumber").is(pair.getVerseNumber())
-                .andOperator(where("tokenNumber").gte(pair.getFirstTokenIndex()),
-                        where("tokenNumber").lte(pair.getLastTokenIndex()))));
-        Criteria criteria;
-        Criteria[] criterion = list.toArray(new Criteria[list.size()]);
-        if (includeHidden) {
-            criteria = where("chapterNumber").is(group.getChapterNumber()).and("hidden").is(hiddenValue)
-                    .orOperator(criterion);
-        } else {
-            criteria = where("chapterNumber").is(group.getChapterNumber()).orOperator(criterion);
-        }
-        Query query = new Query(criteria);
-        return mongoTemplate.find(query, Token.class);
-    }
-
-    public DependencyGraph getDependencyGraph(String displayName) {
-        return dependencyGraphRepository.findByDisplayName(displayName);
-    }
-
-    public List<DependencyGraph> getDependencyGraphs(VerseTokenPairGroup group) {
-        Integer chapterNumber = group.getChapterNumber();
-
-        List<Criteria> criterion = new ArrayList<>();
-        List<VerseTokensPair> pairs = group.getPairs();
-        pairs.forEach(pair -> criterion.add(where("tokens").elemMatch(where("verseNumber").is(pair.getVerseNumber()))));
-        Criteria criteria = where("chapterNumber").is(chapterNumber).orOperator(
-                criterion.toArray(new Criteria[criterion.size()]));
-        Query query = new Query(criteria);
-        return mongoTemplate.find(query, DependencyGraph.class);
-    }
-
     public DependencyGraph createDependencyGraph(VerseTokenPairGroup group, GraphMetaInfo graphMetaInfo)
             throws RuntimeException {
         Integer chapterNumber = group.getChapterNumber();
@@ -198,7 +118,7 @@ public class RepositoryTool {
         System.out.println(">>>>>>>>>>>>>>>> " + displayName);
         DependencyGraph dependencyGraph = dependencyGraphRepository.findByDisplayName(displayName);
         if (dependencyGraph == null) {
-            List<Token> tokens = getTokens(group);
+            List<Token> tokens = repositoryUtil.getTokens(group);
             if (tokens == null || tokens.isEmpty()) {
                 throw new RuntimeException(format("Unable to create dependency graph for %s", displayName));
             }
@@ -234,9 +154,10 @@ public class RepositoryTool {
         }
         DependencyGraph dependencyGraph = dependencyGraphRepository.findOne(id);
         VerseTokenPairGroup group = new VerseTokenPairGroup();
+        group.setIncludeHidden(true);
         group.setChapterNumber(dependencyGraph.getChapterNumber());
         group.getPairs().addAll(dependencyGraph.getTokens());
-        List<Token> hiddenTokens = getHiddenTokens(group);
+        List<Token> hiddenTokens = repositoryUtil.getTokens(group);
         if (hiddenTokens != null && !hiddenTokens.isEmpty()) {
             hiddenTokens.forEach(token -> locationRepository.delete(token.getLocations()));
             tokenRepository.delete(hiddenTokens);
@@ -248,7 +169,7 @@ public class RepositoryTool {
     private void removeNode(Entry<GraphNodeType, List<String>> entry) {
         GraphNodeType key = entry.getKey();
         List<String> ids = entry.getValue();
-        BaseRepository repository = getRepository(key);
+        GraphNodeRepository repository = repositoryUtil.getRepository(key);
         ids.forEach(repository::delete);
     }
 

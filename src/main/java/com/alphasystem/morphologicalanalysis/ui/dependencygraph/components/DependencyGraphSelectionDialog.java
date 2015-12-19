@@ -57,7 +57,7 @@ public class DependencyGraphSelectionDialog extends Dialog<DependencyGraph> {
 
     private void updateTokens() {
         VerseTokenPairGroup selectedGroup = chapterVerseSelectionPane.getSelectedVerse();
-        List<DependencyGraph> dependencyGraphs = repositoryTool.getDependencyGraphs(selectedGroup);
+        List<DependencyGraph> dependencyGraphs = repositoryTool.getRepositoryUtil().getDependencyGraphs(selectedGroup);
         sort(dependencyGraphs, new DependencyGraphComparator());
         dependencyGraphComboBox.getItems().remove(0, dependencyGraphComboBox.getItems().size());
         dependencyGraphComboBox.getItems().addAll(dependencyGraphs);
