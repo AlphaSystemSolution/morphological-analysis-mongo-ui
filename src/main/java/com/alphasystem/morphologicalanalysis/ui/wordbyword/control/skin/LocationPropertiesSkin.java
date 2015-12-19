@@ -42,6 +42,10 @@ public class LocationPropertiesSkin extends SkinBase<LocationPropertiesView> {
             view.setLocationUpdated(false);
             view.setLocationUpdated(true);
         });
+        commonPropertiesView.namedTemplateProperty().addListener((o, ov, nv) -> {
+            view.setLocationUpdated(false);
+            view.setLocationUpdated(true);
+        });
     }
 
     private static String getPropertiesPaneTitle(AbstractProperties properties) {
@@ -106,7 +110,7 @@ public class LocationPropertiesSkin extends SkinBase<LocationPropertiesView> {
                 proNounPropertiesView = new ProNounPropertiesView();
             }
             propertiesView = proNounPropertiesView;
-        } else if (AbstractProperties.isVerb(properties)) {
+        } else if (isVerb(properties)) {
             if (verbPropertiesView == null) {
                 verbPropertiesView = new VerbPropertiesView();
             }
