@@ -190,7 +190,7 @@ public class TreeBankPane extends BorderPane {
 
     private void saveAction() {
         try {
-            repositoryTool.saveDependencyGraph(canvasPane.getDependencyGraph().getDependencyGraph(),
+            repositoryTool.getRepositoryUtil().saveDependencyGraph(canvasPane.getDependencyGraph().getDependencyGraph(),
                     canvasPane.getImpliedOrHiddenTokens(), canvasPane.getRemovalIdMap());
             canvasPane.getImpliedOrHiddenTokens().clear();
             canvasPane.getRemovalIdMap().clear();
@@ -208,7 +208,8 @@ public class TreeBankPane extends BorderPane {
             if (buttonType.getButtonData().isDefaultButton()) {
                 DependencyGraph dependencyGraph = canvasPane.getDependencyGraph().getDependencyGraph();
                 canvasPane.removeAll();
-                repositoryTool.deleteDependencyGraph(dependencyGraph.getId(), canvasPane.getRemovalIdMap());
+                repositoryTool.getRepositoryUtil().deleteDependencyGraph(dependencyGraph.getId(),
+                        canvasPane.getRemovalIdMap());
                 canvasPane.getRemovalIdMap().clear();
                 updateCanvas(new DependencyGraph());
             }

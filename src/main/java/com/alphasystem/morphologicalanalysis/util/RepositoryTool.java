@@ -5,9 +5,7 @@ import com.alphasystem.morphologicalanalysis.common.model.VerseTokenPairGroup;
 import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
 import com.alphasystem.morphologicalanalysis.graph.model.GraphMetaInfo;
 import com.alphasystem.morphologicalanalysis.graph.model.TerminalNode;
-import com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType;
 import com.alphasystem.morphologicalanalysis.graph.repository.DependencyGraphRepository;
-import com.alphasystem.morphologicalanalysis.graph.repository.GraphNodeRepository;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.GraphBuilder;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.*;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.*;
@@ -18,8 +16,6 @@ import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.ConversationType.FIRST_PERSON;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.GenderType.MASCULINE;
@@ -52,7 +48,6 @@ public class RepositoryTool {
         locationRepository = repositoryUtil.getLocationRepository();
         dependencyGraphRepository = repositoryUtil.getDependencyGraphRepository();
         graphBuilder = GraphBuilder.getInstance();
-
     }
 
     public static synchronized RepositoryTool getInstance() {
@@ -135,42 +130,6 @@ public class RepositoryTool {
         }
 
         return dependencyGraph;
-    }
-
-    public void saveDependencyGraph(DependencyGraph dependencyGraph, List<Token> impliedOrHiddenTokens,
-                                    Map<GraphNodeType, List<String>> removalIds) {
-        if (impliedOrHiddenTokens != null && !impliedOrHiddenTokens.isEmpty()) {
-            impliedOrHiddenTokens.forEach(tokenRepository::save);
-        }
-        dependencyGraphRepository.save(dependencyGraph);
-        if (!removalIds.isEmpty()) {
-            removalIds.entrySet().forEach(this::removeNode);
-        }
-    }
-
-    public void deleteDependencyGraph(String id, Map<GraphNodeType, List<String>> removalIds) {
-        if (!removalIds.isEmpty()) {
-            removalIds.entrySet().forEach(this::removeNode);
-        }
-        DependencyGraph dependencyGraph = dependencyGraphRepository.findOne(id);
-        VerseTokenPairGroup group = new VerseTokenPairGroup();
-        group.setIncludeHidden(true);
-        group.setChapterNumber(dependencyGraph.getChapterNumber());
-        group.getPairs().addAll(dependencyGraph.getTokens());
-        List<Token> hiddenTokens = repositoryUtil.getTokens(group);
-        if (hiddenTokens != null && !hiddenTokens.isEmpty()) {
-            hiddenTokens.forEach(token -> locationRepository.delete(token.getLocations()));
-            tokenRepository.delete(hiddenTokens);
-        }
-        dependencyGraphRepository.delete(id);
-    }
-
-    @SuppressWarnings({"unchecked"})
-    private void removeNode(Entry<GraphNodeType, List<String>> entry) {
-        GraphNodeType key = entry.getKey();
-        List<String> ids = entry.getValue();
-        GraphNodeRepository repository = repositoryUtil.getRepository(key);
-        ids.forEach(repository::delete);
     }
 
     public Token createImpliedNode(Token srcToken, PartOfSpeech partOfSpeech, Object type) {
