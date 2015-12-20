@@ -28,6 +28,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.alphasystem.arabic.model.ArabicWord.getSubWord;
+import static com.alphasystem.arabic.ui.util.FontConstants.ARABIC_FONT_24;
+import static com.alphasystem.arabic.ui.util.FontConstants.ENGLISH_FONT_14;
 import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.ROOT;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.*;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.IncompleteVerbCategory.KANA_AND_ITS_SISTERS;
@@ -414,7 +416,7 @@ public class CanvasUtil {
         StringBuilder builder = new StringBuilder();
         if (item != null) {
             GraphNodeType nodeType = item.getGraphNodeType();
-            label.setFont(nodeType.equals(ROOT) ? ENGLISH_FONT_SMALL : ARABIC_FONT_SMALL);
+            label.setFont(nodeType.equals(ROOT) ? ENGLISH_FONT_14 : ARABIC_FONT_24);
             String text = item.getText();
             switch (nodeType) {
                 case PART_OF_SPEECH:

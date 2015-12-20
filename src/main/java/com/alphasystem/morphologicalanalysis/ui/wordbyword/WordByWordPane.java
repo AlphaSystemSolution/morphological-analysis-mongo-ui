@@ -32,7 +32,7 @@ import javafx.stage.Stage;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.alphasystem.morphologicalanalysis.ui.common.Global.ARABIC_FONT_MEDIUM_BOLD;
+import static com.alphasystem.arabic.ui.util.FontConstants.ARABIC_FONT_30;
 import static java.lang.String.format;
 import static javafx.geometry.NodeOrientation.RIGHT_TO_LEFT;
 import static javafx.scene.control.Alert.AlertType.ERROR;
@@ -83,7 +83,7 @@ public class WordByWordPane extends BorderPane {
             {
                 setContentDisplay(GRAPHIC_ONLY);
                 text = new Text();
-                text.setFont(ARABIC_FONT_MEDIUM_BOLD);
+                text.setFont(ARABIC_FONT_30);
                 text.setTextAlignment(CENTER);
                 text.setNodeOrientation(RIGHT_TO_LEFT);
             }
@@ -111,7 +111,7 @@ public class WordByWordPane extends BorderPane {
             {
                 setContentDisplay(GRAPHIC_ONLY);
                 text = new Text();
-                text.setFont(ARABIC_FONT_MEDIUM_BOLD);
+                text.setFont(ARABIC_FONT_30);
                 text.setTextAlignment(CENTER);
                 text.setNodeOrientation(RIGHT_TO_LEFT);
             }

@@ -7,9 +7,9 @@ import javafx.scene.control.TreeCell;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
+import static com.alphasystem.arabic.ui.util.FontConstants.ARABIC_FONT_24;
+import static com.alphasystem.arabic.ui.util.FontConstants.ENGLISH_FONT_14;
 import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.ROOT;
-import static com.alphasystem.morphologicalanalysis.ui.common.Global.ARABIC_FONT_SMALL;
-import static com.alphasystem.morphologicalanalysis.ui.common.Global.ENGLISH_FONT_SMALL;
 import static java.lang.String.format;
 import static javafx.scene.control.ContentDisplay.GRAPHIC_ONLY;
 
@@ -53,7 +53,7 @@ public class GraphNodeTreeCell extends TreeCell<GraphNodeAdapter> {
                     break;
             }
             label.setText(builder.toString());
-            Font font = nodeType.equals(ROOT) ? ENGLISH_FONT_SMALL : ARABIC_FONT_SMALL;
+            Font font = nodeType.equals(ROOT) ? ENGLISH_FONT_14 : ARABIC_FONT_24;
             label.setFont(font);
             setGraphic(label);
         }

@@ -15,7 +15,7 @@ import java.util.List;
 
 import static com.alphasystem.arabic.model.ArabicLetters.WORD_SPACE;
 import static com.alphasystem.arabic.model.ArabicWord.getVerseNumber;
-import static com.alphasystem.morphologicalanalysis.ui.common.Global.ARABIC_FONT_MEDIUM_BOLD;
+import static com.alphasystem.arabic.ui.util.FontConstants.ARABIC_FONT_30;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.SPACE_STR;
 import static javafx.scene.control.ContentDisplay.GRAPHIC_ONLY;
 
@@ -30,7 +30,7 @@ public class DependencyGraphListCell extends ListCell<DependencyGraph> {
     public DependencyGraphListCell() {
         setContentDisplay(GRAPHIC_ONLY);
         label = new Text();
-        label.setFont(ARABIC_FONT_MEDIUM_BOLD);
+        label.setFont(ARABIC_FONT_30);
     }
 
     @Override

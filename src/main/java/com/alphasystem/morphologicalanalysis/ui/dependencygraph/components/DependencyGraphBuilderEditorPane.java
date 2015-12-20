@@ -13,13 +13,10 @@ import javafx.scene.control.SpinnerValueFactory.DoubleSpinnerValueFactory;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 
-import static com.alphasystem.morphologicalanalysis.ui.common.Global.ARABIC_FONT_NAME;
+import static com.alphasystem.arabic.ui.util.FontConstants.ARABIC_FONT_20;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.RESOURCE_BUNDLE;
 import static java.lang.String.format;
 import static javafx.geometry.Pos.CENTER;
-import static javafx.scene.text.Font.font;
-import static javafx.scene.text.FontPosture.REGULAR;
-import static javafx.scene.text.FontWeight.NORMAL;
 
 /**
  * @author sali
@@ -106,7 +103,7 @@ public class DependencyGraphBuilderEditorPane extends BorderPane {
             node.setText(source.getText());
         });
         row++;
-        textField.setFont(font(ARABIC_FONT_NAME, NORMAL, REGULAR, 20));
+        textField.setFont(ARABIC_FONT_20);
         label.setLabelFor(textField);
         gridPane.add(textField, 0, row);
 

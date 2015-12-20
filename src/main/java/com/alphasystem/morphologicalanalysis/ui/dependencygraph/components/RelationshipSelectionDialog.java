@@ -11,7 +11,8 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
 
-import static com.alphasystem.morphologicalanalysis.ui.common.Global.ARABIC_FONT_SMALL_BOLD;
+import static com.alphasystem.arabic.ui.util.FontConstants.ARABIC_FONT_20;
+import static com.alphasystem.arabic.ui.util.FontConstants.ARABIC_FONT_24;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.FI_MAHL;
 import static javafx.scene.control.ButtonType.CANCEL;
 import static javafx.scene.control.ButtonType.OK;
@@ -32,9 +33,9 @@ public class RelationshipSelectionDialog extends Dialog<RelationshipNode> {
         relationshipTypeComboBox = comboBoxFactory.getRelationshipTypeComboBox();
         alternateStatusComboBox = comboBoxFactory.getAlternateStatusComboBox();
         dependentLabel = new Label();
-        dependentLabel.setFont(ARABIC_FONT_SMALL_BOLD);
+        dependentLabel.setFont(ARABIC_FONT_20);
         ownerLabel = new Label();
-        ownerLabel.setFont(ARABIC_FONT_SMALL_BOLD);
+        ownerLabel.setFont(ARABIC_FONT_20);
 
         reset();
         initDialogPane();
@@ -90,7 +91,7 @@ public class RelationshipSelectionDialog extends Dialog<RelationshipNode> {
 
     private Label getAlternateNounStatusLabel() {
         Text text = new Text(FI_MAHL.toUnicode());
-        text.setFont(Global.ARABIC_FONT_SMALL);
+        text.setFont(ARABIC_FONT_24);
         return new Label("", text);
     }
 

@@ -32,6 +32,8 @@ import javafx.scene.text.Text;
 
 import java.util.*;
 
+import static com.alphasystem.arabic.ui.util.FontConstants.ARABIC_FONT_20;
+import static com.alphasystem.arabic.ui.util.FontConstants.ARABIC_FONT_24;
 import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.*;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.*;
 import static com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.CanvasUtil.getIndex;
@@ -792,7 +794,7 @@ public class CanvasPane extends Pane {
                                           final PartOfSpeechNodeAdapter lastPartOfSpeech) {
         Text text = new Text(canvasUtil.getRelationshipMenuItemText(lastPartOfSpeech));
         text.setNodeOrientation(RIGHT_TO_LEFT);
-        text.setFont(ARABIC_FONT_SMALL);
+        text.setFont(ARABIC_FONT_24);
         MenuItem menuItem = new MenuItem("", text);
         menuItem.setUserData(lastPartOfSpeech);
         menuItem.setOnAction(event -> makePhrase(firstPartOfSpeech, lastPartOfSpeech));
@@ -874,7 +876,7 @@ public class CanvasPane extends Pane {
                                                 final LinkSupportAdapter currentNode) {
         Text text = new Text(canvasUtil.getRelationshipMenuItemText(dependentNode));
         text.setNodeOrientation(RIGHT_TO_LEFT);
-        text.setFont(ARABIC_FONT_SMALL);
+        text.setFont(ARABIC_FONT_24);
         MenuItem menuItem = new MenuItem("", text);
         menuItem.setUserData(dependentNode);
         menuItem.setOnAction(event -> {
@@ -935,7 +937,7 @@ public class CanvasPane extends Pane {
 
     private Menu createNounAddImpliedNodeMenu(int index) {
         Text text = new Text(NOUN.getLabel().toUnicode());
-        text.setFont(ARABIC_FONT_SMALL_BOLD);
+        text.setFont(ARABIC_FONT_20);
         Menu menu = new Menu("", text);
 
         for (NounStatus nounStatus : NounStatus.values()) {
@@ -946,7 +948,7 @@ public class CanvasPane extends Pane {
 
     private Menu createVerbAddImpliedNodeMenu(int index) {
         Text text = new Text(VERB.getLabel().toUnicode());
-        text.setFont(ARABIC_FONT_SMALL_BOLD);
+        text.setFont(ARABIC_FONT_20);
         Menu menu = new Menu("", text);
 
         menu.getItems().addAll(createVerbAddImpliedNodeMenuItem(index, PERFECT),
@@ -956,7 +958,7 @@ public class CanvasPane extends Pane {
 
     private Menu createProNounAddImpliedNodeMenu(int index) {
         Text text = new Text(PRONOUN.getLabel().toUnicode());
-        text.setFont(ARABIC_FONT_SMALL_BOLD);
+        text.setFont(ARABIC_FONT_20);
         Menu menu = new Menu("", text);
 
         for (ProNoun proNoun : ProNoun.values()) {
@@ -968,7 +970,7 @@ public class CanvasPane extends Pane {
 
     private MenuItem createNounAddImpliedNodeMenuItem(int index, NounStatus nounStatus) {
         Text text = new Text(nounStatus.getLabel().toUnicode());
-        text.setFont(ARABIC_FONT_SMALL_BOLD);
+        text.setFont(ARABIC_FONT_20);
         MenuItem menuItem = new MenuItem("", text);
         menuItem.setOnAction(event -> addImpliedNode(index, NOUN, nounStatus));
         return menuItem;
@@ -976,7 +978,7 @@ public class CanvasPane extends Pane {
 
     private MenuItem createVerbAddImpliedNodeMenuItem(int index, VerbType verbType) {
         Text text = new Text(verbType.getLabel().toUnicode());
-        text.setFont(ARABIC_FONT_SMALL_BOLD);
+        text.setFont(ARABIC_FONT_20);
         MenuItem menuItem = new MenuItem("", text);
         menuItem.setOnAction(event -> addImpliedNode(index, VERB, verbType));
         return menuItem;
@@ -984,7 +986,7 @@ public class CanvasPane extends Pane {
 
     private MenuItem createProNounAddImpliedNodeMenuItem(int index, ProNoun proNoun) {
         Text text = new Text(proNoun.getLabel().toUnicode());
-        text.setFont(ARABIC_FONT_SMALL_BOLD);
+        text.setFont(ARABIC_FONT_20);
         MenuItem menuItem = new MenuItem("", text);
         menuItem.setOnAction(event -> addImpliedNode(index, PRONOUN, proNoun));
         return menuItem;

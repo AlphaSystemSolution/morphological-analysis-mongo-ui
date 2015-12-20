@@ -18,6 +18,7 @@ import javafx.scene.layout.VBox;
 
 import java.util.List;
 
+import static com.alphasystem.arabic.ui.util.FontConstants.ARABIC_FONT_36;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.*;
 import static com.alphasystem.morphologicalanalysis.ui.wordbyword.control.TokenPropertiesView.SelectionStatus.*;
 import static javafx.geometry.NodeOrientation.RIGHT_TO_LEFT;
@@ -57,7 +58,7 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
         group = new ArabicLabelToggleGroup();
         group.setWidth(64);
         group.setHeight(64);
-        group.setFont(ARABIC_FONT_MEDIUM);
+        group.setFont(ARABIC_FONT_36);
 
         locationPropertiesView.locationUpdatedProperty().addListener((o, ov, nv) -> {
             Location location = locationPropertiesView.getLocation();

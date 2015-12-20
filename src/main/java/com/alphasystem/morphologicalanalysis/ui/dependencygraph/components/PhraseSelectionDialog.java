@@ -16,7 +16,8 @@ import javafx.scene.text.Text;
 import org.controlsfx.control.ListSelectionView;
 
 import static com.alphasystem.arabic.ui.ListType.LABEL_ONLY;
-import static com.alphasystem.morphologicalanalysis.ui.common.Global.ARABIC_FONT_MEDIUM_BOLD;
+import static com.alphasystem.arabic.ui.util.FontConstants.ARABIC_FONT_24;
+import static com.alphasystem.arabic.ui.util.FontConstants.ARABIC_FONT_30;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.FI_MAHL;
 import static javafx.scene.control.ButtonType.CANCEL;
 import static javafx.scene.control.ButtonType.OK;
@@ -41,7 +42,7 @@ public class PhraseSelectionDialog extends Dialog<PhraseNode> {
         relationshipsListView.setRetainSourceValue(true);
         relationshipsListView.getSourceItems().addAll(RelationshipType.values());
         phraseLabel = new Label();
-        phraseLabel.setFont(ARABIC_FONT_MEDIUM_BOLD);
+        phraseLabel.setFont(ARABIC_FONT_30);
         reset();
         initDialog();
         setResultConverter(param -> createResult(param));
@@ -99,7 +100,7 @@ public class PhraseSelectionDialog extends Dialog<PhraseNode> {
 
     private Label getAlternateNounStatusLabel() {
         Text text = new Text(FI_MAHL.toUnicode());
-        text.setFont(Global.ARABIC_FONT_SMALL);
+        text.setFont(ARABIC_FONT_24);
         Label label = new Label("", text);
         return label;
     }

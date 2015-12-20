@@ -5,7 +5,7 @@ import javafx.scene.control.ListCell;
 import javafx.scene.text.Text;
 
 import static com.alphasystem.arabic.model.ArabicWord.getArabicNumber;
-import static com.alphasystem.morphologicalanalysis.ui.common.Global.ARABIC_FONT_SMALL;
+import static com.alphasystem.arabic.ui.util.FontConstants.ARABIC_FONT_24;
 import static java.lang.String.format;
 import static javafx.scene.control.ContentDisplay.GRAPHIC_ONLY;
 
@@ -19,7 +19,7 @@ public class ChapterListCell extends ListCell<Chapter> {
     public ChapterListCell() {
         setContentDisplay(GRAPHIC_ONLY);
         label = new Text();
-        label.setFont(ARABIC_FONT_SMALL);
+        label.setFont(ARABIC_FONT_24);
     }
 
     private static String getChapterNumber(Chapter chapter) {

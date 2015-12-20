@@ -4,7 +4,7 @@ import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
 import javafx.scene.control.ListCell;
 import javafx.scene.text.Text;
 
-import static com.alphasystem.morphologicalanalysis.ui.common.Global.ARABIC_FONT_SMALL;
+import static com.alphasystem.arabic.ui.util.FontConstants.ARABIC_FONT_24;
 import static javafx.scene.control.ContentDisplay.GRAPHIC_ONLY;
 
 /**
@@ -17,7 +17,7 @@ public class TokenListCell extends ListCell<Token> {
     public TokenListCell() {
         setContentDisplay(GRAPHIC_ONLY);
         label = new Text();
-        label.setFont(ARABIC_FONT_SMALL);
+        label.setFont(ARABIC_FONT_24);
     }
 
     @Override
