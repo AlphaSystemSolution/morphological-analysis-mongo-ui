@@ -1,28 +1,18 @@
 package com.alphasystem.morphologicalanalysis.ui.wordbyword;
 
-import com.alphasystem.morphologicalanalysis.ui.wordbyword.control.TokenPropertiesView;
-import com.alphasystem.morphologicalanalysis.util.MorphologicalAnalysisRepositoryUtil;
-import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
+import com.alphasystem.arabic.model.ArabicLetterType;
+import com.alphasystem.arabic.model.NamedTemplate;
+import com.alphasystem.morphologicalanalysis.morphology.model.MorphologicalEntry;
+import com.alphasystem.morphologicalanalysis.morphology.model.RootLetters;
+import com.alphasystem.morphologicalanalysis.morphology.model.support.VerbalNoun;
+import com.alphasystem.morphologicalanalysis.ui.wordbyword.control.MorphologicalEntryView;
 import com.alphasystem.morphologicalanalysis.util.SpringContextHelper;
-import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
-import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
-import com.alphasystem.morphologicalanalysis.wordbyword.repository.TokenRepository;
 import javafx.application.Application;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextArea;
-import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-
-import java.util.List;
-
-import static com.alphasystem.util.AppUtil.NEW_LINE;
-import static java.lang.String.format;
-import static javafx.geometry.Pos.CENTER;
 
 /**
  * @author sali
@@ -48,33 +38,16 @@ public class ViewTestApp extends Application {
         primaryStage.setWidth(bounds.getWidth());
         primaryStage.setHeight(bounds.getHeight());
 
-        MorphologicalAnalysisRepositoryUtil repositoryUtil = RepositoryTool.getInstance().getRepositoryUtil();
-        final TokenRepository tokenRepository = repositoryUtil.getTokenRepository();
-
         VBox vBox = new VBox();
         vBox.setSpacing(10);
 
-        TokenPropertiesView root = new TokenPropertiesView();
-
-        ComboBox<String> displayNameComboBox = new ComboBox<>();
-        displayNameComboBox.getItems().addAll("18:1:1", "18:1:4", "18:1:5", "18:1:6", "18:2:8");
-        displayNameComboBox.valueProperty().addListener((o, ov, nv) -> {
-            Token token = tokenRepository.findByDisplayName(nv);
-            primaryStage.setTitle(format("View Test {%s}", token.getDisplayName()));
-            root.setToken(token);
-        });
-        displayNameComboBox.getSelectionModel().select(0);
-        FlowPane flowPane = new FlowPane();
-        flowPane.setHgap(10);
-        flowPane.setAlignment(CENTER);
-        TextArea textArea = new TextArea();
-        textArea.setPrefRowCount(20);
-        Button button = new Button("          Get Data          ");
-        button.setOnAction(event -> textArea.appendText(getTokenInfo(root)));
-
-        flowPane.getChildren().addAll(displayNameComboBox, button);
-
-        vBox.getChildren().addAll(flowPane, textArea, root);
+        MorphologicalEntryView root = new MorphologicalEntryView();
+        MorphologicalEntry morphologicalEntry = new MorphologicalEntry();
+        morphologicalEntry.setRootLetters(new RootLetters(ArabicLetterType.SEEN, ArabicLetterType.LAM, ArabicLetterType.MEEM));
+        morphologicalEntry.setForm(NamedTemplate.FORM_IV_TEMPLATE);
+        morphologicalEntry.getVerbalNouns().add(VerbalNoun.VERBAL_NOUN_FORM_II);
+        root.setMorphologicalEntry(morphologicalEntry);
+        vBox.getChildren().addAll(root);
 
         Scene scene = new Scene(vBox);
         primaryStage.setMaximized(true);
@@ -82,14 +55,4 @@ public class ViewTestApp extends Application {
         primaryStage.show();
     }
 
-    private String getTokenInfo(TokenPropertiesView root) {
-        root.updateToken();
-        Token token = root.getToken();
-        List<Location> locations = token.getLocations();
-        StringBuilder builder = new StringBuilder();
-        locations.forEach(location -> builder.append(location.getDisplayName()).append(": ").append(location.getStartIndex())
-                .append(" : ").append(location.getEndIndex()).append(NEW_LINE));
-        return format("%s%sToken: %s%s%s", NEW_LINE, NEW_LINE, token.getDisplayName(),
-                NEW_LINE, builder.toString());
-    }
 }
