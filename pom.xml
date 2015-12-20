@@ -77,11 +77,6 @@
             <version>${ma-repository.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.alphasystem.sarf-engine</groupId>
-            <artifactId>sarf-engine-ui</artifactId>
-            <version>${sarf-engine-ui.version}</version>
-        </dependency>
-        <dependency>
             <groupId>com.alphasystem.arabic</groupId>
             <artifactId>arabic-ui-support</artifactId>
             <version>${arabic-ui-support.version}</version>
