@@ -58,11 +58,11 @@ public class WordByWordPane extends BorderPane {
     @SuppressWarnings({"unchecked"})
     public WordByWordPane() {
         tokenEditorDialog = new TokenEditorDialog();
-        tokenEditorDialog.setToken(RepositoryTool.getInstance().getTokenByDisplayName("1:1:1"));
         chapterVerseSelectionPane = new ChapterVerseSelectionPane();
         chapterVerseSelectionPane.availableProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue) {
                 initPane();
+                tokenEditorDialog.setToken(RepositoryTool.getInstance().getTokenByDisplayName("1:1:1"));
             }
         });
         graphMetaInfoSelectionDialog = new GraphMetaInfoSelectionDialog();
