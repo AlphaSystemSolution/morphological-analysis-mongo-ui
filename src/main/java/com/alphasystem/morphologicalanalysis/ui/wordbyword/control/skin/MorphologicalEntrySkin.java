@@ -94,6 +94,17 @@ public class MorphologicalEntrySkin extends SkinBase<MorphologicalEntryView> {
         label.setLabelFor(nounOfPlaceTimesPicker);
         gridPane.add(nounOfPlaceTimesPicker, 1, row);
 
+        // update verbal noun and/or noun of place and time
+        namedTemplateComboBox.getSelectionModel().selectedItemProperty().addListener((o, ov, nv) -> {
+            List<VerbalNoun> verbalNouns = VerbalNoun.getByTemplate(nv);
+            verbalNounsPicker.getValues().clear();
+            verbalNounsPicker.getValues().addAll(verbalNouns);
+
+            List<NounOfPlaceAndTime> nounOfPlaceAndTimes = NounOfPlaceAndTime.getByTemplate(nv);
+            nounOfPlaceTimesPicker.getValues().clear();
+            nounOfPlaceTimesPicker.getValues().addAll(nounOfPlaceAndTimes);
+        });
+
         row++;
         label = new Label(RESOURCE_BUNDLE.getString("translation.label"));
         gridPane.add(label, 0, row);
