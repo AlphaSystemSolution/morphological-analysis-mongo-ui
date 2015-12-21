@@ -30,10 +30,6 @@ public class LocationPropertiesView extends Control {
         return location;
     }
 
-    public final Object getUpdatedProperty() {
-        return updatedProperty.get();
-    }
-
     public final void setUpdatedProperty(Object updatedProperty) {
         this.updatedProperty.set(updatedProperty);
     }

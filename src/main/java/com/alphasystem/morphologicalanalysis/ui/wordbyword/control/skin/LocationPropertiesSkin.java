@@ -1,9 +1,16 @@
 package com.alphasystem.morphologicalanalysis.ui.wordbyword.control.skin;
 
+import com.alphasystem.arabic.model.NamedTemplate;
 import com.alphasystem.morphologicalanalysis.morphology.model.MorphologicalEntry;
+import com.alphasystem.morphologicalanalysis.morphology.model.RootLetters;
 import com.alphasystem.morphologicalanalysis.ui.wordbyword.control.*;
+import com.alphasystem.morphologicalanalysis.util.MorphologicalAnalysisRepositoryUtil;
+import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.AbstractProperties;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
+import javafx.concurrent.Service;
+import javafx.concurrent.Task;
+import javafx.concurrent.Worker;
 import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SkinBase;
@@ -11,6 +18,8 @@ import javafx.scene.control.TitledPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 
+import static com.alphasystem.arabic.ui.util.UiUtilities.defaultCursor;
+import static com.alphasystem.arabic.ui.util.UiUtilities.waitCursor;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.GAP;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.AbstractProperties.*;
 import static javafx.scene.control.ScrollPane.ScrollBarPolicy.AS_NEEDED;
@@ -27,6 +36,7 @@ public class LocationPropertiesSkin extends SkinBase<LocationPropertiesView> {
     private VerbPropertiesView verbPropertiesView;
     private ParticlePropertiesView particlePropertiesView;
     private TitledPane propertiesTitledPane;
+    private MorphologicalAnalysisRepositoryUtil repositoryUtil = RepositoryTool.getInstance().getRepositoryUtil();
 
     public LocationPropertiesSkin(LocationPropertiesView control) {
         super(control);
@@ -39,8 +49,20 @@ public class LocationPropertiesSkin extends SkinBase<LocationPropertiesView> {
             changeMorphologicalEntryView(nv);
         });
         commonPropertiesView.partOfSpeechProperty().addListener((o, ov, nv) -> changePropertiesView(commonPropertiesView.getLocation()));
-        morphologicalEntryView.rootLettersProperty().addListener((o, ov, nv) -> sendUpdatePropertyNotification(view, nv));
-        morphologicalEntryView.formProperty().addListener((o, ov, nv) -> sendUpdatePropertyNotification(view, nv));
+        morphologicalEntryView.rootLettersProperty().addListener((o, ov, nv) -> {
+            sendUpdatePropertyNotification(view, nv);
+            if (nv != null && !nv.isEmpty()) {
+                MorphologicalEntry morphologicalEntry = morphologicalEntryView.getMorphologicalEntry();
+                retrieveEntry(morphologicalEntry, nv, morphologicalEntry.getForm());
+            }
+        });
+        morphologicalEntryView.formProperty().addListener((o, ov, nv) -> {
+            sendUpdatePropertyNotification(view, nv);
+            if (nv != null) {
+                MorphologicalEntry morphologicalEntry = morphologicalEntryView.getMorphologicalEntry();
+                retrieveEntry(morphologicalEntry, morphologicalEntry.getRootLetters(), nv);
+            }
+        });
     }
 
     private static String getPropertiesPaneTitle(AbstractProperties properties) {
@@ -63,6 +85,26 @@ public class LocationPropertiesSkin extends SkinBase<LocationPropertiesView> {
         scrollPane.setFitToHeight(true);
         scrollPane.setContent(content);
         return scrollPane;
+    }
+
+    private void retrieveEntry(MorphologicalEntry morphologicalEntry, RootLetters nv, NamedTemplate form) {
+        RetrieveMorphologicalEntryService service = new RetrieveMorphologicalEntryService(
+                morphologicalEntry, nv, form);
+        service.setOnSucceeded(event -> {
+            defaultCursor(getSkinnable());
+            Worker source = event.getSource();
+            MorphologicalEntry value = (MorphologicalEntry) source.getValue();
+            System.out.println("<<<<<<<<<<<< " + value);
+            if (value != null) {
+                morphologicalEntryView.setMorphologicalEntry(value);
+            }
+        });
+        service.setOnFailed(event -> {
+            defaultCursor(getSkinnable());
+            Worker source = event.getSource();
+            source.getException().printStackTrace();
+        });
+        service.start();
     }
 
     private void sendUpdatePropertyNotification(LocationPropertiesView view, Object nv) {
@@ -142,5 +184,33 @@ public class LocationPropertiesSkin extends SkinBase<LocationPropertiesView> {
         }
         propertiesView.setLocationProperties(properties);
         return propertiesView;
+    }
+
+    private class RetrieveMorphologicalEntryService extends Service<MorphologicalEntry> {
+
+        private final MorphologicalEntry source;
+        private final RootLetters rootLetters;
+        private final NamedTemplate form;
+
+        private RetrieveMorphologicalEntryService(MorphologicalEntry source, RootLetters rootLetters, NamedTemplate form) {
+            this.source = source;
+            this.rootLetters = rootLetters;
+            this.form = form;
+        }
+
+        @Override
+        protected Task<MorphologicalEntry> createTask() {
+            return new Task<MorphologicalEntry>() {
+                @Override
+                protected MorphologicalEntry call() throws Exception {
+                    System.out.println(">>>>>>>>>>>>> about to retrieve");
+                    waitCursor(getSkinnable());
+                    MorphologicalEntry savedEntry = repositoryUtil.findMorphologicalEntry(
+                            new MorphologicalEntry(rootLetters, form));
+                    // if current entry is same as the one just retrieved from DB, then we will not update the UI
+                    return (savedEntry == null || savedEntry.equals(source)) ? null : savedEntry;
+                }
+            };
+        }
     }
 }

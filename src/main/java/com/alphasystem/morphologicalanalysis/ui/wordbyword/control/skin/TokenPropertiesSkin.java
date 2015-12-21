@@ -1,5 +1,6 @@
 package com.alphasystem.morphologicalanalysis.ui.wordbyword.control.skin;
 
+import com.alphasystem.arabic.model.NamedTemplate;
 import com.alphasystem.arabic.ui.ArabicLabelToggleGroup;
 import com.alphasystem.arabic.ui.ArabicLabelView;
 import com.alphasystem.arabic.ui.Browser;
@@ -71,6 +72,10 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
             if (isGivenType(RootLetters.class, nv)) {
                 RootLetters rootLetters = (RootLetters) nv;
                 loadDictionary(rootLetters);
+            }
+            if (isGivenType(NamedTemplate.class, nv)) {
+                NamedTemplate form = (NamedTemplate) nv;
+                // TODO: do something here
             }
         });
 
