@@ -1,5 +1,6 @@
 package com.alphasystem.morphologicalanalysis.ui.wordbyword.control.skin;
 
+import com.alphasystem.morphologicalanalysis.morphology.model.MorphologicalEntry;
 import com.alphasystem.morphologicalanalysis.ui.wordbyword.control.*;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.AbstractProperties;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
@@ -20,6 +21,7 @@ import static javafx.scene.control.ScrollPane.ScrollBarPolicy.AS_NEEDED;
 public class LocationPropertiesSkin extends SkinBase<LocationPropertiesView> {
 
     private CommonPropertiesView commonPropertiesView;
+    private MorphologicalEntryView morphologicalEntryView;
     private NounPropertiesView nounPropertiesView;
     private ProNounPropertiesView proNounPropertiesView;
     private VerbPropertiesView verbPropertiesView;
@@ -34,10 +36,11 @@ public class LocationPropertiesSkin extends SkinBase<LocationPropertiesView> {
         view.locationProperty().addListener((o, ov, nv) -> {
             commonPropertiesView.setLocation(nv);
             changePropertiesView(nv);
+            changeMorphologicalEntryView(nv);
         });
-        commonPropertiesView.partOfSpeechProperty().addListener((o, ov, nv) -> {
-            changePropertiesView(commonPropertiesView.getLocation());
-        });
+        commonPropertiesView.partOfSpeechProperty().addListener((o, ov, nv) -> changePropertiesView(commonPropertiesView.getLocation()));
+        morphologicalEntryView.rootLettersProperty().addListener((o, ov, nv) -> sendUpdatePropertyNotification(view, nv));
+        morphologicalEntryView.formProperty().addListener((o, ov, nv) -> sendUpdatePropertyNotification(view, nv));
     }
 
     private static String getPropertiesPaneTitle(AbstractProperties properties) {
@@ -62,10 +65,19 @@ public class LocationPropertiesSkin extends SkinBase<LocationPropertiesView> {
         return scrollPane;
     }
 
+    private void sendUpdatePropertyNotification(LocationPropertiesView view, Object nv) {
+        view.setUpdatedProperty(null);
+        view.setUpdatedProperty(nv);
+    }
+
     private void changePropertiesView(Location location) {
         AbstractProperties properties = location.getProperties();
         propertiesTitledPane.setContent(getPropertiesView(properties));
         propertiesTitledPane.setText(getPropertiesPaneTitle(properties));
+    }
+
+    private void changeMorphologicalEntryView(Location location) {
+        morphologicalEntryView.setMorphologicalEntry(getMorphologicalEntry(location));
     }
 
     private void initializeSkin() {
@@ -84,9 +96,24 @@ public class LocationPropertiesSkin extends SkinBase<LocationPropertiesView> {
         propertiesTitledPane = new TitledPane(getPropertiesPaneTitle(properties), getPropertiesView(properties));
         hBox.getChildren().add(propertiesTitledPane);
 
+        morphologicalEntryView = new MorphologicalEntryView();
+        morphologicalEntryView.setMorphologicalEntry(getMorphologicalEntry(location));
+
+        titledPane = new TitledPane("Morphological Entry Properties", createScrollPane(morphologicalEntryView));
+        hBox.getChildren().add(titledPane);
+
         BorderPane borderPane = new BorderPane();
         borderPane.setCenter(hBox);
         getChildren().add(borderPane);
+    }
+
+    private MorphologicalEntry getMorphologicalEntry(Location location) {
+        MorphologicalEntry morphologicalEntry = location.getMorphologicalEntry();
+        if (morphologicalEntry == null) {
+            morphologicalEntry = new MorphologicalEntry();
+            location.setMorphologicalEntry(morphologicalEntry);
+        }
+        return morphologicalEntry;
     }
 
     @SuppressWarnings({"unchecked"})
