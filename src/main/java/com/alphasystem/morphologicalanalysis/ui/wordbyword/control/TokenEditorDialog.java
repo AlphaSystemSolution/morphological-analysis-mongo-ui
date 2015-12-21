@@ -44,11 +44,6 @@ public class TokenEditorDialog extends Dialog<Token> {
         setY(offset);
 
         setResultConverter(param -> {
-            if (true) {
-                System.out.println("Inside applyButton.setResultConverter");
-                return null;
-            }
-            System.out.println("Inside applyButton.setResultConverter, why we are here");
             Token token = null;
             if (param.getButtonData().isDefaultButton()) {
                 try {
@@ -66,12 +61,6 @@ public class TokenEditorDialog extends Dialog<Token> {
         getDialogPane().getButtonTypes().addAll(APPLY, OK, CLOSE);
         Button applyButton = (Button) getDialogPane().lookupButton(APPLY);
         applyButton.addEventFilter(ACTION, event -> {
-            if (true) {
-                System.out.println("Inside applyButton.addEventFilter");
-                event.consume();
-                return;
-            }
-            System.out.println("Inside applyButton.addEventFilter, why we are here");
             Token t = null;
             try {
                 t = updateToken();
