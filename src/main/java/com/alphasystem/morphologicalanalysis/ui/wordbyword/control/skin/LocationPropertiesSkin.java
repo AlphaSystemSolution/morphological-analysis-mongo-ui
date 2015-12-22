@@ -90,15 +90,21 @@ public class LocationPropertiesSkin extends SkinBase<LocationPropertiesView> {
     }
 
     private void retrieveEntry(MorphologicalEntry morphologicalEntry, RootLetters nv, NamedTemplate form) {
+        if (nv == null || nv.isEmpty() || form == null) {
+            return;
+        }
         RetrieveMorphologicalEntryService service = new RetrieveMorphologicalEntryService(
                 morphologicalEntry, nv, form);
         service.setOnSucceeded(event -> {
             defaultCursor(getSkinnable());
             Worker source = event.getSource();
             MorphologicalEntry value = (MorphologicalEntry) source.getValue();
-            System.out.println("<<<<<<<<<<<< " + value);
             if (value != null) {
+                getSkinnable().getLocation().setMorphologicalEntry(value);
                 morphologicalEntryView.setMorphologicalEntry(value);
+                NamedTemplate _form = value.getForm();
+                morphologicalEntryView.setForm(null);
+                morphologicalEntryView.setForm(_form);
             }
         });
         service.setOnFailed(event -> {
@@ -204,10 +210,10 @@ public class LocationPropertiesSkin extends SkinBase<LocationPropertiesView> {
             return new Task<MorphologicalEntry>() {
                 @Override
                 protected MorphologicalEntry call() throws Exception {
-                    System.out.println(">>>>>>>>>>>>> about to retrieve " + source.getDisplayName());
                     waitCursor(getSkinnable());
-                    MorphologicalEntry savedEntry = repositoryUtil.findMorphologicalEntry(
-                            new MorphologicalEntry(rootLetters, form));
+                    MorphologicalEntry entry = new MorphologicalEntry(rootLetters, form);
+                    String displayName = source == null ? "none" : source.getDisplayName();
+                    MorphologicalEntry savedEntry = repositoryUtil.findMorphologicalEntry(entry);
                     // if current entry is same as the one just retrieved from DB, then we will not update the UI
                     return (savedEntry == null || savedEntry.equals(source)) ? null : savedEntry;
                 }

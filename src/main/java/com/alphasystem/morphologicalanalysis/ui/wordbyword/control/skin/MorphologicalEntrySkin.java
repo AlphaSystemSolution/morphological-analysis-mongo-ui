@@ -9,12 +9,12 @@ import com.alphasystem.morphologicalanalysis.morphology.model.support.VerbalNoun
 import com.alphasystem.morphologicalanalysis.ui.common.ComboBoxFactory;
 import com.alphasystem.morphologicalanalysis.ui.wordbyword.control.MorphologicalEntryView;
 import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
+import javafx.collections.ObservableSet;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 
-import java.util.List;
+import java.util.Collection;
 
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.GAP;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.RESOURCE_BUNDLE;
@@ -30,6 +30,7 @@ public class MorphologicalEntrySkin extends SkinBase<MorphologicalEntryView> {
         initializeSkin();
     }
 
+    @SuppressWarnings({"unchecked"})
     private void initializeSkin() {
         GridPane gridPane = new GridPane();
         gridPane.setHgap(GAP);
@@ -64,11 +65,11 @@ public class MorphologicalEntrySkin extends SkinBase<MorphologicalEntryView> {
         verbalNounsPicker.getValues().addAll(control.getVerbalNouns());
         verbalNounsPicker.getValues().addListener((ListChangeListener<? super VerbalNoun>) c -> {
             while (c.next()) {
-                if (c.getAddedSize() > 0) {
-                    ObservableList<VerbalNoun> verbalNouns = control.getVerbalNouns();
-                    verbalNouns.clear();
-                    List<?> addedSubList = c.getAddedSubList();
-                    addedSubList.forEach(o -> verbalNouns.add((VerbalNoun) o));
+                if (c.wasRemoved()) {
+                    control.getVerbalNouns().removeAll(c.getRemoved());
+                }
+                if (c.wasAdded()) {
+                    control.getVerbalNouns().addAll((Collection<? extends VerbalNoun>) c.getAddedSubList());
                 }
             }
         });
@@ -83,11 +84,11 @@ public class MorphologicalEntrySkin extends SkinBase<MorphologicalEntryView> {
         nounOfPlaceTimesPicker.getValues().addAll(control.getNounOfPlaceAndTimes());
         nounOfPlaceTimesPicker.getValues().addListener((ListChangeListener<? super NounOfPlaceAndTime>) c -> {
             while (c.next()) {
+                if (c.wasRemoved()) {
+                    control.getNounOfPlaceAndTimes().removeAll(c.getRemoved());
+                }
                 if (c.getAddedSize() > 0) {
-                    ObservableList<NounOfPlaceAndTime> nounOfPlaceAndTimes = control.getNounOfPlaceAndTimes();
-                    nounOfPlaceAndTimes.clear();
-                    List<?> addedSubList = c.getAddedSubList();
-                    addedSubList.forEach(o -> nounOfPlaceAndTimes.add((NounOfPlaceAndTime) o));
+                    control.getNounOfPlaceAndTimes().addAll((Collection<? extends NounOfPlaceAndTime>) c.getAddedSubList());
                 }
             }
         });
@@ -136,8 +137,9 @@ public class MorphologicalEntrySkin extends SkinBase<MorphologicalEntryView> {
         getChildren().add(gridPane);
     }
 
-    private void updateNounOfPlaceTimes(MorphologicalEntryView control, NounOfPlaceTimesPicker nounOfPlaceTimesPicker, NamedTemplate nv) {
-        ObservableList<NounOfPlaceAndTime> nounOfPlaceAndTimesFromControl = control.getNounOfPlaceAndTimes();
+    private void updateNounOfPlaceTimes(MorphologicalEntryView control, NounOfPlaceTimesPicker nounOfPlaceTimesPicker,
+                                        NamedTemplate nv) {
+        ObservableSet<NounOfPlaceAndTime> nounOfPlaceAndTimesFromControl = control.getNounOfPlaceAndTimes();
         nounOfPlaceTimesPicker.getValues().clear();
         if (nounOfPlaceAndTimesFromControl != null && !nounOfPlaceAndTimesFromControl.isEmpty()) {
             nounOfPlaceTimesPicker.getValues().addAll(nounOfPlaceAndTimesFromControl);
@@ -147,7 +149,7 @@ public class MorphologicalEntrySkin extends SkinBase<MorphologicalEntryView> {
     }
 
     private void updateVerbalNouns(MorphologicalEntryView control, VerbalNounsPicker verbalNounsPicker, NamedTemplate nv) {
-        ObservableList<VerbalNoun> verbalNounsFromControl = control.getVerbalNouns();
+        ObservableSet<VerbalNoun> verbalNounsFromControl = control.getVerbalNouns();
         verbalNounsPicker.getValues().clear();
         if (verbalNounsFromControl != null && !verbalNounsFromControl.isEmpty()) {
             verbalNounsPicker.getValues().addAll(verbalNounsFromControl);

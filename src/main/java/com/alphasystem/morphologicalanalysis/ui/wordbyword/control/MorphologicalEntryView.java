@@ -8,12 +8,14 @@ import com.alphasystem.morphologicalanalysis.morphology.model.support.NounOfPlac
 import com.alphasystem.morphologicalanalysis.morphology.model.support.VerbalNoun;
 import com.alphasystem.morphologicalanalysis.ui.wordbyword.control.skin.MorphologicalEntrySkin;
 import javafx.beans.property.*;
-import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
+import javafx.collections.ObservableSet;
+import javafx.collections.SetChangeListener;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 
-import static javafx.collections.FXCollections.observableArrayList;
+import java.util.Set;
+
+import static javafx.collections.FXCollections.observableSet;
 
 /**
  * @author sali
@@ -24,8 +26,8 @@ public class MorphologicalEntryView extends Control {
     private final ObjectProperty<RootLetters> rootLetters = new SimpleObjectProperty<>(null, "rootLetters");
     private final ObjectProperty<NamedTemplate> form = new SimpleObjectProperty<>(null, "form");
     private final StringProperty translation = new SimpleStringProperty(null, "translation");
-    private final ObservableList<VerbalNoun> verbalNouns = observableArrayList();
-    private final ObservableList<NounOfPlaceAndTime> nounOfPlaceAndTimes = observableArrayList();
+    private final ObservableSet<VerbalNoun> verbalNouns = observableSet();
+    private final ObservableSet<NounOfPlaceAndTime> nounOfPlaceAndTimes = observableSet();
     private final BooleanProperty removePassiveLine = new SimpleBooleanProperty(false, "removePassiveLine");
     private final BooleanProperty skipRuleProcessing = new SimpleBooleanProperty(false, "skipRuleProcessing");
 
@@ -50,37 +52,43 @@ public class MorphologicalEntryView extends Control {
             configuration.setSkipRuleProcessing(nv);
             getMorphologicalEntry().setConfiguration(configuration);
         });
-        getVerbalNouns().addListener((ListChangeListener<VerbalNoun>) c -> {
-            while (c.next()) {
-                if (c.getAddedSize() > 0) {
-                    getMorphologicalEntry().getVerbalNouns().addAll(c.getAddedSubList());
-                }
-                if (c.wasRemoved()) {
-                    getMorphologicalEntry().getVerbalNouns().removeAll(c.getRemoved());
-                }
+        getVerbalNouns().addListener((SetChangeListener<? super VerbalNoun>) c -> {
+            if (c.wasRemoved()) {
+                VerbalNoun elementRemoved = (VerbalNoun) c.getElementRemoved();
+                getMorphologicalEntry().getVerbalNouns().remove(elementRemoved);
+            }
+            if (c.wasAdded()) {
+                VerbalNoun elementAdded = (VerbalNoun) c.getElementAdded();
+                getMorphologicalEntry().getVerbalNouns().add(elementAdded);
             }
         });
-        getNounOfPlaceAndTimes().addListener((ListChangeListener<NounOfPlaceAndTime>) c -> {
-            while (c.next()) {
-                if (c.getAddedSize() > 0) {
-                    getMorphologicalEntry().getNounOfPlaceAndTimes().addAll(c.getAddedSubList());
-                }
-                if (c.wasRemoved()) {
-                    getMorphologicalEntry().getNounOfPlaceAndTimes().removeAll(c.getRemoved());
-                }
+        getNounOfPlaceAndTimes().addListener((SetChangeListener<? super NounOfPlaceAndTime>) c -> {
+            if (c.wasRemoved()) {
+                NounOfPlaceAndTime elementRemoved = (NounOfPlaceAndTime) c.getElementRemoved();
+                getMorphologicalEntry().getNounOfPlaceAndTimes().remove(elementRemoved);
+            }
+            if (c.wasAdded()) {
+                NounOfPlaceAndTime elementAdded = (NounOfPlaceAndTime) c.getElementAdded();
+                getMorphologicalEntry().getNounOfPlaceAndTimes().add(elementAdded);
             }
         });
     }
 
     private void setValues(MorphologicalEntry morphologicalEntry) {
         if (morphologicalEntry != null) {
-            setRootLetters(morphologicalEntry.getRootLetters());
+            RootLetters rootLetters = morphologicalEntry.getRootLetters();
+            setRootLetters(rootLetters);
+
             // update verbal nouns and noun of place and time before updating form, this way UI will get updated
             // correctly
-            verbalNouns.clear();
-            verbalNouns.addAll(morphologicalEntry.getVerbalNouns());
-            nounOfPlaceAndTimes.clear();
-            nounOfPlaceAndTimes.addAll(morphologicalEntry.getNounOfPlaceAndTimes());
+            Set<VerbalNoun> verbalNouns = morphologicalEntry.getVerbalNouns();
+            this.verbalNouns.clear();
+            this.verbalNouns.addAll(verbalNouns);
+
+            Set<NounOfPlaceAndTime> nounOfPlaceAndTimes = morphologicalEntry.getNounOfPlaceAndTimes();
+            this.nounOfPlaceAndTimes.clear();
+            this.nounOfPlaceAndTimes.addAll(nounOfPlaceAndTimes);
+
             setForm(morphologicalEntry.getForm());
             setTranslation(morphologicalEntry.getTranslation());
             ConjugationConfiguration configuration = morphologicalEntry.getConfiguration();
@@ -139,11 +147,11 @@ public class MorphologicalEntryView extends Control {
         return translation;
     }
 
-    public final ObservableList<VerbalNoun> getVerbalNouns() {
+    public final ObservableSet<VerbalNoun> getVerbalNouns() {
         return verbalNouns;
     }
 
-    public final ObservableList<NounOfPlaceAndTime> getNounOfPlaceAndTimes() {
+    public final ObservableSet<NounOfPlaceAndTime> getNounOfPlaceAndTimes() {
         return nounOfPlaceAndTimes;
     }
 
