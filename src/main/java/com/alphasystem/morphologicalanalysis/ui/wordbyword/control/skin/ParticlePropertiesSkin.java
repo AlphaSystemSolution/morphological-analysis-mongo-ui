@@ -23,7 +23,7 @@ public class ParticlePropertiesSkin extends AbstractPropertiesSkin<ParticlePrope
     @Override
     protected void initializeSkin() {
         FlowPane flowPane = new FlowPane();
-        Text text = new Text("Particles does not have any properties.");
+        Text text = new Text("Particles does not \nhave any properties.");
         text.setFont(ENGLISH_FONT_ITALIC_12);
         flowPane.getChildren().add(text);
         flowPane.setAlignment(CENTER);
