@@ -21,7 +21,7 @@ import static org.apache.commons.lang3.ArrayUtils.*;
 /**
  * @author sali
  */
-public class SarChartBuilder {
+public class SarfChartBuilder {
 
     private static final int NUM_OF_COLUMNS = 3;
     private static ResourceBundle resourceBundle = ResourceBundle.getBundle("sarf-html-template");
@@ -109,7 +109,6 @@ public class SarChartBuilder {
             reverse(rightSubArray);
             RootWord[] leftSubArray = subarray(leftConjugations, startIndex, endIndex);
             reverse(leftSubArray);
-            int len = leftSubArray.length;
             String[] values = new String[0];
             for (RootWord rootWord : rightSubArray) {
                 values = addValue(rightSideStack.isEmpty(), values, rootWord);
@@ -117,7 +116,7 @@ public class SarChartBuilder {
             for (RootWord rootWord : leftSubArray) {
                 values = addValue(leftSideStack.isEmpty(), values, rootWord);
             }
-            lines.add(format(resourceBundle.getString("detailed_cojugation_column"), values));
+            lines.add(format(resourceBundle.getString("detailed_cojugation_column"), new Object[]{values}));
             startIndex = endIndex;
             endIndex += NUM_OF_COLUMNS;
         }

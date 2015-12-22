@@ -37,7 +37,7 @@ import static com.alphasystem.arabic.ui.util.UiUtilities.defaultCursor;
 import static com.alphasystem.arabic.ui.util.UiUtilities.waitCursor;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.*;
 import static com.alphasystem.morphologicalanalysis.ui.wordbyword.control.TokenPropertiesView.SelectionStatus.*;
-import static com.alphasystem.morphologicalanalysis.util.SarChartBuilder.createChart;
+import static com.alphasystem.morphologicalanalysis.util.SarfChartBuilder.createChart;
 import static com.alphasystem.util.AppUtil.isGivenType;
 import static java.lang.String.format;
 import static javafx.geometry.NodeOrientation.RIGHT_TO_LEFT;

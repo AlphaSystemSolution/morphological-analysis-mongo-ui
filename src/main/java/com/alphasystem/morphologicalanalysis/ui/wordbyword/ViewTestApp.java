@@ -5,7 +5,7 @@ import com.alphasystem.app.sarfengine.conjugation.model.SarfChart;
 import com.alphasystem.app.sarfengine.guice.GuiceSupport;
 import com.alphasystem.arabic.model.NamedTemplate;
 import com.alphasystem.arabic.ui.Browser;
-import com.alphasystem.morphologicalanalysis.util.SarChartBuilder;
+import com.alphasystem.morphologicalanalysis.util.SarfChartBuilder;
 import com.alphasystem.morphologicalanalysis.util.SpringContextHelper;
 import javafx.application.Application;
 import javafx.geometry.Rectangle2D;
@@ -53,7 +53,7 @@ public class ViewTestApp extends Application {
         SarfChart sarfChart = conjugationBuilder.doConjugation(NamedTemplate.FORM_IV_TEMPLATE, "To submit",
                 false, false, SEEN, LAM, MEEM, singletonList(VERBAL_NOUN_FORM_IV),
                 singletonList(NOUN_OF_PLACE_AND_TIME_FORM_IV));
-        File file = SarChartBuilder.createChart(sarfChart);
+        File file = SarfChartBuilder.createChart(sarfChart);
         Browser browser = new Browser();
         browser.loadUrl(file.toURI().toURL().toString());
         vBox.getChildren().addAll(browser);
