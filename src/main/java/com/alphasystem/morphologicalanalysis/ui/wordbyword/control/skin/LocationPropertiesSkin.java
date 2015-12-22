@@ -212,7 +212,6 @@ public class LocationPropertiesSkin extends SkinBase<LocationPropertiesView> {
                 protected MorphologicalEntry call() throws Exception {
                     waitCursor(getSkinnable());
                     MorphologicalEntry entry = new MorphologicalEntry(rootLetters, form);
-                    String displayName = source == null ? "none" : source.getDisplayName();
                     MorphologicalEntry savedEntry = repositoryUtil.findMorphologicalEntry(entry);
                     // if current entry is same as the one just retrieved from DB, then we will not update the UI
                     return (savedEntry == null || savedEntry.equals(source)) ? null : savedEntry;
