@@ -1,6 +1,7 @@
 package com.alphasystem.morphologicalanalysis.ui.wordbyword.control;
 
 import com.alphasystem.morphologicalanalysis.ui.wordbyword.control.skin.CommonPropertiesSkin;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.AbstractProperties;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.NamedTag;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech;
@@ -23,7 +24,13 @@ public class CommonPropertiesView extends Control {
 
     public CommonPropertiesView() {
         locationProperty().addListener((o, ov, nv) -> setValues(nv));
-        partOfSpeechProperty().addListener((o, ov, nv) -> getLocation().setPartOfSpeech((nv == null) ? NOUN : nv));
+        partOfSpeechProperty().addListener((o, ov, nv) -> {
+            // setting part of speech will make properties re-initialize, so hold of the current sets of
+            // properties and sets them back once setting the part of speech.
+            AbstractProperties properties = getLocation().getProperties();
+            getLocation().setPartOfSpeech((nv == null) ? NOUN : nv);
+            getLocation().setProperties(properties);
+        });
         namedTagProperty().addListener((o, ov, nv) -> getLocation().setNamedTag(nv));
         translationProperty().addListener((o, ov, nv) -> getLocation().setTranslation(nv));
     }
