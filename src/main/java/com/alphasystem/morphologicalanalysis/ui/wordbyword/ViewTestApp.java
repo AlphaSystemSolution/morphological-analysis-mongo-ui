@@ -1,11 +1,11 @@
 package com.alphasystem.morphologicalanalysis.ui.wordbyword;
 
-import com.alphasystem.arabic.model.ArabicLetterType;
+import com.alphasystem.app.sarfengine.conjugation.builder.ConjugationBuilder;
+import com.alphasystem.app.sarfengine.conjugation.model.SarfChart;
+import com.alphasystem.app.sarfengine.guice.GuiceSupport;
 import com.alphasystem.arabic.model.NamedTemplate;
-import com.alphasystem.morphologicalanalysis.morphology.model.MorphologicalEntry;
-import com.alphasystem.morphologicalanalysis.morphology.model.RootLetters;
-import com.alphasystem.morphologicalanalysis.morphology.model.support.VerbalNoun;
-import com.alphasystem.morphologicalanalysis.ui.wordbyword.control.MorphologicalEntryView;
+import com.alphasystem.arabic.ui.Browser;
+import com.alphasystem.morphologicalanalysis.util.SarChartBuilder;
 import com.alphasystem.morphologicalanalysis.util.SpringContextHelper;
 import javafx.application.Application;
 import javafx.geometry.Rectangle2D;
@@ -13,6 +13,13 @@ import javafx.scene.Scene;
 import javafx.scene.layout.VBox;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+
+import java.io.File;
+
+import static com.alphasystem.arabic.model.ArabicLetterType.*;
+import static com.alphasystem.morphologicalanalysis.morphology.model.support.NounOfPlaceAndTime.NOUN_OF_PLACE_AND_TIME_FORM_IV;
+import static com.alphasystem.morphologicalanalysis.morphology.model.support.VerbalNoun.VERBAL_NOUN_FORM_IV;
+import static java.util.Collections.singletonList;
 
 /**
  * @author sali
@@ -41,13 +48,15 @@ public class ViewTestApp extends Application {
         VBox vBox = new VBox();
         vBox.setSpacing(10);
 
-        MorphologicalEntryView root = new MorphologicalEntryView();
-        MorphologicalEntry morphologicalEntry = new MorphologicalEntry();
-        morphologicalEntry.setRootLetters(new RootLetters(ArabicLetterType.SEEN, ArabicLetterType.LAM, ArabicLetterType.MEEM));
-        morphologicalEntry.setForm(NamedTemplate.FORM_IV_TEMPLATE);
-        morphologicalEntry.getVerbalNouns().add(VerbalNoun.VERBAL_NOUN_FORM_II);
-        root.setMorphologicalEntry(morphologicalEntry);
-        vBox.getChildren().addAll(root);
+        ConjugationBuilder conjugationBuilder = GuiceSupport.getInstance().getConjugationBuilderFactory()
+                .getConjugationBuilder();
+        SarfChart sarfChart = conjugationBuilder.doConjugation(NamedTemplate.FORM_IV_TEMPLATE, "To submit",
+                false, false, SEEN, LAM, MEEM, singletonList(VERBAL_NOUN_FORM_IV),
+                singletonList(NOUN_OF_PLACE_AND_TIME_FORM_IV));
+        File file = SarChartBuilder.createChart(sarfChart);
+        Browser browser = new Browser();
+        browser.loadUrl(file.toURI().toURL().toString());
+        vBox.getChildren().addAll(browser);
 
         Scene scene = new Scene(vBox);
         primaryStage.setMaximized(true);

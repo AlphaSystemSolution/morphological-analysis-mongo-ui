@@ -1,17 +1,25 @@
 package com.alphasystem.morphologicalanalysis.ui.wordbyword.control.skin;
 
+import com.alphasystem.app.sarfengine.conjugation.builder.ConjugationBuilder;
+import com.alphasystem.app.sarfengine.conjugation.model.SarfChart;
+import com.alphasystem.app.sarfengine.guice.GuiceSupport;
 import com.alphasystem.arabic.model.NamedTemplate;
 import com.alphasystem.arabic.ui.ArabicLabelToggleGroup;
 import com.alphasystem.arabic.ui.ArabicLabelView;
 import com.alphasystem.arabic.ui.Browser;
+import com.alphasystem.morphologicalanalysis.morphology.model.ConjugationConfiguration;
 import com.alphasystem.morphologicalanalysis.morphology.model.MorphologicalEntry;
 import com.alphasystem.morphologicalanalysis.morphology.model.RootLetters;
+import com.alphasystem.morphologicalanalysis.morphology.model.support.NounOfPlaceAndTime;
+import com.alphasystem.morphologicalanalysis.morphology.model.support.VerbalNoun;
 import com.alphasystem.morphologicalanalysis.ui.common.LocationListCell;
 import com.alphasystem.morphologicalanalysis.ui.wordbyword.control.LocationPropertiesView;
 import com.alphasystem.morphologicalanalysis.ui.wordbyword.control.TokenPropertiesView;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Service;
+import javafx.concurrent.Task;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
@@ -19,11 +27,17 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
+import java.io.File;
+import java.net.MalformedURLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.alphasystem.arabic.ui.util.FontConstants.ARABIC_FONT_36;
+import static com.alphasystem.arabic.ui.util.UiUtilities.defaultCursor;
+import static com.alphasystem.arabic.ui.util.UiUtilities.waitCursor;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.*;
 import static com.alphasystem.morphologicalanalysis.ui.wordbyword.control.TokenPropertiesView.SelectionStatus.*;
+import static com.alphasystem.morphologicalanalysis.util.SarChartBuilder.createChart;
 import static com.alphasystem.util.AppUtil.isGivenType;
 import static java.lang.String.format;
 import static javafx.geometry.NodeOrientation.RIGHT_TO_LEFT;
@@ -41,7 +55,11 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
     private final BorderPane lettersPane;
     private final TabPane tabPane;
     private final Browser browser;
-    private Tab browseDictionaryTab;
+    private final Browser conjugationBrowser;
+    private final Tab browseDictionaryTab;
+    private final Tab morphologicalConjugationTab;
+    private ConjugationBuilder conjugationBuilder = GuiceSupport.getInstance().getConjugationBuilderFactory()
+            .getConjugationBuilder();
 
     public TokenPropertiesSkin(TokenPropertiesView control) {
         super(control);
@@ -50,12 +68,17 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
         lettersPane.setBorder(BORDER);
 
         browser = new Browser();
+        conjugationBrowser = new Browser();
 
         tabPane = new TabPane();
         tabPane.setTabClosingPolicy(UNAVAILABLE);
         tabPane.setBorder(BORDER);
+
         browseDictionaryTab = new Tab("Browse Dictionary", browser);
         browseDictionaryTab.setDisable(true);
+
+        morphologicalConjugationTab = new Tab("Morphological Conjugation", conjugationBrowser);
+        morphologicalConjugationTab.setDisable(true);
 
         locationComboBox = new ComboBox<>();
         locationPropertiesView = new LocationPropertiesView();
@@ -72,14 +95,27 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
             if (isGivenType(RootLetters.class, nv)) {
                 RootLetters rootLetters = (RootLetters) nv;
                 loadDictionary(rootLetters);
+                Location location = locationPropertiesView.getLocation();
+                MorphologicalEntry morphologicalEntry = location.getMorphologicalEntry();
+                if (morphologicalEntry != null) {
+                    enableConjugationTab(rootLetters, morphologicalEntry.getForm());
+                }
             }
             if (isGivenType(NamedTemplate.class, nv)) {
                 NamedTemplate form = (NamedTemplate) nv;
-                // TODO: do something here
+                Location location = locationPropertiesView.getLocation();
+                MorphologicalEntry morphologicalEntry = location.getMorphologicalEntry();
+                if (morphologicalEntry != null) {
+                    enableConjugationTab(morphologicalEntry.getRootLetters(), form);
+                }
             }
         });
 
         initializeSkin();
+
+        morphologicalConjugationTab.selectedProperty().addListener((o, ov, nv) -> {
+            loadConjugation(locationPropertiesView.getLocation().getMorphologicalEntry());
+        });
     }
 
     private void createLettersPane() {
@@ -135,7 +171,9 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
                 tabPane.getSelectionModel().select(0);
                 MorphologicalEntry morphologicalEntry = nv.getMorphologicalEntry();
                 if (morphologicalEntry != null) {
-                    loadDictionary(morphologicalEntry.getRootLetters());
+                    RootLetters rootLetters = morphologicalEntry.getRootLetters();
+                    loadDictionary(rootLetters);
+                    enableConjugationTab(rootLetters, morphologicalEntry.getForm());
                 }
                 view.changeLocation(ov, nv);
             }
@@ -161,6 +199,54 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
         }
     }
 
+    private void enableConjugationTab(final RootLetters rootLetters, final NamedTemplate form) {
+        morphologicalConjugationTab.setDisable((rootLetters == null) || rootLetters.isEmpty() || (form == null));
+    }
+
+    private void loadConjugation(final MorphologicalEntry entry) {
+        if (entry != null && !morphologicalConjugationTab.isDisabled()) {
+            Service<SarfChart> service = new Service<SarfChart>() {
+                @Override
+                protected Task<SarfChart> createTask() {
+                    return new Task<SarfChart>() {
+                        @Override
+                        protected SarfChart call() throws Exception {
+                            waitCursor(getSkinnable());
+                            ConjugationConfiguration configuration = entry.getConfiguration();
+                            boolean removePassiveLine = false;
+                            boolean skipRuleProcessing = false;
+                            if (configuration != null) {
+                                removePassiveLine = configuration.isRemovePassiveLine();
+                                skipRuleProcessing = configuration.isSkipRuleProcessing();
+                            }
+                            RootLetters rootLetters = entry.getRootLetters();
+                            List<VerbalNoun> verbalNouns = new ArrayList<>(entry.getVerbalNouns());
+                            List<NounOfPlaceAndTime> nounOfPlaceAndTimes = new ArrayList<>(entry.getNounOfPlaceAndTimes());
+                            return conjugationBuilder.doConjugation(entry.getForm(), entry.getTranslation(),
+                                    removePassiveLine, skipRuleProcessing, rootLetters.getFirstRadical(),
+                                    rootLetters.getSecondRadical(), rootLetters.getThirdRadical(),
+                                    rootLetters.getFourthRadical(), verbalNouns, nounOfPlaceAndTimes);
+                        }
+                    };
+                }
+            };
+            service.setOnSucceeded(event -> {
+                defaultCursor(getSkinnable());
+                SarfChart sarfChart = (SarfChart) event.getSource().getValue();
+                File file = createChart(sarfChart);
+                try {
+                    conjugationBrowser.loadUrl(file.toURI().toURL().toString());
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                }
+            });
+            service.setOnFailed(event -> {
+                defaultCursor(getSkinnable());
+            });
+            service.start();
+        }
+    }
+
     private void updateLocations(Token token) {
         tabPane.getSelectionModel().select(0);
         locationComboBox.getItems().clear();
@@ -182,7 +268,7 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
         vBox.setSpacing(GAP);
 
         tabPane.getTabs().addAll(new Tab(RESOURCE_BUNDLE.getString("locationProperties.label"), locationPropertiesView),
-                browseDictionaryTab);
+                browseDictionaryTab, morphologicalConjugationTab);
 
         createLettersPane();
 
