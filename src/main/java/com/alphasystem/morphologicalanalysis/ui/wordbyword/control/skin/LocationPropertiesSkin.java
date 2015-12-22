@@ -45,10 +45,12 @@ public class LocationPropertiesSkin extends SkinBase<LocationPropertiesView> {
         LocationPropertiesView view = getSkinnable();
         view.locationProperty().addListener((o, ov, nv) -> {
             commonPropertiesView.setLocation(nv);
-            changePropertiesView(nv);
+            changePropertiesView(nv.getProperties());
             changeMorphologicalEntryView(nv);
         });
-        commonPropertiesView.partOfSpeechProperty().addListener((o, ov, nv) -> changePropertiesView(commonPropertiesView.getLocation()));
+        commonPropertiesView.partOfSpeechProperty().addListener((o, ov, nv) -> {
+            changePropertiesView(view.getLocation().getProperties());
+        });
         morphologicalEntryView.rootLettersProperty().addListener((o, ov, nv) -> {
             sendUpdatePropertyNotification(view, nv);
             if (nv != null && !nv.isEmpty()) {
@@ -112,8 +114,7 @@ public class LocationPropertiesSkin extends SkinBase<LocationPropertiesView> {
         view.setUpdatedProperty(nv);
     }
 
-    private void changePropertiesView(Location location) {
-        AbstractProperties properties = location.getProperties();
+    private void changePropertiesView(AbstractProperties properties) {
         propertiesTitledPane.setContent(getPropertiesView(properties));
         propertiesTitledPane.setText(getPropertiesPaneTitle(properties));
     }
@@ -203,7 +204,7 @@ public class LocationPropertiesSkin extends SkinBase<LocationPropertiesView> {
             return new Task<MorphologicalEntry>() {
                 @Override
                 protected MorphologicalEntry call() throws Exception {
-                    System.out.println(">>>>>>>>>>>>> about to retrieve");
+                    System.out.println(">>>>>>>>>>>>> about to retrieve " + source.getDisplayName());
                     waitCursor(getSkinnable());
                     MorphologicalEntry savedEntry = repositoryUtil.findMorphologicalEntry(
                             new MorphologicalEntry(rootLetters, form));
