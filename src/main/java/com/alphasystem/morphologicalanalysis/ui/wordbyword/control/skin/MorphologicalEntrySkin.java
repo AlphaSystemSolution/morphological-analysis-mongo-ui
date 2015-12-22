@@ -96,13 +96,8 @@ public class MorphologicalEntrySkin extends SkinBase<MorphologicalEntryView> {
 
         // update verbal noun and/or noun of place and time
         namedTemplateComboBox.getSelectionModel().selectedItemProperty().addListener((o, ov, nv) -> {
-            List<VerbalNoun> verbalNouns = VerbalNoun.getByTemplate(nv);
-            verbalNounsPicker.getValues().clear();
-            verbalNounsPicker.getValues().addAll(verbalNouns);
-
-            List<NounOfPlaceAndTime> nounOfPlaceAndTimes = NounOfPlaceAndTime.getByTemplate(nv);
-            nounOfPlaceTimesPicker.getValues().clear();
-            nounOfPlaceTimesPicker.getValues().addAll(nounOfPlaceAndTimes);
+            updateVerbalNouns(control, verbalNounsPicker, nv);
+            updateNounOfPlaceTimes(control, nounOfPlaceTimesPicker, nv);
         });
 
         row++;
@@ -139,5 +134,25 @@ public class MorphologicalEntrySkin extends SkinBase<MorphologicalEntryView> {
         gridPane.add(checkBox, 1, row);
 
         getChildren().add(gridPane);
+    }
+
+    private void updateNounOfPlaceTimes(MorphologicalEntryView control, NounOfPlaceTimesPicker nounOfPlaceTimesPicker, NamedTemplate nv) {
+        ObservableList<NounOfPlaceAndTime> nounOfPlaceAndTimesFromControl = control.getNounOfPlaceAndTimes();
+        nounOfPlaceTimesPicker.getValues().clear();
+        if (nounOfPlaceAndTimesFromControl != null && !nounOfPlaceAndTimesFromControl.isEmpty()) {
+            nounOfPlaceTimesPicker.getValues().addAll(nounOfPlaceAndTimesFromControl);
+        } else {
+            nounOfPlaceTimesPicker.getValues().addAll(NounOfPlaceAndTime.getByTemplate(nv));
+        }
+    }
+
+    private void updateVerbalNouns(MorphologicalEntryView control, VerbalNounsPicker verbalNounsPicker, NamedTemplate nv) {
+        ObservableList<VerbalNoun> verbalNounsFromControl = control.getVerbalNouns();
+        verbalNounsPicker.getValues().clear();
+        if (verbalNounsFromControl != null && !verbalNounsFromControl.isEmpty()) {
+            verbalNounsPicker.getValues().addAll(verbalNounsFromControl);
+        } else {
+            verbalNounsPicker.getValues().addAll(VerbalNoun.getByTemplate(nv));
+        }
     }
 }

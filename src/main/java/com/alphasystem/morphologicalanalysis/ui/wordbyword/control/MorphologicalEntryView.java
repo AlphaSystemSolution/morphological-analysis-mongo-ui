@@ -8,6 +8,7 @@ import com.alphasystem.morphologicalanalysis.morphology.model.support.NounOfPlac
 import com.alphasystem.morphologicalanalysis.morphology.model.support.VerbalNoun;
 import com.alphasystem.morphologicalanalysis.ui.wordbyword.control.skin.MorphologicalEntrySkin;
 import javafx.beans.property.*;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
@@ -49,15 +50,39 @@ public class MorphologicalEntryView extends Control {
             configuration.setSkipRuleProcessing(nv);
             getMorphologicalEntry().setConfiguration(configuration);
         });
+        getVerbalNouns().addListener((ListChangeListener<VerbalNoun>) c -> {
+            while (c.next()) {
+                if (c.getAddedSize() > 0) {
+                    getMorphologicalEntry().getVerbalNouns().addAll(c.getAddedSubList());
+                }
+                if (c.wasRemoved()) {
+                    getMorphologicalEntry().getVerbalNouns().removeAll(c.getRemoved());
+                }
+            }
+        });
+        getNounOfPlaceAndTimes().addListener((ListChangeListener<NounOfPlaceAndTime>) c -> {
+            while (c.next()) {
+                if (c.getAddedSize() > 0) {
+                    getMorphologicalEntry().getNounOfPlaceAndTimes().addAll(c.getAddedSubList());
+                }
+                if (c.wasRemoved()) {
+                    getMorphologicalEntry().getNounOfPlaceAndTimes().removeAll(c.getRemoved());
+                }
+            }
+        });
     }
 
     private void setValues(MorphologicalEntry morphologicalEntry) {
         if (morphologicalEntry != null) {
             setRootLetters(morphologicalEntry.getRootLetters());
+            // update verbal nouns and noun of place and time before updating form, this way UI will get updated
+            // correctly
+            verbalNouns.clear();
+            verbalNouns.addAll(morphologicalEntry.getVerbalNouns());
+            nounOfPlaceAndTimes.clear();
+            nounOfPlaceAndTimes.addAll(morphologicalEntry.getNounOfPlaceAndTimes());
             setForm(morphologicalEntry.getForm());
             setTranslation(morphologicalEntry.getTranslation());
-            getVerbalNouns().addAll(morphologicalEntry.getVerbalNouns());
-            getNounOfPlaceAndTimes().addAll(morphologicalEntry.getNounOfPlaceAndTimes());
             ConjugationConfiguration configuration = morphologicalEntry.getConfiguration();
             if (configuration != null) {
                 setRemovePassiveLine(configuration.isRemovePassiveLine());
