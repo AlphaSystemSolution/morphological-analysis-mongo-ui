@@ -41,11 +41,29 @@ public class SarfChartBuilder {
         List<String> lines = new ArrayList<>();
         lines.add(resourceBundle.getString("html_deceleration_start"));
         lines.add(resourceBundle.getString("header"));
+        //createAbbreviatedChart(sarfChart, lines);
+        createDetailedChart(sarfChart, lines);
+        lines.add(resourceBundle.getString("html_deceleration_end"));
+        try {
+            Files.write(Paths.get(outFile.toURI()), lines);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+        return outFile;
+    }
 
+    private static void createAbbreviatedChart(SarfChart sarfChart, List<String> lines) {
+        String s = resourceBundle.getString("abbreviated_cojugation_table_start");
+        lines.add(format(s, sarfChart.hashCode()));
+
+        lines.add(resourceBundle.getString("table_end"));
+    }
+
+    private static void createDetailedChart(SarfChart sarfChart, List<String> lines) {
         // start of detailed conjugation
         String s = resourceBundle.getString("detailed_cojugation_table_start");
-        s = format(s, sarfChart.hashCode());
-        lines.add(s);
+        lines.add(format(s, sarfChart.hashCode()));
 
         SarfKabeer sarfKabeer = sarfChart.getSarfKabeer();
         buildSarfKabeerPair(sarfKabeer.getActiveTensePair(), lines);
@@ -66,15 +84,7 @@ public class SarfChartBuilder {
         buildSarfKabeerPairs(sarfKabeer.getAdverbPairs(), lines);
 
         // end of detailed conjugation
-        lines.add(resourceBundle.getString("detailed_cojugation_table_end"));
-        lines.add(resourceBundle.getString("html_deceleration_end"));
-        try {
-            Files.write(Paths.get(outFile.toURI()), lines);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-        return outFile;
+        lines.add(resourceBundle.getString("table_end"));
     }
 
     private static void addEmptyRow(List<String> lines) {
