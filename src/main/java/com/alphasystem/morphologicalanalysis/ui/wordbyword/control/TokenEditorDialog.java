@@ -7,6 +7,8 @@ import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.concurrent.Service;
+import javafx.concurrent.Task;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -28,6 +30,8 @@ import static javafx.stage.Modality.NONE;
 public class TokenEditorDialog extends Dialog<Token> {
 
     private final ObjectProperty<Token> token = new SimpleObjectProperty<>(null, "token");
+    private final ObjectProperty<Token> nextToken = new SimpleObjectProperty<>(null, "nextToken");
+    private final ObjectProperty<Token> previousToken = new SimpleObjectProperty<>(null, "previousToken");
     private final TokenPropertiesView view = new TokenPropertiesView();
     private final RepositoryTool repositoryTool = RepositoryTool.getInstance();
 
@@ -55,10 +59,10 @@ public class TokenEditorDialog extends Dialog<Token> {
             return token;
         });
 
-        tokenProperty().addListener((o, ov, nv) -> setTitle(getTitle(nv)));
-        view.tokenProperty().bind(tokenProperty());
+        token.addListener((o, ov, nv) -> updateDialog(nv));
+        view.tokenProperty().bind(token);
         getDialogPane().setContent(view);
-        getDialogPane().getButtonTypes().addAll(APPLY, OK, CLOSE);
+        getDialogPane().getButtonTypes().addAll(NEXT, PREVIOUS, APPLY, OK, CLOSE);
         Button applyButton = (Button) getDialogPane().lookupButton(APPLY);
         applyButton.addEventFilter(ACTION, event -> {
             Token t = null;
@@ -72,11 +76,58 @@ public class TokenEditorDialog extends Dialog<Token> {
                 event.consume();
             }
         });
+        Button nextButton = (Button) getDialogPane().lookupButton(NEXT);
+        nextButton.disableProperty().bind(nextToken.isNull());
+        nextButton.addEventFilter(ACTION, event -> {
+            setToken(nextToken.get());
+            event.consume();
+        });
+
+        Button previousButton = (Button) getDialogPane().lookupButton(PREVIOUS);
+        previousButton.disableProperty().bind(previousToken.isNull());
+        previousButton.addEventFilter(ACTION, event -> {
+            setToken(previousToken.get());
+            event.consume();
+        });
     }
 
     private static String getTitle(Token token) {
         String displayName = (token == null) ? "" : format("(%s)", token.getDisplayName());
         return format("Edit token %s", displayName);
+    }
+
+    private void updateDialog(Token newToken) {
+        setTitle(getTitle(newToken));
+        getPreviousToken(newToken);
+        getNextToken(newToken);
+    }
+
+    private void getPreviousToken(Token newToken) {
+        // get new token in separate thread
+        RetrieveTokenService getPreviousTokenService = new RetrieveTokenService(newToken, false);
+        getPreviousTokenService.setOnFailed(event -> {
+            // do some thing
+            event.getSource().getException().printStackTrace();
+        });
+        getPreviousTokenService.setOnSucceeded(event -> {
+            Token token = (Token) event.getSource().getValue();
+            previousToken.setValue(token);
+        });
+        getPreviousTokenService.start();
+    }
+
+    private void getNextToken(Token newToken) {
+        // get new token in separate thread
+        RetrieveTokenService getNextTokenService = new RetrieveTokenService(newToken, true);
+        getNextTokenService.setOnFailed(event -> {
+            // do some thing
+            event.getSource().getException().printStackTrace();
+        });
+        getNextTokenService.setOnSucceeded(event -> {
+            Token token = (Token) event.getSource().getValue();
+            nextToken.setValue(token);
+        });
+        getNextTokenService.start();
     }
 
     private void showError(SystemException e) {
@@ -102,11 +153,30 @@ public class TokenEditorDialog extends Dialog<Token> {
         return repositoryTool.saveToken(token);
     }
 
-    public final ObjectProperty<Token> tokenProperty() {
-        return token;
-    }
-
     public final void setToken(Token token) {
         this.token.set(token);
     }
+
+    private class RetrieveTokenService extends Service<Token> {
+
+        private final Token referenceToken;
+        private final boolean next;
+
+        private RetrieveTokenService(Token referenceToken, boolean next) {
+            this.referenceToken = referenceToken;
+            this.next = next;
+        }
+
+        @Override
+        protected Task<Token> createTask() {
+            return new Task<Token>() {
+                @Override
+                protected Token call() throws Exception {
+                    return next ? repositoryTool.getNextToken(referenceToken) :
+                            repositoryTool.getPreviousToken(referenceToken);
+                }
+            };
+        }
+    }
+
 }

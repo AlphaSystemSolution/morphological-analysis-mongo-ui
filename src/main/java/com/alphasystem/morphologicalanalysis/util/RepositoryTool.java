@@ -77,6 +77,61 @@ public class RepositoryTool {
         return tokenRepository.findByDisplayName(displayName);
     }
 
+    private Token getToken(Token oldToken, boolean next) {
+        if (oldToken == null) {
+            return null;
+        }
+        Integer chapterNumber = oldToken.getChapterNumber();
+        Integer verseNumber = oldToken.getVerseNumber();
+        Integer tokenNumber = oldToken.getTokenNumber();
+        boolean theFirstToken = chapterNumber == 1 && verseNumber == 1 && tokenNumber == 1;
+        boolean theLastToken = chapterNumber == 114 && verseNumber == 6 && tokenNumber == 3;
+        if (next && theLastToken) {
+            // no more token beyond this
+            return null;
+        }
+        if (!next && theFirstToken) {
+            // no more token beyond this
+            return null;
+        }
+        Integer newChapterNumber = chapterNumber;
+        Integer newVerseNumber = verseNumber;
+        Integer newTokenNumber = next ? (tokenNumber + 1) : (tokenNumber - 1);
+        Token newToken = new Token(newChapterNumber, newVerseNumber, newTokenNumber, "");
+        newToken = getTokenByDisplayName(newToken.getDisplayName());
+        if (newToken == null) {
+            // if we don't find any token that means "oldToken" was the last token of this verse,
+            // let's move to next verse.
+            newVerseNumber = next ? (verseNumber + 1) : (verseNumber - 1);
+            newTokenNumber = 1;
+            newToken = new Token(newChapterNumber, newVerseNumber, newTokenNumber, "");
+            newToken = getTokenByDisplayName(newToken.getDisplayName());
+            if (newToken == null) {
+                // we still haven't able to find  next token yet, "oldToken" was the last token of this chapter,
+                // let's move to next chapter
+                newChapterNumber = next ? (chapterNumber + 1) : (chapterNumber - 1);
+                newVerseNumber = 1;
+                newTokenNumber = 1;
+                newToken = new Token(newChapterNumber, newVerseNumber, newTokenNumber, "");
+                newToken = getTokenByDisplayName(newToken.getDisplayName());
+                if (newToken == null) {
+                    // this should never happen, raise the flag
+                    throw new IllegalArgumentException(format("No next token found after {%s:%s:%s}",
+                            chapterNumber, verseNumber, tokenNumber));
+                }
+            }
+        }
+        return newToken;
+    }
+
+    public Token getNextToken(Token oldToken) {
+        return getToken(oldToken, true);
+    }
+
+    public Token getPreviousToken(Token oldToken) {
+        return getToken(oldToken, false);
+    }
+
     public Token saveToken(Token token) {
         // A token contains one or more part of speeches and each part of speech has a location corresponding to it.
         // A location has "startIndex" and "endIndex" of letters from the parent token. At the time of initial data
