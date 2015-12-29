@@ -4,8 +4,7 @@ import com.alphasystem.app.sarfengine.conjugation.builder.ConjugationBuilder;
 import com.alphasystem.app.sarfengine.conjugation.model.SarfChart;
 import com.alphasystem.app.sarfengine.guice.GuiceSupport;
 import com.alphasystem.arabic.model.NamedTemplate;
-import com.alphasystem.arabic.ui.Browser;
-import com.alphasystem.morphologicalanalysis.util.SarfChartBuilder;
+import com.alphasystem.morphologicalanalysis.ui.wordbyword.control.SarfChartView;
 import com.alphasystem.morphologicalanalysis.util.SpringContextHelper;
 import javafx.application.Application;
 import javafx.geometry.Rectangle2D;
@@ -13,8 +12,6 @@ import javafx.scene.Scene;
 import javafx.scene.layout.VBox;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-
-import java.io.File;
 
 import static com.alphasystem.arabic.model.ArabicLetterType.*;
 import static com.alphasystem.morphologicalanalysis.morphology.model.support.NounOfPlaceAndTime.NOUN_OF_PLACE_AND_TIME_FORM_IV;
@@ -53,10 +50,9 @@ public class ViewTestApp extends Application {
         SarfChart sarfChart = conjugationBuilder.doConjugation(NamedTemplate.FORM_IV_TEMPLATE, "To submit",
                 false, false, SEEN, LAM, MEEM, singletonList(VERBAL_NOUN_FORM_IV),
                 singletonList(NOUN_OF_PLACE_AND_TIME_FORM_IV));
-        File file = SarfChartBuilder.createChart(sarfChart);
-        Browser browser = new Browser();
-        browser.loadUrl(file.toURI().toURL().toString());
-        vBox.getChildren().addAll(browser);
+        SarfChartView sarfChartView = new SarfChartView();
+        sarfChartView.setSarfChart(sarfChart);
+        vBox.getChildren().addAll(sarfChartView);
 
         Scene scene = new Scene(vBox);
         primaryStage.setMaximized(true);
