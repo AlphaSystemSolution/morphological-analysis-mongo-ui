@@ -109,7 +109,7 @@ public class MorphologicalEntrySkin extends SkinBase<MorphologicalEntryView> {
         textArea.setPrefRowCount(5);
         textArea.setPrefColumnCount(25);
         label.setLabelFor(textArea);
-        textArea.textProperty().bindBidirectional(control.translationProperty());
+        textArea.textProperty().bindBidirectional(control.shortTranslationProperty());
         ScrollPane scrollPane = new ScrollPane();
         scrollPane.setHbarPolicy(AS_NEEDED);
         scrollPane.setVbarPolicy(AS_NEEDED);
