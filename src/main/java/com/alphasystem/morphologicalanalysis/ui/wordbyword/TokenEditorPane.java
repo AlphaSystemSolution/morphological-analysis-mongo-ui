@@ -103,26 +103,7 @@ public class TokenEditorPane extends VBox {
     }
 
     public void loadNextToken() {
-        Token token = nextToken.get();
-        if (token != null) {
-            Chapter chapter = chapterComboBox.getValue();
-            Verse verse = verseComboBox.getValue();
-            Integer chapterNumber = token.getChapterNumber();
-            Integer verseNumber = token.getVerseNumber();
-            if (!chapterNumber.equals(chapter.getChapterNumber())) {
-                int indexOfChapter = binarySearch(chapterComboBox.getItems(), new Chapter(chapterNumber, ""),
-                        new ChapterComparator());
-                chapterComboBox.getSelectionModel().select(indexOfChapter);
-            } else if (!verseNumber.equals(verse.getVerseNumber())) {
-                int indexOfVerse = binarySearch(verseComboBox.getItems(), new Verse(chapterNumber, verseNumber),
-                        new VerseComparator());
-                verseComboBox.getSelectionModel().select(indexOfVerse);
-            } else {
-                int indexOfToken = binarySearch(tokenComboBox.getItems(),
-                        new Token(chapterNumber, verseNumber, token.getTokenNumber(), ""), new TokenComparator());
-                tokenComboBox.getSelectionModel().select(indexOfToken);
-            }
-        }
+        loadToken(nextToken.get());
     }
 
     public void loadPreviousToken() {
@@ -141,22 +122,12 @@ public class TokenEditorPane extends VBox {
                 chapterComboBox.getSelectionModel().select(indexOfChapter);
             }
             Verse verse = verseComboBox.getValue();
-            if (verse == null) {
-                int indexOfVerse = binarySearch(verseComboBox.getItems(), new Verse(chapterNumber, 1),
-                        new VerseComparator());
-                verse = verseComboBox.getItems().get(indexOfVerse);
-            }
             if (!verseNumber.equals(verse.getVerseNumber())) {
                 int indexOfVerse = binarySearch(verseComboBox.getItems(), new Verse(chapterNumber, verseNumber),
                         new VerseComparator());
                 verseComboBox.getSelectionModel().select(indexOfVerse);
             }
             Token token = tokenComboBox.getValue();
-            if (token == null) {
-                int indexOfToken = binarySearch(tokenComboBox.getItems(),
-                        new Token(chapterNumber, verseNumber, 1, ""), new TokenComparator());
-                token = tokenComboBox.getItems().get(indexOfToken);
-            }
             if (!tokenNumber.equals(token.getTokenNumber())) {
                 int indexOfToken = binarySearch(tokenComboBox.getItems(),
                         new Token(chapterNumber, verseNumber, tokenNumber, ""), new TokenComparator());
@@ -195,21 +166,22 @@ public class TokenEditorPane extends VBox {
     private void updateTokenComboBox(Verse verse) {
         tokenComboBox.getItems().clear();
         if (verse != null) {
+            List<Token> tokens = verse.getTokens();
             Integer tokenCount = verse.getTokenCount();
             if (tokenCount <= DEFAULT_INDEX) {
                 Integer chapterNumber = verse.getChapterNumber();
                 Integer verseNumber = verse.getVerseNumber();
                 tokenCount = repositoryTool.getRepositoryUtil().getTokenCount(chapterNumber, verseNumber);
                 verse.setTokenCount(tokenCount);
-                List<Token> tokens = new ArrayList<>();
+                tokens = new ArrayList<>();
                 for (int i = 1; i <= tokenCount; i++) {
                     Token token = new Token(chapterNumber, verseNumber, i, "");
                     tokens.add(token);
                 }
                 verse.setTokens(tokens);
-                tokenComboBox.getItems().addAll(tokens);
-                tokenComboBox.setValue(tokens.get(DEFAULT_INDEX));
             }
+            tokenComboBox.getItems().addAll(tokens);
+            tokenComboBox.setValue(tokens.get(DEFAULT_INDEX));
         }
     }
 
