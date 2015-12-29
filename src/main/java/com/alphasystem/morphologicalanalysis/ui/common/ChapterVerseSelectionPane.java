@@ -20,7 +20,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static com.alphasystem.arabic.ui.util.UiUtilities.defaultCursor;
+import static com.alphasystem.arabic.ui.util.UiUtilities.waitCursor;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.RESOURCE_BUNDLE;
+import static javafx.geometry.Pos.CENTER;
 
 /**
  * @author sali
@@ -40,12 +43,15 @@ public class ChapterVerseSelectionPane extends BorderPane {
         groupMap = VerseTokensPairsReader.read();
 
         Service<List<Chapter>> service = RepositoryTool.getInstance().getAllChapters();
-        service.start();
+        service.setOnReady(event -> waitCursor(this));
         service.setOnSucceeded(event -> {
             chapters = (List<Chapter>) event.getSource().getValue();
             initPane();
             available.setValue(true);
+            defaultCursor(this);
         });
+        service.setOnFailed(event -> defaultCursor(this));
+        service.start();
     }
 
     public BooleanProperty availableProperty() {
@@ -83,6 +89,7 @@ public class ChapterVerseSelectionPane extends BorderPane {
         grid.add(verseComboBox, 1, 1);
 
         HBox hBox = new HBox();
+        hBox.setAlignment(CENTER);
         hBox.setPadding(new Insets(0, 50, 0, 50));
         hBox.getChildren().add(grid);
         setCenter(hBox);
