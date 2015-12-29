@@ -157,6 +157,9 @@ public class LocationPropertiesSkin extends SkinBase<LocationPropertiesView> {
     }
 
     private MorphologicalEntry getMorphologicalEntry(Location location) {
+        if (location == null) {
+            return null;
+        }
         MorphologicalEntry morphologicalEntry = location.getMorphologicalEntry();
         if (morphologicalEntry == null) {
             morphologicalEntry = new MorphologicalEntry();
