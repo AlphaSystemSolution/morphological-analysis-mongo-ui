@@ -9,6 +9,8 @@ import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.TerminalNo
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.AlternateStatus;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.NounStatus;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderStroke;
 import javafx.scene.text.Font;
@@ -22,6 +24,7 @@ import static com.alphasystem.arabic.model.ArabicLetterType.*;
 import static com.alphasystem.arabic.model.ArabicLetters.WORD_SPACE;
 import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.*;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.*;
+import static com.alphasystem.util.AppUtil.getResourceAsStream;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static javafx.scene.layout.BorderStroke.THIN;
@@ -99,5 +102,18 @@ public class Global {
 
     public static FontMetaInfo fromFont(Font font) {
         return new FontMetaInfo(font.getFamily(), "NORMAL", "REGULAR", font.getSize());
+    }
+
+    public static Image getImage(String imageFolder, String imageName) {
+        imageFolder = imageFolder == null ? "" : format("%s.", imageFolder);
+        return new Image(getResourceAsStream(format("images.%s%s", imageFolder, imageName)));
+    }
+
+    public static ImageView getImageView(String imageFolder, String imageName) {
+        return getImageView(getImage(imageFolder, imageName));
+    }
+
+    public static ImageView getImageView(Image image) {
+        return new ImageView(image);
     }
 }
