@@ -25,7 +25,7 @@ public class MorphologicalEntryView extends Control {
     private final ObjectProperty<MorphologicalEntry> morphologicalEntry = new SimpleObjectProperty<>(null, "morphologicalEntry");
     private final ObjectProperty<RootLetters> rootLetters = new SimpleObjectProperty<>(null, "rootLetters");
     private final ObjectProperty<NamedTemplate> form = new SimpleObjectProperty<>(null, "form");
-    private final StringProperty translation = new SimpleStringProperty(null, "translation");
+    private final StringProperty translation = new SimpleStringProperty(null, "shortTranslation");
     private final ObservableSet<VerbalNoun> verbalNouns = observableSet();
     private final ObservableSet<NounOfPlaceAndTime> nounOfPlaceAndTimes = observableSet();
     private final BooleanProperty removePassiveLine = new SimpleBooleanProperty(false, "removePassiveLine");
@@ -35,7 +35,7 @@ public class MorphologicalEntryView extends Control {
         morphologicalEntryProperty().addListener((o, ov, nv) -> setValues(nv));
         rootLettersProperty().addListener((o, ov, nv) -> getMorphologicalEntry().setRootLetters(nv));
         formProperty().addListener((o, ov, nv) -> getMorphologicalEntry().setForm(nv));
-        translationProperty().addListener((o, ov, nv) -> getMorphologicalEntry().setTranslation(nv));
+        translationProperty().addListener((o, ov, nv) -> getMorphologicalEntry().setShortTranslation(nv));
         removePassiveLineProperty().addListener((o, ov, nv) -> {
             ConjugationConfiguration configuration = getMorphologicalEntry().getConfiguration();
             if (configuration == null) {
@@ -90,7 +90,7 @@ public class MorphologicalEntryView extends Control {
             this.nounOfPlaceAndTimes.addAll(nounOfPlaceAndTimes);
 
             setForm(morphologicalEntry.getForm());
-            setTranslation(morphologicalEntry.getTranslation());
+            setTranslation(morphologicalEntry.getShortTranslation());
             ConjugationConfiguration configuration = morphologicalEntry.getConfiguration();
             if (configuration != null) {
                 setRemovePassiveLine(configuration.isRemovePassiveLine());

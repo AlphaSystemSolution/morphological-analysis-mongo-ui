@@ -105,7 +105,7 @@ public class Global {
     }
 
     public static Image getImage(String imageFolder, String imageName) {
-        imageFolder = imageFolder == null ? "" : format("%s.", imageFolder);
+        imageFolder = (imageFolder == null) ? "" : format("%s.", imageFolder);
         return new Image(getResourceAsStream(format("images.%s%s", imageFolder, imageName)));
     }
 

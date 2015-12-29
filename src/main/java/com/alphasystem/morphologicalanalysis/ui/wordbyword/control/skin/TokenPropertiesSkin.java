@@ -222,7 +222,7 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
                             RootLetters rootLetters = entry.getRootLetters();
                             List<VerbalNoun> verbalNouns = new ArrayList<>(entry.getVerbalNouns());
                             List<NounOfPlaceAndTime> nounOfPlaceAndTimes = new ArrayList<>(entry.getNounOfPlaceAndTimes());
-                            return conjugationBuilder.doConjugation(entry.getForm(), entry.getTranslation(),
+                            return conjugationBuilder.doConjugation(entry.getForm(), entry.getShortTranslation(),
                                     removePassiveLine, skipRuleProcessing, rootLetters.getFirstRadical(),
                                     rootLetters.getSecondRadical(), rootLetters.getThirdRadical(),
                                     rootLetters.getFourthRadical(), verbalNouns, nounOfPlaceAndTimes);
