@@ -27,6 +27,7 @@ import static javafx.stage.Modality.NONE;
 /**
  * @author sali
  */
+@Deprecated
 public class TokenEditorDialog extends Dialog<Token> {
 
     private final ObjectProperty<Token> token = new SimpleObjectProperty<>(null, "token");

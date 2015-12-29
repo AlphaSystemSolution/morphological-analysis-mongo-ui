@@ -9,7 +9,6 @@ import com.alphasystem.morphologicalanalysis.ui.dependencygraph.TreeBankPane;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.DependencyGraphAdapter;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.GraphMetaInfoAdapter;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.CanvasUtil;
-import com.alphasystem.morphologicalanalysis.ui.wordbyword.control.TokenEditorDialog;
 import com.alphasystem.morphologicalanalysis.ui.wordbyword.model.TableCellModel;
 import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
@@ -51,18 +50,15 @@ public class WordByWordPane extends BorderPane {
     private static Map<String, List<Token>> cache = new LinkedHashMap<>();
     private final ObjectProperty<Action> action = new SimpleObjectProperty<>();
     private ChapterVerseSelectionPane chapterVerseSelectionPane;
-    private TokenEditorDialog tokenEditorDialog;
     private GraphMetaInfoSelectionDialog graphMetaInfoSelectionDialog;
     private TableView<TableCellModel> tableView;
 
     @SuppressWarnings({"unchecked"})
     public WordByWordPane() {
-        tokenEditorDialog = new TokenEditorDialog();
         chapterVerseSelectionPane = new ChapterVerseSelectionPane();
         chapterVerseSelectionPane.availableProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue) {
                 initPane();
-                tokenEditorDialog.setToken(RepositoryTool.getInstance().getTokenByDisplayName("1:1:1"));
             }
         });
         graphMetaInfoSelectionDialog = new GraphMetaInfoSelectionDialog();
@@ -135,23 +131,6 @@ public class WordByWordPane extends BorderPane {
         checkBoxColumn.setCellFactory(CheckBoxTableCell.forTableColumn(checkBoxColumn));
 
         tableView = new TableView<>();
-        tableView.setRowFactory(tv -> {
-            TableRow<TableCellModel> row = new TableRow<>();
-            row.setOnMouseClicked(event -> {
-                if (event.getClickCount() == 2) {
-                    TableCellModel model = tableView.getItems().get(row.getIndex());
-                    Token token = model.getToken();
-                    tokenEditorDialog.setToken(token);
-                    try {
-                        Optional<Token> result = tokenEditorDialog.showAndWait();
-                        result.ifPresent(model::setToken);
-                    } catch (Exception e) {
-                        // do nothing
-                    }
-                }
-            });
-            return row;
-        });
         tableView.setEditable(true);
         tableView.getColumns().addAll(descriptionColumn, tokenColumn, tokenNumberColumn, checkBoxColumn);
 
