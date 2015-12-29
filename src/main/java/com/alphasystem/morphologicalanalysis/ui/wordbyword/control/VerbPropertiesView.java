@@ -18,6 +18,7 @@ public class VerbPropertiesView extends AbstractPropertiesView<VerbProperties> {
     private final ObjectProperty<IncompleteVerbCategory> incompleteVerbCategory = new SimpleObjectProperty<>(null, "incompleteVerbCategory");
     private final ObjectProperty<IncompleteVerbType> incompleteVerbType = new SimpleObjectProperty<>(null, "incompleteVerbType");
 
+    @SuppressWarnings({"unchecked"})
     public VerbPropertiesView() {
         super();
         conversationTypeProperty().addListener((o, ov, nv) -> {

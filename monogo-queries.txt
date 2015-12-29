@@ -1,0 +1,18 @@
+db.dependencyGraph.find({
+	'chapterNumber': 1, 
+	$or:[
+	{'tokens': {$elemMatch: {'verseNumber': 1}}},
+	{'tokens': {$elemMatch: {'verseNumber': 2}}}
+	]
+	})
+	
+
+{'chapterNumber': 1, $or: [{'verseNumber': 3, 'tokenNumber': {$gte: 1}, 'tokenNumber': {$lte: 2}}, {'verseNumber': 4, 'tokenNumber': {$gte: 1}, 'tokenNumber': {$lte: 3}}]}
+	
+db.token.find({
+	'chapterNumber': 1, 
+	$or: [
+	{'verseNumber': 3, 'tokenNumber': {$gte: 1}, 'tokenNumber': {$lte: 2}},
+	{'verseNumber': 4, 'tokenNumber': {$gte: 1}, 'tokenNumber': {$lte: 3}}
+	]
+	})

@@ -14,6 +14,7 @@ import com.alphasystem.morphologicalanalysis.morphology.model.support.NounOfPlac
 import com.alphasystem.morphologicalanalysis.morphology.model.support.VerbalNoun;
 import com.alphasystem.morphologicalanalysis.ui.common.LocationListCell;
 import com.alphasystem.morphologicalanalysis.ui.wordbyword.control.LocationPropertiesView;
+import com.alphasystem.morphologicalanalysis.ui.wordbyword.control.SarfChartView;
 import com.alphasystem.morphologicalanalysis.ui.wordbyword.control.TokenPropertiesView;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
@@ -27,17 +28,13 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
-import java.io.File;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.alphasystem.arabic.ui.util.FontConstants.ARABIC_FONT_36;
-import static com.alphasystem.arabic.ui.util.UiUtilities.defaultCursor;
-import static com.alphasystem.arabic.ui.util.UiUtilities.waitCursor;
+import static com.alphasystem.arabic.ui.util.UiUtilities.*;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.*;
 import static com.alphasystem.morphologicalanalysis.ui.wordbyword.control.TokenPropertiesView.SelectionStatus.*;
-import static com.alphasystem.morphologicalanalysis.util.SarfChartBuilder.createChart;
 import static com.alphasystem.util.AppUtil.isGivenType;
 import static java.lang.String.format;
 import static javafx.geometry.NodeOrientation.RIGHT_TO_LEFT;
@@ -55,7 +52,7 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
     private final BorderPane lettersPane;
     private final TabPane tabPane;
     private final Browser browser;
-    private final Browser conjugationBrowser;
+    private final SarfChartView conjugationViewer;
     private final Tab browseDictionaryTab;
     private final Tab morphologicalConjugationTab;
     private ConjugationBuilder conjugationBuilder = GuiceSupport.getInstance().getConjugationBuilderFactory()
@@ -68,7 +65,7 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
         lettersPane.setBorder(BORDER);
 
         browser = new Browser();
-        conjugationBrowser = new Browser();
+        conjugationViewer = new SarfChartView();
 
         tabPane = new TabPane();
         tabPane.setTabClosingPolicy(UNAVAILABLE);
@@ -77,7 +74,8 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
         browseDictionaryTab = new Tab("Browse Dictionary", browser);
         browseDictionaryTab.setDisable(true);
 
-        morphologicalConjugationTab = new Tab("Morphological Conjugation", conjugationBrowser);
+
+        morphologicalConjugationTab = new Tab("Morphological Conjugation", wrapInScrollPane(conjugationViewer));
         morphologicalConjugationTab.setDisable(true);
 
         locationComboBox = new ComboBox<>();
@@ -233,12 +231,7 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
             service.setOnSucceeded(event -> {
                 defaultCursor(getSkinnable());
                 SarfChart sarfChart = (SarfChart) event.getSource().getValue();
-                File file = createChart(sarfChart);
-                try {
-                    conjugationBrowser.loadUrl(file.toURI().toURL().toString());
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                }
+                conjugationViewer.setSarfChart(sarfChart);
             });
             service.setOnFailed(event -> {
                 defaultCursor(getSkinnable());
