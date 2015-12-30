@@ -11,7 +11,8 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
-import static com.alphasystem.morphologicalanalysis.ui.common.Global.getImageView;
+import static de.jensd.fx.glyphs.GlyphsDude.setIcon;
+import static de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon.*;
 import static javafx.scene.input.KeyCode.*;
 import static javafx.scene.input.KeyCombination.ALT_DOWN;
 import static javafx.scene.input.KeyCombination.SHORTCUT_DOWN;
@@ -64,21 +65,21 @@ public class TokenEditorApp extends Application {
 
         toolbarButton = new Button();
         toolbarButton.setTooltip(new Tooltip("Save current token"));
-        toolbarButton.setGraphic(getImageView("24x24", "save-icon.png"));
+        setIcon(toolbarButton, SAVE, "2em");
         toolbarButton.disableProperty().bind(tokenEditorPane.token().isNull());
         toolbarButton.setOnAction(event -> tokenEditorPane.saveToken());
         toolBar.getItems().add(toolbarButton);
 
         toolbarButton = new Button();
         toolbarButton.setTooltip(new Tooltip("Go to next token"));
-        toolbarButton.setGraphic(getImageView("24x24", "next-icon.png"));
+        setIcon(toolbarButton, ANGLE_DOUBLE_RIGHT, "2em");
         toolbarButton.disableProperty().bind(tokenEditorPane.nextToken().isNull());
         toolbarButton.setOnAction(event -> tokenEditorPane.loadNextToken());
         toolBar.getItems().add(toolbarButton);
 
         toolbarButton = new Button();
         toolbarButton.setTooltip(new Tooltip("Go to previous token"));
-        toolbarButton.setGraphic(getImageView("24x24", "previous-icon.png"));
+        setIcon(toolbarButton, ANGLE_DOUBLE_LEFT, "2em");
         toolbarButton.disableProperty().bind(tokenEditorPane.previousToken().isNull());
         toolbarButton.setOnAction(event -> tokenEditorPane.loadPreviousToken());
         toolBar.getItems().add(toolbarButton);
@@ -94,19 +95,22 @@ public class TokenEditorApp extends Application {
         Menu menu = new Menu("File");
         menu.setAccelerator(new KeyCodeCombination(F));
 
-        menuItem = new MenuItem("Save", getImageView("16x16", "save-icon.png"));
+        menuItem = new MenuItem("Save");
+        setIcon(menuItem, SAVE);
         menuItem.disableProperty().bind(tokenEditorPane.token().isNull());
         menuItem.setAccelerator(new KeyCodeCombination(S, SHORTCUT_DOWN));
         menuItem.setOnAction(event -> tokenEditorPane.saveToken());
         menu.getItems().add(menuItem);
 
-        menuItem = new MenuItem("Next", getImageView("16x16", "next-icon.png"));
+        menuItem = new MenuItem("Next");
+        setIcon(menuItem, ANGLE_DOUBLE_RIGHT);
         menuItem.disableProperty().bind(tokenEditorPane.nextToken().isNull());
         menuItem.setAccelerator(new KeyCodeCombination(RIGHT, SHORTCUT_DOWN));
         menuItem.setOnAction(event -> tokenEditorPane.loadNextToken());
         menu.getItems().add(menuItem);
 
-        menuItem = new MenuItem("Previous", getImageView("16x16", "previous-icon.png"));
+        menuItem = new MenuItem("Previous");
+        setIcon(menuItem, ANGLE_DOUBLE_LEFT);
         menuItem.disableProperty().bind(tokenEditorPane.previousToken().isNull());
         menuItem.setAccelerator(new KeyCodeCombination(LEFT, SHORTCUT_DOWN));
         menuItem.setOnAction(event -> tokenEditorPane.loadPreviousToken());

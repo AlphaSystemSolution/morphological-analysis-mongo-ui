@@ -100,7 +100,7 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
                 }
             }
             if (isGivenType(NamedTemplate.class, nv)) {
-                NamedTemplate form = (NamedTemplate) nv;
+                @SuppressWarnings("ConstantConditions") NamedTemplate form = (NamedTemplate) nv;
                 Location location = locationPropertiesView.getLocation();
                 MorphologicalEntry morphologicalEntry = location.getMorphologicalEntry();
                 if (morphologicalEntry != null) {
@@ -238,9 +238,7 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
                 SarfChart sarfChart = (SarfChart) event.getSource().getValue();
                 conjugationViewer.setSarfChart(sarfChart);
             });
-            service.setOnFailed(event -> {
-                defaultCursor(getSkinnable());
-            });
+            service.setOnFailed(event -> defaultCursor(getSkinnable()));
             service.start();
         }
     }
