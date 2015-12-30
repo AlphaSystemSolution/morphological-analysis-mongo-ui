@@ -34,6 +34,7 @@ import static java.lang.String.format;
 import static java.util.Collections.binarySearch;
 import static javafx.geometry.Pos.CENTER;
 import static javafx.scene.control.Alert.AlertType.ERROR;
+import static javafx.scene.control.Alert.AlertType.INFORMATION;
 
 /**
  * @author sali
@@ -99,6 +100,9 @@ public class TokenEditorPane extends VBox {
             }
         }
         token = repositoryTool.saveToken(token);
+        Alert alert = new Alert(INFORMATION);
+        alert.setContentText(format("Token \"%s\" has been saved.", token));
+        alert.showAndWait();
         int selectedLocationIndex = tokenPropertiesView.getSelectedLocationIndex();
         updateToken(null);
         updateToken(token);
