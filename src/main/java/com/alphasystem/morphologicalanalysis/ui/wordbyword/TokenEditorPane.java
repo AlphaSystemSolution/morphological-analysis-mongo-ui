@@ -98,8 +98,11 @@ public class TokenEditorPane extends VBox {
                 return;
             }
         }
-        System.out.println("Saving");
-        repositoryTool.saveToken(token);
+        token = repositoryTool.saveToken(token);
+        int selectedLocationIndex = tokenPropertiesView.getSelectedLocationIndex();
+        updateToken(null);
+        updateToken(token);
+        tokenPropertiesView.setSelectedLocation(selectedLocationIndex);
     }
 
     public void loadNextToken() {
@@ -186,6 +189,7 @@ public class TokenEditorPane extends VBox {
     }
 
     private void updateToken(Token token) {
+        System.out.println();
         Token t = null;
         if (token != null) {
             t = repositoryTool.getTokenByDisplayName(token.getDisplayName());

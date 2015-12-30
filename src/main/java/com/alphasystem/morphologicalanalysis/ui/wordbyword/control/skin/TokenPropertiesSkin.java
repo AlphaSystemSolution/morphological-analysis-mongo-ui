@@ -177,6 +177,11 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
             }
             createLettersPane();
         });
+        view.selectedLocationProperty().addListener((o, ov, nv) -> {
+            if (nv != null) {
+                locationComboBox.setValue(nv);
+            }
+        });
         gridPane.setBorder(BORDER);
         return gridPane;
     }

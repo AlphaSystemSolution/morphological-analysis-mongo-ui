@@ -63,6 +63,20 @@ public class TokenPropertiesView extends Control {
         return labels;
     }
 
+    public ObjectProperty<Location> selectedLocationProperty() {
+        return selectedLocation;
+    }
+
+    public final void setSelectedLocation(int index) {
+        Location location = getToken().getLocations().get(index);
+        selectedLocation.setValue(location);
+    }
+
+    public final int getSelectedLocationIndex() {
+        Location location = selectedLocation.get();
+        return getToken().getLocations().indexOf(location);
+    }
+
     /**
      * Updates the current token and selected location for start and end indices.
      * <div></div>
