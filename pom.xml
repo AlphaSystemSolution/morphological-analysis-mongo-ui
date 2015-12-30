@@ -69,6 +69,23 @@
                 </plugins>
             </build>
         </profile>
+        <profile>
+            <id>tokeneditor</id>
+            <properties>
+                <mainClass>com.alphasystem.morphologicalanalysis.ui.wordbyword.TokenEditorApp</mainClass>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-jar-plugin</artifactId>
+                        <configuration>
+                            <classifier>tokeneditor</classifier>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
     <dependencies>
         <dependency>
