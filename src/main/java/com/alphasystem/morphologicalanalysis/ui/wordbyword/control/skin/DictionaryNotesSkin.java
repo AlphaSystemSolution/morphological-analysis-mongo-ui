@@ -1,7 +1,7 @@
 package com.alphasystem.morphologicalanalysis.ui.wordbyword.control.skin;
 
 import com.alphasystem.arabic.ui.Browser;
-import com.alphasystem.arabickeyboard.ui.KeyboardView;
+import com.alphasystem.arabic.ui.keyboard.KeyboardView;
 import com.alphasystem.morphologicalanalysis.morphology.model.DictionaryNotes;
 import com.alphasystem.morphologicalanalysis.morphology.model.RootLetters;
 import com.alphasystem.morphologicalanalysis.ui.common.Global;
@@ -69,7 +69,6 @@ public class DictionaryNotesSkin extends SkinBase<DictionaryNotesView> {
 
         keyboardView = new KeyboardView();
         keyboardView.setTarget(editor);
-        keyboardView.setStyle("-fx-background-color: beige;-fx-border-color: #2e8b57;-fx-border-width: 2px;-fx-padding: 10;-fx-spacing: 8;");
         keyboardView.setOnMouseClicked(event -> keyboardView.requestFocus());
         keyboardPopup = new Popup();
         keyboardPopup.setAutoHide(true);

@@ -124,11 +124,6 @@
             <version>${svg-model.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.alphasystem.arabic</groupId>
-            <artifactId>arabic-keyboard-ui</artifactId>
-            <version>${arabic-keyboard-ui.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
         </dependency>
@@ -146,7 +141,6 @@
         <ma-repository.version>${project.version}</ma-repository.version>
         <sarf-engine.version>${project.version}</sarf-engine.version>
         <arabic-ui-support.version>${project.version}</arabic-ui-support.version>
-        <arabic-keyboard-ui.version>${project.version}</arabic-keyboard-ui.version>
         <maven.test.skip>true</maven.test.skip>
         <genOutputDirectory>${project.build.directory}/generated/src/main/java</genOutputDirectory>
     </properties>
