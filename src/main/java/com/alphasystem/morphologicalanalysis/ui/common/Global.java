@@ -17,6 +17,15 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.FileSystem;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -24,8 +33,10 @@ import static com.alphasystem.arabic.model.ArabicLetterType.*;
 import static com.alphasystem.arabic.model.ArabicLetters.WORD_SPACE;
 import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.*;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.*;
-import static com.alphasystem.util.AppUtil.getResourceAsStream;
+import static com.alphasystem.util.AppUtil.*;
 import static java.lang.String.format;
+import static java.nio.file.FileSystems.newFileSystem;
+import static java.nio.file.Paths.get;
 import static java.util.Arrays.asList;
 import static javafx.scene.layout.BorderStroke.THIN;
 import static javafx.scene.layout.BorderStrokeStyle.SOLID;
@@ -38,6 +49,9 @@ import static javafx.scene.text.Font.font;
  */
 public class Global {
 
+    public static final File DEFAULT_WORD_BY_WORD_WORKING_DIRECTORY = new File(USER_HOME_DIR, ".wordbyword");
+    public static final File DEFAULT_DICTIONARY_DIRECTORY = new File(DEFAULT_WORD_BY_WORD_WORKING_DIRECTORY, "dictionary");
+    public static final File DEFAULT_CSS_DIRECTORY = new File(DEFAULT_DICTIONARY_DIRECTORY, "css");
     public static final String SPACE_STR = WORD_SPACE.toUnicode();
     public static final ArabicWord FI_MAHL = ArabicWord.getWord(FA, YA, SPACE, MEEM, HHA, LAM);
     public static final List<GraphNodeType> TERMINALS = asList(TERMINAL, IMPLIED, HIDDEN, REFERENCE);
@@ -62,6 +76,10 @@ public class Global {
     public static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("resources");
     public static final String MAWRID_READER_URL = System.getProperty("mawrid-reader.url");
     private static Global instance;
+
+    static {
+        DEFAULT_CSS_DIRECTORY.mkdirs();
+    }
 
     private Global() {
     }
@@ -115,5 +133,34 @@ public class Global {
 
     public static ImageView getImageView(Image image) {
         return new ImageView(image);
+    }
+
+    public static List<String> readAllLines(String resourceName) throws IOException, URISyntaxException {
+        FileSystem fs = null;
+        List<String> lines = null;
+        try {
+            URL url = getResource(resourceName);
+            URI uri = url.toURI();
+            Path path;
+            String[] split = uri.toString().split("!");
+            if (split != null && split.length > 1) {
+                fs = newFileSystem(URI.create(split[0]), new HashMap());
+                path = fs.getPath(split[1]);
+            } else {
+                path = get(uri);
+            }
+            lines = Files.readAllLines(path);
+        } catch (IOException | URISyntaxException e) {
+            throw e;
+        } finally {
+            if (fs != null) {
+                try {
+                    fs.close();
+                } catch (IOException e) {
+                }
+            }
+        }
+
+        return lines;
     }
 }

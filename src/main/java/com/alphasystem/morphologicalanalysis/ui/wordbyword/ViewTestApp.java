@@ -1,10 +1,9 @@
 package com.alphasystem.morphologicalanalysis.ui.wordbyword;
 
-import com.alphasystem.app.sarfengine.conjugation.builder.ConjugationBuilder;
-import com.alphasystem.app.sarfengine.conjugation.model.SarfChart;
-import com.alphasystem.app.sarfengine.guice.GuiceSupport;
-import com.alphasystem.arabic.model.NamedTemplate;
-import com.alphasystem.morphologicalanalysis.ui.wordbyword.control.SarfChartView;
+import com.alphasystem.arabic.model.ArabicLetterType;
+import com.alphasystem.morphologicalanalysis.morphology.model.DictionaryNotes;
+import com.alphasystem.morphologicalanalysis.morphology.model.RootLetters;
+import com.alphasystem.morphologicalanalysis.ui.wordbyword.control.DictionaryNotesView;
 import com.alphasystem.morphologicalanalysis.util.SpringContextHelper;
 import javafx.application.Application;
 import javafx.geometry.Rectangle2D;
@@ -12,11 +11,6 @@ import javafx.scene.Scene;
 import javafx.scene.layout.VBox;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-
-import static com.alphasystem.arabic.model.ArabicLetterType.*;
-import static com.alphasystem.morphologicalanalysis.morphology.model.support.NounOfPlaceAndTime.NOUN_OF_PLACE_AND_TIME_FORM_IV;
-import static com.alphasystem.morphologicalanalysis.morphology.model.support.VerbalNoun.VERBAL_NOUN_FORM_IV;
-import static java.util.Collections.singletonList;
 
 /**
  * @author sali
@@ -45,14 +39,12 @@ public class ViewTestApp extends Application {
         VBox vBox = new VBox();
         vBox.setSpacing(10);
 
-        ConjugationBuilder conjugationBuilder = GuiceSupport.getInstance().getConjugationBuilderFactory()
-                .getConjugationBuilder();
-        SarfChart sarfChart = conjugationBuilder.doConjugation(NamedTemplate.FORM_IV_TEMPLATE, "To submit",
-                false, false, SEEN, LAM, MEEM, singletonList(VERBAL_NOUN_FORM_IV),
-                singletonList(NOUN_OF_PLACE_AND_TIME_FORM_IV));
-        SarfChartView sarfChartView = new SarfChartView();
-        sarfChartView.setSarfChart(sarfChart);
-        vBox.getChildren().addAll(sarfChartView);
+        DictionaryNotesView view = new DictionaryNotesView();
+        DictionaryNotes dictionaryNotes = new DictionaryNotes();
+        RootLetters rootLetters = new RootLetters(ArabicLetterType.NOON, ArabicLetterType.SAD, ArabicLetterType.RA);
+        dictionaryNotes.setRootLetters(rootLetters);
+        view.setDictionaryNotes(dictionaryNotes);
+        vBox.getChildren().addAll(view);
 
         Scene scene = new Scene(vBox);
         primaryStage.setMaximized(true);
