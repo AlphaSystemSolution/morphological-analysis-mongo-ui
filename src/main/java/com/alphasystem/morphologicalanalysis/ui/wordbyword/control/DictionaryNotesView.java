@@ -47,8 +47,14 @@ public class DictionaryNotesView extends Control {
         return previewFileName.get();
     }
 
+    public final void selectSource() {
+        ((DictionaryNotesSkin) getSkin()).selectSource();
+    }
+
     @Override
     protected Skin<?> createDefaultSkin() {
-        return new DictionaryNotesSkin(this);
+        DictionaryNotesSkin skin = new DictionaryNotesSkin(this);
+        setSkin(skin);
+        return skin;
     }
 }
