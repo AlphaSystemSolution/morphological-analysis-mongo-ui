@@ -13,6 +13,7 @@ import com.alphasystem.morphologicalanalysis.morphology.model.MorphologicalEntry
 import com.alphasystem.morphologicalanalysis.morphology.model.RootLetters;
 import com.alphasystem.morphologicalanalysis.morphology.model.support.NounOfPlaceAndTime;
 import com.alphasystem.morphologicalanalysis.morphology.model.support.VerbalNoun;
+import com.alphasystem.morphologicalanalysis.morphology.repository.DictionaryNotesRepository;
 import com.alphasystem.morphologicalanalysis.ui.common.LocationListCell;
 import com.alphasystem.morphologicalanalysis.ui.wordbyword.control.DictionaryNotesView;
 import com.alphasystem.morphologicalanalysis.ui.wordbyword.control.LocationPropertiesView;
@@ -29,6 +30,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,6 +63,9 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
     private final Tab dictionaryNotesTab;
     private ConjugationBuilder conjugationBuilder = GuiceSupport.getInstance().getConjugationBuilderFactory()
             .getConjugationBuilder();
+
+    @Autowired
+    private DictionaryNotesRepository dictionaryNotesRepository;
 
     public TokenPropertiesSkin(TokenPropertiesView control) {
         super(control);
@@ -108,8 +113,7 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
                     enableTabs(rootLetters, morphologicalEntry.getForm());
                     if (oldRootLetters != null && !oldRootLetters.equals(rootLetters)) {
                         // we have change in root letters
-                        DictionaryNotes dictionaryNotes = new DictionaryNotes();
-                        dictionaryNotes.setRootLetters(rootLetters);
+                        DictionaryNotes dictionaryNotes = getDictionaryNotes(rootLetters);
                         morphologicalEntry.setDictionaryNotes(dictionaryNotes);
                         dictionaryNotesView.setDictionaryNotes(dictionaryNotes);
                     }
@@ -227,13 +231,25 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
             MorphologicalEntry morphologicalEntry = location.getMorphologicalEntry();
             DictionaryNotes dictionaryNotes = morphologicalEntry.getDictionaryNotes();
             if (dictionaryNotes == null) {
-                dictionaryNotes = new DictionaryNotes();
-                dictionaryNotes.setRootLetters(morphologicalEntry.getRootLetters());
+                dictionaryNotes = getDictionaryNotes(morphologicalEntry.getRootLetters());
                 morphologicalEntry.setDictionaryNotes(dictionaryNotes);
             }
             dictionaryNotesView.setDictionaryNotes(dictionaryNotes);
         }
         dictionaryNotesTab.setDisable(disable);
+    }
+
+    private DictionaryNotes getDictionaryNotes(final RootLetters rootLetters) {
+        DictionaryNotes dictionaryNotes = null;
+        if (rootLetters != null && !rootLetters.isEmpty()) {
+            dictionaryNotes = dictionaryNotesRepository.findByDisplayName(rootLetters.getDisplayName());
+            if (dictionaryNotes == null) {
+                dictionaryNotes = new DictionaryNotes();
+                dictionaryNotes.setRootLetters(rootLetters);
+            }
+        }
+
+        return dictionaryNotes;
     }
 
     private void loadConjugation(final MorphologicalEntry entry) {
