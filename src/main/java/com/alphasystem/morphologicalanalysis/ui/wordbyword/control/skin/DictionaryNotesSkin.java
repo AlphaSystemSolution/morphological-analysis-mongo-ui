@@ -4,7 +4,6 @@ import com.alphasystem.arabic.ui.Browser;
 import com.alphasystem.arabic.ui.keyboard.KeyboardView;
 import com.alphasystem.morphologicalanalysis.morphology.model.DictionaryNotes;
 import com.alphasystem.morphologicalanalysis.morphology.model.RootLetters;
-import com.alphasystem.morphologicalanalysis.ui.common.Global;
 import com.alphasystem.morphologicalanalysis.ui.wordbyword.control.DictionaryNotesView;
 import com.alphasystem.morphologicalanalysis.ui.wordbyword.model.AsciiDocStyle;
 import de.jensd.fx.glyphs.GlyphIcons;
@@ -77,6 +76,7 @@ public class DictionaryNotesSkin extends SkinBase<DictionaryNotesView> {
     private final KeyboardView keyboardView;
     private final TextArea editor = new TextArea();
     private final Browser preview = new Browser();
+    private final TabPane tabPane = new TabPane();
 
     public DictionaryNotesSkin(DictionaryNotesView control) {
         super(control);
@@ -92,15 +92,14 @@ public class DictionaryNotesSkin extends SkinBase<DictionaryNotesView> {
         initializeSkin();
         getSkinnable().dictionaryNotesProperty().addListener((o, ov, nv) -> populateEditor(nv));
         populateEditor(getSkinnable().getDictionaryNotes());
-        try {
-            preview.loadUrl(new File(Global.DEFAULT_DICTIONARY_DIRECTORY, getSkinnable().getPreviewFileName()).toURI().toURL().toString());
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
     }
 
     private static String formatText(String source, String prefix, String suffix) {
         return format("%s%s%s", prefix, source, suffix);
+    }
+
+    public void selectSource() {
+        tabPane.getSelectionModel().select(0);
     }
 
     private void initializeSkin() {
@@ -110,7 +109,6 @@ public class DictionaryNotesSkin extends SkinBase<DictionaryNotesView> {
         editor.setFont(Font.font("Courier New", NORMAL, REGULAR, 16.0));
         borderPane.setCenter(new StackPane(wrapInScrollPane(editor)));
 
-        TabPane tabPane = new TabPane();
         tabPane.setTabClosingPolicy(UNAVAILABLE);
         tabPane.setSide(BOTTOM);
         Tab previewTab = new Tab("Preview", preview);
@@ -208,9 +206,23 @@ public class DictionaryNotesSkin extends SkinBase<DictionaryNotesView> {
         saveService.setOnSucceeded(event -> {
             defaultCursor(getSkinnable());
             preview.setDisable(false);
-            preview.getWebEngine().reload();
+            loadPreview();
         });
         saveService.start();
+    }
+
+    private void loadPreview() {
+        String location = preview.getWebEngine().getLocation();
+        if (location == null) {
+            File file = new File(DEFAULT_DICTIONARY_DIRECTORY, getSkinnable().getPreviewFileName());
+            try {
+                preview.loadUrl(file.toURI().toURL().toString());
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
+        } else {
+            preview.getWebEngine().reload();
+        }
     }
 
     private void insertHeading() {
