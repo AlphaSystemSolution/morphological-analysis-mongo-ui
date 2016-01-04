@@ -2031,12 +2031,14 @@ p {
     }
 }
 
-.arabic-heading1 {
+.arabic-heading1, .arabic-normal {
     font-family: "Arabic Typesetting";
+}
+
+.arabic-heading1 {
     color: #1569C7;
 }
 
 .arabic-normal {
-    font-family: "Arabic Typesetting";
     font-size: 2em;
 }
