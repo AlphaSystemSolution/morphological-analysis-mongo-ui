@@ -94,27 +94,28 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
         group.setHeight(64);
         group.setFont(ARABIC_FONT_36);
 
+        final Location location = locationPropertiesView.getLocation();
+        final MorphologicalEntry morphologicalEntry = location.getMorphologicalEntry();
         locationPropertiesView.updatedPropertyProperty().addListener((o, ov, nv) -> {
             if (nv == null) {
                 return;
             }
             if (isGivenType(RootLetters.class, nv)) {
                 RootLetters rootLetters = (RootLetters) nv;
+                RootLetters oldRootLetters = (RootLetters) ov;
                 loadDictionary(rootLetters);
-                Location location = locationPropertiesView.getLocation();
-                MorphologicalEntry morphologicalEntry = location.getMorphologicalEntry();
                 if (morphologicalEntry != null) {
                     enableTabs(rootLetters, morphologicalEntry.getForm());
+                    if (oldRootLetters != null && !oldRootLetters.equals(rootLetters)) {
+                        // we have change in root letters
+                        DictionaryNotes dictionaryNotes = new DictionaryNotes();
+                        dictionaryNotes.setRootLetters(rootLetters);
+                        morphologicalEntry.setDictionaryNotes(dictionaryNotes);
+                        dictionaryNotesView.setDictionaryNotes(dictionaryNotes);
+                    }
                 }
-                RootLetters oldRootLetters = (RootLetters) ov;
-                if (oldRootLetters != null && !oldRootLetters.equals(rootLetters)) {
-                    // we have change in
-                }
-            }
-            if (isGivenType(NamedTemplate.class, nv)) {
-                @SuppressWarnings("ConstantConditions") NamedTemplate form = (NamedTemplate) nv;
-                Location location = locationPropertiesView.getLocation();
-                MorphologicalEntry morphologicalEntry = location.getMorphologicalEntry();
+            } else if (isGivenType(NamedTemplate.class, nv)) {
+                NamedTemplate form = (NamedTemplate) nv;
                 if (morphologicalEntry != null) {
                     enableTabs(morphologicalEntry.getRootLetters(), form);
                 }
