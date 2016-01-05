@@ -52,14 +52,14 @@ public class LocationPropertiesSkin extends SkinBase<LocationPropertiesView> {
             changePropertiesView(view.getLocation().getProperties());
         });
         morphologicalEntryView.rootLettersProperty().addListener((o, ov, nv) -> {
-            sendUpdatePropertyNotification(view, nv);
+            getSkinnable().setRootLetters(nv);
             if (nv != null && !nv.isEmpty()) {
                 MorphologicalEntry morphologicalEntry = morphologicalEntryView.getMorphologicalEntry();
                 retrieveEntry(morphologicalEntry, nv, morphologicalEntry.getForm());
             }
         });
         morphologicalEntryView.formProperty().addListener((o, ov, nv) -> {
-            sendUpdatePropertyNotification(view, nv);
+            getSkinnable().setForm(nv);
             if (nv != null) {
                 MorphologicalEntry morphologicalEntry = morphologicalEntryView.getMorphologicalEntry();
                 retrieveEntry(morphologicalEntry, morphologicalEntry.getRootLetters(), nv);
@@ -113,11 +113,6 @@ public class LocationPropertiesSkin extends SkinBase<LocationPropertiesView> {
             source.getException().printStackTrace();
         });
         service.start();
-    }
-
-    private void sendUpdatePropertyNotification(LocationPropertiesView view, Object nv) {
-        view.setUpdatedProperty(null);
-        view.setUpdatedProperty(nv);
     }
 
     private void changePropertiesView(AbstractProperties properties) {
