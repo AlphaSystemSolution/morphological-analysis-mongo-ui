@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Set;
 
 import static com.alphasystem.arabic.model.ArabicWord.fromBuckWalterString;
+import static com.alphasystem.arabic.ui.keyboard.KeyboardView.OutputType.HTML;
 import static com.alphasystem.arabic.ui.util.UiUtilities.*;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.*;
 import static com.alphasystem.util.AppUtil.NEW_LINE;
@@ -88,6 +89,7 @@ public class DictionaryNotesSkin extends SkinBase<DictionaryNotesView> {
         super(control);
 
         keyboardView = new KeyboardView();
+        keyboardView.setOutputType(HTML);
         keyboardView.setTarget(editor);
         keyboardView.setOnMouseClicked(event -> keyboardView.requestFocus());
         keyboardPopup = new Popup();
