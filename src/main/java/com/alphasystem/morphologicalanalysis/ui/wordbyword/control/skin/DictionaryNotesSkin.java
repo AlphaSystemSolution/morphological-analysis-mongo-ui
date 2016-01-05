@@ -5,6 +5,7 @@ import com.alphasystem.arabic.ui.keyboard.KeyboardView;
 import com.alphasystem.morphologicalanalysis.morphology.model.RootLetters;
 import com.alphasystem.morphologicalanalysis.ui.wordbyword.control.DictionaryNotesView;
 import com.alphasystem.morphologicalanalysis.ui.wordbyword.model.AsciiDocStyle;
+import com.alphasystem.util.KeyValuePair;
 import de.jensd.fx.glyphs.GlyphIcons;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
@@ -24,6 +25,7 @@ import org.asciidoctor.Options;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -52,6 +54,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 public class DictionaryNotesSkin extends SkinBase<DictionaryNotesView> {
 
     private static final Set<AsciiDocStyle> ASCII_DOC_STYLE_SET = new LinkedHashSet<>();
+    private static final List<KeyValuePair<String, String>> HTML_SYMBOLS = new ArrayList<>();
     private static final String ASCII_DOCTOR_RESOURCE_PATH = "asciidoctor";
     private static final String CSS_RESOURCE_PATH = "morphology-min.css";
 
@@ -67,6 +70,11 @@ public class DictionaryNotesSkin extends SkinBase<DictionaryNotesView> {
                 new AsciiDocStyle("no-style", "Apply Style", "", ""),
                 new AsciiDocStyle("arabic-normal", "Arabic Normal", "[%s]#", "#"),
                 new AsciiDocStyle("square", "Square", "[%s", "]"));
+
+        addAll(HTML_SYMBOLS,
+                new KeyValuePair<>("Add HTML Symbol", ""),
+                new KeyValuePair<>("No Breaking Space", "&#160;"),
+                new KeyValuePair<>("Dash", "&#x2014;"));
     }
 
     private final Asciidoctor asciidoctor = Asciidoctor.Factory.create();
@@ -132,7 +140,7 @@ public class DictionaryNotesSkin extends SkinBase<DictionaryNotesView> {
                 createButton(SUBSCRIPT, "Subscript", "~", "~"),
                 createButton(SUPERSCRIPT, "Superscript", "^", "^"),
                 createButton(HEADER, "Heading", event -> insertHeading()),
-                new Separator(), createStyleComboBox(), keyboardButton);
+                new Separator(), createStyleComboBox(), createHtmlSymbolsComboBox(), keyboardButton);
 
         return toolBar;
     }
@@ -170,6 +178,20 @@ public class DictionaryNotesSkin extends SkinBase<DictionaryNotesView> {
             selectedText = format("[%s]%s", currentStyles, rest);
         }
         editor.replaceSelection(selectedText);
+    }
+
+    private ComboBox<KeyValuePair<String, String>> createHtmlSymbolsComboBox() {
+        ObservableList<KeyValuePair<String, String>> items = observableArrayList(HTML_SYMBOLS);
+        final ComboBox<KeyValuePair<String, String>> comboBox = new ComboBox<>(items);
+        comboBox.valueProperty().addListener((o, ov, nv) -> {
+            String value = nv.getValue();
+            if (!isBlank(value)) {
+                editor.replaceSelection(value);
+            }
+            runLater(() -> comboBox.getSelectionModel().select(0));
+        });
+        comboBox.getSelectionModel().select(0);
+        return comboBox;
     }
 
     private void showKeyboard(ActionEvent event) {
