@@ -89,7 +89,7 @@ public class LocationPropertiesSkin extends SkinBase<LocationPropertiesView> {
         return scrollPane;
     }
 
-    private void retrieveEntry(MorphologicalEntry morphologicalEntry, RootLetters nv, NamedTemplate form) {
+    private void retrieveEntry(final MorphologicalEntry morphologicalEntry, RootLetters nv, NamedTemplate form) {
         if (nv == null || nv.isEmpty() || form == null) {
             return;
         }
@@ -99,13 +99,12 @@ public class LocationPropertiesSkin extends SkinBase<LocationPropertiesView> {
             defaultCursor(getSkinnable());
             Worker source = event.getSource();
             MorphologicalEntry value = (MorphologicalEntry) source.getValue();
-            if (value != null) {
+            if (value == null) {
+                value = morphologicalEntry;
+            } else {
                 getSkinnable().getLocation().setMorphologicalEntry(value);
-                morphologicalEntryView.setMorphologicalEntry(value);
-                NamedTemplate _form = value.getForm();
-                morphologicalEntryView.setForm(null);
-                morphologicalEntryView.setForm(_form);
             }
+            morphologicalEntryView.setMorphologicalEntry(value);
         });
         service.setOnFailed(event -> {
             defaultCursor(getSkinnable());
