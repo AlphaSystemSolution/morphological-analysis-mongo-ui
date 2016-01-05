@@ -79,8 +79,6 @@ public class MorphologicalEntryView extends Control {
             RootLetters rootLetters = morphologicalEntry.getRootLetters();
             setRootLetters(rootLetters);
 
-            // update verbal nouns and noun of place and time before updating form, this way UI will get updated
-            // correctly
             Set<VerbalNoun> verbalNouns = morphologicalEntry.getVerbalNouns();
             this.verbalNouns.clear();
             this.verbalNouns.addAll(verbalNouns);
@@ -90,6 +88,10 @@ public class MorphologicalEntryView extends Control {
             this.nounOfPlaceAndTimes.addAll(nounOfPlaceAndTimes);
 
             setForm(morphologicalEntry.getForm());
+
+            // update verbal nouns and noun of place and time
+            ((MorphologicalEntrySkin) getSkin()).updateVerbalNounsAndNounOfPlaceTimes();
+
             setShortTranslation(morphologicalEntry.getShortTranslation());
             ConjugationConfiguration configuration = morphologicalEntry.getConfiguration();
             if (configuration != null) {
@@ -181,6 +183,8 @@ public class MorphologicalEntryView extends Control {
 
     @Override
     protected Skin<?> createDefaultSkin() {
-        return new MorphologicalEntrySkin(this);
+        MorphologicalEntrySkin skin = new MorphologicalEntrySkin(this);
+        setSkin(skin);
+        return skin;
     }
 }

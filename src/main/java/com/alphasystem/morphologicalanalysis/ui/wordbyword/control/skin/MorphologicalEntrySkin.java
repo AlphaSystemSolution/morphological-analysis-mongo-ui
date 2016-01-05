@@ -25,6 +25,9 @@ import static javafx.scene.control.ScrollPane.ScrollBarPolicy.AS_NEEDED;
  */
 public class MorphologicalEntrySkin extends SkinBase<MorphologicalEntryView> {
 
+    private final VerbalNounsPicker verbalNounsPicker = new VerbalNounsPicker();
+    private final NounOfPlaceTimesPicker nounOfPlaceTimesPicker = new NounOfPlaceTimesPicker();
+
     public MorphologicalEntrySkin(MorphologicalEntryView control) {
         super(control);
         initializeSkin();
@@ -61,7 +64,6 @@ public class MorphologicalEntrySkin extends SkinBase<MorphologicalEntryView> {
         label = new Label(RESOURCE_BUNDLE.getString("verbalNoun.label"));
         gridPane.add(label, 0, row);
 
-        VerbalNounsPicker verbalNounsPicker = new VerbalNounsPicker();
         verbalNounsPicker.getValues().addAll(control.getVerbalNouns());
         verbalNounsPicker.getValues().addListener((ListChangeListener<? super VerbalNoun>) c -> {
             while (c.next()) {
@@ -80,7 +82,6 @@ public class MorphologicalEntrySkin extends SkinBase<MorphologicalEntryView> {
         label = new Label(RESOURCE_BUNDLE.getString("nounOfPlaceAndTime.label"));
         gridPane.add(label, 0, row);
 
-        NounOfPlaceTimesPicker nounOfPlaceTimesPicker = new NounOfPlaceTimesPicker();
         nounOfPlaceTimesPicker.getValues().addAll(control.getNounOfPlaceAndTimes());
         nounOfPlaceTimesPicker.getValues().addListener((ListChangeListener<? super NounOfPlaceAndTime>) c -> {
             while (c.next()) {
@@ -94,12 +95,6 @@ public class MorphologicalEntrySkin extends SkinBase<MorphologicalEntryView> {
         });
         label.setLabelFor(nounOfPlaceTimesPicker);
         gridPane.add(nounOfPlaceTimesPicker, 1, row);
-
-        // update verbal noun and/or noun of place and time
-        namedTemplateComboBox.getSelectionModel().selectedItemProperty().addListener((o, ov, nv) -> {
-            updateVerbalNouns(control, verbalNounsPicker, nv);
-            updateNounOfPlaceTimes(control, nounOfPlaceTimesPicker, nv);
-        });
 
         row++;
         label = new Label(RESOURCE_BUNDLE.getString("translation.label"));
@@ -137,24 +132,32 @@ public class MorphologicalEntrySkin extends SkinBase<MorphologicalEntryView> {
         getChildren().add(gridPane);
     }
 
-    private void updateNounOfPlaceTimes(MorphologicalEntryView control, NounOfPlaceTimesPicker nounOfPlaceTimesPicker,
-                                        NamedTemplate nv) {
-        ObservableSet<NounOfPlaceAndTime> nounOfPlaceAndTimesFromControl = control.getNounOfPlaceAndTimes();
+    public void updateVerbalNounsAndNounOfPlaceTimes() {
+        updateVerbalNouns();
+        updateNounOfPlaceTimes();
+    }
+
+    private void updateNounOfPlaceTimes() {
+        MorphologicalEntryView control = getSkinnable();
+        NamedTemplate template = control.getForm();
         nounOfPlaceTimesPicker.getValues().clear();
+        ObservableSet<NounOfPlaceAndTime> nounOfPlaceAndTimesFromControl = control.getNounOfPlaceAndTimes();
         if (nounOfPlaceAndTimesFromControl != null && !nounOfPlaceAndTimesFromControl.isEmpty()) {
             nounOfPlaceTimesPicker.getValues().addAll(nounOfPlaceAndTimesFromControl);
         } else {
-            nounOfPlaceTimesPicker.getValues().addAll(NounOfPlaceAndTime.getByTemplate(nv));
+            nounOfPlaceTimesPicker.getValues().addAll(NounOfPlaceAndTime.getByTemplate(template));
         }
     }
 
-    private void updateVerbalNouns(MorphologicalEntryView control, VerbalNounsPicker verbalNounsPicker, NamedTemplate nv) {
-        ObservableSet<VerbalNoun> verbalNounsFromControl = control.getVerbalNouns();
+    private void updateVerbalNouns() {
+        MorphologicalEntryView control = getSkinnable();
+        NamedTemplate template = control.getForm();
         verbalNounsPicker.getValues().clear();
+        ObservableSet<VerbalNoun> verbalNounsFromControl = control.getVerbalNouns();
         if (verbalNounsFromControl != null && !verbalNounsFromControl.isEmpty()) {
             verbalNounsPicker.getValues().addAll(verbalNounsFromControl);
         } else {
-            verbalNounsPicker.getValues().addAll(VerbalNoun.getByTemplate(nv));
+            verbalNounsPicker.getValues().addAll(VerbalNoun.getByTemplate(template));
         }
     }
 }
