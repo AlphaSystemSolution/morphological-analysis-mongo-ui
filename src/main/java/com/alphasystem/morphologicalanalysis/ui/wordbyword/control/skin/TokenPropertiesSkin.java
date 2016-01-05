@@ -183,7 +183,7 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
         return gridPane;
     }
 
-    private void loadDictionary(RootLetters rootLetters) {
+    private void loadDictionary(final RootLetters rootLetters) {
         String searchString = null;
         boolean disableDictionaryTab = browseDictionaryTab.isDisabled();
         if (!disableDictionaryTab) {
@@ -207,17 +207,19 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
 
     private void retrieveDictionaryNotes(final RootLetters rootLetters) {
         Location location = locationPropertiesView.getLocation();
-        DictionaryNotes dictionaryNotes = location.getDictionaryNotes();
+        final DictionaryNotes dictionaryNotes = location.getDictionaryNotes();
         RetrieveDictionaryNotesService service = new RetrieveDictionaryNotesService(dictionaryNotes, rootLetters);
         service.setOnFailed(event -> defaultCursor(getSkinnable()));
         service.setOnSucceeded(event -> {
             defaultCursor(getSkinnable());
             DictionaryNotes notes = (DictionaryNotes) event.getSource().getValue();
-            if (notes != null) {
-                dictionaryNotesView.setDictionaryNotes(null);
-                dictionaryNotesView.setDictionaryNotes(notes);
+            if (notes == null) {
+                notes = dictionaryNotes;
+            } else {
                 location.setDictionaryNotes(notes);
             }
+            dictionaryNotesView.setDictionaryNotes(null);
+            dictionaryNotesView.setDictionaryNotes(notes);
         });
         service.start();
     }
