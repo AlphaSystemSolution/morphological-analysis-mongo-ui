@@ -193,7 +193,6 @@ public class TokenEditorPane extends VBox {
     }
 
     private void updateToken(Token token) {
-        System.out.println();
         Token t = null;
         if (token != null) {
             t = repositoryTool.getTokenByDisplayName(token.getDisplayName());
