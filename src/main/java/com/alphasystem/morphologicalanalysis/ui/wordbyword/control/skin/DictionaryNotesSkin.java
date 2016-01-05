@@ -2,7 +2,6 @@ package com.alphasystem.morphologicalanalysis.ui.wordbyword.control.skin;
 
 import com.alphasystem.arabic.ui.Browser;
 import com.alphasystem.arabic.ui.keyboard.KeyboardView;
-import com.alphasystem.morphologicalanalysis.morphology.model.DictionaryNotes;
 import com.alphasystem.morphologicalanalysis.morphology.model.RootLetters;
 import com.alphasystem.morphologicalanalysis.ui.wordbyword.control.DictionaryNotesView;
 import com.alphasystem.morphologicalanalysis.ui.wordbyword.model.AsciiDocStyle;
@@ -24,7 +23,6 @@ import org.asciidoctor.Options;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -90,8 +88,10 @@ public class DictionaryNotesSkin extends SkinBase<DictionaryNotesView> {
         keyboardPopup.getContent().add(keyboardView);
 
         initializeSkin();
-        getSkinnable().dictionaryNotesProperty().addListener((o, ov, nv) -> populateEditor(nv));
-        populateEditor(getSkinnable().getDictionaryNotes());
+        getSkinnable().notesProperty().addListener((o, ov, nv) -> loadNotes(nv));
+        getSkinnable().previewUrlProperty().addListener((o, ov, nv) -> loadPreview(nv));
+        loadNotes(getSkinnable().getNotes());
+        loadPreview(getSkinnable().getPreviewUrl());
     }
 
     private static String formatText(String source, String prefix, String suffix) {
@@ -153,11 +153,10 @@ public class DictionaryNotesSkin extends SkinBase<DictionaryNotesView> {
 
     private void applyStyle(AsciiDocStyle style) {
         String selectedText = editor.getSelectedText();
-        String finalText = selectedText;
         boolean noStyle = isBlank(selectedText) || !selectedText.startsWith("[");
         if (noStyle) {
             // if there is no previous style then add style
-            finalText = formatText(editor.getSelectedText(), format(style.getFormatStart(), style.getName()),
+            selectedText = formatText(editor.getSelectedText(), format(style.getFormatStart(), style.getName()),
                     style.getFormatEnd());
         } else {
             // check whether the new style is already in the current list
@@ -168,9 +167,9 @@ public class DictionaryNotesSkin extends SkinBase<DictionaryNotesView> {
             if (!currentStyles.contains(style.getName())) {
                 currentStyles = format("%s,%s", currentStyles, style);
             }
-            finalText = format("[%s]%s", currentStyles, rest);
+            selectedText = format("[%s]%s", currentStyles, rest);
         }
-        editor.replaceSelection(finalText);
+        editor.replaceSelection(selectedText);
     }
 
     private void showKeyboard(ActionEvent event) {
@@ -206,23 +205,17 @@ public class DictionaryNotesSkin extends SkinBase<DictionaryNotesView> {
         saveService.setOnSucceeded(event -> {
             defaultCursor(getSkinnable());
             preview.setDisable(false);
-            loadPreview();
+            loadPreview(getSkinnable().getPreviewUrl());
         });
         saveService.start();
     }
 
-    private void loadPreview() {
-        String location = preview.getWebEngine().getLocation();
-        if (location == null) {
-            File file = new File(DEFAULT_DICTIONARY_DIRECTORY, getSkinnable().getPreviewFileName());
-            try {
-                preview.loadUrl(file.toURI().toURL().toString());
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            }
-        } else {
-            preview.getWebEngine().reload();
+    private void loadPreview(String previewUrl) {
+        File previewFile = getSkinnable().getPreviewFile();
+        if (previewFile != null && !previewFile.exists()) {
+            return;
         }
+        preview.loadUrl(previewUrl);
     }
 
     private void insertHeading() {
@@ -249,12 +242,7 @@ public class DictionaryNotesSkin extends SkinBase<DictionaryNotesView> {
         editor.replaceSelection(formatText(editor.getSelectedText(), prefix, suffix));
     }
 
-    private void populateEditor(DictionaryNotes dictionaryNotes) {
-        if (dictionaryNotes == null || dictionaryNotes.isEmpty()) {
-            return;
-        }
-        boolean doSave = true;
-        String notes = dictionaryNotes.getNotes();
+    private void loadNotes(String notes) {
         if (isBlank(notes)) {
             try {
                 List<String> lines = readAllLines(format("%s.%s", ASCII_DOCTOR_RESOURCE_PATH, "template.adoc"));
@@ -263,35 +251,29 @@ public class DictionaryNotesSkin extends SkinBase<DictionaryNotesView> {
                 for (int i = 1; i < lines.size(); i++) {
                     builder.append(NEW_LINE).append(lines.get(i));
                 }
-                String text = builder.toString();
-                RootLetters rootLetters = dictionaryNotes.getRootLetters();
-                String displayName = rootLetters.getDisplayName();
-                String replacement = fromBuckWalterString(displayName).toUnicode();
-                notes = text.replace("${ArticleName}", replacement);
-                dictionaryNotes.setNotes(notes);
+                notes = builder.toString();
+                RootLetters rootLetters = getSkinnable().getRootLetters();
+                if (rootLetters != null) {
+                    String displayName = rootLetters.getDisplayName();
+                    String replacement = fromBuckWalterString(displayName).toUnicode();
+                    notes = notes.replace("${ArticleName}", replacement);
+                }
+                getSkinnable().setNotes(notes);
             } catch (IOException | URISyntaxException e) {
                 e.printStackTrace();
-                doSave = false;
             }
         }
-        if (doSave) {
-            editor.setText(notes);
-            saveAction();
-        }
+        editor.setText(notes);
     }
 
     private void convertDoc() throws Exception {
         Options options = new Options();
         options.setBaseDir(DEFAULT_DICTIONARY_DIRECTORY.getAbsolutePath());
-        options.setToFile(getSkinnable().getPreviewFileName());
+        options.setToFile(getSkinnable().getPreviewFile().getName());
         AttributesBuilder attributesBuilder = AttributesBuilder.attributes().stylesDir(DEFAULT_CSS_DIRECTORY.getName())
                 .styleSheetName(CSS_RESOURCE_PATH).linkCss(true);
         options.setAttributes(attributesBuilder.get());
-        try {
-            asciidoctor.convert(editor.getText(), options);
-        } catch (Exception e) {
-            throw e;
-        }
+        asciidoctor.convert(editor.getText(), options);
     }
 
 }
