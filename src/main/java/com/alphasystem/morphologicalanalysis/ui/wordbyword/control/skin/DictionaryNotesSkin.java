@@ -273,7 +273,9 @@ public class DictionaryNotesSkin extends SkinBase<DictionaryNotesView> {
         AttributesBuilder attributesBuilder = AttributesBuilder.attributes().stylesDir(DEFAULT_CSS_DIRECTORY.getName())
                 .styleSheetName(CSS_RESOURCE_PATH).linkCss(true);
         options.setAttributes(attributesBuilder.get());
-        asciidoctor.convert(editor.getText(), options);
+        String text = editor.getText();
+        getSkinnable().setNotes(text);
+        asciidoctor.convert(text, options);
     }
 
 }
