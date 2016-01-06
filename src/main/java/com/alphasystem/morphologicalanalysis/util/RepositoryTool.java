@@ -110,8 +110,7 @@ public class RepositoryTool {
             token.getLocations().add(location);
         }
 
-        tokenRepository.save(token);
-        return token;
+        return tokenRepository.save(token);
     }
 
     public DependencyGraph createDependencyGraph(VerseTokenPairGroup group, GraphMetaInfo graphMetaInfo)
