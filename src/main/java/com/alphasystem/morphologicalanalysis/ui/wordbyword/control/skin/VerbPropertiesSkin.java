@@ -53,7 +53,7 @@ public class VerbPropertiesSkin extends AbstractPropertiesSkin<VerbProperties, V
         label = new Label(RESOURCE_BUNDLE.getString("verbMode.label"));
         gridPane.add(label, 0, row);
 
-        comboBox = COMBO_BOX_FACTORY.getConversationTypeComboBox();
+        comboBox = COMBO_BOX_FACTORY.getVerbModeComboBox();
         label.setLabelFor(comboBox);
         comboBox.valueProperty().bindBidirectional(view.verbModeProperty());
         gridPane.add(comboBox, 1, row);
@@ -62,7 +62,7 @@ public class VerbPropertiesSkin extends AbstractPropertiesSkin<VerbProperties, V
         label = new Label(RESOURCE_BUNDLE.getString("numberType.label"));
         gridPane.add(label, 0, row);
 
-        comboBox = COMBO_BOX_FACTORY.getConversationTypeComboBox();
+        comboBox = COMBO_BOX_FACTORY.getNumberTypeComboBox();
         label.setLabelFor(comboBox);
         comboBox.valueProperty().bindBidirectional(view.numberTypeProperty());
         gridPane.add(comboBox, 1, row);
@@ -71,7 +71,7 @@ public class VerbPropertiesSkin extends AbstractPropertiesSkin<VerbProperties, V
         label = new Label(RESOURCE_BUNDLE.getString("genderType.label"));
         gridPane.add(label, 0, row);
 
-        comboBox = COMBO_BOX_FACTORY.getConversationTypeComboBox();
+        comboBox = COMBO_BOX_FACTORY.getGenderTypeComboBox();
         label.setLabelFor(comboBox);
         comboBox.valueProperty().bindBidirectional(view.genderTypeProperty());
         gridPane.add(comboBox, 1, row);
