@@ -3,8 +3,10 @@ package com.alphasystem.morphologicalanalysis.ui.wordbyword.control.skin;
 import com.alphasystem.arabic.ui.Browser;
 import com.alphasystem.arabic.ui.keyboard.KeyboardView;
 import com.alphasystem.morphologicalanalysis.morphology.model.RootLetters;
+import com.alphasystem.morphologicalanalysis.morphology.repository.DictionaryNotesRepository;
 import com.alphasystem.morphologicalanalysis.ui.wordbyword.control.DictionaryNotesView;
 import com.alphasystem.morphologicalanalysis.ui.wordbyword.model.AsciiDocStyle;
+import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
 import com.alphasystem.util.KeyValuePair;
 import de.jensd.fx.glyphs.GlyphIcons;
 import javafx.collections.ObservableList;
@@ -31,7 +33,6 @@ import java.util.List;
 import java.util.Set;
 
 import static com.alphasystem.arabic.model.ArabicWord.fromBuckWalterString;
-import static com.alphasystem.arabic.ui.keyboard.KeyboardView.OutputType.HTML;
 import static com.alphasystem.arabic.ui.util.UiUtilities.*;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.*;
 import static com.alphasystem.util.AppUtil.NEW_LINE;
@@ -45,8 +46,6 @@ import static javafx.application.Platform.runLater;
 import static javafx.collections.FXCollections.observableArrayList;
 import static javafx.geometry.Side.BOTTOM;
 import static javafx.scene.control.TabPane.TabClosingPolicy.UNAVAILABLE;
-import static javafx.scene.text.FontPosture.REGULAR;
-import static javafx.scene.text.FontWeight.NORMAL;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 /**
@@ -84,12 +83,13 @@ public class DictionaryNotesSkin extends SkinBase<DictionaryNotesView> {
     private final TextArea editor = new TextArea();
     private final Browser preview = new Browser();
     private final TabPane tabPane = new TabPane();
+    private final DictionaryNotesRepository dictionaryNotesRepository = RepositoryTool.getInstance().getRepositoryUtil()
+            .getDictionaryNotesRepository();
 
     public DictionaryNotesSkin(DictionaryNotesView control) {
         super(control);
 
         keyboardView = new KeyboardView();
-        keyboardView.setOutputType(HTML);
         keyboardView.setTarget(editor);
         keyboardView.setOnMouseClicked(event -> keyboardView.requestFocus());
         keyboardPopup = new Popup();
@@ -116,7 +116,7 @@ public class DictionaryNotesSkin extends SkinBase<DictionaryNotesView> {
         BorderPane borderPane = new BorderPane();
         borderPane.setTop(createToolBar());
 
-        editor.setFont(Font.font("Courier New", NORMAL, REGULAR, 16.0));
+        editor.setFont(Font.font("Courier New", 14.0));
         borderPane.setCenter(new StackPane(wrapInScrollPane(editor)));
 
         tabPane.setTabClosingPolicy(UNAVAILABLE);
@@ -299,6 +299,7 @@ public class DictionaryNotesSkin extends SkinBase<DictionaryNotesView> {
         options.setAttributes(attributesBuilder.get());
         String text = editor.getText();
         getSkinnable().setNotes(text);
+        dictionaryNotesRepository.save(getSkinnable().getDictionaryNotes());
         asciidoctor.convert(text, options);
     }
 
