@@ -38,6 +38,7 @@ import static com.alphasystem.morphologicalanalysis.ui.common.Global.*;
 import static com.alphasystem.util.AppUtil.NEW_LINE;
 import static de.jensd.fx.glyphs.GlyphsDude.setIcon;
 import static de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon.*;
+import static de.jensd.fx.glyphs.octicons.OctIcon.KEYBOARD;
 import static java.lang.String.format;
 import static java.nio.file.Files.write;
 import static java.nio.file.Paths.get;
@@ -134,7 +135,7 @@ public class DictionaryNotesSkin extends SkinBase<DictionaryNotesView> {
 
         Button saveButton = createButton(SAVE, "Save Notes", event -> saveAction());
         saveButton.disableProperty().bind(getSkinnable().disabledProperty());
-        Button keyboardButton = createButton(KEYBOARD_ALT, "Show Keyboard", this::showKeyboard);
+        Button keyboardButton = createButton(KEYBOARD, "Show Keyboard", this::showKeyboard);
         toolBar.getItems().addAll(saveButton,
                 createButton(BOLD, "Bold", "*", "*"), createButton(ITALIC, "Italic", "_", "_"),
                 createButton(UNDERLINE, "Underline", "[underline]#", "#"),
