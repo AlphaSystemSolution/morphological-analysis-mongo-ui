@@ -1,5 +1,6 @@
 package com.alphasystem.morphologicalanalysis.ui.wordbyword.control.skin;
 
+import com.alphasystem.arabic.model.ArabicWord;
 import com.alphasystem.arabic.ui.Browser;
 import com.alphasystem.arabic.ui.keyboard.KeyboardView;
 import com.alphasystem.morphologicalanalysis.morphology.model.RootLetters;
@@ -35,7 +36,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import static com.alphasystem.arabic.model.ArabicWord.fromBuckWalterString;
+import static com.alphasystem.arabic.model.ArabicWord.addTatweel;
 import static com.alphasystem.arabic.ui.util.UiUtilities.*;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.*;
 import static com.alphasystem.util.AppUtil.NEW_LINE;
@@ -292,10 +293,11 @@ public class DictionaryNotesSkin extends SkinBase<DictionaryNotesView> {
                 notes = builder.toString();
                 RootLetters rootLetters = getSkinnable().getRootLetters();
                 if (rootLetters != null) {
-                    String displayName = rootLetters.getDisplayName();
-                    //TODO: use different logic to create title
-                    String replacement = fromBuckWalterString(displayName).toUnicode();
-                    notes = notes.replace("${ArticleName}", replacement);
+                    ArabicWord arabicWord = rootLetters.getLabel();
+                    if (arabicWord != null) {
+                        arabicWord = addTatweel(arabicWord);
+                    }
+                    notes = notes.replace("${ArticleName}", arabicWord.toUnicode());
                 }
                 getSkinnable().setNotes(notes);
             } catch (IOException | URISyntaxException e) {
