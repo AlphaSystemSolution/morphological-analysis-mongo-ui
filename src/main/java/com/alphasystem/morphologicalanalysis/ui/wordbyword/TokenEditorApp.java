@@ -47,6 +47,7 @@ public class TokenEditorApp extends Application {
         pane.setCenter(tokenEditorPane);
         pane.setTop(createTopPane(primaryStage, tokenEditorPane));
         Scene scene = new Scene(pane);
+        scene.getStylesheets().addAll("/styles/glyphs_custom.css");
         primaryStage.setMaximized(true);
         primaryStage.setScene(scene);
         primaryStage.show();
