@@ -206,20 +206,12 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
     }
 
     private void retrieveDictionaryNotes(final RootLetters rootLetters) {
-        Location location = locationPropertiesView.getLocation();
-        final DictionaryNotes dictionaryNotes = location.getDictionaryNotes();
-        RetrieveDictionaryNotesService service = new RetrieveDictionaryNotesService(dictionaryNotes, rootLetters);
+        RetrieveDictionaryNotesService service = new RetrieveDictionaryNotesService(rootLetters);
         service.setOnFailed(event -> defaultCursor(getSkinnable()));
         service.setOnSucceeded(event -> {
             defaultCursor(getSkinnable());
-            DictionaryNotes notes = (DictionaryNotes) event.getSource().getValue();
-            if (notes == null) {
-                notes = dictionaryNotes;
-            } else {
-                location.setDictionaryNotes(notes);
-            }
             dictionaryNotesView.setDictionaryNotes(null);
-            dictionaryNotesView.setDictionaryNotes(notes);
+            dictionaryNotesView.setDictionaryNotes((DictionaryNotes) event.getSource().getValue());
         });
         service.start();
     }
@@ -254,6 +246,7 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
             service.setOnSucceeded(event -> {
                 defaultCursor(getSkinnable());
                 SarfChart sarfChart = (SarfChart) event.getSource().getValue();
+                conjugationViewer.setSarfChart(null);
                 conjugationViewer.setSarfChart(sarfChart);
             });
             service.setOnFailed(event -> defaultCursor(getSkinnable()));
@@ -299,11 +292,9 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
 
     private class RetrieveDictionaryNotesService extends Service<DictionaryNotes> {
 
-        private final DictionaryNotes source;
         private final RootLetters rootLetters;
 
-        private RetrieveDictionaryNotesService(final DictionaryNotes source, final RootLetters rootLetters) {
-            this.source = source;
+        private RetrieveDictionaryNotesService(final RootLetters rootLetters) {
             this.rootLetters = rootLetters;
         }
 
@@ -315,7 +306,7 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
                     waitCursor(getSkinnable());
                     DictionaryNotes tmp = new DictionaryNotes(rootLetters);
                     DictionaryNotes saved = repositoryUtil.findDictionaryNotes(tmp);
-                    return (saved == null) ? tmp : (saved.equals(source) ? null : saved);
+                    return (saved == null) ? tmp : saved;
                 }
             };
         }
