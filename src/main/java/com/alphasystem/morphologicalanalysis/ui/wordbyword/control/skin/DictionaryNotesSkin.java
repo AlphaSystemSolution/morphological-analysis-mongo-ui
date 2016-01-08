@@ -4,6 +4,7 @@ import com.alphasystem.arabic.ui.Browser;
 import com.alphasystem.arabic.ui.keyboard.KeyboardView;
 import com.alphasystem.morphologicalanalysis.morphology.model.RootLetters;
 import com.alphasystem.morphologicalanalysis.morphology.repository.DictionaryNotesRepository;
+import com.alphasystem.morphologicalanalysis.ui.common.Global;
 import com.alphasystem.morphologicalanalysis.ui.wordbyword.control.DictionaryNotesView;
 import com.alphasystem.morphologicalanalysis.ui.wordbyword.model.AsciiDocStyle;
 import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
@@ -26,7 +27,9 @@ import org.asciidoctor.Options;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -56,16 +59,10 @@ public class DictionaryNotesSkin extends SkinBase<DictionaryNotesView> {
 
     private static final Set<AsciiDocStyle> ASCII_DOC_STYLE_SET = new LinkedHashSet<>();
     private static final List<KeyValuePair<String, String>> HTML_SYMBOLS = new ArrayList<>();
-    private static final String ASCII_DOCTOR_RESOURCE_PATH = "asciidoctor";
-    private static final String CSS_RESOURCE_PATH = "morphology-min.css";
 
     static {
-        try {
-            write(get(DEFAULT_CSS_DIRECTORY.getAbsolutePath(), CSS_RESOURCE_PATH),
-                    readAllLines(format("%s.%s", ASCII_DOCTOR_RESOURCE_PATH, CSS_RESOURCE_PATH)));
-        } catch (IOException | URISyntaxException e) {
-            e.printStackTrace();
-        }
+        copyResources(DEFAULT_CSS_DIRECTORY, ASCII_DOCTOR_RESOURCE_PATH, CSS_RESOURCE_PATH);
+        copyResources(DEFAULT_DICTIONARY_DIRECTORY, ASCII_DOCTOR_RESOURCE_PATH, DEFAULT_PREVIEW_FILE_NAME);
 
         addAll(ASCII_DOC_STYLE_SET,
                 new AsciiDocStyle("no-style", "Apply Style", "", ""),
@@ -100,9 +97,29 @@ public class DictionaryNotesSkin extends SkinBase<DictionaryNotesView> {
 
         initializeSkin();
         getSkinnable().notesProperty().addListener((o, ov, nv) -> loadNotes(nv));
-        getSkinnable().previewUrlProperty().addListener((o, ov, nv) -> loadPreview(nv));
+        getSkinnable().rootLettersProperty().addListener((o, ov, nv) -> loadPreview());
         loadNotes(getSkinnable().getNotes());
-        loadPreview(getSkinnable().getPreviewUrl());
+        loadPreview();
+    }
+
+    private static String getPreviewUrl() {
+        String url = null;
+        try {
+            url = Global.DEFAULT_PREVIEW_FILE.toURI().toURL().toExternalForm();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        return url;
+    }
+
+    private static void copyResources(File destDir, String resourceDir, String resourceName) {
+        try {
+            Path path = get(destDir.getAbsolutePath(), resourceName);
+            List<String> lines = readAllLines(format("%s.%s", resourceDir, resourceName));
+            write(path, lines);
+        } catch (IOException | URISyntaxException e) {
+            e.printStackTrace();
+        }
     }
 
     private static String formatText(String source, String prefix, String suffix) {
@@ -230,17 +247,13 @@ public class DictionaryNotesSkin extends SkinBase<DictionaryNotesView> {
         saveService.setOnSucceeded(event -> {
             defaultCursor(getSkinnable());
             preview.setDisable(false);
-            loadPreview(getSkinnable().getPreviewUrl());
+            loadPreview();
         });
         saveService.start();
     }
 
-    private void loadPreview(String previewUrl) {
-        File previewFile = getSkinnable().getPreviewFile();
-        if (previewFile != null && !previewFile.exists()) {
-            return;
-        }
-        preview.loadUrl(previewUrl);
+    private void loadPreview() {
+        preview.loadUrl(getPreviewUrl());
     }
 
     private void insertHeading() {
@@ -280,6 +293,7 @@ public class DictionaryNotesSkin extends SkinBase<DictionaryNotesView> {
                 RootLetters rootLetters = getSkinnable().getRootLetters();
                 if (rootLetters != null) {
                     String displayName = rootLetters.getDisplayName();
+                    //TODO: use different logic to create title
                     String replacement = fromBuckWalterString(displayName).toUnicode();
                     notes = notes.replace("${ArticleName}", replacement);
                 }
@@ -294,7 +308,7 @@ public class DictionaryNotesSkin extends SkinBase<DictionaryNotesView> {
     private void convertDoc() throws Exception {
         Options options = new Options();
         options.setBaseDir(DEFAULT_DICTIONARY_DIRECTORY.getAbsolutePath());
-        options.setToFile(getSkinnable().getPreviewFile().getName());
+        options.setToFile(DEFAULT_PREVIEW_FILE.getName());
         AttributesBuilder attributesBuilder = AttributesBuilder.attributes().stylesDir(DEFAULT_CSS_DIRECTORY.getName())
                 .styleSheetName(CSS_RESOURCE_PATH).linkCss(true);
         options.setAttributes(attributesBuilder.get());
