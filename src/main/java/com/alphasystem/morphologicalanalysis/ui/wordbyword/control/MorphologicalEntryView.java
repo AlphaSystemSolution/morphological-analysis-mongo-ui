@@ -94,10 +94,14 @@ public class MorphologicalEntryView extends Control {
 
             setShortTranslation(morphologicalEntry.getShortTranslation());
             ConjugationConfiguration configuration = morphologicalEntry.getConfiguration();
+            boolean removePassiveLine = false;
+            boolean skipRuleProcessing = false;
             if (configuration != null) {
-                setRemovePassiveLine(configuration.isRemovePassiveLine());
-                setSkipRuleProcessing(configuration.isSkipRuleProcessing());
+                removePassiveLine = configuration.isRemovePassiveLine();
+                skipRuleProcessing = configuration.isSkipRuleProcessing();
             }
+            setRemovePassiveLine(removePassiveLine);
+            setSkipRuleProcessing(skipRuleProcessing);
         }
     }
 
