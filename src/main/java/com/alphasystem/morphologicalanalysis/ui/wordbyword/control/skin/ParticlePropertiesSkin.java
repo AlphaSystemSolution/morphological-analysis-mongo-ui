@@ -8,7 +8,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
-import static com.alphasystem.arabic.ui.util.FontConstants.ENGLISH_FONT_ITALIC_12;
+import static com.alphasystem.fx.ui.util.FontConstants.ENGLISH_FONT_ITALIC_12;
 import static javafx.geometry.Pos.CENTER;
 
 /**

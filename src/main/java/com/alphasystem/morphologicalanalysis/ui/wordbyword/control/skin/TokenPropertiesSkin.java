@@ -35,8 +35,8 @@ import javafx.scene.layout.VBox;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.alphasystem.arabic.ui.util.FontConstants.ARABIC_FONT_36;
-import static com.alphasystem.arabic.ui.util.UiUtilities.*;
+import static com.alphasystem.fx.ui.util.FontConstants.ARABIC_FONT_36;
+import static com.alphasystem.fx.ui.util.UiUtilities.*;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.*;
 import static com.alphasystem.morphologicalanalysis.ui.wordbyword.control.TokenPropertiesView.SelectionStatus.*;
 import static java.lang.String.format;
@@ -159,7 +159,10 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
         gridPane.add(locationComboBox, 1, 0);
 
         TokenPropertiesView view = getSkinnable();
-        view.tokenProperty().addListener((o, ov, nv) -> updateLocations(nv));
+        view.tokenProperty().addListener((o, ov, nv) -> {
+            updateLocations(null);
+            updateLocations(nv);
+        });
         locationComboBox.getSelectionModel().selectedItemProperty().addListener((o, ov, nv) -> {
             if (nv != null) {
                 locationPropertiesView.setLocation(nv);
@@ -262,11 +265,11 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
             return;
         }
         List<Location> locations = token.getLocations();
-        if (locations == null || locations.isEmpty()) {
+        if (locations.isEmpty()) {
             return;
         }
         locationComboBox.setDisable(false);
-        locationComboBox.getItems().addAll(locations.toArray(new Location[locations.size()]));
+        locations.forEach(location -> locationComboBox.getItems().add(location));
         locationComboBox.getSelectionModel().select(0);
     }
 

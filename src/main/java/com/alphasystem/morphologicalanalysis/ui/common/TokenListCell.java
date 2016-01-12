@@ -4,7 +4,7 @@ import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
 import javafx.scene.control.ListCell;
 import javafx.scene.text.Text;
 
-import static com.alphasystem.arabic.ui.util.FontConstants.ARABIC_FONT_24;
+import static com.alphasystem.fx.ui.util.FontConstants.ARABIC_FONT_24;
 import static javafx.scene.control.ContentDisplay.GRAPHIC_ONLY;
 
 /**

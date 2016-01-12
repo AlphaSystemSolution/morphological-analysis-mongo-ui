@@ -25,8 +25,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static com.alphasystem.arabic.ui.util.UiUtilities.defaultCursor;
-import static com.alphasystem.arabic.ui.util.UiUtilities.waitCursor;
+import static com.alphasystem.fx.ui.util.UiUtilities.defaultCursor;
+import static com.alphasystem.fx.ui.util.UiUtilities.waitCursor;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.GAP;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.RESOURCE_BUNDLE;
 import static com.alphasystem.util.AppUtil.NEW_LINE;

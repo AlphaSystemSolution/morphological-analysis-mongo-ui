@@ -7,8 +7,8 @@ import javafx.scene.control.TreeCell;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
-import static com.alphasystem.arabic.ui.util.FontConstants.ARABIC_FONT_24;
-import static com.alphasystem.arabic.ui.util.FontConstants.ENGLISH_FONT_14;
+import static com.alphasystem.fx.ui.util.FontConstants.ARABIC_FONT_24;
+import static com.alphasystem.fx.ui.util.FontConstants.ENGLISH_FONT_14;
 import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.ROOT;
 import static java.lang.String.format;
 import static javafx.scene.control.ContentDisplay.GRAPHIC_ONLY;

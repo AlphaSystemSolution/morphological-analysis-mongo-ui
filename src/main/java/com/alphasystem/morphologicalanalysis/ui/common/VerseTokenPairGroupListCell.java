@@ -8,7 +8,7 @@ import javafx.scene.text.Text;
 import java.util.List;
 
 import static com.alphasystem.arabic.model.ArabicWord.getArabicNumber;
-import static com.alphasystem.arabic.ui.util.FontConstants.ARABIC_FONT_24;
+import static com.alphasystem.fx.ui.util.FontConstants.ARABIC_FONT_24;
 import static javafx.scene.control.ContentDisplay.GRAPHIC_ONLY;
 
 /**

@@ -28,8 +28,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.alphasystem.arabic.model.ArabicWord.getSubWord;
-import static com.alphasystem.arabic.ui.util.FontConstants.ARABIC_FONT_24;
-import static com.alphasystem.arabic.ui.util.FontConstants.ENGLISH_FONT_14;
+import static com.alphasystem.fx.ui.util.FontConstants.ARABIC_FONT_24;
+import static com.alphasystem.fx.ui.util.FontConstants.ENGLISH_FONT_14;
 import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.ROOT;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.*;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.IncompleteVerbCategory.KANA_AND_ITS_SISTERS;

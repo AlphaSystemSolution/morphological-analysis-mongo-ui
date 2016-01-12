@@ -19,7 +19,7 @@ import javafx.scene.paint.Paint;
 import static com.alphasystem.arabic.model.ArabicLetterType.*;
 import static com.alphasystem.arabic.model.ArabicLetters.WORD_SPACE;
 import static com.alphasystem.arabic.model.ArabicWord.*;
-import static com.alphasystem.arabic.ui.util.FontConstants.*;
+import static com.alphasystem.fx.ui.util.FontConstants.*;
 import static javafx.geometry.NodeOrientation.RIGHT_TO_LEFT;
 import static javafx.geometry.Pos.CENTER;
 import static javafx.geometry.Pos.CENTER_RIGHT;

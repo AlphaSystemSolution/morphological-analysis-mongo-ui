@@ -18,8 +18,8 @@ import javafx.scene.control.TitledPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 
-import static com.alphasystem.arabic.ui.util.UiUtilities.defaultCursor;
-import static com.alphasystem.arabic.ui.util.UiUtilities.waitCursor;
+import static com.alphasystem.fx.ui.util.UiUtilities.defaultCursor;
+import static com.alphasystem.fx.ui.util.UiUtilities.waitCursor;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.GAP;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.AbstractProperties.*;
 import static javafx.scene.control.ScrollPane.ScrollBarPolicy.AS_NEEDED;

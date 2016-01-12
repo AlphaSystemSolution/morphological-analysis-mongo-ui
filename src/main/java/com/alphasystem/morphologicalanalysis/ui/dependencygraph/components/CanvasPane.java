@@ -32,8 +32,8 @@ import javafx.scene.text.Text;
 
 import java.util.*;
 
-import static com.alphasystem.arabic.ui.util.FontConstants.ARABIC_FONT_20;
-import static com.alphasystem.arabic.ui.util.FontConstants.ARABIC_FONT_24;
+import static com.alphasystem.fx.ui.util.FontConstants.ARABIC_FONT_20;
+import static com.alphasystem.fx.ui.util.FontConstants.ARABIC_FONT_24;
 import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.*;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.*;
 import static com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.CanvasUtil.getIndex;

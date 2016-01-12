@@ -15,7 +15,7 @@ import java.util.List;
 
 import static com.alphasystem.arabic.model.ArabicLetters.WORD_SPACE;
 import static com.alphasystem.arabic.model.ArabicWord.getVerseNumber;
-import static com.alphasystem.arabic.ui.util.FontConstants.ARABIC_FONT_30;
+import static com.alphasystem.fx.ui.util.FontConstants.ARABIC_FONT_30;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.SPACE_STR;
 import static javafx.scene.control.ContentDisplay.GRAPHIC_ONLY;
 

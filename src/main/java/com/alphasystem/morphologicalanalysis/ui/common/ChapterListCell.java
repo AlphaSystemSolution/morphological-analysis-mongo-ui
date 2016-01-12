@@ -5,7 +5,7 @@ import javafx.scene.control.ListCell;
 import javafx.scene.text.Text;
 
 import static com.alphasystem.arabic.model.ArabicWord.getArabicNumber;
-import static com.alphasystem.arabic.ui.util.FontConstants.ARABIC_FONT_24;
+import static com.alphasystem.fx.ui.util.FontConstants.ARABIC_FONT_24;
 import static java.lang.String.format;
 import static javafx.scene.control.ContentDisplay.GRAPHIC_ONLY;
 

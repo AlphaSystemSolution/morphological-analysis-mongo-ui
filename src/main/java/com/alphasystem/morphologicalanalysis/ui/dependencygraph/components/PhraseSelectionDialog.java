@@ -16,8 +16,8 @@ import javafx.scene.text.Text;
 import org.controlsfx.control.ListSelectionView;
 
 import static com.alphasystem.arabic.ui.ListType.LABEL_ONLY;
-import static com.alphasystem.arabic.ui.util.FontConstants.ARABIC_FONT_24;
-import static com.alphasystem.arabic.ui.util.FontConstants.ARABIC_FONT_30;
+import static com.alphasystem.fx.ui.util.FontConstants.ARABIC_FONT_24;
+import static com.alphasystem.fx.ui.util.FontConstants.ARABIC_FONT_30;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.FI_MAHL;
 import static javafx.scene.control.ButtonType.CANCEL;
 import static javafx.scene.control.ButtonType.OK;

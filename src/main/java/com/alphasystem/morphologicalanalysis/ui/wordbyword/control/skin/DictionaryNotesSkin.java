@@ -26,26 +26,23 @@ import org.asciidoctor.Asciidoctor;
 import org.asciidoctor.AttributesBuilder;
 import org.asciidoctor.Options;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
 import static com.alphasystem.arabic.model.ArabicWord.addTatweel;
-import static com.alphasystem.arabic.ui.util.UiUtilities.*;
+import static com.alphasystem.fx.ui.util.UiUtilities.*;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.*;
-import static com.alphasystem.util.AppUtil.NEW_LINE;
+import static com.alphasystem.util.AppUtil.*;
 import static de.jensd.fx.glyphs.GlyphsDude.setIcon;
 import static de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon.*;
 import static de.jensd.fx.glyphs.octicons.OctIcon.KEYBOARD;
+import static java.lang.Character.isWhitespace;
 import static java.lang.String.format;
-import static java.nio.file.Files.write;
-import static java.nio.file.Paths.get;
 import static java.util.Collections.addAll;
 import static javafx.application.Platform.runLater;
 import static javafx.collections.FXCollections.observableArrayList;
@@ -73,7 +70,10 @@ public class DictionaryNotesSkin extends SkinBase<DictionaryNotesView> {
         addAll(HTML_SYMBOLS,
                 new KeyValuePair<>("Add HTML Symbol", ""),
                 new KeyValuePair<>("No Breaking Space", "&#160;"),
-                new KeyValuePair<>("Dash", "&#x2014;"));
+                new KeyValuePair<>("Em Dash", "&#x2014;"),
+                new KeyValuePair<>("Copyright", "&#xa9x;"),
+                new KeyValuePair<>("Registered", "&#xae;"),
+                new KeyValuePair<>("Registered", "&#xae;"));
     }
 
     private final Asciidoctor asciidoctor = Asciidoctor.Factory.create();
@@ -113,18 +113,8 @@ public class DictionaryNotesSkin extends SkinBase<DictionaryNotesView> {
         return url;
     }
 
-    private static void copyResources(File destDir, String resourceDir, String resourceName) {
-        try {
-            Path path = get(destDir.getAbsolutePath(), resourceName);
-            List<String> lines = readAllLines(format("%s.%s", resourceDir, resourceName));
-            write(path, lines);
-        } catch (IOException | URISyntaxException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private static String formatText(String source, String prefix, String suffix) {
-        return format("%s%s%s", prefix, source, suffix);
+    private static String formatText(String source, String markupBegin, String markupEnd) {
+        return format("%s%s%s", markupBegin, source, markupEnd);
     }
 
     public void selectSource() {
@@ -155,11 +145,12 @@ public class DictionaryNotesSkin extends SkinBase<DictionaryNotesView> {
         saveButton.disableProperty().bind(getSkinnable().disabledProperty());
         Button keyboardButton = createButton(KEYBOARD, "Show Keyboard", this::showKeyboard);
         toolBar.getItems().addAll(saveButton,
-                createButton(BOLD, "Bold", "*", "*"), createButton(ITALIC, "Italic", "_", "_"),
-                createButton(UNDERLINE, "Underline", "[underline]#", "#"),
-                createButton(STRIKETHROUGH, "Strike through", "[line-through]#", "#"),
-                createButton(SUBSCRIPT, "Subscript", "~", "~"),
-                createButton(SUPERSCRIPT, "Superscript", "^", "^"),
+                createButton(BOLD, "Bold", event -> applyBold()),
+                createButton(ITALIC, "Italic", event -> applyItalic()),
+                createButton(UNDERLINE, "Underline", event -> applyUnderline()),
+                createButton(STRIKETHROUGH, "Strike through", event -> applyStrikeThrough()),
+                createButton(SUBSCRIPT, "Subscript", event1 -> applySubscript()),
+                createButton(SUPERSCRIPT, "Superscript", event2 -> applySuperscript()),
                 createButton(HEADER, "Heading", event -> insertHeading()),
                 new Separator(), createStyleComboBox(), createHtmlSymbolsComboBox(), keyboardButton);
 
@@ -225,6 +216,86 @@ public class DictionaryNotesSkin extends SkinBase<DictionaryNotesView> {
         }
     }
 
+    private void loadPreview() {
+        preview.loadUrl(getPreviewUrl());
+    }
+
+    private Button createButton(GlyphIcons icon, String tooltip, EventHandler<ActionEvent> action) {
+        Button button = new Button();
+        button.setTooltip(new Tooltip(tooltip));
+        setIcon(button, icon);
+        button.setOnAction(action);
+        return button;
+    }
+
+    private void loadNotes(String notes) {
+        if (isBlank(notes)) {
+            try {
+                List<String> lines = readAllLines(format("%s.%s", ASCII_DOCTOR_RESOURCE_PATH, "template.adoc"));
+                StringBuilder builder = new StringBuilder();
+                builder.append(lines.get(0));
+                for (int i = 1; i < lines.size(); i++) {
+                    builder.append(NEW_LINE).append(lines.get(i));
+                }
+                notes = builder.toString();
+                RootLetters rootLetters = getSkinnable().getRootLetters();
+                if (rootLetters != null) {
+                    ArabicWord arabicWord = rootLetters.getLabel();
+                    if (arabicWord != null) {
+                        arabicWord = addTatweel(arabicWord);
+                        notes = notes.replace("${ArticleName}", arabicWord.toUnicode());
+                    }
+                }
+                getSkinnable().setNotes(notes);
+            } catch (IOException | URISyntaxException e) {
+                e.printStackTrace();
+            }
+        }
+        editor.setText(notes);
+    }
+
+    private void convertDoc() throws Exception {
+        Options options = new Options();
+        options.setBaseDir(DEFAULT_DICTIONARY_DIRECTORY.getAbsolutePath());
+        options.setToFile(DEFAULT_PREVIEW_FILE.getName());
+        AttributesBuilder attributesBuilder = AttributesBuilder.attributes().stylesDir(DEFAULT_CSS_DIRECTORY.getName())
+                .styleSheetName(CSS_RESOURCE_PATH).linkCss(true);
+        options.setAttributes(attributesBuilder.get());
+        String text = editor.getText();
+        getSkinnable().setNotes(text);
+        dictionaryNotesRepository.save(getSkinnable().getDictionaryNotes());
+        asciidoctor.convert(text, options);
+    }
+
+    // action helpers
+
+    private boolean isBoundaryWord() {
+        IndexRange selection = editor.getSelection();
+        boolean boundaryWord = true;
+        try {
+            String text = editor.getText(selection.getStart() - 1, selection.getStart());
+            boundaryWord = isWhitespace(text.charAt(0));
+            if (boundaryWord) {
+                text = editor.getText(selection.getEnd(), selection.getEnd() + 1);
+                boundaryWord = isWhitespace(text.charAt(0));
+            }
+        } catch (Exception ex) {
+        }
+        return boundaryWord;
+    }
+
+    private void applyMarkup(String markupBegin, String markupEnd, int offset) {
+        editor.replaceSelection(formatText(editor.getSelectedText(), markupBegin, markupEnd));
+        if (isBlank(editor.getSelectedText())) {
+            for (int i = 1; i <= offset; i++) {
+                editor.backward();
+            }
+        }
+        editor.requestFocus();
+    }
+
+    // actions
+
     private void saveAction() {
         Service<Void> saveService = new Service<Void>() {
             @Override
@@ -253,8 +324,36 @@ public class DictionaryNotesSkin extends SkinBase<DictionaryNotesView> {
         saveService.start();
     }
 
-    private void loadPreview() {
-        preview.loadUrl(getPreviewUrl());
+    private void applyBold() {
+        boolean boundaryWord = isBoundaryWord();
+        String markupBegin = boundaryWord ? "*" : "**";
+        String markupEnd = boundaryWord ? "*" : "**";
+        int offset = boundaryWord ? 1 : 2;
+        applyMarkup(markupBegin, markupEnd, offset);
+    }
+
+    private void applyItalic() {
+        boolean boundaryWord = isBoundaryWord();
+        String markupBegin = boundaryWord ? "_" : "__";
+        String markupEnd = boundaryWord ? "_" : "__";
+        int offset = boundaryWord ? 1 : 2;
+        applyMarkup(markupBegin, markupEnd, offset);
+    }
+
+    private void applyUnderline() {
+        applyMarkup("[underline]#", "#", 0);
+    }
+
+    private void applyStrikeThrough() {
+        applyMarkup("[line-through]#", "#", 0);
+    }
+
+    private void applySubscript() {
+        applyMarkup("~", "~", 0);
+    }
+
+    private void applySuperscript() {
+        applyMarkup("^", "^", 0);
     }
 
     private void insertHeading() {
@@ -264,60 +363,4 @@ public class DictionaryNotesSkin extends SkinBase<DictionaryNotesView> {
         String insert = currentLine.startsWith("=") ? "=" : "= ";
         editor.insertText(i + 1, insert);
     }
-
-    private Button createButton(GlyphIcons icon, String tooltip, EventHandler<ActionEvent> action) {
-        Button button = new Button();
-        button.setTooltip(new Tooltip(tooltip));
-        setIcon(button, icon);
-        button.setOnAction(action);
-        return button;
-    }
-
-    private Button createButton(GlyphIcons icon, String tooltip, String prefix, String suffix) {
-        return createButton(icon, tooltip, event -> doAction(prefix, suffix));
-    }
-
-    private void doAction(String prefix, String suffix) {
-        editor.replaceSelection(formatText(editor.getSelectedText(), prefix, suffix));
-    }
-
-    private void loadNotes(String notes) {
-        if (isBlank(notes)) {
-            try {
-                List<String> lines = readAllLines(format("%s.%s", ASCII_DOCTOR_RESOURCE_PATH, "template.adoc"));
-                StringBuilder builder = new StringBuilder();
-                builder.append(lines.get(0));
-                for (int i = 1; i < lines.size(); i++) {
-                    builder.append(NEW_LINE).append(lines.get(i));
-                }
-                notes = builder.toString();
-                RootLetters rootLetters = getSkinnable().getRootLetters();
-                if (rootLetters != null) {
-                    ArabicWord arabicWord = rootLetters.getLabel();
-                    if (arabicWord != null) {
-                        arabicWord = addTatweel(arabicWord);
-                    }
-                    notes = notes.replace("${ArticleName}", arabicWord.toUnicode());
-                }
-                getSkinnable().setNotes(notes);
-            } catch (IOException | URISyntaxException e) {
-                e.printStackTrace();
-            }
-        }
-        editor.setText(notes);
-    }
-
-    private void convertDoc() throws Exception {
-        Options options = new Options();
-        options.setBaseDir(DEFAULT_DICTIONARY_DIRECTORY.getAbsolutePath());
-        options.setToFile(DEFAULT_PREVIEW_FILE.getName());
-        AttributesBuilder attributesBuilder = AttributesBuilder.attributes().stylesDir(DEFAULT_CSS_DIRECTORY.getName())
-                .styleSheetName(CSS_RESOURCE_PATH).linkCss(true);
-        options.setAttributes(attributesBuilder.get());
-        String text = editor.getText();
-        getSkinnable().setNotes(text);
-        dictionaryNotesRepository.save(getSkinnable().getDictionaryNotes());
-        asciidoctor.convert(text, options);
-    }
-
 }
