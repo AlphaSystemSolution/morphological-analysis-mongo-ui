@@ -47,6 +47,7 @@ public class ViewTestApp extends Application {
         vBox.getChildren().addAll(view);
 
         Scene scene = new Scene(vBox);
+        scene.getStylesheets().addAll("/styles/glyphs_custom.css");
         primaryStage.setMaximized(true);
         primaryStage.setScene(scene);
         primaryStage.show();
