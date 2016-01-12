@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.*;
 
-import static com.alphasystem.morphologicalanalysis.ui.common.Global.readAllLines;
+import static com.alphasystem.util.AppUtil.readAllLines;
 import static java.lang.Integer.parseInt;
 
 /**

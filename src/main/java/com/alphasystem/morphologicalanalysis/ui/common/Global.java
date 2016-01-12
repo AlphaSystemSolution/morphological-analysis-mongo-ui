@@ -18,14 +18,6 @@ import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.FileSystem;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.HashMap;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -33,10 +25,9 @@ import static com.alphasystem.arabic.model.ArabicLetterType.*;
 import static com.alphasystem.arabic.model.ArabicLetters.WORD_SPACE;
 import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.*;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.*;
-import static com.alphasystem.util.AppUtil.*;
+import static com.alphasystem.util.AppUtil.USER_HOME_DIR;
+import static com.alphasystem.util.AppUtil.getResourceAsStream;
 import static java.lang.String.format;
-import static java.nio.file.FileSystems.newFileSystem;
-import static java.nio.file.Paths.get;
 import static java.util.Arrays.asList;
 import static javafx.scene.layout.BorderStroke.THIN;
 import static javafx.scene.layout.BorderStrokeStyle.SOLID;
@@ -139,32 +130,4 @@ public class Global {
         return new ImageView(image);
     }
 
-    public static List<String> readAllLines(String resourceName) throws IOException, URISyntaxException {
-        FileSystem fs = null;
-        List<String> lines = null;
-        try {
-            URL url = getResource(resourceName);
-            URI uri = url.toURI();
-            Path path;
-            String[] split = uri.toString().split("!");
-            if (split != null && split.length > 1) {
-                fs = newFileSystem(URI.create(split[0]), new HashMap());
-                path = fs.getPath(split[1]);
-            } else {
-                path = get(uri);
-            }
-            lines = Files.readAllLines(path);
-        } catch (IOException | URISyntaxException e) {
-            throw e;
-        } finally {
-            if (fs != null) {
-                try {
-                    fs.close();
-                } catch (IOException e) {
-                }
-            }
-        }
-
-        return lines;
-    }
 }
