@@ -3,4 +3,4 @@
 = [arabic-heading1]#${ArticleName}#
 :doctype: article
 :encoding: utf-8
-:lang: en
+:sourceLanguage: en

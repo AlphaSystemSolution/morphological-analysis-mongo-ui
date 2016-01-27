@@ -7,7 +7,6 @@ import javafx.scene.control.ComboBox;
 import static com.alphasystem.arabic.ui.ComboBoxHelper.createComboBox;
 import static com.alphasystem.arabic.ui.ListType.LABEL_AND_CODE;
 import static com.alphasystem.arabic.ui.ListType.LABEL_ONLY;
-import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 
 /**
  * @author sali
@@ -89,10 +88,8 @@ public class ComboBoxFactory {
         return createComboBox(true, LABEL_ONLY, IncompleteVerbCategory.values());
     }
 
-    public ComboBox<IncompleteVerbType> getIncompleteVerbTypeComboBox(IncompleteVerbType[] values) {
-        boolean addEmptyValue = isEmpty(values);
-        values = addEmptyValue ? new IncompleteVerbType[0] : values;
-        return createComboBox(addEmptyValue, LABEL_ONLY, values);
+    public <T extends Enum<T> & IncompleteVerbType> ComboBox<T> getIncompleteVerbTypeComboBox(T[] values) {
+        return createComboBox(true, LABEL_ONLY, values);
     }
 
 }

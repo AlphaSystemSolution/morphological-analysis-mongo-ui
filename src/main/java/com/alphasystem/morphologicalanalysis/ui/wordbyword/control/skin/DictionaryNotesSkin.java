@@ -280,6 +280,7 @@ public class DictionaryNotesSkin extends SkinBase<DictionaryNotesView> {
                 boundaryWord = isWhitespace(text.charAt(0));
             }
         } catch (Exception ex) {
+            // ignore
         }
         return boundaryWord;
     }

@@ -3,7 +3,6 @@ package com.alphasystem.morphologicalanalysis.ui.wordbyword.control.skin;
 import com.alphasystem.morphologicalanalysis.ui.wordbyword.control.VerbPropertiesView;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.VerbProperties;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.IncompleteVerbCategory;
-import com.alphasystem.morphologicalanalysis.wordbyword.model.support.IncompleteVerbType;
 import javafx.geometry.Insets;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -89,7 +88,7 @@ public class VerbPropertiesSkin extends AbstractPropertiesSkin<VerbProperties, V
         label = new Label(RESOURCE_BUNDLE.getString("incompleteVerbType.label"));
         gridPane.add(label, 0, row);
 
-        ComboBox<IncompleteVerbType> incompleteVerbTypeComboBox = COMBO_BOX_FACTORY.getIncompleteVerbTypeComboBox(null);
+        ComboBox incompleteVerbTypeComboBox = COMBO_BOX_FACTORY.getIncompleteVerbTypeComboBox(null);
         label.setLabelFor(incompleteVerbTypeComboBox);
         incompleteVerbTypeComboBox.valueProperty().bindBidirectional(view.incompleteVerbTypeProperty());
         gridPane.add(incompleteVerbTypeComboBox, 1, row);

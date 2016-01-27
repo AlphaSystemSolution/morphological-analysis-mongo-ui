@@ -8,7 +8,7 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.BorderPane;
 
-import static com.alphasystem.util.AppUtil.isGivenType;
+import static com.alphasystem.util.AppUtil.isInstanceOf;
 import static javafx.geometry.Side.TOP;
 import static javafx.scene.control.TabPane.TabClosingPolicy.UNAVAILABLE;
 
@@ -43,7 +43,7 @@ public class ControlPane extends BorderPane {
             }
             propertiesPane.getAlignTokensYField().getValueFactory().setValue(node.getY());
             propertiesPane.getAlignTokensYField().valueProperty().addListener((observable1, oldValue1, newValue1) -> {
-                nodes.stream().filter(gn -> isGivenType(TerminalNodeAdapter.class, gn)).forEach(gn -> gn.setY(newValue1));
+                nodes.stream().filter(gn -> isInstanceOf(TerminalNodeAdapter.class, gn)).forEach(gn -> gn.setY(newValue1));
             });
             propertiesPane.getAlignTranslationsY().getValueFactory().setValue(node.getTranslationY());
             ObservableList<PartOfSpeechNodeAdapter> partOfSpeeches = node.getPartOfSpeeches();
@@ -53,11 +53,11 @@ public class ControlPane extends BorderPane {
                 propertiesPane.getAlignPOSControlYField().getValueFactory().setValue(partOfSpeechNode.getCy());
             }
             propertiesPane.getAlignTranslationsY().valueProperty().addListener((observable1, oldValue1, newValue1) -> {
-                nodes.stream().filter(gn -> isGivenType(TerminalNodeAdapter.class, gn)).forEach(
+                nodes.stream().filter(gn -> isInstanceOf(TerminalNodeAdapter.class, gn)).forEach(
                         gn -> ((TerminalNodeAdapter) gn).setTranslationY(newValue1));
             });
             propertiesPane.getAlignPOSsYField().valueProperty().addListener((observable1, oldValue1, newValue1) -> {
-                nodes.stream().filter(gn -> isGivenType(TerminalNodeAdapter.class, gn)).forEach(gn -> {
+                nodes.stream().filter(gn -> isInstanceOf(TerminalNodeAdapter.class, gn)).forEach(gn -> {
                     TerminalNodeAdapter terminalNode = (TerminalNodeAdapter) gn;
                     ObservableList<PartOfSpeechNodeAdapter> partOfSpeeches1 = terminalNode.getPartOfSpeeches();
                     if (!partOfSpeeches1.isEmpty()) {
@@ -66,7 +66,7 @@ public class ControlPane extends BorderPane {
                 });
             });
             propertiesPane.getAlignPOSControlYField().valueProperty().addListener((observable1, oldValue1, newValue1) -> {
-                nodes.stream().filter(gn -> isGivenType(TerminalNodeAdapter.class, gn)).forEach(gn -> {
+                nodes.stream().filter(gn -> isInstanceOf(TerminalNodeAdapter.class, gn)).forEach(gn -> {
                     TerminalNodeAdapter terminalNode = (TerminalNodeAdapter) gn;
                     ObservableList<PartOfSpeechNodeAdapter> partOfSpeeches1 = terminalNode.getPartOfSpeeches();
                     if (!partOfSpeeches1.isEmpty()) {
@@ -76,7 +76,7 @@ public class ControlPane extends BorderPane {
             });
             propertiesPane.getAlignGroupTranslateYField().getValueFactory().setValue(node.getTranslateY());
             propertiesPane.getAlignGroupTranslateYField().valueProperty().addListener((observable1, oldValue1, newValue1) -> {
-                nodes.stream().filter(gn -> isGivenType(TerminalNodeAdapter.class, gn)).forEach(
+                nodes.stream().filter(gn -> isInstanceOf(TerminalNodeAdapter.class, gn)).forEach(
                         tn -> tn.setTranslateY(newValue1));
             });
 
