@@ -5,7 +5,7 @@ import com.alphasystem.app.sarfengine.conjugation.model.SarfChart;
 import com.alphasystem.app.sarfengine.guice.GuiceSupport;
 import com.alphasystem.arabic.ui.ArabicLabelToggleGroup;
 import com.alphasystem.arabic.ui.ArabicLabelView;
-import com.alphasystem.arabic.ui.Browser;
+import com.alphasystem.fx.ui.Browser;
 import com.alphasystem.morphologicalanalysis.morphology.model.ConjugationConfiguration;
 import com.alphasystem.morphologicalanalysis.morphology.model.DictionaryNotes;
 import com.alphasystem.morphologicalanalysis.morphology.model.MorphologicalEntry;

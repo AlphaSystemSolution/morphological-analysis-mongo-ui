@@ -1,8 +1,8 @@
 package com.alphasystem.morphologicalanalysis.ui.wordbyword.control.skin;
 
 import com.alphasystem.arabic.model.ArabicWord;
-import com.alphasystem.arabic.ui.Browser;
 import com.alphasystem.arabic.ui.keyboard.KeyboardView;
+import com.alphasystem.fx.ui.Browser;
 import com.alphasystem.morphologicalanalysis.morphology.model.RootLetters;
 import com.alphasystem.morphologicalanalysis.morphology.repository.DictionaryNotesRepository;
 import com.alphasystem.morphologicalanalysis.ui.common.Global;
