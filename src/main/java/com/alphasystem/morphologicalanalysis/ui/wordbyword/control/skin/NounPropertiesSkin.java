@@ -1,5 +1,6 @@
 package com.alphasystem.morphologicalanalysis.ui.wordbyword.control.skin;
 
+import com.alphasystem.morphologicalanalysis.ui.common.ComboBoxFactory;
 import com.alphasystem.morphologicalanalysis.ui.wordbyword.control.NounPropertiesView;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.NounProperties;
 import javafx.geometry.Insets;
@@ -33,7 +34,7 @@ public class NounPropertiesSkin extends AbstractPropertiesSkin<NounProperties, N
         Label label = new Label(RESOURCE_BUNDLE.getString("nounStatus.label"));
         gridPane.add(label, 0, row);
 
-        ComboBox comboBox = COMBO_BOX_FACTORY.getNounStatusComboBox();
+        ComboBox comboBox = ComboBoxFactory.getNounStatusComboBox();
         label.setLabelFor(comboBox);
         comboBox.valueProperty().bindBidirectional(view.nounStatusProperty());
         gridPane.add(comboBox, 1, row);
@@ -42,7 +43,7 @@ public class NounPropertiesSkin extends AbstractPropertiesSkin<NounProperties, N
         label = new Label(RESOURCE_BUNDLE.getString("numberType.label"));
         gridPane.add(label, 0, row);
 
-        comboBox = COMBO_BOX_FACTORY.getNumberTypeComboBox();
+        comboBox = ComboBoxFactory.getNumberTypeComboBox();
         label.setLabelFor(comboBox);
         comboBox.valueProperty().bindBidirectional(view.numberTypeProperty());
         gridPane.add(comboBox, 1, row);
@@ -51,7 +52,7 @@ public class NounPropertiesSkin extends AbstractPropertiesSkin<NounProperties, N
         label = new Label(RESOURCE_BUNDLE.getString("genderType.label"));
         gridPane.add(label, 0, row);
 
-        comboBox = COMBO_BOX_FACTORY.getGenderTypeComboBox();
+        comboBox = ComboBoxFactory.getGenderTypeComboBox();
         label.setLabelFor(comboBox);
         comboBox.valueProperty().bindBidirectional(view.genderTypeProperty());
         gridPane.add(comboBox, 1, row);
@@ -60,7 +61,7 @@ public class NounPropertiesSkin extends AbstractPropertiesSkin<NounProperties, N
         label = new Label(RESOURCE_BUNDLE.getString("nounType.label"));
         gridPane.add(label, 0, row);
 
-        comboBox = COMBO_BOX_FACTORY.getNounTypeComboBox();
+        comboBox = ComboBoxFactory.getNounTypeComboBox();
         label.setLabelFor(comboBox);
         comboBox.valueProperty().bindBidirectional(view.nounTypeProperty());
         gridPane.add(comboBox, 1, row);
@@ -69,7 +70,7 @@ public class NounPropertiesSkin extends AbstractPropertiesSkin<NounProperties, N
         label = new Label(RESOURCE_BUNDLE.getString("nounKind.label"));
         gridPane.add(label, 0, row);
 
-        comboBox = COMBO_BOX_FACTORY.getNounKindComboBox();
+        comboBox = ComboBoxFactory.getNounKindComboBox();
         label.setLabelFor(comboBox);
         comboBox.valueProperty().bindBidirectional(view.nounKindProperty());
         gridPane.add(comboBox, 1, row);

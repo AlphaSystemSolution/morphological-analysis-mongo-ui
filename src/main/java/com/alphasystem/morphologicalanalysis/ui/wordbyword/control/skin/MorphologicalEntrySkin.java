@@ -55,7 +55,7 @@ public class MorphologicalEntrySkin extends SkinBase<MorphologicalEntryView> {
         label = new Label(RESOURCE_BUNDLE.getString("form.label"));
         gridPane.add(label, 0, row);
 
-        ComboBox<NamedTemplate> namedTemplateComboBox = ComboBoxFactory.getInstance().getNamedTemplateComboBox();
+        ComboBox<NamedTemplate> namedTemplateComboBox = ComboBoxFactory.getNamedTemplateComboBox();
         label.setLabelFor(namedTemplateComboBox);
         namedTemplateComboBox.valueProperty().bindBidirectional(control.formProperty());
         gridPane.add(namedTemplateComboBox, 1, row);

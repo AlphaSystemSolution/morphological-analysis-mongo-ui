@@ -1,5 +1,6 @@
 package com.alphasystem.morphologicalanalysis.ui.wordbyword.control.skin;
 
+import com.alphasystem.morphologicalanalysis.ui.common.ComboBoxFactory;
 import com.alphasystem.morphologicalanalysis.ui.wordbyword.control.VerbPropertiesView;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.VerbProperties;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.IncompleteVerbCategory;
@@ -34,7 +35,7 @@ public class VerbPropertiesSkin extends AbstractPropertiesSkin<VerbProperties, V
         Label label = new Label(RESOURCE_BUNDLE.getString("nounStatus.label"));
         gridPane.add(label, 0, row);
 
-        ComboBox comboBox = COMBO_BOX_FACTORY.getVerbTypeComboBox();
+        ComboBox comboBox = ComboBoxFactory.getVerbTypeComboBox();
         label.setLabelFor(comboBox);
         comboBox.valueProperty().bindBidirectional(view.verbTypeProperty());
         gridPane.add(comboBox, 1, row);
@@ -43,7 +44,7 @@ public class VerbPropertiesSkin extends AbstractPropertiesSkin<VerbProperties, V
         label = new Label(RESOURCE_BUNDLE.getString("conversationType.label"));
         gridPane.add(label, 0, row);
 
-        comboBox = COMBO_BOX_FACTORY.getConversationTypeComboBox();
+        comboBox = ComboBoxFactory.getConversationTypeComboBox();
         label.setLabelFor(comboBox);
         comboBox.valueProperty().bindBidirectional(view.conversationTypeProperty());
         gridPane.add(comboBox, 1, row);
@@ -52,7 +53,7 @@ public class VerbPropertiesSkin extends AbstractPropertiesSkin<VerbProperties, V
         label = new Label(RESOURCE_BUNDLE.getString("verbMode.label"));
         gridPane.add(label, 0, row);
 
-        comboBox = COMBO_BOX_FACTORY.getVerbModeComboBox();
+        comboBox = ComboBoxFactory.getVerbModeComboBox();
         label.setLabelFor(comboBox);
         comboBox.valueProperty().bindBidirectional(view.verbModeProperty());
         gridPane.add(comboBox, 1, row);
@@ -61,7 +62,7 @@ public class VerbPropertiesSkin extends AbstractPropertiesSkin<VerbProperties, V
         label = new Label(RESOURCE_BUNDLE.getString("numberType.label"));
         gridPane.add(label, 0, row);
 
-        comboBox = COMBO_BOX_FACTORY.getNumberTypeComboBox();
+        comboBox = ComboBoxFactory.getNumberTypeComboBox();
         label.setLabelFor(comboBox);
         comboBox.valueProperty().bindBidirectional(view.numberTypeProperty());
         gridPane.add(comboBox, 1, row);
@@ -70,7 +71,7 @@ public class VerbPropertiesSkin extends AbstractPropertiesSkin<VerbProperties, V
         label = new Label(RESOURCE_BUNDLE.getString("genderType.label"));
         gridPane.add(label, 0, row);
 
-        comboBox = COMBO_BOX_FACTORY.getGenderTypeComboBox();
+        comboBox = ComboBoxFactory.getGenderTypeComboBox();
         label.setLabelFor(comboBox);
         comboBox.valueProperty().bindBidirectional(view.genderTypeProperty());
         gridPane.add(comboBox, 1, row);
@@ -79,7 +80,7 @@ public class VerbPropertiesSkin extends AbstractPropertiesSkin<VerbProperties, V
         label = new Label(RESOURCE_BUNDLE.getString("incompleteVerbCategory.label"));
         gridPane.add(label, 0, row);
 
-        ComboBox<IncompleteVerbCategory> incompleteVerbCategoryComboBox = COMBO_BOX_FACTORY.getIncompleteVerbCategoryComboBox();
+        ComboBox<IncompleteVerbCategory> incompleteVerbCategoryComboBox = ComboBoxFactory.getIncompleteVerbCategoryComboBox();
         label.setLabelFor(incompleteVerbCategoryComboBox);
         incompleteVerbCategoryComboBox.valueProperty().bindBidirectional(view.incompleteVerbCategoryProperty());
         gridPane.add(incompleteVerbCategoryComboBox, 1, row);
@@ -88,7 +89,7 @@ public class VerbPropertiesSkin extends AbstractPropertiesSkin<VerbProperties, V
         label = new Label(RESOURCE_BUNDLE.getString("incompleteVerbType.label"));
         gridPane.add(label, 0, row);
 
-        ComboBox incompleteVerbTypeComboBox = COMBO_BOX_FACTORY.getIncompleteVerbTypeComboBox(null);
+        ComboBox incompleteVerbTypeComboBox = ComboBoxFactory.getIncompleteVerbTypeComboBox(null);
         label.setLabelFor(incompleteVerbTypeComboBox);
         incompleteVerbTypeComboBox.valueProperty().bindBidirectional(view.incompleteVerbTypeProperty());
         gridPane.add(incompleteVerbTypeComboBox, 1, row);

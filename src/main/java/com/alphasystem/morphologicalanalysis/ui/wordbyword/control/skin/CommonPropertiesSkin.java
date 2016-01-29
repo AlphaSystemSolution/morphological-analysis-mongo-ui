@@ -17,8 +17,6 @@ import static com.alphasystem.morphologicalanalysis.ui.common.Global.RESOURCE_BU
  */
 public class CommonPropertiesSkin extends SkinBase<CommonPropertiesView> {
 
-    private static final ComboBoxFactory COMBO_BOX_FACTORY = ComboBoxFactory.getInstance();
-
     public CommonPropertiesSkin(CommonPropertiesView view) {
         super(view);
         initializeSkin();
@@ -47,7 +45,7 @@ public class CommonPropertiesSkin extends SkinBase<CommonPropertiesView> {
         label = new Label(RESOURCE_BUNDLE.getString("partOfSpeech.label"));
         gridPane.add(label, 0, row);
 
-        ComboBox comboBox = COMBO_BOX_FACTORY.getPartOfSpeechComboBox();
+        ComboBox comboBox = ComboBoxFactory.getPartOfSpeechComboBox();
         label.setLabelFor(comboBox);
         comboBox.valueProperty().bindBidirectional(view.partOfSpeechProperty());
         gridPane.add(comboBox, 1, row);
@@ -56,7 +54,7 @@ public class CommonPropertiesSkin extends SkinBase<CommonPropertiesView> {
         label = new Label(RESOURCE_BUNDLE.getString("namedTag.label"));
         gridPane.add(label, 0, row);
 
-        comboBox = COMBO_BOX_FACTORY.getNamedTagComboBox();
+        comboBox = ComboBoxFactory.getNamedTagComboBox();
         label.setLabelFor(comboBox);
         comboBox.valueProperty().bindBidirectional(view.namedTagProperty());
         gridPane.add(comboBox, 1, row);

@@ -34,8 +34,7 @@ public class PhraseSelectionDialog extends Dialog<PhraseNode> {
 
     public PhraseSelectionDialog() {
         setTitle(getLabel("title"));
-        ComboBoxFactory comboBoxFactory = ComboBoxFactory.getInstance();
-        alternateStatusComboBox = comboBoxFactory.getAlternateStatusComboBox();
+        alternateStatusComboBox = ComboBoxFactory.getAlternateStatusComboBox();
         relationshipsListView = new ListSelectionView<>();
         relationshipsListView.setCellFactory(new ArabicSupportEnumCellFactory<>(LABEL_ONLY));
         relationshipsListView.setMinHeight(5);

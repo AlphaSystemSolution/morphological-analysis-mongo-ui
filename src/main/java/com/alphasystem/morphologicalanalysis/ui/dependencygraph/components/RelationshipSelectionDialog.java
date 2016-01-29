@@ -29,9 +29,8 @@ public class RelationshipSelectionDialog extends Dialog<RelationshipNode> {
 
     public RelationshipSelectionDialog() {
         setTitle(getLabel("title"));
-        ComboBoxFactory comboBoxFactory = ComboBoxFactory.getInstance();
-        relationshipTypeComboBox = comboBoxFactory.getRelationshipTypeComboBox();
-        alternateStatusComboBox = comboBoxFactory.getAlternateStatusComboBox();
+        relationshipTypeComboBox = ComboBoxFactory.getRelationshipTypeComboBox();
+        alternateStatusComboBox = ComboBoxFactory.getAlternateStatusComboBox();
         dependentLabel = new Label();
         dependentLabel.setFont(ARABIC_FONT_20);
         ownerLabel = new Label();
@@ -100,7 +99,7 @@ public class RelationshipSelectionDialog extends Dialog<RelationshipNode> {
         alternateStatusComboBox.getSelectionModel().select(0);
     }
 
-    public void reset(String dependentNodeLabel, String ownerNodeLabel){
+    public void reset(String dependentNodeLabel, String ownerNodeLabel) {
         reset();
         dependentLabel.setText(dependentNodeLabel);
         ownerLabel.setText(ownerNodeLabel);
