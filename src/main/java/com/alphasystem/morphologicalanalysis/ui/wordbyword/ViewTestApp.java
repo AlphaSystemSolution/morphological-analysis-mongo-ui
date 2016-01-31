@@ -1,14 +1,19 @@
 package com.alphasystem.morphologicalanalysis.ui.wordbyword;
 
-import com.alphasystem.arabic.model.ArabicLetterType;
-import com.alphasystem.morphologicalanalysis.morphology.model.DictionaryNotes;
-import com.alphasystem.morphologicalanalysis.morphology.model.RootLetters;
-import com.alphasystem.morphologicalanalysis.ui.wordbyword.control.DictionaryNotesView;
-import com.alphasystem.morphologicalanalysis.util.SpringContextHelper;
+import com.alphasystem.morphologicalanalysis.ui.wordbyword.control.NounPropertiesView;
+import com.alphasystem.morphologicalanalysis.ui.wordbyword.control.ParticlePropertiesView;
+import com.alphasystem.morphologicalanalysis.ui.wordbyword.control.ProNounPropertiesView;
+import com.alphasystem.morphologicalanalysis.ui.wordbyword.control.VerbPropertiesView;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.NounProperties;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.ParticleProperties;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.ProNounProperties;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.VerbProperties;
 import javafx.application.Application;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
-import javafx.scene.layout.VBox;
+import javafx.scene.control.TitledPane;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
@@ -18,7 +23,7 @@ import javafx.stage.Stage;
 public class ViewTestApp extends Application {
 
     static {
-        SpringContextHelper.getInstance();
+        //SpringContextHelper.getInstance();
     }
 
     public static void main(String[] args) {
@@ -36,17 +41,28 @@ public class ViewTestApp extends Application {
         primaryStage.setWidth(bounds.getWidth());
         primaryStage.setHeight(bounds.getHeight());
 
-        VBox vBox = new VBox();
-        vBox.setSpacing(10);
+        GridPane gridPane = new GridPane();
+        gridPane.setVgap(5);
+        gridPane.setHgap(5);
 
-        DictionaryNotesView view = new DictionaryNotesView();
-        DictionaryNotes dictionaryNotes = new DictionaryNotes();
-        RootLetters rootLetters = new RootLetters(ArabicLetterType.NOON, ArabicLetterType.SAD, ArabicLetterType.RA);
-        dictionaryNotes.setRootLetters(rootLetters);
-        view.setDictionaryNotes(dictionaryNotes);
-        vBox.getChildren().addAll(view);
+        NounPropertiesView nounPropertiesView = new NounPropertiesView();
+        nounPropertiesView.setLocationProperties(new NounProperties());
+        gridPane.add(new TitledPane("Noun Properties", nounPropertiesView), 0, 0);
 
-        Scene scene = new Scene(vBox);
+        ProNounPropertiesView proNounPropertiesView = new ProNounPropertiesView();
+        proNounPropertiesView.setLocationProperties(new ProNounProperties());
+        gridPane.add(new TitledPane("ProNoun Properties", proNounPropertiesView), 1, 0);
+
+        VerbPropertiesView verbPropertiesView = new VerbPropertiesView();
+        verbPropertiesView.setLocationProperties(new VerbProperties());
+        gridPane.add(new TitledPane("Verb Properties", verbPropertiesView), 0, 1);
+
+        ParticlePropertiesView particlePropertiesView = new ParticlePropertiesView();
+        particlePropertiesView.setLocationProperties(new ParticleProperties());
+        gridPane.add(new TitledPane("Particle Properties", particlePropertiesView), 1, 1);
+
+        BorderPane borderPane = new BorderPane();
+        Scene scene = new Scene(borderPane);
         scene.getStylesheets().addAll("/styles/glyphs_custom.css");
         primaryStage.setMaximized(true);
         primaryStage.setScene(scene);

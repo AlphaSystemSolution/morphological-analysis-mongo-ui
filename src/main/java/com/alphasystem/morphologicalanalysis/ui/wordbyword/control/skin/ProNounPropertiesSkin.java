@@ -1,15 +1,18 @@
 package com.alphasystem.morphologicalanalysis.ui.wordbyword.control.skin;
 
-import com.alphasystem.morphologicalanalysis.ui.common.ComboBoxFactory;
 import com.alphasystem.morphologicalanalysis.ui.wordbyword.control.ProNounPropertiesView;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.ProNounProperties;
-import javafx.geometry.Insets;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.support.*;
+import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.layout.GridPane;
+import javafx.scene.layout.BorderPane;
 
-import static com.alphasystem.morphologicalanalysis.ui.common.Global.GAP;
+import java.io.IOException;
+import java.net.URL;
+
+import static com.alphasystem.fx.ui.util.UiUtilities.loadFXML;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.RESOURCE_BUNDLE;
+import static java.lang.String.format;
 
 /**
  * @author sali
@@ -21,60 +24,49 @@ public class ProNounPropertiesSkin extends AbstractPropertiesSkin<ProNounPropert
     }
 
     @Override
-    @SuppressWarnings({"unchecked"})
     protected void initializeSkin() {
-        GridPane gridPane = new GridPane();
-        gridPane.setHgap(GAP);
-        gridPane.setVgap(GAP);
-        gridPane.setPadding(new Insets(GAP));
+        getChildren().setAll(new SkinView());
+    }
 
-        ProNounPropertiesView view = getSkinnable();
-        int row = 0;
+    private class SkinView extends BorderPane {
 
-        Label label = new Label(RESOURCE_BUNDLE.getString("proNounType.label"));
-        gridPane.add(label, 0, row);
+        @FXML
+        private ComboBox<ProNounType> proNounTypeComboBox;
 
-        ComboBox comboBox = ComboBoxFactory.getProNounTypeComboBox();
-        label.setLabelFor(comboBox);
-        comboBox.valueProperty().bindBidirectional(view.proNounTypeProperty());
-        gridPane.add(comboBox, 1, row);
+        @FXML
+        private ComboBox<NounStatus> nounStatusComboBox;
 
-        row++;
-        label = new Label(RESOURCE_BUNDLE.getString("numberType.label"));
-        gridPane.add(label, 0, row);
+        @FXML
+        private ComboBox<NumberType> numberTypeComboBox;
 
-        comboBox = ComboBoxFactory.getNumberTypeComboBox();
-        label.setLabelFor(comboBox);
-        comboBox.valueProperty().bindBidirectional(view.numberTypeProperty());
-        gridPane.add(comboBox, 1, row);
+        @FXML
+        private ComboBox<GenderType> genderTypeComboBox;
 
-        row++;
-        label = new Label(RESOURCE_BUNDLE.getString("genderType.label"));
-        gridPane.add(label, 0, row);
+        @FXML
+        private ComboBox<ConversationType> conversationTypeComboBox;
 
-        comboBox = ComboBoxFactory.getGenderTypeComboBox();
-        label.setLabelFor(comboBox);
-        comboBox.valueProperty().bindBidirectional(view.genderTypeProperty());
-        gridPane.add(comboBox, 1, row);
+        private SkinView() {
+            init();
+        }
 
-        row++;
-        label = new Label(RESOURCE_BUNDLE.getString("conversationType.label"));
-        gridPane.add(label, 0, row);
+        private void init() {
+            URL fxmlURL = getClass().getResource(format("/fxml/%s.fxml",
+                    getSkinnable().getClass().getSimpleName()));
+            try {
+                loadFXML(this, fxmlURL, RESOURCE_BUNDLE);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
 
-        comboBox = ComboBoxFactory.getConversationTypeComboBox();
-        label.setLabelFor(comboBox);
-        comboBox.valueProperty().bindBidirectional(view.conversationTypeProperty());
-        gridPane.add(comboBox, 1, row);
-
-        row++;
-        label = new Label(RESOURCE_BUNDLE.getString("nounStatus.label"));
-        gridPane.add(label, 0, row);
-
-        comboBox = ComboBoxFactory.getNounStatusComboBox();
-        label.setLabelFor(comboBox);
-        comboBox.valueProperty().bindBidirectional(view.nounStatusProperty());
-        gridPane.add(comboBox, 1, row);
-
-        getChildren().add(gridPane);
+        @FXML
+        void initialize() {
+            final ProNounPropertiesView view = getSkinnable();
+            proNounTypeComboBox.valueProperty().bindBidirectional(view.proNounTypeProperty());
+            nounStatusComboBox.valueProperty().bindBidirectional(view.nounStatusProperty());
+            numberTypeComboBox.valueProperty().bindBidirectional(view.numberTypeProperty());
+            genderTypeComboBox.valueProperty().bindBidirectional(view.genderTypeProperty());
+            conversationTypeComboBox.valueProperty().bindBidirectional(view.conversationTypeProperty());
+        }
     }
 }

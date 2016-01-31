@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.alphasystem.arabic.ui.ArabicSupportEnumComboBox?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.*?>
+<?import java.lang.Double?>
+<fx:root xmlns:fx="http://javafx.com/fxml/1" type="javafx.scene.layout.BorderPane"
+         xmlns="http://javafx.com/javafx/8.0.40">
+    <fx:define>
+        <Double fx:id="GAP" fx:value="10.0"/>
+    </fx:define>
+    <styleClass>border</styleClass>
+    <center>
+        <GridPane vgap="$GAP" hgap="$GAP">
+            <padding>
+                <Insets top="$GAP" bottom="$GAP" left="$GAP" right="$GAP"/>
+            </padding>
+            <Label text="%translation.label" GridPane.columnIndex="0" GridPane.rowIndex="0"
+                   labelFor="$translationField"/>
+            <TextArea fx:id="translationField" prefRowCount="5" prefColumnCount="15" GridPane.columnIndex="1"
+                      GridPane.rowIndex="0"/>
+
+            <Label text="%partOfSpeech.label" GridPane.columnIndex="0" GridPane.rowIndex="1"
+                   labelFor="$partOfSpeechComboBox"/>
+            <ArabicSupportEnumComboBox fx:id="partOfSpeechComboBox" required="true" type="LABEL_AND_CODE"
+                                       clazz="com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech"
+                                       GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+            <Label text="%namedTag.label" GridPane.columnIndex="0" GridPane.rowIndex="2" labelFor="$namedTagComboBox"/>
+            <ArabicSupportEnumComboBox fx:id="namedTagComboBox" required="true" type="LABEL_AND_CODE"
+                                       clazz="com.alphasystem.morphologicalanalysis.wordbyword.model.support.NamedTag"
+                                       GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+        </GridPane>
+    </center>
+</fx:root>

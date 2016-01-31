@@ -7,6 +7,8 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.control.Skin;
 
+import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.IncompleteVerbCategory.DUMMY;
+
 /**
  * @author sali
  */
@@ -41,7 +43,7 @@ public class VerbPropertiesView extends AbstractPropertiesView<VerbProperties> {
         });
         incompleteVerbCategoryProperty().addListener((o, ov, nv) -> {
             VerbProperties verbProperties = getLocationProperties();
-            if (verbProperties != null) {
+            if ((verbProperties != null) && ((nv != null) && !nv.equals(DUMMY))) {
                 verbProperties.setIncompleteVerb(createIncompleteVerb(nv));
             }
         });

@@ -10,6 +10,7 @@ import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.NOUN;
+import static com.alphasystem.util.AppUtil.getResource;
 
 /**
  * @author sali
@@ -32,6 +33,11 @@ public class CommonPropertiesView extends Control {
         setPartOfSpeech((location == null) ? NOUN : location.getPartOfSpeech());
         setNamedTag((location == null) ? null : location.getNamedTag());
         setTranslation(location == null ? null : location.getTranslation());
+    }
+
+    @Override
+    public String getUserAgentStylesheet() {
+        return getResource("styles/application.css").toExternalForm();
     }
 
     public final Location getLocation() {

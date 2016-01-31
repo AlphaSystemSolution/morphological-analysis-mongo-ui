@@ -3,13 +3,13 @@ package com.alphasystem.morphologicalanalysis.ui.wordbyword.control.skin;
 import com.alphasystem.morphologicalanalysis.ui.wordbyword.control.ParticlePropertiesView;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.ParticleProperties;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
 
-import static com.alphasystem.fx.ui.util.FontConstants.ENGLISH_FONT_ITALIC_12;
-import static javafx.geometry.Pos.CENTER;
+import java.io.IOException;
+import java.net.URL;
+
+import static com.alphasystem.fx.ui.util.UiUtilities.loadFXML;
+import static com.alphasystem.morphologicalanalysis.ui.common.Global.RESOURCE_BUNDLE;
+import static java.lang.String.format;
 
 /**
  * @author sali
@@ -22,19 +22,23 @@ public class ParticlePropertiesSkin extends AbstractPropertiesSkin<ParticlePrope
 
     @Override
     protected void initializeSkin() {
-        FlowPane flowPane = new FlowPane();
-        Text text = new Text("Particles does not \nhave any properties.");
-        text.setFont(ENGLISH_FONT_ITALIC_12);
-        flowPane.getChildren().add(text);
-        flowPane.setAlignment(CENTER);
+        getChildren().setAll(new SkinView());
+    }
 
-        VBox vBox = new VBox();
-        vBox.setSpacing(40);
-        vBox.getChildren().addAll(new Pane(), flowPane, new Pane());
+    private class SkinView extends BorderPane {
 
-        BorderPane borderPane = new BorderPane();
-        borderPane.setCenter(vBox);
+        private SkinView() {
+            init();
+        }
 
-        getChildren().add(borderPane);
+        private void init() {
+            URL fxmlURL = getClass().getResource(format("/fxml/%s.fxml",
+                    getSkinnable().getClass().getSimpleName()));
+            try {
+                loadFXML(this, fxmlURL, RESOURCE_BUNDLE);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

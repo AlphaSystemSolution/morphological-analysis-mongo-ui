@@ -1,16 +1,20 @@
 package com.alphasystem.morphologicalanalysis.ui.wordbyword.control.skin;
 
-import com.alphasystem.morphologicalanalysis.ui.common.ComboBoxFactory;
 import com.alphasystem.morphologicalanalysis.ui.wordbyword.control.CommonPropertiesView;
-import javafx.geometry.Insets;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.support.NamedTag;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech;
+import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
 import javafx.scene.control.SkinBase;
 import javafx.scene.control.TextArea;
-import javafx.scene.layout.GridPane;
+import javafx.scene.layout.BorderPane;
 
-import static com.alphasystem.morphologicalanalysis.ui.common.Global.GAP;
+import java.io.IOException;
+import java.net.URL;
+
+import static com.alphasystem.fx.ui.util.UiUtilities.loadFXML;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.RESOURCE_BUNDLE;
+import static java.lang.String.format;
 
 /**
  * @author sali
@@ -19,46 +23,40 @@ public class CommonPropertiesSkin extends SkinBase<CommonPropertiesView> {
 
     public CommonPropertiesSkin(CommonPropertiesView view) {
         super(view);
-        initializeSkin();
+        getChildren().setAll(new SkinView());
     }
 
-    @SuppressWarnings({"unchecked"})
-    private void initializeSkin() {
-        GridPane gridPane = new GridPane();
-        gridPane.setHgap(GAP);
-        gridPane.setVgap(GAP);
-        gridPane.setPadding(new Insets(GAP));
+    private class SkinView extends BorderPane {
 
-        CommonPropertiesView view = getSkinnable();
-        int row = 0;
-        Label label = new Label(RESOURCE_BUNDLE.getString("translation.label"));
-        gridPane.add(label, 0, row);
+        @FXML
+        private TextArea translationField;
 
-        TextArea textArea = new TextArea();
-        textArea.setPrefRowCount(5);
-        textArea.setPrefColumnCount(15);
-        label.setLabelFor(textArea);
-        textArea.textProperty().bindBidirectional(view.translationProperty());
-        gridPane.add(textArea, 1, row);
+        @FXML
+        private ComboBox<PartOfSpeech> partOfSpeechComboBox;
 
-        row++;
-        label = new Label(RESOURCE_BUNDLE.getString("partOfSpeech.label"));
-        gridPane.add(label, 0, row);
+        @FXML
+        private ComboBox<NamedTag> namedTagComboBox;
 
-        ComboBox comboBox = ComboBoxFactory.getPartOfSpeechComboBox();
-        label.setLabelFor(comboBox);
-        comboBox.valueProperty().bindBidirectional(view.partOfSpeechProperty());
-        gridPane.add(comboBox, 1, row);
+        private SkinView() {
+            init();
+        }
 
-        row++;
-        label = new Label(RESOURCE_BUNDLE.getString("namedTag.label"));
-        gridPane.add(label, 0, row);
+        private void init() {
+            URL fxmlURL = getClass().getResource(format("/fxml/%s.fxml",
+                    getSkinnable().getClass().getSimpleName()));
+            try {
+                loadFXML(this, fxmlURL, RESOURCE_BUNDLE);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
 
-        comboBox = ComboBoxFactory.getNamedTagComboBox();
-        label.setLabelFor(comboBox);
-        comboBox.valueProperty().bindBidirectional(view.namedTagProperty());
-        gridPane.add(comboBox, 1, row);
-        getChildren().add(gridPane);
+        @FXML
+        void initialize() {
+            final CommonPropertiesView view = getSkinnable();
+            translationField.textProperty().bindBidirectional(view.translationProperty());
+            partOfSpeechComboBox.valueProperty().bindBidirectional(view.partOfSpeechProperty());
+            namedTagComboBox.valueProperty().bindBidirectional(view.namedTagProperty());
+        }
     }
-
 }

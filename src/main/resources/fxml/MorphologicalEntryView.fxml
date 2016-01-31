@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.alphasystem.arabic.ui.ArabicSupportEnumComboBox?>
+<?import com.alphasystem.arabic.ui.NounOfPlaceTimesPicker?>
+<?import com.alphasystem.arabic.ui.RootLettersPicker?>
+<?import com.alphasystem.arabic.ui.VerbalNounsPicker?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import java.lang.Double?>
+<fx:root xmlns:fx="http://javafx.com/fxml/1" type="javafx.scene.layout.BorderPane"
+         xmlns="http://javafx.com/javafx/8.0.40">
+    <fx:define>
+        <Double fx:id="GAP" fx:value="10.0"/>
+    </fx:define>
+    <styleClass>border</styleClass>
+    <center>
+        <GridPane vgap="$GAP" hgap="$GAP">
+            <padding>
+                <Insets top="$GAP" bottom="$GAP" left="$GAP" right="$GAP"/>
+            </padding>
+            <Label text="%rootLetters.label" GridPane.columnIndex="0" GridPane.rowIndex="0"
+                   labelFor="$rootLettersPicker" GridPane.halignment="RIGHT"/>
+            <RootLettersPicker fx:id="rootLettersPicker" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+            <Label text="%form.label" GridPane.columnIndex="0" GridPane.rowIndex="1" labelFor="$namedTemplateComboBox"
+                   GridPane.halignment="RIGHT"/>
+            <ArabicSupportEnumComboBox fx:id="namedTemplateComboBox" required="false" type="LABEL_AND_CODE"
+                                       clazz="com.alphasystem.arabic.model.NamedTemplate"
+                                       GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+            <Label text="%verbalNoun.label" GridPane.columnIndex="0" GridPane.rowIndex="2"
+                   labelFor="$verbalNounsPicker" GridPane.halignment="RIGHT"/>
+            <VerbalNounsPicker fx:id="verbalNounsPicker" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+
+            <Label text="%nounOfPlaceAndTime.label" GridPane.columnIndex="0" GridPane.rowIndex="3"
+                   labelFor="$nounOfPlaceTimesPicker" GridPane.halignment="RIGHT"/>
+            <NounOfPlaceTimesPicker fx:id="nounOfPlaceTimesPicker" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+
+            <Label text="%translation.label" GridPane.columnIndex="0" GridPane.rowIndex="4"
+                   labelFor="$translationField" GridPane.halignment="RIGHT"/>
+            <ScrollPane vbarPolicy="AS_NEEDED" hbarPolicy="AS_NEEDED" fitToWidth="true" fitToHeight="true"
+                        GridPane.columnIndex="1" GridPane.rowIndex="4">
+                <TextArea fx:id="translationField" prefRowCount="5" prefColumnCount="15"/>
+            </ScrollPane>
+
+            <Label text="%removePassiveLine.label" GridPane.columnIndex="0" GridPane.rowIndex="5"
+                   labelFor="$removePassiveLine" GridPane.halignment="RIGHT"/>
+            <CheckBox fx:id="removePassiveLine" GridPane.columnIndex="1" GridPane.rowIndex="5"/>
+
+            <Label text="%skipRuleProcessing.label" GridPane.columnIndex="0" GridPane.rowIndex="6"
+                   labelFor="$skipRuleProcessing" GridPane.halignment="RIGHT"/>
+            <CheckBox fx:id="skipRuleProcessing" GridPane.columnIndex="1" GridPane.rowIndex="6"/>
+        </GridPane>
+    </center>
+</fx:root>

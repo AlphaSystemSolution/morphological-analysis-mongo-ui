@@ -6,130 +6,35 @@ import com.alphasystem.arabic.ui.RootLettersPicker;
 import com.alphasystem.arabic.ui.VerbalNounsPicker;
 import com.alphasystem.morphologicalanalysis.morphology.model.support.NounOfPlaceAndTime;
 import com.alphasystem.morphologicalanalysis.morphology.model.support.VerbalNoun;
-import com.alphasystem.morphologicalanalysis.ui.common.ComboBoxFactory;
 import com.alphasystem.morphologicalanalysis.ui.wordbyword.control.MorphologicalEntryView;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableSet;
-import javafx.geometry.Insets;
-import javafx.scene.control.*;
-import javafx.scene.layout.GridPane;
+import javafx.fxml.FXML;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.SkinBase;
+import javafx.scene.control.TextArea;
+import javafx.scene.layout.BorderPane;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.Collection;
 
-import static com.alphasystem.morphologicalanalysis.ui.common.Global.GAP;
+import static com.alphasystem.fx.ui.util.UiUtilities.loadFXML;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.RESOURCE_BUNDLE;
-import static javafx.scene.control.ScrollPane.ScrollBarPolicy.AS_NEEDED;
+import static java.lang.String.format;
 
 /**
  * @author sali
  */
 public class MorphologicalEntrySkin extends SkinBase<MorphologicalEntryView> {
 
-    private final VerbalNounsPicker verbalNounsPicker = new VerbalNounsPicker();
-    private final NounOfPlaceTimesPicker nounOfPlaceTimesPicker = new NounOfPlaceTimesPicker();
+    private final SkinView skinView;
 
     public MorphologicalEntrySkin(MorphologicalEntryView control) {
         super(control);
-        initializeSkin();
-    }
-
-    @SuppressWarnings({"unchecked"})
-    private void initializeSkin() {
-        GridPane gridPane = new GridPane();
-        gridPane.setHgap(GAP);
-        gridPane.setVgap(GAP);
-        gridPane.setPadding(new Insets(GAP));
-
-        MorphologicalEntryView control = getSkinnable();
-
-        int row = 0;
-        Label label = new Label(RESOURCE_BUNDLE.getString("rootLetters.label"));
-        gridPane.add(label, 0, row);
-
-        RootLettersPicker rootLettersPicker = new RootLettersPicker();
-        label.setLabelFor(rootLettersPicker);
-        rootLettersPicker.rootLettersProperty().bindBidirectional(control.rootLettersProperty());
-        gridPane.add(rootLettersPicker, 1, row);
-
-        row++;
-        label = new Label(RESOURCE_BUNDLE.getString("form.label"));
-        gridPane.add(label, 0, row);
-
-        ComboBox<NamedTemplate> namedTemplateComboBox = ComboBoxFactory.getNamedTemplateComboBox();
-        label.setLabelFor(namedTemplateComboBox);
-        namedTemplateComboBox.valueProperty().bindBidirectional(control.formProperty());
-        gridPane.add(namedTemplateComboBox, 1, row);
-
-        row++;
-        label = new Label(RESOURCE_BUNDLE.getString("verbalNoun.label"));
-        gridPane.add(label, 0, row);
-
-        verbalNounsPicker.getValues().addAll(control.getVerbalNouns());
-        verbalNounsPicker.getValues().addListener((ListChangeListener<? super VerbalNoun>) c -> {
-            while (c.next()) {
-                if (c.wasRemoved()) {
-                    control.getVerbalNouns().removeAll(c.getRemoved());
-                }
-                if (c.wasAdded()) {
-                    control.getVerbalNouns().addAll((Collection<? extends VerbalNoun>) c.getAddedSubList());
-                }
-            }
-        });
-        label.setLabelFor(verbalNounsPicker);
-        gridPane.add(verbalNounsPicker, 1, row);
-
-        row++;
-        label = new Label(RESOURCE_BUNDLE.getString("nounOfPlaceAndTime.label"));
-        gridPane.add(label, 0, row);
-
-        nounOfPlaceTimesPicker.getValues().addAll(control.getNounOfPlaceAndTimes());
-        nounOfPlaceTimesPicker.getValues().addListener((ListChangeListener<? super NounOfPlaceAndTime>) c -> {
-            while (c.next()) {
-                if (c.wasRemoved()) {
-                    control.getNounOfPlaceAndTimes().removeAll(c.getRemoved());
-                }
-                if (c.getAddedSize() > 0) {
-                    control.getNounOfPlaceAndTimes().addAll((Collection<? extends NounOfPlaceAndTime>) c.getAddedSubList());
-                }
-            }
-        });
-        label.setLabelFor(nounOfPlaceTimesPicker);
-        gridPane.add(nounOfPlaceTimesPicker, 1, row);
-
-        row++;
-        label = new Label(RESOURCE_BUNDLE.getString("translation.label"));
-        gridPane.add(label, 0, row);
-
-        TextArea textArea = new TextArea();
-        textArea.setPrefRowCount(5);
-        textArea.setPrefColumnCount(25);
-        label.setLabelFor(textArea);
-        textArea.textProperty().bindBidirectional(control.shortTranslationProperty());
-        ScrollPane scrollPane = new ScrollPane();
-        scrollPane.setHbarPolicy(AS_NEEDED);
-        scrollPane.setVbarPolicy(AS_NEEDED);
-        scrollPane.setContent(textArea);
-        gridPane.add(scrollPane, 1, row);
-
-        row++;
-        label = new Label(RESOURCE_BUNDLE.getString("removePassiveLine.label"));
-        gridPane.add(label, 0, row);
-
-        CheckBox checkBox = new CheckBox();
-        checkBox.selectedProperty().bindBidirectional(control.removePassiveLineProperty());
-        label.setLabelFor(checkBox);
-        gridPane.add(checkBox, 1, row);
-
-        row++;
-        label = new Label(RESOURCE_BUNDLE.getString("skipRuleProcessing.label"));
-        gridPane.add(label, 0, row);
-
-        checkBox = new CheckBox();
-        checkBox.selectedProperty().bindBidirectional(control.skipRuleProcessingProperty());
-        label.setLabelFor(checkBox);
-        gridPane.add(checkBox, 1, row);
-
-        getChildren().add(gridPane);
+        skinView = new SkinView();
+        getChildren().setAll(skinView);
     }
 
     public void updateVerbalNounsAndNounOfPlaceTimes() {
@@ -140,24 +45,95 @@ public class MorphologicalEntrySkin extends SkinBase<MorphologicalEntryView> {
     private void updateNounOfPlaceTimes() {
         MorphologicalEntryView control = getSkinnable();
         NamedTemplate template = control.getForm();
-        nounOfPlaceTimesPicker.getValues().clear();
+        skinView.nounOfPlaceTimesPicker.getValues().clear();
         ObservableSet<NounOfPlaceAndTime> nounOfPlaceAndTimesFromControl = control.getNounOfPlaceAndTimes();
         if (nounOfPlaceAndTimesFromControl != null && !nounOfPlaceAndTimesFromControl.isEmpty()) {
-            nounOfPlaceTimesPicker.getValues().addAll(nounOfPlaceAndTimesFromControl);
+            skinView.nounOfPlaceTimesPicker.getValues().addAll(nounOfPlaceAndTimesFromControl);
         } else {
-            nounOfPlaceTimesPicker.getValues().addAll(NounOfPlaceAndTime.getByTemplate(template));
+            skinView.nounOfPlaceTimesPicker.getValues().addAll(NounOfPlaceAndTime.getByTemplate(template));
         }
     }
 
     private void updateVerbalNouns() {
         MorphologicalEntryView control = getSkinnable();
         NamedTemplate template = control.getForm();
-        verbalNounsPicker.getValues().clear();
+        skinView.verbalNounsPicker.getValues().clear();
         ObservableSet<VerbalNoun> verbalNounsFromControl = control.getVerbalNouns();
         if (verbalNounsFromControl != null && !verbalNounsFromControl.isEmpty()) {
-            verbalNounsPicker.getValues().addAll(verbalNounsFromControl);
+            skinView.verbalNounsPicker.getValues().addAll(verbalNounsFromControl);
         } else {
-            verbalNounsPicker.getValues().addAll(VerbalNoun.getByTemplate(template));
+            skinView.verbalNounsPicker.getValues().addAll(VerbalNoun.getByTemplate(template));
+        }
+    }
+
+    private class SkinView extends BorderPane {
+
+        @FXML
+        private RootLettersPicker rootLettersPicker;
+
+        @FXML
+        private ComboBox<NamedTemplate> namedTemplateComboBox;
+
+        @FXML
+        private VerbalNounsPicker verbalNounsPicker;
+
+        @FXML
+        private NounOfPlaceTimesPicker nounOfPlaceTimesPicker;
+
+        @FXML
+        private TextArea translationField;
+
+        @FXML
+        private CheckBox removePassiveLine;
+
+        @FXML
+        private CheckBox skipRuleProcessing;
+
+        private SkinView() {
+            init();
+        }
+
+        private void init() {
+            URL fxmlURL = getClass().getResource(format("/fxml/%s.fxml",
+                    getSkinnable().getClass().getSimpleName()));
+            try {
+                loadFXML(this, fxmlURL, RESOURCE_BUNDLE);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        @FXML
+        @SuppressWarnings({"unchecked", "SuspiciousMethodCalls"})
+        void initialize() {
+            final MorphologicalEntryView view = getSkinnable();
+            rootLettersPicker.rootLettersProperty().bindBidirectional(view.rootLettersProperty());
+            namedTemplateComboBox.valueProperty().bindBidirectional(view.formProperty());
+            verbalNounsPicker.getValues().addAll(view.getVerbalNouns());
+            verbalNounsPicker.getValues().addListener((ListChangeListener<? super VerbalNoun>) c -> {
+                while (c.next()) {
+                    if (c.wasRemoved()) {
+                        view.getVerbalNouns().removeAll(c.getRemoved());
+                    }
+                    if (c.wasAdded()) {
+                        view.getVerbalNouns().addAll((Collection<? extends VerbalNoun>) c.getAddedSubList());
+                    }
+                }
+            });
+            nounOfPlaceTimesPicker.getValues().addAll(view.getNounOfPlaceAndTimes());
+            nounOfPlaceTimesPicker.getValues().addListener((ListChangeListener<? super NounOfPlaceAndTime>) c -> {
+                while (c.next()) {
+                    if (c.wasRemoved()) {
+                        view.getNounOfPlaceAndTimes().removeAll(c.getRemoved());
+                    }
+                    if (c.getAddedSize() > 0) {
+                        view.getNounOfPlaceAndTimes().addAll((Collection<? extends NounOfPlaceAndTime>) c.getAddedSubList());
+                    }
+                }
+            });
+            translationField.textProperty().bindBidirectional(view.shortTranslationProperty());
+            removePassiveLine.selectedProperty().bindBidirectional(view.removePassiveLineProperty());
+            skipRuleProcessing.selectedProperty().bindBidirectional(view.skipRuleProcessingProperty());
         }
     }
 }

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.alphasystem.arabic.ui.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import java.lang.Double?>
+<fx:root xmlns:fx="http://javafx.com/fxml/1" type="javafx.scene.layout.BorderPane"
+         xmlns="http://javafx.com/javafx/8.0.40">
+    <fx:define>
+        <Double fx:id="GAP" fx:value="10.0"/>
+    </fx:define>
+    <styleClass>border</styleClass>
+    <center>
+        <GridPane vgap="$GAP" hgap="$GAP">
+            <padding>
+                <Insets top="$GAP" bottom="$GAP" left="$GAP" right="$GAP"/>
+            </padding>
+
+            <Label text="%verbType.label" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+            <ArabicSupportEnumComboBox fx:id="verbTypeComboBox" required="true" type="LABEL_AND_CODE"
+                                       clazz="com.alphasystem.morphologicalanalysis.wordbyword.model.support.VerbType"
+                                       GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+            <Label text="%conversationType.label" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+            <ArabicSupportEnumComboBox fx:id="conversationTypeComboBox" required="true" type="LABEL_AND_CODE"
+                                       clazz="com.alphasystem.morphologicalanalysis.wordbyword.model.support.ConversationType"
+                                       GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+            <Label text="%numberType.label" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+            <ArabicSupportEnumComboBox fx:id="numberTypeComboBox" required="true" type="LABEL_AND_CODE"
+                                       clazz="com.alphasystem.morphologicalanalysis.wordbyword.model.support.NumberType"
+                                       GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+
+            <Label text="%genderType.label" GridPane.columnIndex="0" GridPane.rowIndex="3"
+                   labelFor="$genderTypeComboBox"/>
+            <ArabicSupportEnumComboBox fx:id="genderTypeComboBox" required="true" type="LABEL_AND_CODE"
+                                       clazz="com.alphasystem.morphologicalanalysis.wordbyword.model.support.GenderType"
+                                       GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+
+            <Label text="%verbMode.label" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
+            <ArabicSupportEnumComboBox fx:id="verbModeComboBox" required="false" type="LABEL_AND_CODE"
+                                       clazz="com.alphasystem.morphologicalanalysis.wordbyword.model.support.VerbMode"
+                                       GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+
+            <Label text="%incompleteVerbCategory.label" GridPane.columnIndex="0" GridPane.rowIndex="5"
+                   labelFor="$incompleteVerbCategoryComboBox"/>
+            <ArabicSupportEnumComboBox fx:id="incompleteVerbCategoryComboBox" required="true" type="LABEL_ONLY"
+                                       clazz="com.alphasystem.morphologicalanalysis.wordbyword.model.support.IncompleteVerbCategory"
+                                       GridPane.columnIndex="1" GridPane.rowIndex="5"/>
+
+            <Label text="%incompleteVerbType.label" GridPane.columnIndex="0" GridPane.rowIndex="6"
+                   labelFor="$incompleteVerbTypeComboBox"/>
+            <ArabicSupportEnumComboBox fx:id="incompleteVerbTypeComboBox" required="false" type="LABEL_ONLY"
+                                       GridPane.columnIndex="1" GridPane.rowIndex="6"
+                                       clazz="com.alphasystem.morphologicalanalysis.wordbyword.model.support.DummyFamily"/>
+        </GridPane>
+    </center>
+</fx:root>

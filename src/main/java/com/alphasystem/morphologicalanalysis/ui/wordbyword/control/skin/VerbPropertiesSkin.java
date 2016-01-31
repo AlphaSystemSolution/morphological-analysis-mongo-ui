@@ -1,16 +1,19 @@
 package com.alphasystem.morphologicalanalysis.ui.wordbyword.control.skin;
 
-import com.alphasystem.morphologicalanalysis.ui.common.ComboBoxFactory;
 import com.alphasystem.morphologicalanalysis.ui.wordbyword.control.VerbPropertiesView;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.VerbProperties;
-import com.alphasystem.morphologicalanalysis.wordbyword.model.support.IncompleteVerbCategory;
-import javafx.geometry.Insets;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.support.*;
+import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.layout.GridPane;
+import javafx.scene.layout.BorderPane;
 
-import static com.alphasystem.morphologicalanalysis.ui.common.Global.GAP;
+import java.io.IOException;
+import java.net.URL;
+
+import static com.alphasystem.fx.ui.util.UiUtilities.loadFXML;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.RESOURCE_BUNDLE;
+import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.IncompleteVerbCategory.DUMMY;
+import static java.lang.String.format;
 
 /**
  * @author sali
@@ -22,89 +25,66 @@ public class VerbPropertiesSkin extends AbstractPropertiesSkin<VerbProperties, V
     }
 
     @Override
-    @SuppressWarnings({"unchecked"})
     protected void initializeSkin() {
-        GridPane gridPane = new GridPane();
-        gridPane.setHgap(GAP);
-        gridPane.setVgap(GAP);
-        gridPane.setPadding(new Insets(GAP));
+        getChildren().setAll(new SkinView());
+    }
 
-        VerbPropertiesView view = getSkinnable();
-        int row = 0;
+    private class SkinView extends BorderPane {
 
-        Label label = new Label(RESOURCE_BUNDLE.getString("nounStatus.label"));
-        gridPane.add(label, 0, row);
+        @FXML
+        private ComboBox<VerbType> verbTypeComboBox;
 
-        ComboBox comboBox = ComboBoxFactory.getVerbTypeComboBox();
-        label.setLabelFor(comboBox);
-        comboBox.valueProperty().bindBidirectional(view.verbTypeProperty());
-        gridPane.add(comboBox, 1, row);
+        @FXML
+        private ComboBox<ConversationType> conversationTypeComboBox;
 
-        row++;
-        label = new Label(RESOURCE_BUNDLE.getString("conversationType.label"));
-        gridPane.add(label, 0, row);
+        @FXML
+        private ComboBox<NumberType> numberTypeComboBox;
 
-        comboBox = ComboBoxFactory.getConversationTypeComboBox();
-        label.setLabelFor(comboBox);
-        comboBox.valueProperty().bindBidirectional(view.conversationTypeProperty());
-        gridPane.add(comboBox, 1, row);
+        @FXML
+        private ComboBox<GenderType> genderTypeComboBox;
 
-        row++;
-        label = new Label(RESOURCE_BUNDLE.getString("verbMode.label"));
-        gridPane.add(label, 0, row);
+        @FXML
+        private ComboBox<VerbMode> verbModeComboBox;
 
-        comboBox = ComboBoxFactory.getVerbModeComboBox();
-        label.setLabelFor(comboBox);
-        comboBox.valueProperty().bindBidirectional(view.verbModeProperty());
-        gridPane.add(comboBox, 1, row);
+        @FXML
+        private ComboBox<IncompleteVerbCategory> incompleteVerbCategoryComboBox;
 
-        row++;
-        label = new Label(RESOURCE_BUNDLE.getString("numberType.label"));
-        gridPane.add(label, 0, row);
+        @FXML
+        private ComboBox<IncompleteVerbType> incompleteVerbTypeComboBox;
 
-        comboBox = ComboBoxFactory.getNumberTypeComboBox();
-        label.setLabelFor(comboBox);
-        comboBox.valueProperty().bindBidirectional(view.numberTypeProperty());
-        gridPane.add(comboBox, 1, row);
+        private SkinView() {
+            init();
+        }
 
-        row++;
-        label = new Label(RESOURCE_BUNDLE.getString("genderType.label"));
-        gridPane.add(label, 0, row);
-
-        comboBox = ComboBoxFactory.getGenderTypeComboBox();
-        label.setLabelFor(comboBox);
-        comboBox.valueProperty().bindBidirectional(view.genderTypeProperty());
-        gridPane.add(comboBox, 1, row);
-
-        row++;
-        label = new Label(RESOURCE_BUNDLE.getString("incompleteVerbCategory.label"));
-        gridPane.add(label, 0, row);
-
-        ComboBox<IncompleteVerbCategory> incompleteVerbCategoryComboBox = ComboBoxFactory.getIncompleteVerbCategoryComboBox();
-        label.setLabelFor(incompleteVerbCategoryComboBox);
-        incompleteVerbCategoryComboBox.valueProperty().bindBidirectional(view.incompleteVerbCategoryProperty());
-        gridPane.add(incompleteVerbCategoryComboBox, 1, row);
-
-        row++;
-        label = new Label(RESOURCE_BUNDLE.getString("incompleteVerbType.label"));
-        gridPane.add(label, 0, row);
-
-        ComboBox incompleteVerbTypeComboBox = ComboBoxFactory.getIncompleteVerbTypeComboBox(null);
-        label.setLabelFor(incompleteVerbTypeComboBox);
-        incompleteVerbTypeComboBox.valueProperty().bindBidirectional(view.incompleteVerbTypeProperty());
-        gridPane.add(incompleteVerbTypeComboBox, 1, row);
-        incompleteVerbTypeComboBox.setDisable(true);
-
-        incompleteVerbCategoryComboBox.getSelectionModel().selectedItemProperty().addListener((o, ov, nv) -> {
-            boolean disable = (nv == null);
-            incompleteVerbTypeComboBox.getItems().clear();
-            incompleteVerbTypeComboBox.setDisable(disable);
-            if (!disable) {
-                incompleteVerbTypeComboBox.getItems().addAll(nv.getMembers());
-                gridPane.requestLayout();
+        private void init() {
+            URL fxmlURL = getClass().getResource(format("/fxml/%s.fxml",
+                    getSkinnable().getClass().getSimpleName()));
+            try {
+                loadFXML(this, fxmlURL, RESOURCE_BUNDLE);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        });
+        }
 
-        getChildren().add(gridPane);
+        @FXML
+        void initialize() {
+            final VerbPropertiesView view = getSkinnable();
+            verbTypeComboBox.valueProperty().bindBidirectional(view.verbTypeProperty());
+            conversationTypeComboBox.valueProperty().bindBidirectional(view.conversationTypeProperty());
+            numberTypeComboBox.valueProperty().bindBidirectional(view.numberTypeProperty());
+            genderTypeComboBox.valueProperty().bindBidirectional(view.genderTypeProperty());
+            verbModeComboBox.valueProperty().bindBidirectional(view.verbModeProperty());
+            incompleteVerbCategoryComboBox.valueProperty().bindBidirectional(view.incompleteVerbCategoryProperty());
+            incompleteVerbTypeComboBox.valueProperty().bindBidirectional(view.incompleteVerbTypeProperty());
+            incompleteVerbTypeComboBox.setDisable(true);
+            incompleteVerbCategoryComboBox.valueProperty().addListener((o, ov, nv) -> {
+                boolean disable = (nv == null) || nv.equals(DUMMY);
+                incompleteVerbTypeComboBox.getItems().clear();
+                incompleteVerbTypeComboBox.setDisable(disable);
+                if (!disable) {
+                    incompleteVerbTypeComboBox.getItems().addAll(nv.getMembers());
+                }
+            });
+        }
     }
 }

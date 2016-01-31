@@ -15,6 +15,7 @@ import javafx.scene.control.Skin;
 
 import java.util.Set;
 
+import static com.alphasystem.util.AppUtil.getResource;
 import static javafx.collections.FXCollections.observableSet;
 
 /**
@@ -103,6 +104,11 @@ public class MorphologicalEntryView extends Control {
             setRemovePassiveLine(removePassiveLine);
             setSkipRuleProcessing(skipRuleProcessing);
         }
+    }
+
+    @Override
+    public String getUserAgentStylesheet() {
+        return getResource("styles/application.css").toExternalForm();
     }
 
     public final MorphologicalEntry getMorphologicalEntry() {

@@ -7,6 +7,8 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.control.Control;
 
+import static com.alphasystem.util.AppUtil.getResource;
+
 /**
  * @author sali
  */
@@ -35,6 +37,11 @@ public class AbstractPropertiesView<T extends AbstractProperties> extends Contro
     protected void setValues(T nv) {
         setNumberType((nv == null) ? null : nv.getNumber());
         setGenderType((nv == null) ? null : nv.getGender());
+    }
+
+    @Override
+    public String getUserAgentStylesheet() {
+        return getResource("styles/application.css").toExternalForm();
     }
 
     public final T getLocationProperties() {
