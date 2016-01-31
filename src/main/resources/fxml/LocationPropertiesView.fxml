@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.alphasystem.morphologicalanalysis.ui.wordbyword.control.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import java.lang.Double?>
+<fx:root xmlns:fx="http://javafx.com/fxml/1" type="javafx.scene.layout.BorderPane"
+         xmlns="http://javafx.com/javafx/8.0.40">
+    <fx:define>
+        <Double fx:id="GAP" fx:value="10.0"/>
+        <NounPropertiesView fx:id="nounPropertiesView"/>
+        <ProNounPropertiesView fx:id="proNounPropertiesView"/>
+        <VerbPropertiesView fx:id="verbPropertiesView"/>
+        <ParticlePropertiesView fx:id="particlePropertiesView"/>
+    </fx:define>
+    <center>
+        <HBox spacing="$GAP">
+            <TitledPane text="%commonPropertiesView.title">
+                <ScrollPane vbarPolicy="AS_NEEDED" hbarPolicy="AS_NEEDED" fitToWidth="true" fitToHeight="true">
+                    <CommonPropertiesView fx:id="commonPropertiesView"/>
+                </ScrollPane>
+            </TitledPane>
+            <TitledPane fx:id="propertiesTitledPane"/>
+            <TitledPane text="%morphologicalEntryView.title">
+                <ScrollPane vbarPolicy="AS_NEEDED" hbarPolicy="AS_NEEDED" fitToWidth="true" fitToHeight="true">
+                    <MorphologicalEntryView fx:id="morphologicalEntryView"/>
+                </ScrollPane>
+            </TitledPane>
+        </HBox>
+    </center>
+</fx:root>
