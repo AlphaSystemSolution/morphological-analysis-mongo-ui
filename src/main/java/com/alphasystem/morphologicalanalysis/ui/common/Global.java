@@ -42,11 +42,8 @@ public class Global {
 
     public static final File DEFAULT_WORD_BY_WORD_WORKING_DIRECTORY = new File(USER_HOME_DIR, ".wordbyword");
     public static final File DEFAULT_DICTIONARY_DIRECTORY = new File(DEFAULT_WORD_BY_WORD_WORKING_DIRECTORY, "dictionary");
-    public static final File DEFAULT_CSS_DIRECTORY = new File(DEFAULT_DICTIONARY_DIRECTORY, "css");
-    public static final String DEFAULT_PREVIEW_FILE_NAME = "preview.html";
-    public static final String ASCII_DOCTOR_RESOURCE_PATH = "asciidoctor";
-    public static final String CSS_RESOURCE_PATH = "morphology-min.css";
-    public static final File DEFAULT_PREVIEW_FILE = new File(DEFAULT_DICTIONARY_DIRECTORY, DEFAULT_PREVIEW_FILE_NAME);
+    public static final String DEFAULT_NOTES_FILE_EXTENSION = ".adoc";
+    public static final String DEFAULT_CSS_DIRECTORY = "css";
     public static final String SPACE_STR = WORD_SPACE.toUnicode();
     public static final ArabicWord FI_MAHL = ArabicWord.getWord(FA, YA, SPACE, MEEM, HHA, LAM);
     public static final List<GraphNodeType> TERMINALS = asList(TERMINAL, IMPLIED, HIDDEN, REFERENCE);
@@ -71,10 +68,6 @@ public class Global {
     public static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("resources");
     public static final String MAWRID_READER_URL = System.getProperty("mawrid-reader.url");
     private static Global instance;
-
-    static {
-        DEFAULT_CSS_DIRECTORY.mkdirs();
-    }
 
     private Global() {
     }

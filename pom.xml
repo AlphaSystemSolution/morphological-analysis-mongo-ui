@@ -114,9 +114,9 @@
             <version>8.40.10</version>
         </dependency>
         <dependency>
-            <groupId>org.asciidoctor</groupId>
-            <artifactId>asciidoctorj</artifactId>
-            <version>1.5.2</version>
+            <groupId>com.alphasystem.app</groupId>
+            <artifactId>asciidoctor-editor</artifactId>
+            <version>${asciidoctor-editor.version}</version>
         </dependency>
         <dependency>
             <groupId>com.alphasystem.svg</groupId>
@@ -141,6 +141,7 @@
         <ma-repository.version>${project.version}</ma-repository.version>
         <sarf-engine.version>${project.version}</sarf-engine.version>
         <arabic-ui-support.version>${project.version}</arabic-ui-support.version>
+        <asciidoctor-editor.version>${project.version}</asciidoctor-editor.version>
         <maven.test.skip>true</maven.test.skip>
         <genOutputDirectory>${project.build.directory}/generated/src/main/java</genOutputDirectory>
     </properties>

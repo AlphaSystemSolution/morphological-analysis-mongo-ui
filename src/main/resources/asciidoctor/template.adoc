@@ -1,6 +1,0 @@
-:last-update-label!:
-
-= [arabic-heading1]#${ArticleName}#
-:doctype: article
-:encoding: utf-8
-:sourceLanguage: en
