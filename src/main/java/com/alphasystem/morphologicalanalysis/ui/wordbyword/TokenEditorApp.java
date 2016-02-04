@@ -11,6 +11,11 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+
+import static com.alphasystem.morphologicalanalysis.ui.common.Global.DEFAULT_DICTIONARY_DIRECTORY;
+import static com.alphasystem.util.nio.NIOFileUtils.copyDir;
 import static de.jensd.fx.glyphs.GlyphsDude.setIcon;
 import static de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon.*;
 import static javafx.scene.input.KeyCode.*;
@@ -23,6 +28,16 @@ import static javafx.scene.input.KeyCombination.SHORTCUT_DOWN;
 public class TokenEditorApp extends Application {
 
     static {
+        if (!DEFAULT_DICTIONARY_DIRECTORY.exists()) {
+            DEFAULT_DICTIONARY_DIRECTORY.mkdirs();
+
+            try {
+                copyDir(DEFAULT_DICTIONARY_DIRECTORY.toPath(), "asciidoctor", TokenEditorApp.class);
+            } catch (IOException | URISyntaxException e) {
+                e.printStackTrace();
+            }
+        }
+
         SpringContextHelper.getInstance();
     }
 
