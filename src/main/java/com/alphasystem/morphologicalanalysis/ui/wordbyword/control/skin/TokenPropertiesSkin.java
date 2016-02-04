@@ -1,5 +1,9 @@
 package com.alphasystem.morphologicalanalysis.ui.wordbyword.control.skin;
 
+import com.alphasystem.app.asciidoctoreditor.ui.ApplicationController;
+import com.alphasystem.app.asciidoctoreditor.ui.control.AsciiDoctorEditor;
+import com.alphasystem.app.asciidoctoreditor.ui.model.ApplicationMode;
+import com.alphasystem.app.asciidoctoreditor.ui.model.AsciiDocPropertyInfo;
 import com.alphasystem.app.sarfengine.conjugation.builder.ConjugationBuilder;
 import com.alphasystem.app.sarfengine.conjugation.model.SarfChart;
 import com.alphasystem.app.sarfengine.guice.GuiceSupport;
@@ -12,8 +16,8 @@ import com.alphasystem.morphologicalanalysis.morphology.model.MorphologicalEntry
 import com.alphasystem.morphologicalanalysis.morphology.model.RootLetters;
 import com.alphasystem.morphologicalanalysis.morphology.model.support.NounOfPlaceAndTime;
 import com.alphasystem.morphologicalanalysis.morphology.model.support.VerbalNoun;
+import com.alphasystem.morphologicalanalysis.morphology.repository.DictionaryNotesRepository;
 import com.alphasystem.morphologicalanalysis.ui.common.LocationListCell;
-import com.alphasystem.morphologicalanalysis.ui.wordbyword.control.DictionaryNotesView;
 import com.alphasystem.morphologicalanalysis.ui.wordbyword.control.LocationPropertiesView;
 import com.alphasystem.morphologicalanalysis.ui.wordbyword.control.SarfChartView;
 import com.alphasystem.morphologicalanalysis.ui.wordbyword.control.TokenPropertiesView;
@@ -25,6 +29,8 @@ import javafx.beans.binding.BooleanBinding;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
+import javafx.concurrent.WorkerStateEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
@@ -32,14 +38,25 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.alphasystem.app.asciidoctoreditor.ui.model.Action.SAVE;
+import static com.alphasystem.app.asciidoctoreditor.ui.model.DocumentType.ARTICLE;
+import static com.alphasystem.app.asciidoctoreditor.ui.model.IconFontName.FONT_AWESOME;
+import static com.alphasystem.app.asciidoctoreditor.ui.model.Icons.FONT;
 import static com.alphasystem.fx.ui.util.FontConstants.ARABIC_FONT_36;
 import static com.alphasystem.fx.ui.util.UiUtilities.*;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.*;
 import static com.alphasystem.morphologicalanalysis.ui.wordbyword.control.TokenPropertiesView.SelectionStatus.*;
+import static com.alphasystem.util.nio.NIOFileUtils.fastCopy;
 import static java.lang.String.format;
+import static java.nio.file.Files.newInputStream;
+import static java.nio.file.Files.newOutputStream;
+import static java.nio.file.Paths.get;
+import static java.nio.file.StandardOpenOption.CREATE;
+import static java.nio.file.StandardOpenOption.WRITE;
 import static javafx.geometry.NodeOrientation.RIGHT_TO_LEFT;
 import static javafx.geometry.Pos.CENTER;
 import static javafx.scene.control.TabPane.TabClosingPolicy.UNAVAILABLE;
@@ -56,13 +73,14 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
     private final TabPane tabPane;
     private final Browser browser;
     private final SarfChartView conjugationViewer;
-    private final DictionaryNotesView dictionaryNotesView;
+    private final AsciiDoctorEditor asciiDoctorEditor;
     private final Tab browseDictionaryTab;
     private final Tab morphologicalConjugationTab;
     private final Tab dictionaryNotesTab;
+    private final MorphologicalAnalysisRepositoryUtil repositoryUtil = RepositoryTool.getInstance().getRepositoryUtil();
+    private final DictionaryNotesRepository dictionaryNotesRepository = repositoryUtil.getDictionaryNotesRepository();
     private ConjugationBuilder conjugationBuilder = GuiceSupport.getInstance().getConjugationBuilderFactory()
             .getConjugationBuilder();
-    private MorphologicalAnalysisRepositoryUtil repositoryUtil = RepositoryTool.getInstance().getRepositoryUtil();
 
     public TokenPropertiesSkin(TokenPropertiesView control) {
         super(control);
@@ -72,7 +90,7 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
 
         browser = new Browser();
         conjugationViewer = new SarfChartView();
-        dictionaryNotesView = new DictionaryNotesView();
+        asciiDoctorEditor = new AsciiDoctorEditor(ApplicationMode.EMBEDDED);
 
         tabPane = new TabPane();
         tabPane.setTabClosingPolicy(UNAVAILABLE);
@@ -81,8 +99,20 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
         browseDictionaryTab = new Tab("Browse Dictionary", browser);
         morphologicalConjugationTab = new Tab("Morphological Conjugation", wrapInScrollPane(conjugationViewer));
 
-        dictionaryNotesTab = new Tab("Dictionary Notes", dictionaryNotesView);
-        dictionaryNotesTab.selectedProperty().addListener((o, ov, nv) -> dictionaryNotesView.selectSource());
+        dictionaryNotesTab = new Tab("Dictionary Notes", asciiDoctorEditor);
+        asciiDoctorEditor.actionProperty().addListener((o, ov, nv) -> {
+            if (SAVE.equals(nv)) {
+                final DictionaryNotes dictionaryNotes = (DictionaryNotes) dictionaryNotesTab.getUserData();
+                try (InputStream inputStream = newInputStream(get(getDictionaryNotesFile(dictionaryNotes).getPath()))) {
+                    dictionaryNotes.setInputStream(inputStream);
+                    dictionaryNotesRepository.store(dictionaryNotes);
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+        //TODO: whenever we are selecting "Dictionary Notes" tab we should be directly going to source tab
+        //dictionaryNotesTab.selectedProperty().addListener((o, ov, nv) -> dictionaryNotesView.selectSource());
 
         locationComboBox = new ComboBox<>();
         locationPropertiesView = new LocationPropertiesView();
@@ -111,6 +141,10 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
         morphologicalConjugationTab.selectedProperty().addListener((o, ov, nv) -> {
             loadConjugation(locationPropertiesView.getLocation().getMorphologicalEntry());
         });
+    }
+
+    private static File getDictionaryNotesFile(final DictionaryNotes dictionaryNotes) {
+        return new File(DEFAULT_DICTIONARY_DIRECTORY, dictionaryNotes.getFileName());
     }
 
     private void createLettersPane() {
@@ -204,7 +238,11 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
     private void loadDictionaryNotes(final RootLetters rootLetters) {
         boolean disabled = dictionaryNotesTab.isDisabled();
         if (!disabled) {
-            retrieveDictionaryNotes(rootLetters);
+            try {
+                retrieveDictionaryNotes(rootLetters);
+            } catch (UncheckedIOException ex) {
+                ex.printStackTrace();
+            }
         }
     }
 
@@ -213,10 +251,48 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
         service.setOnFailed(event -> defaultCursor(getSkinnable()));
         service.setOnSucceeded(event -> {
             defaultCursor(getSkinnable());
-            dictionaryNotesView.setDictionaryNotes(null);
-            dictionaryNotesView.setDictionaryNotes((DictionaryNotes) event.getSource().getValue());
+            DictionaryNotes dictionaryNotes = (DictionaryNotes) event.getSource().getValue();
+            if (dictionaryNotes.getId() == null) {
+                waitCursor(getSkinnable());
+                createNewDictionaryNotes(rootLetters);
+            } else {
+                final File dictionaryNotesFile = getDictionaryNotesFile(dictionaryNotes);
+                try (InputStream inputStream = dictionaryNotes.getInputStream();
+                     OutputStream outputStream = newOutputStream(dictionaryNotesFile.toPath(), WRITE, CREATE)) {
+                    fastCopy(inputStream, outputStream);
+                    asciiDoctorEditor.setInitialFile(dictionaryNotesFile);
+                } catch (IOException ex) {
+                    throw new UncheckedIOException(ex.getMessage(), ex);
+                }
+            }
+            dictionaryNotesTab.setUserData(dictionaryNotes);
         });
         service.start();
+    }
+
+    private void createNewDictionaryNotes(RootLetters rootLetters) {
+        // new dictionary notes, create now
+        AsciiDocPropertyInfo propertyInfo = new AsciiDocPropertyInfo();
+        propertyInfo.setDocumentType(ARTICLE.getType());
+        propertyInfo.setDocumentName(rootLetters.getName());
+        propertyInfo.setDocumentTitle(format("[arabic-heading1]#%s#", rootLetters.getLabel().toHtmlCode()));
+        propertyInfo.setStylesDir(DEFAULT_CSS_DIRECTORY);
+        propertyInfo.setLinkCss(true);
+        propertyInfo.setIcons(FONT.getValue());
+        propertyInfo.setIconFontName(FONT_AWESOME.getDispalyName());
+        propertyInfo.setDocInfo2(true);
+        propertyInfo.setOmitLastUpdatedTimeStamp(true);
+        propertyInfo.setSrcFile(getDictionaryNotesFile(new DictionaryNotes(rootLetters)));
+        EventHandler<WorkerStateEvent> onFailed = event -> {
+            defaultCursor(getSkinnable());
+            final Throwable ex = event.getSource().getException();
+            throw new RuntimeException(ex.getMessage(), ex);
+        };
+        EventHandler<WorkerStateEvent> onSucceeded = event -> {
+            asciiDoctorEditor.setInitialFile((File) event.getSource().getValue());
+            defaultCursor(getSkinnable());
+        };
+        ApplicationController.getInstance().doNewDocAction(propertyInfo, onFailed, onSucceeded);
     }
 
     private void loadConjugation(final MorphologicalEntry entry) {
@@ -307,9 +383,7 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
                 @Override
                 protected DictionaryNotes call() throws Exception {
                     waitCursor(getSkinnable());
-                    DictionaryNotes tmp = new DictionaryNotes(rootLetters);
-                    DictionaryNotes saved = repositoryUtil.findDictionaryNotes(tmp);
-                    return (saved == null) ? tmp : saved;
+                    return dictionaryNotesRepository.retrieve(rootLetters);
                 }
             };
         }
