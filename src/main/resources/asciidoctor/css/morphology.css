@@ -1,9 +1,13 @@
-.arabic-heading1, .arabic-normal {
+.arabic-heading1, .arabic-label, .arabic-normal {
     font-family: "Arabic Typesetting";
 }
 
-.arabic-heading1 {
+.arabic-heading1, .arabic-label {
     color: #1569C7;
+}
+
+.arabic-label {
+    font-size: 3em;
 }
 
 .arabic-normal {
