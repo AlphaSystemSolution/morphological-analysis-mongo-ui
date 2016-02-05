@@ -39,6 +39,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 import java.io.*;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,8 +53,7 @@ import static com.alphasystem.morphologicalanalysis.ui.common.Global.*;
 import static com.alphasystem.morphologicalanalysis.ui.wordbyword.control.TokenPropertiesView.SelectionStatus.*;
 import static com.alphasystem.util.nio.NIOFileUtils.fastCopy;
 import static java.lang.String.format;
-import static java.nio.file.Files.newInputStream;
-import static java.nio.file.Files.newOutputStream;
+import static java.nio.file.Files.*;
 import static java.nio.file.Paths.get;
 import static java.nio.file.StandardOpenOption.CREATE;
 import static java.nio.file.StandardOpenOption.WRITE;
@@ -103,7 +103,8 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
         asciiDoctorEditor.actionProperty().addListener((o, ov, nv) -> {
             if (SAVE.equals(nv)) {
                 final DictionaryNotes dictionaryNotes = (DictionaryNotes) dictionaryNotesTab.getUserData();
-                try (InputStream inputStream = newInputStream(get(getDictionaryNotesFile(dictionaryNotes).getPath()))) {
+                final Path path = dictionaryNotes.getFilePath();
+                try (InputStream inputStream = newInputStream(path)) {
                     dictionaryNotes.setInputStream(inputStream);
                     dictionaryNotesRepository.store(dictionaryNotes);
                 } catch (IOException ex) {
@@ -143,8 +144,22 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
         });
     }
 
-    private static File getDictionaryNotesFile(final DictionaryNotes dictionaryNotes) {
-        return new File(DEFAULT_DICTIONARY_DIRECTORY, dictionaryNotes.getFileName());
+    private static void setDictionaryNotesFile(final DictionaryNotes dictionaryNotes) {
+        String fileName = dictionaryNotes.getFileName();
+        if (fileName == null) {
+            Path filePath = get(format("%s%s", dictionaryNotes.getName(), DEFAULT_NOTES_FILE_EXTENSION));
+            fileName = filePath.getFileName().toString();
+            dictionaryNotes.setFileName(fileName);
+        }
+        Path path = get(DEFAULT_DICTIONARY_DIRECTORY.getPath(), fileName);
+        try {
+            if (!exists(path)) {
+                path = createFile(path);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        dictionaryNotes.setFilePath(path);
     }
 
     private void createLettersPane() {
@@ -252,15 +267,16 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
         service.setOnSucceeded(event -> {
             defaultCursor(getSkinnable());
             DictionaryNotes dictionaryNotes = (DictionaryNotes) event.getSource().getValue();
+            setDictionaryNotesFile(dictionaryNotes);
+            Path dictionaryNotesFile = dictionaryNotes.getFilePath();
             if (dictionaryNotes.getId() == null) {
                 waitCursor(getSkinnable());
-                createNewDictionaryNotes(rootLetters);
+                createNewDictionaryNotes(dictionaryNotes);
             } else {
-                final File dictionaryNotesFile = getDictionaryNotesFile(dictionaryNotes);
                 try (InputStream inputStream = dictionaryNotes.getInputStream();
-                     OutputStream outputStream = newOutputStream(dictionaryNotesFile.toPath(), WRITE, CREATE)) {
+                     OutputStream outputStream = newOutputStream(dictionaryNotesFile, WRITE, CREATE)) {
                     fastCopy(inputStream, outputStream);
-                    asciiDoctorEditor.setInitialFile(dictionaryNotesFile);
+                    asciiDoctorEditor.setInitialFile(dictionaryNotesFile.toFile());
                 } catch (IOException ex) {
                     throw new UncheckedIOException(ex.getMessage(), ex);
                 }
@@ -270,19 +286,20 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
         service.start();
     }
 
-    private void createNewDictionaryNotes(RootLetters rootLetters) {
+    private void createNewDictionaryNotes(DictionaryNotes dictionaryNotes) {
         // new dictionary notes, create now
         AsciiDocPropertyInfo propertyInfo = new AsciiDocPropertyInfo();
         propertyInfo.setDocumentType(ARTICLE.getType());
-        propertyInfo.setDocumentName(rootLetters.getName());
-        propertyInfo.setDocumentTitle(format("[arabic-heading1]#%s#", rootLetters.getLabel().toHtmlCode()));
+        propertyInfo.setDocumentName(dictionaryNotes.getName());
+        propertyInfo.setDocumentTitle(format("[arabic-heading1]#%s#",
+                dictionaryNotes.getRootLetters().getLabel().toHtmlCode()));
         propertyInfo.setStylesDir(DEFAULT_CSS_DIRECTORY);
         propertyInfo.setLinkCss(true);
         propertyInfo.setIcons(FONT.getValue());
         propertyInfo.setIconFontName(FONT_AWESOME.getDispalyName());
         propertyInfo.setDocInfo2(true);
         propertyInfo.setOmitLastUpdatedTimeStamp(true);
-        propertyInfo.setSrcFile(getDictionaryNotesFile(new DictionaryNotes(rootLetters)));
+        propertyInfo.setSrcFile(dictionaryNotes.getFilePath().toFile());
         EventHandler<WorkerStateEvent> onFailed = event -> {
             defaultCursor(getSkinnable());
             final Throwable ex = event.getSource().getException();
@@ -292,7 +309,7 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
             asciiDoctorEditor.setInitialFile((File) event.getSource().getValue());
             defaultCursor(getSkinnable());
         };
-        ApplicationController.getInstance().doNewDocAction(propertyInfo, onFailed, onSucceeded);
+        ApplicationController.getInstance().doNewDocAction(propertyInfo, true, onFailed, onSucceeded);
     }
 
     private void loadConjugation(final MorphologicalEntry entry) {
