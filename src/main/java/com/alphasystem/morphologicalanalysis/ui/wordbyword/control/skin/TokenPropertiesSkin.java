@@ -3,12 +3,12 @@ package com.alphasystem.morphologicalanalysis.ui.wordbyword.control.skin;
 import com.alphasystem.app.asciidoctoreditor.ui.ApplicationController;
 import com.alphasystem.app.asciidoctoreditor.ui.control.AsciiDoctorEditor;
 import com.alphasystem.app.asciidoctoreditor.ui.model.ApplicationMode;
-import com.alphasystem.app.asciidoctoreditor.ui.model.AsciiDocPropertyInfo;
 import com.alphasystem.app.sarfengine.conjugation.builder.ConjugationBuilder;
 import com.alphasystem.app.sarfengine.conjugation.model.SarfChart;
 import com.alphasystem.app.sarfengine.guice.GuiceSupport;
 import com.alphasystem.arabic.ui.ArabicLabelToggleGroup;
 import com.alphasystem.arabic.ui.ArabicLabelView;
+import com.alphasystem.asciidoc.model.AsciiDocumentInfo;
 import com.alphasystem.fx.ui.Browser;
 import com.alphasystem.morphologicalanalysis.morphology.model.ConjugationConfiguration;
 import com.alphasystem.morphologicalanalysis.morphology.model.DictionaryNotes;
@@ -288,7 +288,7 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
 
     private void createNewDictionaryNotes(DictionaryNotes dictionaryNotes) {
         // new dictionary notes, create now
-        AsciiDocPropertyInfo propertyInfo = new AsciiDocPropertyInfo();
+        AsciiDocumentInfo propertyInfo = new AsciiDocumentInfo();
         propertyInfo.setDocumentType(ARTICLE.getType());
         propertyInfo.setDocumentName(dictionaryNotes.getName());
         propertyInfo.setDocumentTitle(format("[arabic-heading1]#%s#",
