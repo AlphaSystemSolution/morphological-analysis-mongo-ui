@@ -65,12 +65,12 @@ public class WordByWordPane extends BorderPane {
         actionProperty().addListener((observable, oldValue, newValue) -> performAction(newValue));
 
         TableColumn descriptionColumn = new TableColumn<>();
-        descriptionColumn.setMinWidth(700);
+        descriptionColumn.setMinWidth(800);
         descriptionColumn.setText("Description");
         descriptionColumn.setCellValueFactory(new PropertyValueFactory<>("morphologicalDescription"));
 
         TableColumn<TableCellModel, String> tokenColumn = new TableColumn<>();
-        tokenColumn.setMinWidth(200);
+        tokenColumn.setMinWidth(500);
         tokenColumn.setText("Token");
         tokenColumn.setCellValueFactory(new PropertyValueFactory<>("tokenText"));
         tokenColumn.setCellFactory(column -> new TableCell<TableCellModel, String>() {
@@ -98,7 +98,7 @@ public class WordByWordPane extends BorderPane {
         });
 
         TableColumn tokenNumberColumn = new TableColumn<>();
-        tokenNumberColumn.setMinWidth(200);
+        tokenNumberColumn.setMinWidth(500);
         tokenNumberColumn.setText("Token Number");
         tokenNumberColumn.setCellValueFactory(new PropertyValueFactory<>("tokenNumber"));
         tokenNumberColumn.setCellFactory(column -> new TableCell<TableCellModel, String>() {
@@ -251,7 +251,7 @@ public class WordByWordPane extends BorderPane {
         double width = bounds.getWidth();
         left.setPrefWidth(width / 3);
 
-        topPane.setLeft(left);
+        //topPane.setLeft(left);
         topPane.setCenter(chapterVerseSelectionPane);
         chapterVerseSelectionPane.selectedVerseProperty().addListener((observable, oldValue, newValue) -> {
             refreshTable();
