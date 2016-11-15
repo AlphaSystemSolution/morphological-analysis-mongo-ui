@@ -2,6 +2,7 @@ package com.alphasystem.morphologicalanalysis.ui.dependencygraph.model;
 
 import com.alphasystem.morphologicalanalysis.graph.model.TerminalNode;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.CanvasUtil;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -39,9 +40,14 @@ public class TerminalNodeAdapter extends LineSupportAdapter<TerminalNode> {
     @Override
     protected void initValues(TerminalNode terminalNode) {
         super.initValues(terminalNode);
-        setTranslationX(terminalNode == null ? null : terminalNode.getTranslationX());
-        setTranslationY(terminalNode == null ? null : terminalNode.getTranslationY());
-        setTranslationText(terminalNode == null ? null : terminalNode.getToken().getTranslation());
+        if (terminalNode != null) {
+            setTranslationX(terminalNode.getTranslationX());
+            setTranslationY(terminalNode.getTranslationY());
+            final Token token = terminalNode.getToken();
+            if (token != null) {
+                setTranslationText(token.getTranslation());
+            }
+        }
         partOfSpeeches.remove(0, partOfSpeeches.size());
         if (terminalNode != null) {
             setTranslationFont(CanvasUtil.getInstance().createFont(terminalNode.getTranslationFont()));
