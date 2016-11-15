@@ -45,6 +45,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-jar-plugin</artifactId>
+                        <version>3.0.2</version>
                         <configuration>
                             <classifier>wordbyword</classifier>
                         </configuration>
@@ -62,6 +63,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-jar-plugin</artifactId>
+                        <version>3.0.2</version>
                         <configuration>
                             <classifier>treebank</classifier>
                         </configuration>
@@ -79,6 +81,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-jar-plugin</artifactId>
+                        <version>3.0.2</version>
                         <configuration>
                             <classifier>tokeneditor</classifier>
                         </configuration>
@@ -118,11 +121,11 @@
             <artifactId>asciidoctor-editor</artifactId>
             <version>${asciidoctor-editor.version}</version>
         </dependency>
-        <dependency>
-            <groupId>com.alphasystem.svg</groupId>
-            <artifactId>svg-model</artifactId>
-            <version>${svg-model.version}</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>com.alphasystem.svg</groupId>-->
+            <!--<artifactId>svg-model</artifactId>-->
+            <!--<version>${svg-model.version}</version>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
