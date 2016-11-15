@@ -394,66 +394,46 @@ public class CanvasPane extends Pane {
                 cubicCurve.getControlX1(), cubicCurve.getControlY1(), cubicCurve.getControlX2(),
                 cubicCurve.getControlY2(), cubicCurve.getEndX(), cubicCurve.getEndY());
         Polyline arrow = tool.drawPolyline(color, arrowPoints);
-        rn.t1Property().addListener((observable, oldValue, newValue) -> {
-            updateArrawPoints((Double) newValue, rn.getT2(), cubicCurve.getStartX(),
-                    cubicCurve.getStartY(), cubicCurve.getControlX1(), cubicCurve.getControlY1(),
-                    cubicCurve.getControlX2(), cubicCurve.getControlY2(), cubicCurve.getEndX(), cubicCurve.getEndY(),
-                    arrow);
-        });
-        rn.t2Property().addListener((observable, oldValue, newValue) -> {
-            updateArrawPoints(rn.getT1(), (Double) newValue, cubicCurve.getStartX(),
-                    cubicCurve.getStartY(), cubicCurve.getControlX1(), cubicCurve.getControlY1(),
-                    cubicCurve.getControlX2(), cubicCurve.getControlY2(), cubicCurve.getEndX(), cubicCurve.getEndY(),
-                    arrow);
-        });
-        cubicCurve.startXProperty().addListener((observable, oldValue, newValue) -> {
-            updateArrawPoints(rn.getT1(), rn.getT2(), (Double) newValue,
-                    cubicCurve.getStartY(), cubicCurve.getControlX1(), cubicCurve.getControlY1(),
-                    cubicCurve.getControlX2(), cubicCurve.getControlY2(), cubicCurve.getEndX(), cubicCurve.getEndY(),
-                    arrow);
-        });
-        cubicCurve.startYProperty().addListener((observable, oldValue, newValue) -> {
-            updateArrawPoints(rn.getT1(), rn.getT2(), cubicCurve.getStartX(),
-                    (Double) newValue, cubicCurve.getControlX1(), cubicCurve.getControlY1(),
-                    cubicCurve.getControlX2(), cubicCurve.getControlY2(), cubicCurve.getEndX(), cubicCurve.getEndY(),
-                    arrow);
-        });
-        cubicCurve.controlX1Property().addListener((observable, oldValue, newValue) -> {
-            updateArrawPoints(rn.getT1(), rn.getT2(), cubicCurve.getStartX(),
-                    cubicCurve.getStartY(), (Double) newValue, cubicCurve.getControlY1(),
-                    cubicCurve.getControlX2(), cubicCurve.getControlY2(), cubicCurve.getEndX(), cubicCurve.getEndY(),
-                    arrow);
-        });
-        cubicCurve.controlY1Property().addListener((observable, oldValue, newValue) -> {
-            updateArrawPoints(rn.getT1(), rn.getT2(), cubicCurve.getStartX(),
-                    cubicCurve.getStartY(), rn.getControlX1(), (Double) newValue,
-                    cubicCurve.getControlX2(), cubicCurve.getControlY2(), cubicCurve.getEndX(), cubicCurve.getEndY(),
-                    arrow);
-        });
-        cubicCurve.controlX2Property().addListener((observable, oldValue, newValue) -> {
-            updateArrawPoints(rn.getT1(), rn.getT2(), cubicCurve.getStartX(),
-                    cubicCurve.getStartY(), rn.getControlX1(), cubicCurve.getControlY1(),
-                    (Double) newValue, cubicCurve.getControlY2(), cubicCurve.getEndX(), cubicCurve.getEndY(),
-                    arrow);
-        });
-        cubicCurve.controlY2Property().addListener((observable, oldValue, newValue) -> {
-            updateArrawPoints(rn.getT1(), rn.getT2(), cubicCurve.getStartX(),
-                    cubicCurve.getStartY(), rn.getControlX1(), rn.getControlY1(),
-                    cubicCurve.getControlX2(), (Double) newValue, cubicCurve.getEndX(), cubicCurve.getEndY(),
-                    arrow);
-        });
-        cubicCurve.endXProperty().addListener((observable, oldValue, newValue) -> {
-            updateArrawPoints(rn.getT1(), rn.getT2(), cubicCurve.getStartX(),
-                    cubicCurve.getStartY(), cubicCurve.getControlX1(), cubicCurve.getControlY1(),
-                    cubicCurve.getControlX2(), cubicCurve.getControlY2(), (Double) newValue, cubicCurve.getEndY(),
-                    arrow);
-        });
-        cubicCurve.endYProperty().addListener((observable, oldValue, newValue) -> {
-            updateArrawPoints(rn.getT1(), rn.getT2(), cubicCurve.getStartX(),
-                    cubicCurve.getStartY(), cubicCurve.getControlX1(), cubicCurve.getControlY1(),
-                    cubicCurve.getControlX2(), cubicCurve.getControlY2(), cubicCurve.getEndX(), (Double) newValue,
-                    arrow);
-        });
+        rn.t1Property().addListener((observable, oldValue, newValue) -> updateArrawPoints((Double) newValue, rn.getT2(), cubicCurve.getStartX(),
+                cubicCurve.getStartY(), cubicCurve.getControlX1(), cubicCurve.getControlY1(),
+                cubicCurve.getControlX2(), cubicCurve.getControlY2(), cubicCurve.getEndX(), cubicCurve.getEndY(),
+                arrow));
+        rn.t2Property().addListener((observable, oldValue, newValue) -> updateArrawPoints(rn.getT1(), (Double) newValue, cubicCurve.getStartX(),
+                cubicCurve.getStartY(), cubicCurve.getControlX1(), cubicCurve.getControlY1(),
+                cubicCurve.getControlX2(), cubicCurve.getControlY2(), cubicCurve.getEndX(), cubicCurve.getEndY(),
+                arrow));
+        cubicCurve.startXProperty().addListener((observable, oldValue, newValue) -> updateArrawPoints(rn.getT1(), rn.getT2(), (Double) newValue,
+                cubicCurve.getStartY(), cubicCurve.getControlX1(), cubicCurve.getControlY1(),
+                cubicCurve.getControlX2(), cubicCurve.getControlY2(), cubicCurve.getEndX(), cubicCurve.getEndY(),
+                arrow));
+        cubicCurve.startYProperty().addListener((observable, oldValue, newValue) -> updateArrawPoints(rn.getT1(), rn.getT2(), cubicCurve.getStartX(),
+                (Double) newValue, cubicCurve.getControlX1(), cubicCurve.getControlY1(),
+                cubicCurve.getControlX2(), cubicCurve.getControlY2(), cubicCurve.getEndX(), cubicCurve.getEndY(),
+                arrow));
+        cubicCurve.controlX1Property().addListener((observable, oldValue, newValue) -> updateArrawPoints(rn.getT1(), rn.getT2(), cubicCurve.getStartX(),
+                cubicCurve.getStartY(), (Double) newValue, cubicCurve.getControlY1(),
+                cubicCurve.getControlX2(), cubicCurve.getControlY2(), cubicCurve.getEndX(), cubicCurve.getEndY(),
+                arrow));
+        cubicCurve.controlY1Property().addListener((observable, oldValue, newValue) -> updateArrawPoints(rn.getT1(), rn.getT2(), cubicCurve.getStartX(),
+                cubicCurve.getStartY(), rn.getControlX1(), (Double) newValue,
+                cubicCurve.getControlX2(), cubicCurve.getControlY2(), cubicCurve.getEndX(), cubicCurve.getEndY(),
+                arrow));
+        cubicCurve.controlX2Property().addListener((observable, oldValue, newValue) -> updateArrawPoints(rn.getT1(), rn.getT2(), cubicCurve.getStartX(),
+                cubicCurve.getStartY(), rn.getControlX1(), cubicCurve.getControlY1(),
+                (Double) newValue, cubicCurve.getControlY2(), cubicCurve.getEndX(), cubicCurve.getEndY(),
+                arrow));
+        cubicCurve.controlY2Property().addListener((observable, oldValue, newValue) -> updateArrawPoints(rn.getT1(), rn.getT2(), cubicCurve.getStartX(),
+                cubicCurve.getStartY(), rn.getControlX1(), rn.getControlY1(),
+                cubicCurve.getControlX2(), (Double) newValue, cubicCurve.getEndX(), cubicCurve.getEndY(),
+                arrow));
+        cubicCurve.endXProperty().addListener((observable, oldValue, newValue) -> updateArrawPoints(rn.getT1(), rn.getT2(), cubicCurve.getStartX(),
+                cubicCurve.getStartY(), cubicCurve.getControlX1(), cubicCurve.getControlY1(),
+                cubicCurve.getControlX2(), cubicCurve.getControlY2(), (Double) newValue, cubicCurve.getEndY(),
+                arrow));
+        cubicCurve.endYProperty().addListener((observable, oldValue, newValue) -> updateArrawPoints(rn.getT1(), rn.getT2(), cubicCurve.getStartX(),
+                cubicCurve.getStartY(), cubicCurve.getControlX1(), cubicCurve.getControlY1(),
+                cubicCurve.getControlX2(), cubicCurve.getControlY2(), cubicCurve.getEndX(), (Double) newValue,
+                arrow));
 
         Group group = new Group();
         group.setId(format("rln_%s", rn.getSrc().getDisplayName()));
@@ -492,7 +472,7 @@ public class CanvasPane extends Pane {
         return line;
     }
 
-    private Text drawText(GraphNodeAdapter node, Color color) {
+    private <T extends GraphNode> Text drawText(GraphNodeAdapter<T> node, Color color) {
         Text arabicText = tool.drawText(node.getId(), node.getText(), RIGHT, color, node.getX(), node.getY(),
                 node.getFont());
         arabicText.setUserData(node);
@@ -501,6 +481,7 @@ public class CanvasPane extends Pane {
         arabicText.textProperty().bind(node.textProperty());
         arabicText.xProperty().bind(node.xProperty());
         arabicText.yProperty().bind(node.yProperty());
+        node.fontProperty().addListener((observable, oldValue, newValue) -> arabicText.fontProperty().setValue(newValue));
 
         return arabicText;
     }
@@ -511,7 +492,7 @@ public class CanvasPane extends Pane {
 
         translationText.xProperty().bind(tn.translationXProperty());
         translationText.yProperty().bind(tn.translationYProperty());
-        // TODO: FONT
+        tn.translationFontProperty().addListener((observable, oldValue, newValue) -> translationText.fontProperty().set(newValue));
 
         return translationText;
     }

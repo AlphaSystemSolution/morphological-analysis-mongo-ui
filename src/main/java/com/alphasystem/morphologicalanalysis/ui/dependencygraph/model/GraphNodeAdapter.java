@@ -33,8 +33,7 @@ public abstract class GraphNodeAdapter<N extends GraphNode> {
         yProperty().addListener((observable, oldValue, newValue) -> getSrc().setY((Double) newValue));
         translateXProperty().addListener((observable, oldValue, newValue) -> getSrc().setTranslateX((Double) newValue));
         translateYProperty().addListener((observable, oldValue, newValue) -> getSrc().setTranslateY((Double) newValue));
-        fontProperty().addListener((observable, oldValue, newValue) ->
-                getSrc().getFont().withFamily(newValue.getFamily()).withSize(newValue.getSize()));
+        fontProperty().addListener((observable, oldValue, newValue) -> getSrc().getFont().withFamily(newValue.getFamily()).withSize(newValue.getSize()));
     }
 
     protected void initValues(N graphNode) {

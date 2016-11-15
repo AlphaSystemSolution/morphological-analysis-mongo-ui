@@ -1,5 +1,6 @@
 package com.alphasystem.morphologicalanalysis.ui.dependencygraph.components;
 
+import com.alphasystem.morphologicalanalysis.graph.model.GraphNode;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.*;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.DecimalFormatStringConverter;
 import javafx.beans.property.DoubleProperty;
@@ -12,11 +13,17 @@ import javafx.scene.control.*;
 import javafx.scene.control.SpinnerValueFactory.DoubleSpinnerValueFactory;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
+import javafx.scene.text.FontWeight;
 
 import static com.alphasystem.fx.ui.util.FontConstants.ARABIC_FONT_20;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.RESOURCE_BUNDLE;
+import static com.alphasystem.util.AppUtil.isInstanceOf;
 import static java.lang.String.format;
+import static javafx.collections.FXCollections.observableArrayList;
 import static javafx.geometry.Pos.CENTER;
+import static javafx.scene.text.Font.font;
 
 /**
  * @author sali
@@ -177,12 +184,12 @@ public class DependencyGraphBuilderEditorPane extends BorderPane {
     }
 
     private TitledPane[] addTerminalNodeProperties(TerminalNodeAdapter node) {
-        return new TitledPane[]{addLineProperties(node), addTranslationProperties(node),
+        return new TitledPane[]{addLineProperties(node), addTranslationProperties(node), addFontProperties(node),
                 addGroupTranslateProperties(node)};
     }
 
     private TitledPane[] addPartOfSpeechProperties(PartOfSpeechNodeAdapter node) {
-        return new TitledPane[]{addRelationshipControlPointProperties(node)};
+        return new TitledPane[]{addRelationshipControlPointProperties(node), addFontProperties(node)};
     }
 
     private TitledPane[] addRelationshipNodeProperties(RelationshipNodeAdapter node) {
@@ -222,11 +229,48 @@ public class DependencyGraphBuilderEditorPane extends BorderPane {
         });
         gridPane.add(spinner, 0, ++row);
 
-        return new TitledPane[]{createTitledPane("controlPointProperties.label", gridPane)};
+        return new TitledPane[]{createTitledPane("controlPointProperties.label", gridPane), addFontProperties(node)};
+    }
+
+    private <T extends GraphNode> TitledPane addFontProperties(GraphNodeAdapter<T> node) {
+        final Font font = node.getFont();
+        GridPane gridPane = getGridPane();
+
+        row = 0;
+        Label label = new Label(RESOURCE_BUNDLE.getString("font.family.label"));
+        gridPane.add(label, 0, row);
+        TextField textField = new TextField(font.getFamily());
+        textField.setEditable(false);
+        label.setLabelFor(textField);
+        gridPane.add(textField, 0, ++row);
+
+        label = new Label(RESOURCE_BUNDLE.getString("font.size.label"));
+        gridPane.add(label, 0, ++row);
+        ComboBox<Integer> sizeComboBox = createSizeComboBox(node.fontProperty());
+        label.setLabelFor(sizeComboBox);
+        gridPane.add(sizeComboBox, 0, ++row);
+
+        if (isInstanceOf(TerminalNodeAdapter.class, node)) {
+            TerminalNodeAdapter tna = (TerminalNodeAdapter) node;
+            label = new Label(RESOURCE_BUNDLE.getString("translationFont.family.label"));
+            gridPane.add(label, 0, ++row);
+            textField = new TextField(font.getFamily());
+            textField.setEditable(false);
+            label.setLabelFor(textField);
+            gridPane.add(textField, 0, ++row);
+
+            label = new Label(RESOURCE_BUNDLE.getString("translationFont.size.label"));
+            gridPane.add(label, 0, ++row);
+            sizeComboBox = createSizeComboBox(tna.translationFontProperty());
+            label.setLabelFor(sizeComboBox);
+            gridPane.add(sizeComboBox, 0, ++row);
+        }
+
+        return createTitledPane("fontProperties.label", gridPane);
     }
 
     private TitledPane[] addPhraseNodeProperties(PhraseNodeAdapter node) {
-        return new TitledPane[]{addLineProperties(node), addRelationshipControlPointProperties(node)};
+        return new TitledPane[]{addLineProperties(node), addRelationshipControlPointProperties(node), addFontProperties(node)};
     }
 
     private TitledPane createTitledPane(String labelKey, GridPane gridPane) {
@@ -279,6 +323,18 @@ public class DependencyGraphBuilderEditorPane extends BorderPane {
         Spinner<Double> spinner = new Spinner<>();
         spinner.setValueFactory(new DoubleSpinnerValueFactory(min, max, initialValue, 0.5));
         return spinner;
+    }
+
+    private <T extends GraphNode> ComboBox<Integer> createSizeComboBox(ObjectProperty<Font> fontProperty) {
+        final Font font = fontProperty.get();
+        final ObservableList<Integer> values = observableArrayList(8, 9, 10, 11, 12, 14, 16, 18, 20, 22,
+                24, 26, 28, 30, 36, 48, 72);
+        ComboBox<Integer> comboBox = new ComboBox<>(values);
+        comboBox.getSelectionModel().select(new Integer(new Double(font.getSize()).intValue()));
+        comboBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            fontProperty.setValue(font(font.getFamily(), FontWeight.NORMAL, FontPosture.REGULAR, newValue));
+        });
+        return comboBox;
     }
 
     private Slider createSlider(double min, double max, double value) {
