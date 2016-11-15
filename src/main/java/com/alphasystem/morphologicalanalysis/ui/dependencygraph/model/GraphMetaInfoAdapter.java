@@ -29,14 +29,16 @@ public class GraphMetaInfoAdapter {
 
     public GraphMetaInfoAdapter(GraphMetaInfo src) {
         graphMetaInfoProperty().addListener((observable, oldValue, newValue) -> {
-            setWidth(newValue == null ? null : newValue.getWidth());
-            setHeight(newValue == null ? null : newValue.getHeight());
-            setGapBetweenTokens(newValue == null ? null : newValue.getGapBetweenTokens());
-            setTokenWidth(newValue == null ? null : newValue.getTokenWidth());
-            setTokenHeight(newValue == null ? null : newValue.getTokenHeight());
-            setShowGridLines(newValue == null ? true : newValue.isShowGridLines());
-            setShowOutLines(newValue == null ? true : newValue.isShowOutLines());
-            setDebugMode(newValue == null ? true : newValue.isDebugMode());
+            if (newValue != null) {
+                setWidth(newValue.getWidth());
+                setHeight(newValue.getHeight());
+                setGapBetweenTokens(newValue.getGapBetweenTokens());
+                setTokenWidth(newValue.getTokenWidth());
+                setTokenHeight(newValue.getTokenHeight());
+            }
+            setShowGridLines((newValue == null) ? true : newValue.isShowGridLines());
+            setShowOutLines((newValue == null) ? true : newValue.isShowOutLines());
+            setDebugMode((newValue == null) ? true : newValue.isDebugMode());
             setTerminalFont(DUMMY_TERMINAL_NODE.getFont());
             setTranslationFont(DUMMY_TERMINAL_NODE.getTranslationFont());
             setPosFont(DUMMY_POS_NODE.getFont());
@@ -46,12 +48,10 @@ public class GraphMetaInfoAdapter {
                 graphMetaInfoProperty().get().setWidth((Double) newValue));
         heightProperty().addListener((observable, oldValue, newValue) ->
                 graphMetaInfoProperty().get().setHeight((Double) newValue));
-        tokenWidthProperty().addListener((observable, oldValue, newValue) -> {
-            graphMetaInfoProperty().get().setTokenWidth((Double) newValue);
-        });
-        tokenHeightProperty().addListener((observable, oldValue, newValue) -> {
-            graphMetaInfoProperty().get().setTokenHeight((Double) newValue);
-        });
+        tokenWidthProperty().addListener((observable, oldValue, newValue) ->
+                graphMetaInfoProperty().get().setTokenWidth((Double) newValue));
+        tokenHeightProperty().addListener((observable, oldValue, newValue) ->
+                graphMetaInfoProperty().get().setTokenHeight((Double) newValue));
         gapBetweenTokensProperty().addListener((observable, oldValue, newValue) ->
                 graphMetaInfoProperty().get().setGapBetweenTokens((Double) newValue));
         showGridLinesProperty().addListener((observable, oldValue, newValue) ->

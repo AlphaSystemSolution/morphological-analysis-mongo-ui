@@ -26,7 +26,7 @@ public class RelationshipNodeAdapter extends GraphNodeAdapter<RelationshipNode> 
     private final ObjectProperty<LinkSupportAdapter> dependent = new SimpleObjectProperty<>();
     private final ObjectProperty<LinkSupportAdapter> owner = new SimpleObjectProperty<>();
 
-    public RelationshipNodeAdapter() {
+    RelationshipNodeAdapter() {
         super();
         controlX1Property().addListener((observable, oldValue, newValue) -> getSrc().setControlX1((Double) newValue));
         controlX2Property().addListener((observable, oldValue, newValue) -> getSrc().setControlX2((Double) newValue));
@@ -34,9 +34,8 @@ public class RelationshipNodeAdapter extends GraphNodeAdapter<RelationshipNode> 
         controlY2Property().addListener((observable, oldValue, newValue) -> getSrc().setControlY2((Double) newValue));
         t1Property().addListener((observable, oldValue, newValue) -> getSrc().setT1((Double) newValue));
         t2Property().addListener((observable, oldValue, newValue) -> getSrc().setT2((Double) newValue));
-        relationshipTypeProperty().addListener((observable, oldValue, newValue) -> {
-            stroke.setValue(newValue == null ? Color.BLACK : web(newValue.getColorCode()));
-        });
+        relationshipTypeProperty().addListener((observable, oldValue, newValue) ->
+                stroke.setValue(newValue == null ? Color.BLACK : web(newValue.getColorCode())));
     }
 
     @Override

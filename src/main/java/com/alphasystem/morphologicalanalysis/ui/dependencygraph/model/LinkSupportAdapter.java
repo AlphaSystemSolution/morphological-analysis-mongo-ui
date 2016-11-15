@@ -19,7 +19,7 @@ public class LinkSupportAdapter<N extends LinkSupport> extends LineSupportAdapte
      */
     private final DoubleProperty cy = new SimpleDoubleProperty();
 
-    protected LinkSupportAdapter() {
+    LinkSupportAdapter() {
         super();
         cxProperty().addListener((observable, oldValue, newValue) -> getSrc().setCx((Double) newValue));
         cyProperty().addListener((observable, oldValue, newValue) -> getSrc().setCy((Double) newValue));
@@ -28,8 +28,10 @@ public class LinkSupportAdapter<N extends LinkSupport> extends LineSupportAdapte
     @Override
     protected void initValues(N graphNode) {
         super.initValues(graphNode);
-        setCx(graphNode == null ? null : graphNode.getCx());
-        setCy(graphNode == null ? null : graphNode.getCy());
+        if (graphNode != null) {
+            setCx(graphNode.getCx());
+            setCy(graphNode.getCy());
+        }
     }
 
     public final double getCx() {

@@ -26,31 +26,30 @@ public abstract class GraphNodeAdapter<N extends GraphNode> {
     private Object parent;
 
     protected GraphNodeAdapter() {
-        srcProperty().addListener((observable, oldValue, newValue) -> {
-            initValues(newValue);
-        });
+        srcProperty().addListener((observable, oldValue, newValue) -> initValues(newValue));
         xProperty().addListener((observable, oldValue, newValue) -> getSrc().setX((Double) newValue));
         yProperty().addListener((observable, oldValue, newValue) -> getSrc().setY((Double) newValue));
         translateXProperty().addListener((observable, oldValue, newValue) -> getSrc().setTranslateX((Double) newValue));
         translateYProperty().addListener((observable, oldValue, newValue) -> getSrc().setTranslateY((Double) newValue));
-        fontProperty().addListener((observable, oldValue, newValue) -> getSrc().getFont().withFamily(newValue.getFamily()).withSize(newValue.getSize()));
+        fontProperty().addListener((observable, oldValue, newValue) ->
+                getSrc().getFont().withFamily(newValue.getFamily()).withSize(newValue.getSize()));
     }
 
     protected void initValues(N graphNode) {
-        setId(graphNode == null ? null : graphNode.getId());
-        setGraphNodeType(graphNode == null ? null : graphNode.getGraphNodeType());
         setText(CanvasUtil.getInstance().getNodeText(graphNode));
-        setX(graphNode == null ? null : graphNode.getX());
-        setY(graphNode == null ? null : graphNode.getY());
-        setTranslateX(graphNode == null ? null : graphNode.getTranslateX());
-        setTranslateY(graphNode == null ? null : graphNode.getTranslateY());
-        Font font = null;
         if (graphNode != null) {
+            setId(graphNode.getId());
+            setGraphNodeType(graphNode.getGraphNodeType());
+            setX(graphNode.getX());
+            setY(graphNode.getY());
+            setTranslateX(graphNode.getTranslateX());
+            setTranslateY(graphNode.getTranslateY());
+
             FontMetaInfo fontMetaInfo = graphNode.getFont();
-            font = Font.font(fontMetaInfo.getFamily(), FontWeight.valueOf(fontMetaInfo.getWeight()),
+            Font font = Font.font(fontMetaInfo.getFamily(), FontWeight.valueOf(fontMetaInfo.getWeight()),
                     FontPosture.valueOf(fontMetaInfo.getPosture()), fontMetaInfo.getSize());
+            setFont(font);
         }
-        setFont(font);
     }
 
     public final String getId() {

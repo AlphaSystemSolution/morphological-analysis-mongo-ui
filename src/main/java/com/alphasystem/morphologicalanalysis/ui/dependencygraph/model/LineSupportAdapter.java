@@ -29,7 +29,7 @@ public abstract class LineSupportAdapter<N extends LineSupport> extends GraphNod
      */
     private final DoubleProperty y2 = new SimpleDoubleProperty();
 
-    protected LineSupportAdapter() {
+    LineSupportAdapter() {
         super();
         x1Property().addListener((observable, oldValue, newValue) -> getSrc().setX1((Double) newValue));
         y1Property().addListener((observable, oldValue, newValue) -> getSrc().setY1((Double) newValue));
@@ -40,11 +40,12 @@ public abstract class LineSupportAdapter<N extends LineSupport> extends GraphNod
     @Override
     protected void initValues(N graphNode) {
         super.initValues(graphNode);
-        setX1(graphNode == null ? null : graphNode.getX1());
-        setY1(graphNode == null ? null : graphNode.getY1());
-        setX2(graphNode == null ? null : graphNode.getX2());
-        setY2(graphNode == null ? null : graphNode.getY2());
-
+        if (graphNode != null) {
+            setX1(graphNode.getX1());
+            setY1(graphNode.getY1());
+            setX2(graphNode.getX2());
+            setY2(graphNode.getY2());
+        }
     }
 
     public final double getX1() {

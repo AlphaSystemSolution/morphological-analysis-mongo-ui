@@ -29,13 +29,15 @@ public class PhraseNodeAdapter extends LinkSupportAdapter<PhraseNode> {
     @Override
     protected void initValues(PhraseNode phraseNode) {
         super.initValues(phraseNode);
-        setAlternateStatus(phraseNode == null ? null : phraseNode.getAlternateStatus());
         CanvasUtil canvasUtil = CanvasUtil.getInstance();
-        List<PartOfSpeechNode> fragments = phraseNode.getFragments();
-        fragments.forEach(partOfSpeechNode -> getFragments().add(
-                (PartOfSpeechNodeAdapter) canvasUtil.createLinkSupportAdapter(partOfSpeechNode)));
-        List<RelationshipType> relationships = phraseNode.getRelationships();
-        relationships.forEach(relationship -> getRelationships().add(relationship));
+        if (phraseNode != null) {
+            setAlternateStatus(phraseNode.getAlternateStatus());
+            List<PartOfSpeechNode> fragments = phraseNode.getFragments();
+            fragments.forEach(partOfSpeechNode -> getFragments().add(
+                    (PartOfSpeechNodeAdapter) canvasUtil.createLinkSupportAdapter(partOfSpeechNode)));
+            List<RelationshipType> relationships = phraseNode.getRelationships();
+            relationships.forEach(relationship -> getRelationships().add(relationship));
+        }
     }
 
     public final AlternateStatus getAlternateStatus() {

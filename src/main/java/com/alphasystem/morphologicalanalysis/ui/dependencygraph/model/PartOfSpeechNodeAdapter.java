@@ -18,10 +18,8 @@ public class PartOfSpeechNodeAdapter extends LinkSupportAdapter<PartOfSpeechNode
     @Override
     protected void initValues(PartOfSpeechNode graphNode) {
         super.initValues(graphNode);
-        setHidden(graphNode == null ? false : graphNode.isHidden());
-        hiddenProperty().addListener((observable, oldValue, newValue) -> {
-            getSrc().setHidden(newValue);
-        });
+        setHidden(graphNode != null && graphNode.isHidden());
+        hiddenProperty().addListener((observable, oldValue, newValue) -> getSrc().setHidden(newValue));
     }
 
     public boolean isHidden() {
