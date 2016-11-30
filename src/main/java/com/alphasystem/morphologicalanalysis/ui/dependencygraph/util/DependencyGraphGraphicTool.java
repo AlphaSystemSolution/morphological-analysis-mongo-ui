@@ -59,7 +59,7 @@ public final class DependencyGraphGraphicTool {
         Path gridLines = new Path();
         gridLines.setId(GRID_LINES);
         gridLines.setStroke(DARK_GRAY_CLOUD);
-        gridLines.setStrokeWidth(0.5);
+        gridLines.setStrokeWidth(1.0);
 
         ObservableList<PathElement> elements = gridLines.getElements();
 
