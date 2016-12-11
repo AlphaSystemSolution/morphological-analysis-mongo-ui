@@ -128,6 +128,9 @@ public class GlobalPropertiesView extends Control {
             getDependencyGraph().getGraphNodes()
                     .stream().filter(gn -> isInstanceOf(TerminalNodeAdapter.class, gn))
                     .forEach(tn -> ((TerminalNodeAdapter) tn).getPartOfSpeeches().forEach(pn -> pn.setFont(fromFontMetaInfo(newValue))));
+            getDependencyGraph().getGraphNodes().stream().filter(gn ->
+                    (isInstanceOf(PhraseNodeAdapter.class, gn)) || isInstanceOf(RelationshipNodeAdapter.class, gn))
+                    .forEach(n -> n.setFont(fromFontMetaInfo(newValue)));
         });
     }
 

@@ -46,8 +46,8 @@
                                labelFor="$alignPosYAxisSpinner"/>
                         <Spinner fx:id="alignPosYAxisSpinner" GridPane.columnIndex="0" GridPane.rowIndex="5"/>
                         <Label text="%alignPOSYControl.label" GridPane.columnIndex="0" GridPane.rowIndex="6"
-                               labelFor="$alignPOSControlAxisSpinner"/>
-                        <Spinner fx:id="alignPOSControlAxisSpinner" GridPane.columnIndex="0" GridPane.rowIndex="7"/>
+                               labelFor="$alignPOSControlYAxisSpinner"/>
+                        <Spinner fx:id="alignPOSControlYAxisSpinner" GridPane.columnIndex="0" GridPane.rowIndex="7"/>
                         <Label text="%alignGroupTranslateX.label" GridPane.columnIndex="0" GridPane.rowIndex="8"
                                labelFor="$groupTranslateXAxisSpinner"/>
                         <Spinner fx:id="groupTranslateXAxisSpinner" GridPane.columnIndex="0" GridPane.rowIndex="9"/>
