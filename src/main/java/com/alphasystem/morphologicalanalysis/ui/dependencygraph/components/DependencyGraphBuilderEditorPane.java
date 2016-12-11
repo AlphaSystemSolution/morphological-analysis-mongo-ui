@@ -22,7 +22,7 @@ import static com.alphasystem.morphologicalanalysis.ui.common.Global.RESOURCE_BU
 import static com.alphasystem.util.AppUtil.isInstanceOf;
 import static java.lang.String.format;
 import static javafx.collections.FXCollections.observableArrayList;
-import static javafx.geometry.Pos.CENTER;
+import static javafx.geometry.Pos.TOP_CENTER;
 import static javafx.scene.text.Font.font;
 
 /**
@@ -61,7 +61,7 @@ public class DependencyGraphBuilderEditorPane extends BorderPane {
         setCenter(accordion);
     }
 
-    void initPane() {
+    private void initPane() {
         ObservableList<TitledPane> panes = accordion.getPanes();
         panes.remove(0, panes.size());
 
@@ -389,7 +389,7 @@ public class DependencyGraphBuilderEditorPane extends BorderPane {
 
     private GridPane getGridPane() {
         GridPane gridPane = new GridPane();
-        gridPane.setAlignment(CENTER);
+        gridPane.setAlignment(TOP_CENTER);
         gridPane.setHgap(DEFAULT_OFFSET);
         gridPane.setVgap(DEFAULT_OFFSET);
         gridPane.setPadding(DEFAULT_PADDING);

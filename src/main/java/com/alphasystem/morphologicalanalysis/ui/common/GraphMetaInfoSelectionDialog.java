@@ -15,7 +15,6 @@ import org.controlsfx.dialog.FontSelectorDialog;
 import java.util.Optional;
 
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.*;
-import static java.lang.String.format;
 import static javafx.geometry.Pos.CENTER;
 import static javafx.scene.control.ButtonType.CANCEL;
 import static javafx.scene.control.ButtonType.OK;
@@ -73,10 +72,6 @@ public class GraphMetaInfoSelectionDialog extends Dialog<GraphMetaInfoAdapter> {
             }
             return getGraphMetaInfo();
         });
-    }
-
-    private static String getFontDisplayValue(FontMetaInfo fmi) {
-        return format("%s, %s", fmi.getFamily(), fmi.getSize());
     }
 
     public final GraphMetaInfoAdapter getGraphMetaInfo() {

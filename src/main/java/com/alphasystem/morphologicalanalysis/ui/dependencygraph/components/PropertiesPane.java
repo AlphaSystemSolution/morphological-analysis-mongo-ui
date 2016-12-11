@@ -18,6 +18,7 @@ import static javafx.geometry.Pos.CENTER;
 /**
  * @author sali
  */
+@Deprecated
 public class PropertiesPane extends BorderPane {
 
     private final Spinner<Double> widthField = new Spinner<>();

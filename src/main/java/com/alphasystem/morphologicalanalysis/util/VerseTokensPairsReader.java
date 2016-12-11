@@ -39,9 +39,7 @@ public class VerseTokensPairsReader {
                 currentGroupList.add(createGroup(chapterNumber, line));
                 listIterator.remove();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (URISyntaxException e) {
+        } catch (IOException | URISyntaxException e) {
             e.printStackTrace();
         }
 

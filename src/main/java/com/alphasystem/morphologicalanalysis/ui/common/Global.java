@@ -123,4 +123,8 @@ public class Global {
         return new ImageView(image);
     }
 
+    public static String getFontDisplayValue(FontMetaInfo fmi) {
+        return (fmi == null) ? "" : format("%s, %s", fmi.getFamily(), fmi.getSize());
+    }
+
 }
