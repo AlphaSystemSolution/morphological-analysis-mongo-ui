@@ -61,7 +61,7 @@ public class GlobalPropertiesSkin extends SkinBase<GlobalPropertiesView> {
         private Spinner<Double> alignPosYAxisSpinner;
 
         @FXML
-        private Spinner<Double> alignPOSControlAxisSpinner;
+        private Spinner<Double> alignPOSControlYAxisSpinner;
 
         @FXML
         private Spinner<Double> groupTranslateXAxisSpinner;
@@ -107,6 +107,23 @@ public class GlobalPropertiesSkin extends SkinBase<GlobalPropertiesView> {
             accordion.setExpandedPane(accordion.getPanes().get(0));
             final GlobalPropertiesView control = getSkinnable();
 
+            setupCanvasWidth(control);
+            setupCanvasHeight(control);
+            setupShowGridLines(control);
+            setupShowOutline(control);
+            setupDebugMode(control);
+            setupAlignTerminalYAxis(control);
+            setupAlignTranslationsYAxis(control);
+            setupAlignPosYAxis(control);
+            setupAlignPOSControlYAxis(control);
+            setupGroupTranslateXAxis(control);
+            setupGroupTranslateYAxis(control);
+            setupTerminalFont(control);
+            setupTranslationFont(control);
+            setupPartOfSpeechFont(control);
+        }
+
+        private void setupCanvasWidth(GlobalPropertiesView control) {
             widthSpinner.setValueFactory(new DoubleSpinnerValueFactory(MIN_WIDTH, MAX_WIDTH, control.getCanvasWidth(), 20.0));
             control.canvasWidthProperty().addListener((observable, oldValue, newValue) -> {
                 final Double value = (Double) newValue;
@@ -114,40 +131,58 @@ public class GlobalPropertiesSkin extends SkinBase<GlobalPropertiesView> {
                 groupTranslateXAxisSlider.setMax(value);
             });
             widthSpinner.valueProperty().addListener((observable, oldValue, newValue) -> control.setCanvasWidth(newValue));
+        }
 
+        private void setupCanvasHeight(GlobalPropertiesView control) {
             heightSpinner.setValueFactory(new DoubleSpinnerValueFactory(MIN_WIDTH, MAX_WIDTH, control.getCanvasHeight(), 20.0));
             control.canvasHeightProperty().addListener((observable, oldValue, newValue) -> heightSpinner.getValueFactory().setValue((Double) newValue));
             heightSpinner.valueProperty().addListener((observable, oldValue, newValue) -> control.setCanvasHeight(newValue));
+        }
 
+        private void setupShowGridLines(GlobalPropertiesView control) {
             showGridLines.selectedProperty().setValue(control.isShowGridLines());
             showGridLines.selectedProperty().bindBidirectional(control.showGridLinesProperty());
+        }
 
+        private void setupShowOutline(GlobalPropertiesView control) {
             showOutline.selectedProperty().setValue(control.isShowOutline());
             showOutline.selectedProperty().bindBidirectional(control.showOutlineProperty());
+        }
 
+        private void setupDebugMode(GlobalPropertiesView control) {
             debugMode.selectedProperty().setValue(control.isDebugMode());
             debugMode.selectedProperty().bindBidirectional(control.debugModeProperty());
+        }
 
+        private void setupAlignTerminalYAxis(GlobalPropertiesView control) {
             alignTerminalYAxisSpinner.setValueFactory(new DoubleSpinnerValueFactory(0, MAX_HEIGHT, 0, 0.5));
             control.alignTerminalYAxisProperty().addListener((observable, oldValue, newValue) ->
                     alignTerminalYAxisSpinner.getValueFactory().setValue((Double) newValue));
             alignTerminalYAxisSpinner.valueProperty().addListener((observable, oldValue, newValue) -> control.setAlignTerminalYAxis(newValue));
+        }
 
+        void setupAlignTranslationsYAxis(GlobalPropertiesView control) {
             alignTranslationsYAxisSpinner.setValueFactory(new DoubleSpinnerValueFactory(0, MAX_HEIGHT, 0, 0.5));
             control.alignTranslationYAxisProperty().addListener((observable, oldValue, newValue) ->
                     alignTranslationsYAxisSpinner.getValueFactory().setValue((Double) newValue));
             alignTranslationsYAxisSpinner.valueProperty().addListener((observable, oldValue, newValue) -> control.setAlignTranslationYAxis(newValue));
+        }
 
+        private void setupAlignPosYAxis(GlobalPropertiesView control) {
             alignPosYAxisSpinner.setValueFactory(new DoubleSpinnerValueFactory(0, MAX_HEIGHT, 0, 0.5));
             control.alignPosYAxisProperty().addListener((observable, oldValue, newValue) ->
                     alignPosYAxisSpinner.getValueFactory().setValue((Double) newValue));
             alignPosYAxisSpinner.valueProperty().addListener((observable, oldValue, newValue) -> control.setAlignPosYAxis(newValue));
+        }
 
-            alignPOSControlAxisSpinner.setValueFactory(new DoubleSpinnerValueFactory(0, MAX_HEIGHT, 0, 0.5));
+        private void setupAlignPOSControlYAxis(GlobalPropertiesView control) {
+            alignPOSControlYAxisSpinner.setValueFactory(new DoubleSpinnerValueFactory(0, MAX_HEIGHT, 0, 0.5));
             control.alignPOSControlYAxisProperty().addListener((observable, oldValue, newValue) ->
-                    alignPOSControlAxisSpinner.getValueFactory().setValue((Double) newValue));
-            alignPOSControlAxisSpinner.valueProperty().addListener((observable, oldValue, newValue) -> control.setAlignPOSControlYAxis(newValue));
+                    alignPOSControlYAxisSpinner.getValueFactory().setValue((Double) newValue));
+            alignPOSControlYAxisSpinner.valueProperty().addListener((observable, oldValue, newValue) -> control.setAlignPOSControlYAxis(newValue));
+        }
 
+        private void setupGroupTranslateXAxis(GlobalPropertiesView control) {
             groupTranslateXAxisSpinner.setValueFactory(new DoubleSpinnerValueFactory(0, MAX_WIDTH, 0, 0.5));
             groupTranslateXAxisSlider.setMin(0);
             control.groupTranslateXAxisProperty().addListener((observable, oldValue, newValue) -> {
@@ -167,15 +202,13 @@ public class GlobalPropertiesSkin extends SkinBase<GlobalPropertiesView> {
                 groupTranslateXAxisSlider.setValue(d);
                 groupTranslateXAxisSpinner.getValueFactory().setValue(d);
             });
+        }
 
+        private void setupGroupTranslateYAxis(GlobalPropertiesView control) {
             groupTranslateYAxisSpinner.setValueFactory(new DoubleSpinnerValueFactory(-100.0, control.getCanvasHeight(), 0, 0.5));
             control.groupTranslateYAxisProperty().addListener((observable, oldValue, newValue) ->
                     groupTranslateYAxisSpinner.getValueFactory().setValue((Double) newValue));
             groupTranslateYAxisSpinner.valueProperty().addListener((observable, oldValue, newValue) -> control.setGroupTranslateYAxis(newValue));
-
-            setupTerminalFont(control);
-            setupTranslationFont(control);
-            setupPartOfSpeechFont(control);
         }
 
         private void setupTranslationFont(GlobalPropertiesView control) {
