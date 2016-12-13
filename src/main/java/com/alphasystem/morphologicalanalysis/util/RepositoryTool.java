@@ -139,6 +139,28 @@ public class RepositoryTool {
         return dependencyGraph;
     }
 
+    public boolean isTransientGraph(String displayName) {
+        return repositoryUtil.getDependencyGraphRepository().findByDisplayName(displayName) == null;
+    }
+
+    public DependencyGraph recreateDependencyGraph(DependencyGraph src, List<TerminalNode> terminalNodes) {
+        if (src == null) {
+            //TODO: handle error
+            return null;
+        }
+        DependencyGraph dependencyGraph = new DependencyGraph();
+        dependencyGraph.setChapterNumber(src.getChapterNumber());
+        dependencyGraph.setMetaInfo(src.getMetaInfo());
+        dependencyGraph.setTokens(src.getTokens());
+        dependencyGraph.setDisplayName(src.getDisplayName());
+        terminalNodes.forEach(terminalNode -> {
+            terminalNode.initDisplayName();
+            dependencyGraph.addNode(terminalNode);
+        });
+
+        return dependencyGraph;
+    }
+
     public Token createImpliedNode(Token srcToken, PartOfSpeech partOfSpeech, Object type) {
         Token token = null;
         if (NOUN.equals(partOfSpeech)) {
