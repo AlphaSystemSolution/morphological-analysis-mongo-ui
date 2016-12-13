@@ -32,6 +32,9 @@ public class GraphBuilder {
     private double tokenWidth = RECTANGLE_WIDTH;
     private double tokenHeight = RECTANGLE_HEIGHT;
     private double gapBetweenTokens = GAP_BETWEEN_TOKENS;
+    private FontMetaInfo terminalFont;
+    private FontMetaInfo translationFont;
+    private FontMetaInfo posFont;
     private double rectX;
     private double textX;
     private double textY;
@@ -119,6 +122,8 @@ public class GraphBuilder {
         terminalNode.setTranslationX(x3);
         terminalNode.setTranslationY(y3);
         terminalNode.setTranslateY(-85.0);
+        terminalNode.setFont(terminalFont);
+        terminalNode.setTranslationFont(translationFont);
 
         // update counters
         rectX = x2 + gapBetweenTokens;
@@ -251,6 +256,13 @@ public class GraphBuilder {
         return referenceNode;
     }
 
+    public List<TerminalNode> recreateNodes(List<TerminalNode> srcNodes) {
+        List<TerminalNode> terminalNodes = new ArrayList<>();
+        srcNodes.forEach(terminalNode -> terminalNodes.add(buildTerminalNode(terminalNode.getToken(), terminalNode.getGraphNodeType())));
+        buildPartOfSpeechNodes(terminalNodes);
+        return terminalNodes;
+    }
+
     private PartOfSpeechNode buildPartOfSpeechNode(Location location, Double posX) {
         PartOfSpeechNode partOfSpeechNode = new PartOfSpeechNode(location);
         Long count = repositoryUtil.getPartOfSpeechNodeRepository()
@@ -265,26 +277,18 @@ public class GraphBuilder {
         partOfSpeechNode.setCx(x);
         x = textY + 15;
         partOfSpeechNode.setCy(x);
+        partOfSpeechNode.setFont(posFont);
         return partOfSpeechNode;
     }
 
     public void set(GraphMetaInfo metaInfo) {
-        setTokenWidth(metaInfo.getTokenWidth());
-        setTokenHeight(metaInfo.getTokenHeight());
-        setGapBetweenTokens(metaInfo.getGapBetweenTokens());
+        this.tokenWidth = metaInfo.getTokenWidth();
+        this.tokenHeight = metaInfo.getTokenHeight();
+        this.gapBetweenTokens = metaInfo.getGapBetweenTokens();
+        this.terminalFont = metaInfo.getTerminalFont();
+        this.translationFont = metaInfo.getTranslationFont();
+        this.posFont = metaInfo.getPartOfSpeechFont();
         reset();
-    }
-
-    public void setTokenWidth(double tokenWidth) {
-        this.tokenWidth = tokenWidth;
-    }
-
-    public void setTokenHeight(double tokenHeight) {
-        this.tokenHeight = tokenHeight;
-    }
-
-    public void setGapBetweenTokens(double gapBetweenTokens) {
-        this.gapBetweenTokens = gapBetweenTokens;
     }
 
     private void reset() {
