@@ -37,13 +37,13 @@ import static com.alphasystem.fx.ui.util.FontConstants.ARABIC_FONT_24;
 import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.*;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.*;
 import static com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.CanvasUtil.getIndex;
-import static com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.CanvasUtil.getReferenceLine;
 import static com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.CubicCurveHelper.arrowPoints;
 import static com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.DependencyGraphGraphicTool.DARK_GRAY_CLOUD;
 import static com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.DependencyGraphGraphicTool.GRID_LINES;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.*;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.VerbType.IMPERFECT;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.VerbType.PERFECT;
+import static com.alphasystem.util.AppUtil.isInstanceOf;
 import static java.lang.String.format;
 import static java.util.Collections.reverse;
 import static javafx.collections.FXCollections.observableArrayList;
@@ -526,7 +526,7 @@ public class CanvasPane extends Pane {
         });
 
         menuItem = new MenuItem("Add Reference Node ...");
-        menuItem.setOnAction(event -> makeReference(index));
+        menuItem.setOnAction(event -> makeReference());
         menuItems.add(menuItem);
 
         menuItem = new MenuItem("Remove");
@@ -869,28 +869,16 @@ public class CanvasPane extends Pane {
         return menuItem;
     }
 
-    private void makeReference(int index) {
+    private void makeReference() {
         DependencyGraph dependencyGraph = getDependencyGraph().getDependencyGraph();
         List<VerseTokensPair> tokens = dependencyGraph.getTokens();
         referenceSelectionDialog.reset(dependencyGraph.getChapterNumber(), tokens.get(0).getVerseNumber());
         Optional<Token> result = referenceSelectionDialog.showAndWait();
-        result.ifPresent(token -> addReference(token, index));
+        result.ifPresent(this::addReference);
     }
 
-    private void addReference(Token token, int index) {
-        GraphMetaInfoAdapter graphMetaInfoAdapter = getDependencyGraph().getGraphMetaInfo();
-        graphBuilder.set(graphMetaInfoAdapter.getGraphMetaInfo());
-        Group group = (Group) canvasPane.getChildren().get(index);
-        Line referenceLine = getReferenceLine(group);
-        ReferenceNode referenceNode = graphBuilder.buildReferenceNode(token, referenceLine);
-        canvasUtil.updateFonts(referenceNode, graphMetaInfoAdapter);
-        ReferenceNodeAdapter referenceNodeAdapter = new ReferenceNodeAdapter();
-        referenceNodeAdapter.setSrc(referenceNode);
-        getDependencyGraph().getDependencyGraph().getNodes().add(referenceNode);
-        getDependencyGraph().getGraphNodes().add(referenceNodeAdapter);
-        DependencyGraphAdapter dependencyGraph = getDependencyGraph();
-        setDependencyGraph(null);
-        setDependencyGraph(dependencyGraph);
+    private void addReference(Token token) {
+        recreateGraph(token, -1, GraphNodeType.REFERENCE);
     }
 
     private void makeRelationship(final LinkSupportAdapter dependentNode, final LinkSupportAdapter ownerNode,
@@ -992,42 +980,7 @@ public class CanvasPane extends Pane {
         }
         impliedOrHiddenTokens.add(impliedToken);
 
-        GraphMetaInfoAdapter graphMetaInfoAdapter = getDependencyGraph().getGraphMetaInfo();
-        canvasUtil.shiftRight(index, getDependencyGraph());
-        // a flag to represents that node is to be added left to first node
-        boolean leftToFirst = index <= 0;
-        index = leftToFirst ? 0 : index - 1;
-        Node node = canvasPane.getChildren().get(index);
-        Group group = (Group) node;
-        Line referenceLine = getReferenceLine(group);
-        if (leftToFirst) {
-            // if we are adding node at the left to first node then make reference line to go to negative
-            // we will adjust it later
-            Line line = new Line();
-            double offset = graphMetaInfoAdapter.getGapBetweenTokens() + graphMetaInfoAdapter.getTokenWidth();
-            line.setStartX(referenceLine.getStartX() - offset);
-            line.setEndX(referenceLine.getEndX() - offset);
-            line.setStartY(referenceLine.getStartY());
-            line.setEndY(referenceLine.getEndY());
-            referenceLine = line;
-        }
-        graphBuilder.set(graphMetaInfoAdapter.getGraphMetaInfo());
-        ImpliedNodeAdapter impliedNodeAdapter = createImpliedNodeAdapter(impliedToken,
-                referenceLine, graphMetaInfoAdapter);
-        getDependencyGraph().getDependencyGraph().getNodes().add(index, impliedNodeAdapter.getSrc());
-        getDependencyGraph().getGraphNodes().add(index, impliedNodeAdapter);
-        DependencyGraphAdapter dependencyGraph = getDependencyGraph();
-        setDependencyGraph(null);
-        setDependencyGraph(dependencyGraph);
-    }
-
-    private ImpliedNodeAdapter createImpliedNodeAdapter(Token token, Line referenceLine,
-                                                        GraphMetaInfoAdapter graphMetaInfoAdapter) {
-        ImpliedNodeAdapter impliedNodeAdapter = new ImpliedNodeAdapter();
-        ImpliedNode impliedNode = graphBuilder.buildImpliedNode(token, referenceLine);
-        canvasUtil.updateFonts(impliedNode, graphMetaInfoAdapter);
-        impliedNodeAdapter.setSrc(impliedNode);
-        return impliedNodeAdapter;
+        recreateGraph(impliedToken, index, GraphNodeType.IMPLIED);
     }
 
     private void addHiddenNode(int index, Location location) {
@@ -1044,41 +997,11 @@ public class CanvasPane extends Pane {
         Token hiddenToken = repositoryTool.createHiddenNode(terminalNode.getToken(), vp.getGender(), vp.getNumber(),
                 vp.getConversationType());
         impliedOrHiddenTokens.add(hiddenToken);
-        GraphMetaInfoAdapter graphMetaInfoAdapter = getDependencyGraph().getGraphMetaInfo();
-        canvasUtil.shiftRight(index, getDependencyGraph());
         // a flag to represents that node is to be added left to first node
         boolean leftToFirst = index <= 0;
-        index = leftToFirst ? 0 : index - 1;
-        Node node = canvasPane.getChildren().get(index);
-        Group group = (Group) node;
-        Line referenceLine = getReferenceLine(group);
-        if (leftToFirst) {
-            // if we are adding node at the left to first node then make reference line to go to negative
-            // we will adjust it later
-            Line line = new Line();
-            double offset = graphMetaInfoAdapter.getGapBetweenTokens() + graphMetaInfoAdapter.getTokenWidth();
-            line.setStartX(referenceLine.getStartX() - offset);
-            line.setEndX(referenceLine.getEndX() - offset);
-            line.setStartY(referenceLine.getStartY());
-            line.setEndY(referenceLine.getEndY());
-            referenceLine = line;
-        }
-        graphBuilder.set(graphMetaInfoAdapter.getGraphMetaInfo());
-        HiddenNodeAdapter hiddenNodeAdapter = createHiddenNodeAdapter(hiddenToken, referenceLine, graphMetaInfoAdapter);
-        getDependencyGraph().getDependencyGraph().getNodes().add(index, hiddenNodeAdapter.getSrc());
-        getDependencyGraph().getGraphNodes().add(index, hiddenNodeAdapter);
-        DependencyGraphAdapter dependencyGraph = getDependencyGraph();
-        setDependencyGraph(null);
-        setDependencyGraph(dependencyGraph);
-    }
+        index = leftToFirst ? 0 : index;
+        recreateGraph(hiddenToken, index, GraphNodeType.HIDDEN);
 
-    private HiddenNodeAdapter createHiddenNodeAdapter(Token token, Line referenceLine,
-                                                      GraphMetaInfoAdapter graphMetaInfoAdapter) {
-        HiddenNodeAdapter hiddenNodeAdapter = new HiddenNodeAdapter();
-        HiddenNode hiddenNode = graphBuilder.buildHiddenNode(token, referenceLine);
-        canvasUtil.updateFonts(hiddenNode, graphMetaInfoAdapter);
-        hiddenNodeAdapter.setSrc(hiddenNode);
-        return hiddenNodeAdapter;
     }
 
     private ObservableList<GraphNodeAdapter> copyGraphNodes() {
@@ -1128,6 +1051,49 @@ public class CanvasPane extends Pane {
                 break;
         }
         return list;
+    }
+
+    private void recreateGraph(Token token, int index, GraphNodeType type) {
+        GraphMetaInfoAdapter graphMetaInfoAdapter = getDependencyGraph().getGraphMetaInfo();
+        graphBuilder.set(graphMetaInfoAdapter.getGraphMetaInfo());
+
+        DependencyGraph dg = getDependencyGraph().getDependencyGraph();
+        List<TerminalNode> existingNodes = new ArrayList<>();
+        dg.getNodes().stream().filter(gn -> isInstanceOf(TerminalNode.class, gn)).forEach(tn -> existingNodes.add((TerminalNode) tn));
+
+        switch (type) {
+            case REFERENCE:
+                existingNodes.add(new ReferenceNode(token));
+                break;
+            case HIDDEN:
+                existingNodes.add(index, new HiddenNode(token));
+                break;
+            case IMPLIED:
+                existingNodes.add(index, new ImpliedNode(token));
+                break;
+            default:
+                break;
+        }
+
+        final List<TerminalNode> terminalNodes = graphBuilder.recreateNodes(existingNodes);
+//        terminalNodes.forEach(terminalNode -> System.out.println(format("{{{{{ %s:%s:%s }}}}}", terminalNode.getGraphNodeType(),
+//                terminalNode.getId(), terminalNode.getToken().getDisplayName())));
+
+        final boolean transientGraph = repositoryTool.isTransientGraph(dg.getDisplayName());
+
+        // remove  all nodes
+        removeAll();
+        if(!transientGraph) {
+            repositoryTool.getRepositoryUtil().deleteDependencyGraph(dg.getId(), removalIdMap);
+        }
+        removalIdMap.clear();
+
+        dg = repositoryTool.recreateDependencyGraph(dg, terminalNodes);
+        if (!transientGraph) {
+            repositoryTool.getRepositoryUtil().saveDependencyGraph(dg, impliedOrHiddenTokens, null);
+        }
+        setDependencyGraph(null);
+        setDependencyGraph(new DependencyGraphAdapter(dg));
     }
 
     public final DependencyGraphAdapter getDependencyGraph() {
