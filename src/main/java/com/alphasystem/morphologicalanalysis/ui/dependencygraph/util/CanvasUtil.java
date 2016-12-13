@@ -12,20 +12,14 @@ import com.alphasystem.morphologicalanalysis.wordbyword.model.*;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.*;
 import com.alphasystem.morphologicalanalysis.wordbyword.repository.LocationRepository;
 import javafx.collections.ObservableList;
-import javafx.scene.Group;
-import javafx.scene.Node;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
-import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 
 import java.util.List;
-import java.util.Optional;
 
 import static com.alphasystem.arabic.model.ArabicWord.getSubWord;
 import static com.alphasystem.fx.ui.util.FontConstants.ARABIC_FONT_24;
@@ -36,7 +30,6 @@ import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.Inc
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.RelationshipType._KAF;
 import static com.alphasystem.util.AppUtil.isInstanceOf;
 import static java.lang.String.format;
-import static javafx.scene.control.Alert.AlertType.INFORMATION;
 import static javafx.scene.text.Font.font;
 
 /**
@@ -74,31 +67,6 @@ public class CanvasUtil {
             }
         }
         return index;
-    }
-
-    public static Line getReferenceLine(Group parent) {
-        ObservableList<Node> children = parent.getChildren();
-        Line line = null;
-        for (Node child : children) {
-            if (isInstanceOf(Line.class, child)) {
-                line = (Line) child;
-                break;
-            }
-        }
-        if (line == null) {
-            showAlert(INFORMATION, "No line found.", null);
-            return null;
-        }
-        return line;
-    }
-
-    private static Optional<ButtonType> showAlert(Alert.AlertType type, String contentText, String headerText) {
-        Alert alert = new Alert(type);
-        if (headerText != null) {
-            alert.setHeaderText(headerText);
-        }
-        alert.setContentText(contentText);
-        return alert.showAndWait();
     }
 
     private static String getText(GraphNodeAdapter item) {
@@ -361,19 +329,6 @@ public class CanvasUtil {
                 graphNode.setFont(adapterInfo.getPosFont());
                 break;
         }
-    }
-
-    /**
-     * Shift nodes to the right. The calculation of shifting right is:
-     * <div>
-     * <code>{@link GraphMetaInfoAdapter#getGapBetweenTokens()} + {@link GraphMetaInfoAdapter#getTokenWidth()} + {@link GraphNodeAdapter#getTranslateX()}</code>
-     * </div>
-     *
-     * @param index                  index of current node
-     * @param dependencyGraphAdapter dependency graph
-     */
-    public void shiftRight(int index, DependencyGraphAdapter dependencyGraphAdapter) {
-        shiftNodes(index, false, dependencyGraphAdapter);
     }
 
     /**
