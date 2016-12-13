@@ -32,10 +32,11 @@ public class GlobalPropertiesView extends Control {
     private final ObjectProperty<FontMetaInfo> posFont = new SimpleObjectProperty<>(null, "terminalFont");
     private final ObjectProperty<DependencyGraphAdapter> dependencyGraph = new SimpleObjectProperty<>(null, "dependencyGraph");
 
-    public GlobalPropertiesView() {
+    public GlobalPropertiesView(DependencyGraphAdapter dependencyGraph) {
         dependencyGraphProperty().addListener((observable, oldValue, newValue) -> initValues(newValue));
         initListeners();
         setSkin(new GlobalPropertiesSkin(this));
+        setDependencyGraph(dependencyGraph);
     }
 
     private void initValues(DependencyGraphAdapter dga) {
@@ -62,7 +63,7 @@ public class GlobalPropertiesView extends Control {
             setAlignTerminalYAxis(node.getY());
             setAlignTranslationYAxis(node.getTranslationY());
             final ObservableList<PartOfSpeechNodeAdapter> partOfSpeeches = node.getPartOfSpeeches();
-            if (partOfSpeeches != null) {
+            if (partOfSpeeches != null && !partOfSpeeches.isEmpty()) {
                 final PartOfSpeechNodeAdapter posAdapter = partOfSpeeches.get(0);
                 if (posAdapter != null) {
                     setAlignPosYAxis(posAdapter.getY());

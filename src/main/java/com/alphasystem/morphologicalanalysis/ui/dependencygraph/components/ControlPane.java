@@ -24,14 +24,13 @@ public class ControlPane extends BorderPane {
     public ControlPane(DependencyGraphAdapter dependencyGraph) {
         editorPane = new DependencyGraphBuilderEditorPane(null, 0, 0);
 
-        final GlobalPropertiesView globalPropertiesView = new GlobalPropertiesView();
-        globalPropertiesView.setDependencyGraph(dependencyGraph);
+        final GlobalPropertiesView globalPropertiesView = new GlobalPropertiesView(dependencyGraph);
 
         dependencyGraphProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue == null) {
                 return;
             }
-            globalPropertiesView.setDependencyGraph(dependencyGraph);
+            globalPropertiesView.setDependencyGraph(newValue);
             refreshPanel(newValue);
         });
 
