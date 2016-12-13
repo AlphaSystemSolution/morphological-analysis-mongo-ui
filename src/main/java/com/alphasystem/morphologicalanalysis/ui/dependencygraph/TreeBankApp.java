@@ -117,17 +117,17 @@ public class TreeBankApp extends Application {
     private void create(Stage stage, String displayName) {
         graphMetaInfoSelectionDialog.setGraphMetaInfo(null);
         Optional<GraphMetaInfoAdapter> result = graphMetaInfoSelectionDialog.showAndWait();
-        result.ifPresent(adapterInfo -> {
+        result.ifPresent(metaInfo -> {
             int i = displayName.indexOf('|');
             Integer chapterNumber = parseInt(displayName.substring(0, i));
             VerseTokenPairGroup group = createGroup(chapterNumber, displayName.substring(i + 1));
-            DependencyGraph dependencyGraph = canvasUtil.createDependencyGraph(group, adapterInfo);
+            DependencyGraph dependencyGraph = canvasUtil.createDependencyGraph(group, metaInfo);
             DependencyGraphAdapter dependencyGraphAdapter = new DependencyGraphAdapter(new DependencyGraph());
             Alert alert = new Alert(INFORMATION);
             alert.setContentText(format("Graph Created {%s}", dependencyGraph.getDisplayName()));
             alert.showAndWait().filter(response -> response == OK).ifPresent(response -> {
                 dependencyGraphAdapter.setDependencyGraph(dependencyGraph);
-                dependencyGraphAdapter.setGraphMetaInfo(adapterInfo);
+                dependencyGraphAdapter.setGraphMetaInfo(metaInfo);
             });
             showStage(stage, dependencyGraphAdapter);
         });
