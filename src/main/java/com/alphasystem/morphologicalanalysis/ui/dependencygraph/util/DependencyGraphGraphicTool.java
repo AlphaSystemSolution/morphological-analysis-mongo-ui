@@ -55,7 +55,7 @@ public final class DependencyGraphGraphicTool {
      * @param height        height of the canvas
      * @param step          gap between lines
      */
-    public Path drawGridLines(boolean showGridLines, int width, int height, int step) {
+    private Path drawGridLines(boolean showGridLines, int width, int height, int step) {
         Path gridLines = new Path();
         gridLines.setId(GRID_LINES);
         gridLines.setStroke(DARK_GRAY_CLOUD);
