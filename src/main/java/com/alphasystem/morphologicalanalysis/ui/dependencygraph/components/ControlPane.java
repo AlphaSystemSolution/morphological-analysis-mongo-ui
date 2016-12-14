@@ -6,6 +6,8 @@ import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.GraphMetaI
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.GraphNodeAdapter;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.BorderPane;
@@ -39,16 +41,19 @@ public class ControlPane extends BorderPane {
         tabPane.setTabClosingPolicy(UNAVAILABLE);
         tabPane.setSide(TOP);
 
-        BorderPane borderPane = new BorderPane();
-        borderPane.setCenter(editorPane);
-
-
         tabPane.getTabs().addAll(
-                new Tab(" Properties ", globalPropertiesView),
-                new Tab("   Editor   ", borderPane));
+                new Tab(" Properties ", wrapInBorderPane(globalPropertiesView)),
+                new Tab("   Editor   ", wrapInBorderPane(editorPane)));
 
         setCenter(tabPane);
         setDependencyGraph(dependencyGraph);
+    }
+
+    private BorderPane wrapInBorderPane(Node node){
+        BorderPane borderPane = new BorderPane();
+        borderPane.setCenter(node);
+        borderPane.setPadding(new Insets(5, 5, 5, 5));
+        return borderPane;
     }
 
     private void refreshPanel(DependencyGraphAdapter dependencyGraph) {
