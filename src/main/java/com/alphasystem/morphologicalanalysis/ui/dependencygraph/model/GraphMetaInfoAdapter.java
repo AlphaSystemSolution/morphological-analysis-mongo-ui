@@ -5,6 +5,10 @@ import com.alphasystem.morphologicalanalysis.graph.model.GraphMetaInfo;
 import com.alphasystem.morphologicalanalysis.graph.model.PartOfSpeechNode;
 import com.alphasystem.morphologicalanalysis.graph.model.TerminalNode;
 import javafx.beans.property.*;
+import javafx.scene.paint.Color;
+import org.apache.commons.lang3.StringUtils;
+
+import static com.alphasystem.morphologicalanalysis.ui.common.Global.getColorValue;
 
 /**
  * @author sali
@@ -13,6 +17,7 @@ public class GraphMetaInfoAdapter {
 
     private static final TerminalNode DUMMY_TERMINAL_NODE = new TerminalNode();
     private static final PartOfSpeechNode DUMMY_POS_NODE = new PartOfSpeechNode();
+    private static final String DEFAULT_COLOR = getColorValue(Color.BEIGE);
 
     private final ObjectProperty<GraphMetaInfo> graphMetaInfo = new SimpleObjectProperty<>();
     private final DoubleProperty width = new SimpleDoubleProperty();
@@ -23,6 +28,7 @@ public class GraphMetaInfoAdapter {
     private final BooleanProperty showGridLines = new SimpleBooleanProperty();
     private final BooleanProperty showOutLines = new SimpleBooleanProperty();
     private final BooleanProperty debugMode = new SimpleBooleanProperty();
+    private final StringProperty backgroundColor = new SimpleStringProperty();
     private final ObjectProperty<FontMetaInfo> terminalFont = new SimpleObjectProperty<>();
     private final ObjectProperty<FontMetaInfo> posFont = new SimpleObjectProperty<>();
     private final ObjectProperty<FontMetaInfo> translationFont = new SimpleObjectProperty<>();
@@ -41,6 +47,8 @@ public class GraphMetaInfoAdapter {
                 setShowGridLines(newValue.isShowGridLines());
                 setShowOutLines(newValue.isShowOutLines());
                 setDebugMode(newValue.isDebugMode());
+                final String backgroundColor = newValue.getBackgroundColor();
+                setBackgroundColor(backgroundColor);
             } else {
                 setTerminalFont(DUMMY_TERMINAL_NODE.getFont());
                 setTranslationFont(DUMMY_TERMINAL_NODE.getTranslationFont());
@@ -48,6 +56,7 @@ public class GraphMetaInfoAdapter {
                 setShowGridLines(true);
                 setShowOutLines(true);
                 setDebugMode(true);
+                setBackgroundColor(null);
             }
         });
         setGraphMetaInfo(src);
@@ -73,6 +82,21 @@ public class GraphMetaInfoAdapter {
                 graphMetaInfoProperty().get().setShowOutLines(newValue));
         debugModeProperty().addListener((observable, oldValue, newValue) ->
                 graphMetaInfoProperty().get().setDebugMode(newValue));
+        backgroundColorProperty().addListener((observable, oldValue, newValue) -> {
+            graphMetaInfoProperty().get().setBackgroundColor(newValue);
+        });
+    }
+
+    public final String getBackgroundColor() {
+        return backgroundColor.get();
+    }
+
+    public final StringProperty backgroundColorProperty() {
+        return backgroundColor;
+    }
+
+    public final void setBackgroundColor(String backgroundColor) {
+        this.backgroundColor.set(StringUtils.isBlank(backgroundColor) ? DEFAULT_COLOR : backgroundColor);
     }
 
     public final ObjectProperty<FontMetaInfo> translationFontProperty() {
