@@ -13,6 +13,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderStroke;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
@@ -125,6 +126,15 @@ public class Global {
 
     public static String getFontDisplayValue(FontMetaInfo fmi) {
         return (fmi == null) ? "" : format("%s, %s", fmi.getFamily(), fmi.getSize());
+    }
+
+    public static String getColorValue(Color color) {
+        return format("#%s%s%s", toHexColorCode(color.getRed()), toHexColorCode(color.getGreen()), toHexColorCode(color.getBlue()));
+    }
+
+    private static String toHexColorCode(double value) {
+        String hexValue = Long.toHexString(Math.round(value * 255));
+        return (hexValue.length() <= 1) ? format("0%s", hexValue) : hexValue;
     }
 
 }
