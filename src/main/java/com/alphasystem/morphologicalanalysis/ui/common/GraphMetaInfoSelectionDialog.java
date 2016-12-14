@@ -79,7 +79,8 @@ public class GraphMetaInfoSelectionDialog extends Dialog<GraphMetaInfoAdapter> {
     }
 
     public final void setGraphMetaInfo(GraphMetaInfoAdapter graphMetaInfo) {
-        graphMetaInfo = graphMetaInfo == null ? new GraphMetaInfoAdapter(new GraphMetaInfo()) : graphMetaInfo;
+        graphMetaInfo = (graphMetaInfo == null) ? new GraphMetaInfoAdapter(new GraphMetaInfo()) : graphMetaInfo;
+        graphMetaInfo.setBackgroundColor(null);
         this.graphMetaInfo.set(graphMetaInfo);
     }
 
