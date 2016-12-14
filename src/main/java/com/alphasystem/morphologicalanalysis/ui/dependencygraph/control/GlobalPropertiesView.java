@@ -7,8 +7,11 @@ import javafx.beans.property.*;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.fromFontMetaInfo;
+import static com.alphasystem.morphologicalanalysis.ui.common.Global.getColorValue;
 import static com.alphasystem.util.AppUtil.isInstanceOf;
 
 /**
@@ -30,6 +33,7 @@ public class GlobalPropertiesView extends Control {
     private final ObjectProperty<FontMetaInfo> terminalFont = new SimpleObjectProperty<>(null, "terminalFont");
     private final ObjectProperty<FontMetaInfo> translationFont = new SimpleObjectProperty<>(null, "terminalFont");
     private final ObjectProperty<FontMetaInfo> posFont = new SimpleObjectProperty<>(null, "terminalFont");
+    private final ObjectProperty<Paint> backgroundColor = new SimpleObjectProperty<>(null, "backgroundColor");
     private final ObjectProperty<DependencyGraphAdapter> dependencyGraph = new SimpleObjectProperty<>(null, "dependencyGraph");
 
     public GlobalPropertiesView(DependencyGraphAdapter dependencyGraph) {
@@ -76,6 +80,7 @@ public class GlobalPropertiesView extends Control {
             setTerminalFont(graphMetaInfo.getTerminalFont());
             setTranslationFont(graphMetaInfo.getTranslationFont());
             setPosFont(graphMetaInfo.getPosFont());
+            setBackgroundColor(Color.web(graphMetaInfo.getBackgroundColor()));
         }
     }
 
@@ -90,6 +95,8 @@ public class GlobalPropertiesView extends Control {
                 getDependencyGraph().getGraphMetaInfo().setShowOutLines(newValue));
         debugModeProperty().addListener((observable, oldValue, newValue) ->
                 getDependencyGraph().getGraphMetaInfo().setDebugMode(newValue));
+        backgroundColorProperty().addListener((observable, oldValue, newValue) ->
+                getDependencyGraph().getGraphMetaInfo().setBackgroundColor(getColorValue((Color) newValue)));
 
         alignTerminalYAxisProperty().addListener((observable, oldValue1, newValue) ->
                 getDependencyGraph().getGraphNodes().stream().filter(gn -> isInstanceOf(TerminalNodeAdapter.class, gn))
@@ -301,6 +308,18 @@ public class GlobalPropertiesView extends Control {
 
     public final void setPosFont(FontMetaInfo posFont) {
         this.posFont.set(posFont);
+    }
+
+    public final Paint getBackgroundColor() {
+        return backgroundColor.get();
+    }
+
+    public final ObjectProperty<Paint> backgroundColorProperty() {
+        return backgroundColor;
+    }
+
+    public final void setBackgroundColor(Paint backgroundColor) {
+        this.backgroundColor.set(backgroundColor);
     }
 
     public final DependencyGraphAdapter getDependencyGraph() {

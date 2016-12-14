@@ -2,10 +2,12 @@ package com.alphasystem.morphologicalanalysis.ui.dependencygraph.control.skin;
 
 import com.alphasystem.morphologicalanalysis.graph.model.FontMetaInfo;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.control.GlobalPropertiesView;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.SpinnerValueFactory.DoubleSpinnerValueFactory;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.util.StringConverter;
 
@@ -90,6 +92,9 @@ public class GlobalPropertiesSkin extends SkinBase<GlobalPropertiesView> {
         @FXML
         private ComboBox<Integer> partOfSpeechFontSize;
 
+        @FXML
+        private ColorPicker colorPicker;
+
         private SkinView() {
             init();
         }
@@ -106,12 +111,17 @@ public class GlobalPropertiesSkin extends SkinBase<GlobalPropertiesView> {
         void initialize() {
             accordion.setExpandedPane(accordion.getPanes().get(0));
             final GlobalPropertiesView control = getSkinnable();
+            colorPicker.setValue((Color) control.getBackgroundColor());
+            colorPicker.setOnAction(event1 -> {
+                control.setBackgroundColor(colorPicker.getValue());
+            });
 
             setupCanvasWidth(control);
             setupCanvasHeight(control);
             setupShowGridLines(control);
             setupShowOutline(control);
             setupDebugMode(control);
+            setupBackgroundColor(control);
             setupAlignTerminalYAxis(control);
             setupAlignTranslationsYAxis(control);
             setupAlignPosYAxis(control);
@@ -152,6 +162,10 @@ public class GlobalPropertiesSkin extends SkinBase<GlobalPropertiesView> {
         private void setupDebugMode(GlobalPropertiesView control) {
             debugMode.selectedProperty().setValue(control.isDebugMode());
             debugMode.selectedProperty().bindBidirectional(control.debugModeProperty());
+        }
+
+        private void setupBackgroundColor(GlobalPropertiesView control){
+            colorPicker.setValue((Color) control.getBackgroundColor());
         }
 
         private void setupAlignTerminalYAxis(GlobalPropertiesView control) {
@@ -254,6 +268,11 @@ public class GlobalPropertiesSkin extends SkinBase<GlobalPropertiesView> {
                     control.setPosFont(deriveFromFamily(control.getPosFont(), newValue)));
             partOfSpeechFontSize.valueProperty().addListener((observable, oldValue, newValue) ->
                     control.setPosFont(deriveFromSize(control.getPosFont(), newValue)));
+        }
+
+        private void showColorChooser(ActionEvent event){
+            System.out.println(":::::::::::::");
+            colorPicker.show();
         }
 
     }

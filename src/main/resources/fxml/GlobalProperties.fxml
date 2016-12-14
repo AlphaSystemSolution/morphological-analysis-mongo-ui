@@ -3,6 +3,8 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import java.lang.*?>
+<?import javafx.scene.text.Text?>
+<?import javafx.scene.shape.Rectangle?>
 <fx:root xmlns:fx="http://javafx.com/fxml/1" type="javafx.scene.layout.BorderPane"
          xmlns="http://javafx.com/javafx/8.0.40">
     <styleClass>border</styleClass>
@@ -29,6 +31,9 @@
                         <Label text="%debugMode.label" GridPane.columnIndex="0" GridPane.rowIndex="8"
                                labelFor="$debugMode"/>
                         <CheckBox fx:id="debugMode" GridPane.columnIndex="0" GridPane.rowIndex="9"/>
+                        <Label text="%backgroundColor.label" GridPane.columnIndex="0" GridPane.rowIndex="10"
+                               labelFor="$colorPicker"/>
+                        <ColorPicker fx:id="colorPicker" GridPane.columnIndex="0" GridPane.rowIndex="11"/>
                     </GridPane>
                 </TitledPane>
                 <TitledPane text="Alignment">
