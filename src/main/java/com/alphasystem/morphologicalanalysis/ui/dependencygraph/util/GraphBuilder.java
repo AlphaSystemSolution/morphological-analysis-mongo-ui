@@ -9,17 +9,15 @@ import com.alphasystem.morphologicalanalysis.util.MorphologicalAnalysisRepositor
 import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
-import javafx.scene.shape.Line;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.*;
+import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.TERMINAL;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.*;
 import static java.lang.String.format;
 import static java.util.Collections.reverse;
-import static java.util.Collections.singletonList;
 
 /**
  * @author sali
@@ -60,7 +58,7 @@ public class GraphBuilder {
      *
      * @param tokens list source tokens
      * @return list terminal nodes
-     * @throws IllegalArgumentException
+     * @throws IllegalArgumentException if token list is null or empty
      */
     public List<TerminalNode> buildTerminalNodes(List<Token> tokens) throws IllegalArgumentException {
         if (tokens == null || tokens.isEmpty()) {
@@ -83,9 +81,9 @@ public class GraphBuilder {
      * @param token    source token
      * @param nodeType graph node type
      * @return terminal node
-     * @throws IllegalArgumentException
+     * @throws IllegalArgumentException if token is null
      */
-    public TerminalNode buildTerminalNode(Token token, GraphNodeType nodeType)
+    private TerminalNode buildTerminalNode(Token token, GraphNodeType nodeType)
             throws IllegalArgumentException {
         if (token == null) {
             throw new IllegalArgumentException("Token cannot be null");
@@ -135,7 +133,7 @@ public class GraphBuilder {
         return terminalNode;
     }
 
-    public void buildPartOfSpeechNodes(List<TerminalNode> terminalNodes) {
+    private void buildPartOfSpeechNodes(List<TerminalNode> terminalNodes) {
         reset();
         textY = 150;
 
@@ -145,7 +143,7 @@ public class GraphBuilder {
         }
     }
 
-    public List<PartOfSpeechNode> buildPartOfSpeechNodes(TerminalNode terminalNode) {
+    private List<PartOfSpeechNode> buildPartOfSpeechNodes(TerminalNode terminalNode) {
         List<PartOfSpeechNode> partOfSpeechNodes = new ArrayList<>();
 
         Token token = terminalNode.getToken();
@@ -158,32 +156,6 @@ public class GraphBuilder {
         }
 
         return partOfSpeechNodes;
-    }
-
-    public ImpliedNode buildImpliedNode(Token token, Line referenceLine) {
-        rectX = gapBetweenTokens + referenceLine.getEndX();
-        textX = rectX + 30;
-        x1 = rectX;
-        x2 = tokenWidth + rectX;
-        x3 = rectX + 30;
-
-        ImpliedNode impliedNode = (ImpliedNode) buildTerminalNode(token, IMPLIED);
-        buildPartOfSpeechNodes(singletonList(impliedNode));
-
-        return impliedNode;
-    }
-
-    public HiddenNode buildHiddenNode(Token token, Line referenceLine) {
-        rectX = gapBetweenTokens + referenceLine.getEndX();
-        textX = rectX + 30;
-        x1 = rectX;
-        x2 = tokenWidth + rectX;
-        x3 = rectX + 30;
-
-        HiddenNode hiddenNode = (HiddenNode) buildTerminalNode(token, HIDDEN);
-        buildPartOfSpeechNodes(singletonList(hiddenNode));
-
-        return hiddenNode;
     }
 
     public void buildRelationshipNode(RelationshipNode relationshipNode, LinkSupportAdapter dependentNode,
@@ -240,22 +212,6 @@ public class GraphBuilder {
         fragments.forEach(psna -> phraseNode.getFragments().add(psna.getSrc()));
     }
 
-    public ReferenceNode buildReferenceNode(Token token, Line referenceLine) {
-        rectX = gapBetweenTokens + referenceLine.getEndX();
-        textX = rectX + 30;
-        x1 = rectX;
-        x2 = tokenWidth + rectX;
-        x3 = rectX + 30;
-
-        ReferenceNode referenceNode = (ReferenceNode) buildTerminalNode(token, REFERENCE);
-
-        reset();
-        textY = 160;
-        referenceNode.setPartOfSpeechNodes(buildPartOfSpeechNodes(referenceNode));
-
-        return referenceNode;
-    }
-
     public List<TerminalNode> recreateNodes(List<TerminalNode> srcNodes) {
         List<TerminalNode> terminalNodes = new ArrayList<>();
         srcNodes.forEach(terminalNode -> terminalNodes.add(buildTerminalNode(terminalNode.getToken(), terminalNode.getGraphNodeType())));
@@ -293,11 +249,10 @@ public class GraphBuilder {
 
     private void reset() {
         rectX = INITIAL_X;
-        double rectY = INITIAL_Y;
         textX = rectX + 10;
         textY = 125;
         x1 = rectX;
-        y1 = tokenHeight + rectY;
+        y1 = tokenHeight + INITIAL_Y;
         x2 = tokenWidth + rectX;
         y2 = y1;
         x3 = rectX + 30;
