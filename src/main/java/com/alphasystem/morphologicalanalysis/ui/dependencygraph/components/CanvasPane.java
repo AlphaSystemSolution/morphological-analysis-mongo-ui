@@ -98,7 +98,12 @@ public class CanvasPane extends Pane {
         canvasPane.setMinSize(USE_PREF_SIZE, USE_PREF_SIZE);
         canvasPane.setMaxSize(USE_PREF_SIZE, USE_PREF_SIZE);
         canvasPane.setPrefSize(canvasWidth, canvasHeight);
-        canvasPane.setBackground(new Background(new BackgroundFill(BEIGE, null, null)));
+        canvasPane.setBackground(new Background(new BackgroundFill(Color.web(metaInfo.getBackgroundColor()), null, null)));
+        metaInfo.backgroundColorProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                canvasPane.setBackground(new Background(new BackgroundFill(Color.web(newValue), null, null)));
+            }
+        });
         initListeners();
         setDependencyGraph(src);
 
@@ -1083,7 +1088,7 @@ public class CanvasPane extends Pane {
 
         // remove  all nodes
         removeAll();
-        if(!transientGraph) {
+        if (!transientGraph) {
             repositoryTool.getRepositoryUtil().deleteDependencyGraph(dg.getId(), removalIdMap);
         }
         removalIdMap.clear();
