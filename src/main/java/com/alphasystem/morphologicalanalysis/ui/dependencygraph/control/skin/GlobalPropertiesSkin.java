@@ -2,14 +2,13 @@ package com.alphasystem.morphologicalanalysis.ui.dependencygraph.control.skin;
 
 import com.alphasystem.morphologicalanalysis.graph.model.FontMetaInfo;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.control.GlobalPropertiesView;
-import javafx.event.ActionEvent;
+import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.FontSizeStringConverter;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.SpinnerValueFactory.DoubleSpinnerValueFactory;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-import javafx.util.StringConverter;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -164,7 +163,7 @@ public class GlobalPropertiesSkin extends SkinBase<GlobalPropertiesView> {
             debugMode.selectedProperty().bindBidirectional(control.debugModeProperty());
         }
 
-        private void setupBackgroundColor(GlobalPropertiesView control){
+        private void setupBackgroundColor(GlobalPropertiesView control) {
             colorPicker.setValue((Color) control.getBackgroundColor());
         }
 
@@ -270,11 +269,6 @@ public class GlobalPropertiesSkin extends SkinBase<GlobalPropertiesView> {
                     control.setPosFont(deriveFromSize(control.getPosFont(), newValue)));
         }
 
-        private void showColorChooser(ActionEvent event){
-            System.out.println(":::::::::::::");
-            colorPicker.show();
-        }
-
     }
 
     private static FontMetaInfo deriveFromFamily(FontMetaInfo src, String family) {
@@ -285,15 +279,4 @@ public class GlobalPropertiesSkin extends SkinBase<GlobalPropertiesView> {
         return new FontMetaInfo(src.getFamily(), src.getWeight(), src.getPosture(), size);
     }
 
-    private static class FontSizeStringConverter extends StringConverter<Integer> {
-        @Override
-        public String toString(Integer object) {
-            return (object == null) ? "" : String.valueOf(object);
-        }
-
-        @Override
-        public Integer fromString(String string) {
-            return (string == null) ? 0 : Integer.parseInt(string);
-        }
-    }
 }
