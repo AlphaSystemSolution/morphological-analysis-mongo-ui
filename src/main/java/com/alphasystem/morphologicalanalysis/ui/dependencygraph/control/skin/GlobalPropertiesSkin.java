@@ -1,6 +1,5 @@
 package com.alphasystem.morphologicalanalysis.ui.dependencygraph.control.skin;
 
-import com.alphasystem.morphologicalanalysis.graph.model.FontMetaInfo;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.control.GlobalPropertiesView;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.FontSizeStringConverter;
 import javafx.fxml.FXML;
@@ -269,14 +268,6 @@ public class GlobalPropertiesSkin extends SkinBase<GlobalPropertiesView> {
                     control.setPosFont(deriveFromSize(control.getPosFont(), newValue)));
         }
 
-    }
-
-    private static FontMetaInfo deriveFromFamily(FontMetaInfo src, String family) {
-        return new FontMetaInfo(family, src.getWeight(), src.getPosture(), src.getSize());
-    }
-
-    private static FontMetaInfo deriveFromSize(FontMetaInfo src, double size) {
-        return new FontMetaInfo(src.getFamily(), src.getWeight(), src.getPosture(), size);
     }
 
 }

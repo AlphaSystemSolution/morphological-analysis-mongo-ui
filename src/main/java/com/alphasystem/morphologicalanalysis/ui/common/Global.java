@@ -111,6 +111,14 @@ public class Global {
         return new FontMetaInfo(font.getFamily(), "NORMAL", "REGULAR", font.getSize());
     }
 
+    public static FontMetaInfo deriveFromFamily(FontMetaInfo src, String family) {
+        return new FontMetaInfo(family, src.getWeight(), src.getPosture(), src.getSize());
+    }
+
+    public static FontMetaInfo deriveFromSize(FontMetaInfo src, double size) {
+        return new FontMetaInfo(src.getFamily(), src.getWeight(), src.getPosture(), size);
+    }
+
     public static Image getImage(String imageFolder, String imageName) {
         imageFolder = (imageFolder == null) ? "" : format("%s.", imageFolder);
         return new Image(getResourceAsStream(format("images.%s%s", imageFolder, imageName)));
@@ -130,6 +138,14 @@ public class Global {
 
     public static String getColorValue(Color color) {
         return format("#%s%s%s", toHexColorCode(color.getRed()), toHexColorCode(color.getGreen()), toHexColorCode(color.getBlue()));
+    }
+
+    public static double getMinValue(double value, int diff) {
+        return Math.floor(value - diff);
+    }
+
+    public static double getMaxValue(double value, int diff) {
+        return Math.ceil(value + diff);
     }
 
     private static String toHexColorCode(double value) {
