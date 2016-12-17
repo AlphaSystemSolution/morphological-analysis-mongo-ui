@@ -1,0 +1,20 @@
+<?import com.alphasystem.morphologicalanalysis.ui.dependencygraph.control.editor.CommonPropertiesEditor?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Accordion?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.BorderPane?>
+<fx:root xmlns:fx="http://javafx.com/fxml/1" type="javafx.scene.layout.BorderPane"
+         xmlns:as="http://javafx.com/javafx/8.0.40">
+    <padding>
+        <Insets top="5" bottom="5" left="5" right="5"/>
+    </padding>
+    <center>
+        <Accordion fx:id="accordion">
+            <panes>
+                <TitledPane fx:id="commonPropertiesPane">
+                    <CommonPropertiesEditor fx:id="commonPropertiesEditor"/>
+                </TitledPane>
+            </panes>
+        </Accordion>
+    </center>
+</fx:root>

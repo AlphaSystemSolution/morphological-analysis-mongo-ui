@@ -1,0 +1,28 @@
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<fx:root xmlns:fx="http://javafx.com/fxml/1" type="javafx.scene.layout.GridPane"
+         xmlns="http://javafx.com/javafx/8.0.40">
+    <alignment>TOP_CENTER</alignment>
+    <hgap>5</hgap>
+    <vgap>5</vgap>
+    <padding>
+        <Insets top="5" bottom="5" left="5" right="5"/>
+    </padding>
+    <Label text="%startXIndex.label" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+    <Spinner fx:id="x1Spinner" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+    <Slider fx:id="x1Slider" showTickMarks="true" showTickLabels="true" majorTickUnit="5" minorTickCount="1"
+            blockIncrement="0.5" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+    <Label text="%startYIndex.label" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+    <Spinner fx:id="y1Spinner" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
+    <Slider fx:id="y1Slider" showTickMarks="true" showTickLabels="true" majorTickUnit="5" minorTickCount="1"
+            blockIncrement="0.5" GridPane.columnIndex="0" GridPane.rowIndex="5"/>
+    <Label text="%endXIndex.label" GridPane.columnIndex="0" GridPane.rowIndex="6"/>
+    <Spinner fx:id="x2Spinner" GridPane.columnIndex="0" GridPane.rowIndex="7"/>
+    <Slider fx:id="x2Slider" showTickMarks="true" showTickLabels="true" majorTickUnit="5" minorTickCount="1"
+            blockIncrement="0.5" GridPane.columnIndex="0" GridPane.rowIndex="8"/>
+    <Label text="%endYIndex.label" GridPane.columnIndex="0" GridPane.rowIndex="9"/>
+    <Spinner fx:id="y2Spinner" GridPane.columnIndex="0" GridPane.rowIndex="10"/>
+    <Slider fx:id="y2Slider" showTickMarks="true" showTickLabels="true" majorTickUnit="5" minorTickCount="1"
+            blockIncrement="0.5" GridPane.columnIndex="0" GridPane.rowIndex="11"/>
+</fx:root>
