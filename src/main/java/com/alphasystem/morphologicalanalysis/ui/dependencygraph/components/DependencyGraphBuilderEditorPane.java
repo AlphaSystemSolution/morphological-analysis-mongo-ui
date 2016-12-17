@@ -144,9 +144,9 @@ public class DependencyGraphBuilderEditorPane extends BorderPane {
         GridPane gridPane = getGridPane();
 
         row = 0;
-        addFields(gridPane, "tanslationXIndex.label", TerminalNodeAdapter::getTranslationX,
+        addFields(gridPane, "translationXIndex.label", TerminalNodeAdapter::getTranslationX,
                 TerminalNodeAdapter::setTranslationX, node, getCanvasWidth());
-        addFields(gridPane, "tanslationYIndex.label", TerminalNodeAdapter::getTranslationY,
+        addFields(gridPane, "translationYIndex.label", TerminalNodeAdapter::getTranslationY,
                 TerminalNodeAdapter::setTranslationY, node, getCanvasHeight());
         //TODO: add Translation Font properties
 
