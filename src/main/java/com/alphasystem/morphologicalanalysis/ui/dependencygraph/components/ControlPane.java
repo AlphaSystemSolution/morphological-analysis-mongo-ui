@@ -22,10 +22,15 @@ import static javafx.scene.control.TabPane.TabClosingPolicy.UNAVAILABLE;
 public class ControlPane extends BorderPane {
 
     private final ObjectProperty<DependencyGraphAdapter> dependencyGraph = new SimpleObjectProperty<>();
+    private final PropertiesEditor[] editors = new PropertiesEditor[4];
     private final Tab editorTab;
 
-    @SuppressWarnings({"unckecked"})
+    @SuppressWarnings({"unchecked"})
     public ControlPane(DependencyGraphAdapter dependencyGraph) {
+        editors[0] = new TerminalPropertiesEditor();
+        editors[1] = new PartOfSpeechPropertiesEditor();
+        editors[2] = new PhrasePropertiesEditor();
+        editors[3] = new RelationshipPropertiesEditor();
         final GlobalPropertiesView globalPropertiesView = new GlobalPropertiesView(dependencyGraph);
 
         dependencyGraphProperty().addListener((observable, oldValue, newValue) -> {
@@ -41,7 +46,7 @@ public class ControlPane extends BorderPane {
         tabPane.setTabClosingPolicy(UNAVAILABLE);
         tabPane.setSide(TOP);
 
-        TerminalPropertiesEditor editor = new TerminalPropertiesEditor();
+        PropertiesEditor editor = editors[0];
         editor.setNode(null);
         editorTab = new Tab("   Editor   ", editor);
         tabPane.getTabs().addAll(
@@ -62,33 +67,7 @@ public class ControlPane extends BorderPane {
     @SuppressWarnings({"unchecked"})
     private void refreshPanel(DependencyGraphAdapter dependencyGraph) {
         getDependencyGraph().selectedNodeProperty().addListener(
-                (observable, oldValue, newValue) -> {
-                    PropertiesEditor editor = null;
-                    final GraphNodeType type = newValue.getGraphNodeType();
-                    switch (type) {
-                        case TERMINAL:
-                        case REFERENCE:
-                        case HIDDEN:
-                        case IMPLIED:
-                            editor = new TerminalPropertiesEditor();
-                            break;
-                        case PART_OF_SPEECH:
-                            editor = new PartOfSpeechPropertiesEditor();
-                            break;
-                        case PHRASE:
-                            editor = new PhrasePropertiesEditor();
-                            break;
-                        case RELATIONSHIP:
-                            editor = new RelationshipPropertiesEditor();
-                            break;
-                        default:
-                            break;
-                    }
-                    if (editor != null) {
-                        editor.setNode(newValue);
-                        editorTab.setContent(editor);
-                    }
-                });
+                (observable, oldValue, newValue) -> updateEditor(newValue));
         if (dependencyGraph != null && !dependencyGraph.isEmpty()) {
             GraphNodeAdapter node = dependencyGraph.getGraphNodes().get(0);
             PropertiesEditor editor = new TerminalPropertiesEditor();
@@ -96,6 +75,35 @@ public class ControlPane extends BorderPane {
             editorTab.setContent(editor);
         }
         requestLayout();
+    }
+
+    @SuppressWarnings({"unchecked"})
+    private void updateEditor(GraphNodeAdapter newValue) {
+        PropertiesEditor editor = null;
+        final GraphNodeType type = newValue.getGraphNodeType();
+        switch (type) {
+            case TERMINAL:
+            case REFERENCE:
+            case HIDDEN:
+            case IMPLIED:
+                editor = editors[0];
+                break;
+            case PART_OF_SPEECH:
+                editor = editors[1];
+                break;
+            case PHRASE:
+                editor = editors[2];
+                break;
+            case RELATIONSHIP:
+                editor = editors[3];
+                break;
+            default:
+                break;
+        }
+        if (editor != null) {
+            editor.setNode(newValue);
+            editorTab.setContent(editor);
+        }
     }
 
     public final DependencyGraphAdapter getDependencyGraph() {
