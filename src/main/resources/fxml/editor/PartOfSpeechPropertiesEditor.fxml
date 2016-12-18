@@ -1,10 +1,9 @@
-<?import com.alphasystem.morphologicalanalysis.ui.dependencygraph.control.editor.LinkSupportControlPropertiesEditor?>
+<?import com.alphasystem.morphologicalanalysis.ui.dependencygraph.control.editor.pos.PartOfSpeechCommonPropertiesEditor?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Accordion?>
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.layout.BorderPane?>
-<fx:root xmlns:fx="http://javafx.com/fxml/1" type="javafx.scene.layout.BorderPane"
-         xmlns:as="http://javafx.com/javafx/8.0.40">
+<fx:root xmlns:fx="http://javafx.com/fxml/1" type="javafx.scene.layout.BorderPane">
     <padding>
         <Insets top="5" bottom="5" left="5" right="5"/>
     </padding>
@@ -12,7 +11,7 @@
         <Accordion fx:id="accordion">
             <panes>
                 <TitledPane fx:id="commonPropertiesPane">
-                    <LinkSupportControlPropertiesEditor fx:id="commonPropertiesEditor"/>
+                    <PartOfSpeechCommonPropertiesEditor fx:id="commonPropertiesEditor"/>
                 </TitledPane>
             </panes>
         </Accordion>

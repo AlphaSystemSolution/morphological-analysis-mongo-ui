@@ -1,11 +1,10 @@
-<?import com.alphasystem.morphologicalanalysis.ui.dependencygraph.control.editor.CommonPropertiesEditor?>
+<?import com.alphasystem.morphologicalanalysis.ui.dependencygraph.control.editor.relationship.RelationshipCommonPropertiesEditor?>
 <?import com.alphasystem.morphologicalanalysis.ui.dependencygraph.control.editor.RelationshipControlPropertiesEditor?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Accordion?>
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.layout.BorderPane?>
-<fx:root xmlns:fx="http://javafx.com/fxml/1" type="javafx.scene.layout.BorderPane"
-         xmlns:as="http://javafx.com/javafx/8.0.40">
+<fx:root xmlns:fx="http://javafx.com/fxml/1" type="javafx.scene.layout.BorderPane">
     <padding>
         <Insets top="5" bottom="5" left="5" right="5"/>
     </padding>
@@ -13,7 +12,7 @@
         <Accordion fx:id="accordion">
             <panes>
                 <TitledPane fx:id="commonPropertiesPane">
-                    <CommonPropertiesEditor fx:id="commonPropertiesEditor"/>
+                    <RelationshipCommonPropertiesEditor fx:id="commonPropertiesEditor"/>
                 </TitledPane>
                 <TitledPane text="%controlPointProperties.label">
                     <RelationshipControlPropertiesEditor/>
