@@ -6,8 +6,10 @@ import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.PropertyAcc
 import javafx.beans.property.ObjectProperty;
 import javafx.scene.control.Slider;
 import javafx.scene.control.Spinner;
-import javafx.scene.control.SpinnerValueFactory;
+import javafx.scene.control.SpinnerValueFactory.DoubleSpinnerValueFactory;
 import javafx.scene.layout.GridPane;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.getMaxValue;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.getMinValue;
@@ -15,11 +17,16 @@ import static com.alphasystem.morphologicalanalysis.ui.common.Global.getMinValue
 /**
  * @author sali
  */
-class SkinViewBase<N extends GraphNode, A extends GraphNodeAdapter<N>> extends GridPane {
+public class SkinViewBase<N extends GraphNode, A extends GraphNodeAdapter<N>> extends GridPane {
 
-    private void setupField(ObjectProperty<? extends PropertyAccessor<N, A>> property, Spinner<Double> spinner, Slider slider, int lowerMinValue,
-                            int upperMaxValue) {
-        spinner.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(-100, 100, 0, 0.5));
+    void setupField(ObjectProperty<? extends PropertyAccessor<N, A>> property, Spinner<Double> spinner, Slider slider,
+                    Pair<Integer, Integer> minMaxPair) {
+        setupField(property, spinner, slider, minMaxPair.getLeft(), minMaxPair.getRight());
+    }
+
+    void setupField(ObjectProperty<? extends PropertyAccessor<N, A>> property, Spinner<Double> spinner, Slider slider,
+                    int lowerMinValue, int upperMaxValue) {
+        spinner.setValueFactory(new DoubleSpinnerValueFactory(-100, 100, 0, 0.5));
         slider.setMin(0);
         slider.setMin(0);
         slider.setValue(0);
@@ -29,7 +36,10 @@ class SkinViewBase<N extends GraphNode, A extends GraphNodeAdapter<N>> extends G
                 double x = newValue.get();
                 final double minValue = getMinValue(x, lowerMinValue);
                 final double maxValue = getMaxValue(x, upperMaxValue);
-                spinner.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(minValue, maxValue, x, 0.5));
+                final DoubleSpinnerValueFactory valueFactory = (DoubleSpinnerValueFactory) spinner.getValueFactory();
+                valueFactory.setMin(minValue);
+                valueFactory.setMax(maxValue);
+                valueFactory.setValue(x);
                 slider.setMin(minValue);
                 slider.setMax(maxValue);
                 slider.setValue(x);
@@ -48,6 +58,22 @@ class SkinViewBase<N extends GraphNode, A extends GraphNodeAdapter<N>> extends G
     }
 
     void setupField(ObjectProperty<? extends PropertyAccessor<N, A>> property, Spinner<Double> spinner, Slider slider) {
-        setupField(property, spinner, slider, 10, 10);
+        setupField(property, spinner, slider, getSpinnerDefaultMinMaxRange());
+    }
+
+    Pair<Integer, Integer> getXSpinnerDefaultMinMaxRange() {
+        return getSpinnerDefaultMinMaxRange();
+    }
+
+    Pair<Integer, Integer> getYSpinnerDefaultMinMaxRange() {
+        return getSpinnerDefaultMinMaxRange();
+    }
+
+    Pair<Integer, Integer> getSpinnerDefaultMinMaxRange() {
+        return getSpinnerMinMaxRange(30, 30);
+    }
+
+    Pair<Integer, Integer> getSpinnerMinMaxRange(int min, int max) {
+        return new ImmutablePair<>(min, max);
     }
 }
