@@ -1,4 +1,5 @@
 <?import com.alphasystem.morphologicalanalysis.ui.dependencygraph.control.editor.CommonPropertiesEditor?>
+<?import com.alphasystem.morphologicalanalysis.ui.dependencygraph.control.editor.RelationshipControlPropertiesEditor?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Accordion?>
 <?import javafx.scene.control.TitledPane?>
@@ -13,6 +14,9 @@
             <panes>
                 <TitledPane fx:id="commonPropertiesPane">
                     <CommonPropertiesEditor fx:id="commonPropertiesEditor"/>
+                </TitledPane>
+                <TitledPane text="%controlPointProperties.label">
+                    <RelationshipControlPropertiesEditor/>
                 </TitledPane>
             </panes>
         </Accordion>

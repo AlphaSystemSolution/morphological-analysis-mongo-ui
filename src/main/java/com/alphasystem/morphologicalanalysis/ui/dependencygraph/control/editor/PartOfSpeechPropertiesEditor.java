@@ -10,8 +10,8 @@ import javafx.scene.control.Skin;
  */
 public class PartOfSpeechPropertiesEditor extends PropertiesEditor<PartOfSpeechNode, PartOfSpeechNodeAdapter> {
 
-    @Override
-    protected void initSkin() {
+    public PartOfSpeechPropertiesEditor(){
+        super();
         setSkin(new EditorSkin<>(this));
     }
 

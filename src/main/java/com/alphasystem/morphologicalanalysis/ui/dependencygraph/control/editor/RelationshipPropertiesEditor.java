@@ -10,8 +10,8 @@ import javafx.scene.control.Skin;
  */
 public class RelationshipPropertiesEditor extends PropertiesEditor<RelationshipNode, RelationshipNodeAdapter> {
 
-    @Override
-    protected void initSkin() {
+    public RelationshipPropertiesEditor(){
+        super();
         setSkin(new EditorSkin<>(this));
     }
 

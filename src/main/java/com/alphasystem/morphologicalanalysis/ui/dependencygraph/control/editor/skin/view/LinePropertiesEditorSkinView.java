@@ -6,20 +6,18 @@ import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.LineSuppor
 import javafx.fxml.FXML;
 import javafx.scene.control.Slider;
 import javafx.scene.control.Spinner;
-import javafx.scene.layout.GridPane;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 
 import static com.alphasystem.fx.ui.util.UiUtilities.loadFXML;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.RESOURCE_BUNDLE;
-import static com.alphasystem.morphologicalanalysis.ui.dependencygraph.control.editor.PropertiesEditor.setupField;
 import static com.alphasystem.util.AppUtil.getPath;
 
 /**
  * @author sali
  */
-public class LinePropertiesEditorSkinView<N extends LineSupport, A extends LineSupportAdapter<N>> extends GridPane {
+public class LinePropertiesEditorSkinView<N extends LineSupport, A extends LineSupportAdapter<N>> extends SkinViewBase<N, A> {
 
     private final LinePropertiesEditor<N, A> control;
 

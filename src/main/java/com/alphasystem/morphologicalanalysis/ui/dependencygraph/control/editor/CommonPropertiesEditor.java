@@ -18,38 +18,13 @@ import javafx.scene.text.Font;
  */
 public class CommonPropertiesEditor<N extends GraphNode, A extends GraphNodeAdapter<N>> extends PropertiesEditor<N, A> {
 
-    private StringProperty text;
-    private ObjectProperty<PropertyAccessor<N, A>> x;
-    private ObjectProperty<PropertyAccessor<N, A>> y;
-    private ObjectProperty<Font> arabicFont;
+    private final StringProperty text = new SimpleStringProperty(null, "text");
+    private final ObjectProperty<PropertyAccessor<N, A>> x = new SimpleObjectProperty<>(null, "x", new XPropertyAccessor<>(null));
+    private final ObjectProperty<PropertyAccessor<N, A>> y = new SimpleObjectProperty<>(null, "y", new YPropertyAccessor<>(null));
+    private final ObjectProperty<Font> arabicFont = new SimpleObjectProperty<>(null, "arabicFont");
 
-    @Override
-    protected void initialize(A node) {
-        if (text == null) {
-            text = new SimpleStringProperty(null, "text");
-        }
-        if (x == null) {
-            x = new SimpleObjectProperty<>(null, "x");
-        }
-        if (y == null) {
-            y = new SimpleObjectProperty<>(null, "y");
-        }
-        if (arabicFont == null) {
-            arabicFont = new SimpleObjectProperty<>(null, "arabicFont");
-        }
-        setText((node == null) ? "" : node.getText());
-        setX(new XPropertyAccessor<>(node));
-        setY(new YPropertyAccessor<>(node));
-        setArabicFont((node == null) ? null : node.getFont());
-    }
-
-    @Override
-    protected void initSkin() {
-        setSkin(new CommonPropertiesEditorSkin<>(this));
-    }
-
-    @Override
-    protected void initListeners() {
+    public CommonPropertiesEditor() {
+        super();
         textProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
                 getNode().setText(newValue);
@@ -61,6 +36,15 @@ public class CommonPropertiesEditor<N extends GraphNode, A extends GraphNodeAdap
             }
             getNode().setFont(newValue);
         });
+        setSkin(new CommonPropertiesEditorSkin<>(this));
+    }
+
+    @Override
+    protected void setValues(A node) {
+        setText((node == null) ? "" : node.getText());
+        setX(new XPropertyAccessor<>(node));
+        setY(new YPropertyAccessor<>(node));
+        setArabicFont((node == null) ? null : node.getFont());
     }
 
     public final String getText() {

@@ -15,17 +15,16 @@ import javafx.scene.control.Skin;
  */
 public class GroupTranslateEditor<N extends TerminalNode, A extends GraphNodeAdapter<N>> extends PropertiesEditor<N, A> {
 
-    private ObjectProperty<PropertyAccessor<N, A>> x;
-    private ObjectProperty<PropertyAccessor<N, A>> y;
+    private final ObjectProperty<PropertyAccessor<N, A>> x = new SimpleObjectProperty<>(null, "translationX", new TranslateXPropertyAccessor<>(null));
+    private final ObjectProperty<PropertyAccessor<N, A>> y= new SimpleObjectProperty<>(null, "translationY", new TranslateYPropertyAccessor<>(null));
+
+    public GroupTranslateEditor(){
+        super();
+        setSkin(new GroupTranslateEditorSkin<>(this));
+    }
 
     @Override
-    protected void initialize(A node) {
-        if (x == null) {
-            x = new SimpleObjectProperty<>(null, "translationX");
-        }
-        if (y == null) {
-            y = new SimpleObjectProperty<>(null, "translationY");
-        }
+    protected void setValues(A node) {
         setX(new TranslateXPropertyAccessor<>(node));
         setY(new TranslateYPropertyAccessor<>(node));
     }
@@ -52,11 +51,6 @@ public class GroupTranslateEditor<N extends TerminalNode, A extends GraphNodeAda
 
     public final void setY(PropertyAccessor<N, A> y) {
         this.y.set(y);
-    }
-
-    @Override
-    protected void initSkin() {
-        setSkin(new GroupTranslateEditorSkin<>(this));
     }
 
     @Override

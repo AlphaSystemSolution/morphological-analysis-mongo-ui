@@ -11,7 +11,6 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Slider;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
 
 import java.io.IOException;
@@ -19,13 +18,12 @@ import java.net.URISyntaxException;
 
 import static com.alphasystem.fx.ui.util.UiUtilities.loadFXML;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.*;
-import static com.alphasystem.morphologicalanalysis.ui.dependencygraph.control.editor.PropertiesEditor.setupField;
 import static com.alphasystem.util.AppUtil.getPath;
 
 /**
  * @author sali
  */
-public class TranslationPropertiesEditorSkinView<N extends TerminalNode, A extends GraphNodeAdapter<N>> extends GridPane {
+public class TranslationPropertiesEditorSkinView<N extends TerminalNode, A extends GraphNodeAdapter<N>> extends SkinViewBase<N, A> {
 
     private final TranslationPropertiesEditor<N, A> control;
 

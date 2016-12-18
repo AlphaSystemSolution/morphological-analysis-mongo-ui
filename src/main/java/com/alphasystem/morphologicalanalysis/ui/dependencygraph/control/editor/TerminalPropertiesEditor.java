@@ -10,8 +10,8 @@ import javafx.scene.control.Skin;
  */
 public class TerminalPropertiesEditor extends PropertiesEditor<TerminalNode, TerminalNodeAdapter> {
 
-    @Override
-   protected void initSkin() {
+    public TerminalPropertiesEditor(){
+        super();
         setSkin(new EditorSkin<>(this));
     }
 

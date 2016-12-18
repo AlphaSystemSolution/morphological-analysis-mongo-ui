@@ -1,5 +1,5 @@
-<?import com.alphasystem.morphologicalanalysis.ui.dependencygraph.control.editor.CommonPropertiesEditor?>
 <?import com.alphasystem.morphologicalanalysis.ui.dependencygraph.control.editor.LinePropertiesEditor?>
+<?import com.alphasystem.morphologicalanalysis.ui.dependencygraph.control.editor.LinkSupportControlPropertiesEditor?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Accordion?>
 <?import javafx.scene.control.TitledPane?>
@@ -13,7 +13,7 @@
         <Accordion fx:id="accordion">
             <panes>
                 <TitledPane fx:id="commonPropertiesPane">
-                    <CommonPropertiesEditor fx:id="commonPropertiesEditor"/>
+                    <LinkSupportControlPropertiesEditor fx:id="commonPropertiesEditor"/>
                 </TitledPane>
                 <TitledPane text="%lineProperties.label">
                     <LinePropertiesEditor fx:id="linePropertiesEditor"/>

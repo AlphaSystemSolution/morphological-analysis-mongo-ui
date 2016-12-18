@@ -20,34 +20,14 @@ import javafx.scene.text.Font;
 public class TranslationPropertiesEditor<N extends TerminalNode, A extends GraphNodeAdapter<N>>
         extends PropertiesEditor<N, A> {
 
-    private StringProperty text;
-    private ObjectProperty<PropertyAccessor<N, A>> x;
-    private ObjectProperty<PropertyAccessor<N, A>> y;
-    private ObjectProperty<Font> translationFont;
+    private final StringProperty text = new SimpleStringProperty(null, "translationText");
+    private final ObjectProperty<PropertyAccessor<N, A>> x = new SimpleObjectProperty<>(null, "translationX", new TranslationXPropertyAccessor<>(null));
+    private final ObjectProperty<PropertyAccessor<N, A>> y = new SimpleObjectProperty<>(null, "translationY", new TranslationYPropertyAccessor<>(null));
+    private final ObjectProperty<Font> translationFont = new SimpleObjectProperty<>(null, "translationFont");
 
-    @Override
-    protected void initialize(A node) {
-        if (text == null) {
-            text = new SimpleStringProperty(null, "translationText");
-        }
-        if (x == null) {
-            x = new SimpleObjectProperty<>(null, "translationX");
-        }
-        if (y == null) {
-            y = new SimpleObjectProperty<>(null, "translationY");
-        }
-        if (translationFont == null) {
-            translationFont = new SimpleObjectProperty<>(null, "translationFont");
-        }
-        TerminalNodeAdapter adapter = (TerminalNodeAdapter) node;
-        setText((adapter == null) ? "" : adapter.getTranslationText());
-        setX(new TranslationXPropertyAccessor<>(node));
-        setY(new TranslationYPropertyAccessor<>(node));
-        setTranslationFont((adapter == null) ? null : adapter.getTranslationFont());
-    }
 
-    @Override
-    protected void initListeners() {
+    public TranslationPropertiesEditor() {
+        super();
         textProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
                 ((TerminalNodeAdapter) getNode()).setTranslationText(newValue);
@@ -59,6 +39,16 @@ public class TranslationPropertiesEditor<N extends TerminalNode, A extends Graph
             }
             ((TerminalNodeAdapter) getNode()).setTranslationFont(newValue);
         });
+        setSkin(new TranslationPropertiesEditorSkin<>(this));
+    }
+
+    @Override
+    protected void setValues(A node) {
+        TerminalNodeAdapter adapter = (TerminalNodeAdapter) node;
+        setText((adapter == null) ? "" : adapter.getTranslationText());
+        setX(new TranslationXPropertyAccessor<>(node));
+        setY(new TranslationYPropertyAccessor<>(node));
+        setTranslationFont((adapter == null) ? null : adapter.getTranslationFont());
     }
 
     public final String getText() {
@@ -107,11 +97,6 @@ public class TranslationPropertiesEditor<N extends TerminalNode, A extends Graph
 
     public final void setTranslationFont(Font translationFont) {
         this.translationFont.set(translationFont);
-    }
-
-    @Override
-    protected void initSkin() {
-        setSkin(new TranslationPropertiesEditorSkin<>(this));
     }
 
     @Override

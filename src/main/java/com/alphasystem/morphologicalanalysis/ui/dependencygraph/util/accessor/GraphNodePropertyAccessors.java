@@ -1,13 +1,7 @@
 package com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.accessor;
 
-import com.alphasystem.morphologicalanalysis.graph.model.GraphNode;
-import com.alphasystem.morphologicalanalysis.graph.model.LineSupport;
-import com.alphasystem.morphologicalanalysis.graph.model.LinkSupport;
-import com.alphasystem.morphologicalanalysis.graph.model.TerminalNode;
-import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.GraphNodeAdapter;
-import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.LineSupportAdapter;
-import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.LinkSupportAdapter;
-import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.TerminalNodeAdapter;
+import com.alphasystem.morphologicalanalysis.graph.model.*;
+import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.*;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.PropertyAccessor;
 
 /**
@@ -75,27 +69,39 @@ public final class GraphNodePropertyAccessors {
         }
     }
 
-    public static class ControlX1PropertyAccessor<N extends LinkSupport, A extends LinkSupportAdapter<N>> extends PropertyAccessor<N, A> {
-        public ControlX1PropertyAccessor(A node) {
-            super(LinkSupportAdapter::getX1, LinkSupportAdapter::setX1, node);
+    public static class ControlX1PropertyAccessor extends PropertyAccessor<RelationshipNode, RelationshipNodeAdapter> {
+        public ControlX1PropertyAccessor(RelationshipNodeAdapter node) {
+            super(RelationshipNodeAdapter::getControlX1, RelationshipNodeAdapter::setControlX1, node);
         }
     }
 
-    public static class ControlX2PropertyAccessor<N extends LinkSupport, A extends LinkSupportAdapter<N>> extends PropertyAccessor<N, A> {
-        public ControlX2PropertyAccessor(A node) {
-            super(LinkSupportAdapter::getX2, LinkSupportAdapter::setX2, node);
+    public static class ControlX2PropertyAccessor extends PropertyAccessor<RelationshipNode, RelationshipNodeAdapter> {
+        public ControlX2PropertyAccessor(RelationshipNodeAdapter node) {
+            super(RelationshipNodeAdapter::getControlX2, RelationshipNodeAdapter::setControlX2, node);
         }
     }
 
-    public static class ControlY1PropertyAccessor<N extends LinkSupport, A extends LinkSupportAdapter<N>> extends PropertyAccessor<N, A> {
-        public ControlY1PropertyAccessor(A node) {
-            super(LinkSupportAdapter::getY1, LinkSupportAdapter::setY1, node);
+    public static class ControlY1PropertyAccessor extends PropertyAccessor<RelationshipNode, RelationshipNodeAdapter> {
+        public ControlY1PropertyAccessor(RelationshipNodeAdapter node) {
+            super(RelationshipNodeAdapter::getControlY1, RelationshipNodeAdapter::setControlY1, node);
         }
     }
 
-    public static class ControlY2PropertyAccessor<N extends LinkSupport, A extends LinkSupportAdapter<N>> extends PropertyAccessor<N, A> {
-        public ControlY2PropertyAccessor(A node) {
-            super(LinkSupportAdapter::getY2, LinkSupportAdapter::setY2, node);
+    public static class ControlY2PropertyAccessor extends PropertyAccessor<RelationshipNode, RelationshipNodeAdapter> {
+        public ControlY2PropertyAccessor(RelationshipNodeAdapter node) {
+            super(RelationshipNodeAdapter::getControlY2, RelationshipNodeAdapter::setControlY2, node);
+        }
+    }
+
+    public static class T1PropertyAccessor extends PropertyAccessor<RelationshipNode, RelationshipNodeAdapter> {
+        public T1PropertyAccessor(RelationshipNodeAdapter node) {
+            super(RelationshipNodeAdapter::getT1, RelationshipNodeAdapter::setT1, node);
+        }
+    }
+
+    public static class T2PropertyAccessor extends PropertyAccessor<RelationshipNode, RelationshipNodeAdapter> {
+        public T2PropertyAccessor(RelationshipNodeAdapter node) {
+            super(RelationshipNodeAdapter::getT2, RelationshipNodeAdapter::setT2, node);
         }
     }
 

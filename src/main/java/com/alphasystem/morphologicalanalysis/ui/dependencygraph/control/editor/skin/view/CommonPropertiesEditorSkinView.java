@@ -11,7 +11,6 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Slider;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
 
 import java.io.IOException;
@@ -19,15 +18,14 @@ import java.net.URISyntaxException;
 
 import static com.alphasystem.fx.ui.util.UiUtilities.loadFXML;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.*;
-import static com.alphasystem.morphologicalanalysis.ui.dependencygraph.control.editor.PropertiesEditor.setupField;
 import static com.alphasystem.util.AppUtil.getPath;
 
 /**
  * @author sali
  */
-public class CommonPropertiesEditorSkinView<N extends GraphNode, A extends GraphNodeAdapter<N>> extends GridPane {
+public class CommonPropertiesEditorSkinView<N extends GraphNode, A extends GraphNodeAdapter<N>> extends SkinViewBase<N, A> {
 
-    private final CommonPropertiesEditor<N, A> control;
+    protected final CommonPropertiesEditor<N, A> control;
 
     @FXML private TextField textField;
     @FXML private Spinner<Double> xSpinner;
@@ -40,7 +38,7 @@ public class CommonPropertiesEditorSkinView<N extends GraphNode, A extends Graph
     public CommonPropertiesEditorSkinView(CommonPropertiesEditor<N, A> control) {
         this.control = control;
         try {
-            loadFXML(this, getPath("fxml.editor.CommonPropertiesEditor.fxml").toUri().toURL(), RESOURCE_BUNDLE);
+            loadFXML(this, getPath(String.format("fxml.editor.%s.fxml", control.getClass().getSimpleName())).toUri().toURL(), RESOURCE_BUNDLE);
         } catch (IOException | URISyntaxException e) {
             throw new RuntimeException(e);
         }

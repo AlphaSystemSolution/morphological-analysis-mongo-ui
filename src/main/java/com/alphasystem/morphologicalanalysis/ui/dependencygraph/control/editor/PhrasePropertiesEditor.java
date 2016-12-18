@@ -10,8 +10,8 @@ import javafx.scene.control.Skin;
  */
 public class PhrasePropertiesEditor extends PropertiesEditor<PhraseNode, PhraseNodeAdapter> {
 
-    @Override
-   protected void initSkin() {
+    public PhrasePropertiesEditor() {
+        super();
         setSkin(new EditorSkin<>(this));
     }
 

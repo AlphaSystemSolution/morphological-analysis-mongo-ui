@@ -17,34 +17,22 @@ import javafx.scene.control.Skin;
  */
 public class LinePropertiesEditor<N extends LineSupport, A extends LineSupportAdapter<N>> extends PropertiesEditor<N, A> {
 
-    private ObjectProperty<PropertyAccessor<N, A>> x1;
-    private ObjectProperty<PropertyAccessor<N, A>> y1;
-    private ObjectProperty<PropertyAccessor<N, A>> x2;
-    private ObjectProperty<PropertyAccessor<N, A>> y2;
+    private final ObjectProperty<PropertyAccessor<N, A>> x1 = new SimpleObjectProperty<>(null, "x1", new X1PropertyAccessor<>(null));
+    private final ObjectProperty<PropertyAccessor<N, A>> y1 = new SimpleObjectProperty<>(null, "y1", new Y1PropertyAccessor<>(null));
+    private final ObjectProperty<PropertyAccessor<N, A>> x2 = new SimpleObjectProperty<>(null, "x2", new X2PropertyAccessor<>(null));
+    private final ObjectProperty<PropertyAccessor<N, A>> y2 = new SimpleObjectProperty<>(null, "y2", new Y2PropertyAccessor<>(null));
+
+    public LinePropertiesEditor(){
+        super();
+        setSkin(new LinePropertiesEditorSkin<>(this));
+    }
 
     @Override
-    protected void initialize(A node) {
-        if (x1 == null) {
-            x1 = new SimpleObjectProperty<>(null, "x1");
-        }
-        if (y1 == null) {
-            y1 = new SimpleObjectProperty<>(null, "y1");
-        }
-        if (x2 == null) {
-            x2 = new SimpleObjectProperty<>(null, "x2");
-        }
-        if (y2 == null) {
-            y2 = new SimpleObjectProperty<>(null, "y2");
-        }
+    protected void setValues(A node) {
         setX1(new X1PropertyAccessor<>(node));
         setY1(new Y1PropertyAccessor<>(node));
         setX2(new X2PropertyAccessor<>(node));
         setY2(new Y2PropertyAccessor<>(node));
-    }
-
-    @Override
-    protected void initSkin() {
-        setSkin(new LinePropertiesEditorSkin(this));
     }
 
     public final PropertyAccessor<N, A> getX1() {

@@ -6,20 +6,18 @@ import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.GraphNodeA
 import javafx.fxml.FXML;
 import javafx.scene.control.Slider;
 import javafx.scene.control.Spinner;
-import javafx.scene.layout.GridPane;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 
 import static com.alphasystem.fx.ui.util.UiUtilities.loadFXML;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.RESOURCE_BUNDLE;
-import static com.alphasystem.morphologicalanalysis.ui.dependencygraph.control.editor.PropertiesEditor.setupField;
 import static com.alphasystem.util.AppUtil.getPath;
 
 /**
  * @author sali
  */
-public class GroupTranslateEditorSkinView<N extends TerminalNode, A extends GraphNodeAdapter<N>> extends GridPane {
+public class GroupTranslateEditorSkinView<N extends TerminalNode, A extends GraphNodeAdapter<N>> extends SkinViewBase<N, A> {
 
     private final GroupTranslateEditor<N, A> control;
 
