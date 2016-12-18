@@ -1,8 +1,9 @@
 package com.alphasystem.morphologicalanalysis.ui.dependencygraph.components;
 
+import com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.control.GlobalPropertiesView;
+import com.alphasystem.morphologicalanalysis.ui.dependencygraph.control.editor.*;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.DependencyGraphAdapter;
-import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.GraphMetaInfoAdapter;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.GraphNodeAdapter;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -21,11 +22,10 @@ import static javafx.scene.control.TabPane.TabClosingPolicy.UNAVAILABLE;
 public class ControlPane extends BorderPane {
 
     private final ObjectProperty<DependencyGraphAdapter> dependencyGraph = new SimpleObjectProperty<>();
-    private DependencyGraphBuilderEditorPane editorPane;
+    private final Tab editorTab;
 
+    @SuppressWarnings({"unckecked"})
     public ControlPane(DependencyGraphAdapter dependencyGraph) {
-        editorPane = new DependencyGraphBuilderEditorPane(null, 0, 0);
-
         final GlobalPropertiesView globalPropertiesView = new GlobalPropertiesView(dependencyGraph);
 
         dependencyGraphProperty().addListener((observable, oldValue, newValue) -> {
@@ -41,30 +41,59 @@ public class ControlPane extends BorderPane {
         tabPane.setTabClosingPolicy(UNAVAILABLE);
         tabPane.setSide(TOP);
 
+        TerminalPropertiesEditor editor = new TerminalPropertiesEditor();
+        editor.setNode(null);
+        editorTab = new Tab("   Editor   ", editor);
         tabPane.getTabs().addAll(
                 new Tab(" Properties ", wrapInBorderPane(globalPropertiesView)),
-                new Tab("   Editor   ", wrapInBorderPane(editorPane)));
+                editorTab);
 
         setCenter(tabPane);
         setDependencyGraph(dependencyGraph);
     }
 
-    private BorderPane wrapInBorderPane(Node node){
+    private BorderPane wrapInBorderPane(Node node) {
         BorderPane borderPane = new BorderPane();
         borderPane.setCenter(node);
         borderPane.setPadding(new Insets(5, 5, 5, 5));
         return borderPane;
     }
 
+    @SuppressWarnings({"unchecked"})
     private void refreshPanel(DependencyGraphAdapter dependencyGraph) {
         getDependencyGraph().selectedNodeProperty().addListener(
-                (observable, oldValue, newValue) -> editorPane.setGraphNode(newValue));
+                (observable, oldValue, newValue) -> {
+                    PropertiesEditor editor = null;
+                    final GraphNodeType type = newValue.getGraphNodeType();
+                    switch (type) {
+                        case TERMINAL:
+                        case REFERENCE:
+                        case HIDDEN:
+                        case IMPLIED:
+                            editor = new TerminalPropertiesEditor();
+                            break;
+                        case PART_OF_SPEECH:
+                            editor = new PartOfSpeechPropertiesEditor();
+                            break;
+                        case PHRASE:
+                            editor = new PhrasePropertiesEditor();
+                            break;
+                        case RELATIONSHIP:
+                            editor = new RelationshipPropertiesEditor();
+                            break;
+                        default:
+                            break;
+                    }
+                    if (editor != null) {
+                        editor.setNode(newValue);
+                        editorTab.setContent(editor);
+                    }
+                });
         if (dependencyGraph != null && !dependencyGraph.isEmpty()) {
             GraphNodeAdapter node = dependencyGraph.getGraphNodes().get(0);
-            GraphMetaInfoAdapter graphMetaInfo = dependencyGraph.getGraphMetaInfo();
-            editorPane.setCanvasWidth(graphMetaInfo.getWidth());
-            editorPane.setCanvasHeight(graphMetaInfo.getHeight());
-            editorPane.setGraphNode(node);
+            PropertiesEditor editor = new TerminalPropertiesEditor();
+            editor.setNode(node);
+            editorTab.setContent(editor);
         }
         requestLayout();
     }
