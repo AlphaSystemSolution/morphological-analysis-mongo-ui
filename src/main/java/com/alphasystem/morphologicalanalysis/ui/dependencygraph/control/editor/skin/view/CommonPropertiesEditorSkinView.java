@@ -14,7 +14,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.text.Font;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
+import java.nio.file.Path;
 
 import static com.alphasystem.fx.ui.util.UiUtilities.loadFXML;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.*;
@@ -23,7 +23,7 @@ import static com.alphasystem.util.AppUtil.getPath;
 /**
  * @author sali
  */
-public class CommonPropertiesEditorSkinView<N extends GraphNode, A extends GraphNodeAdapter<N>> extends SkinViewBase<N, A> {
+abstract class CommonPropertiesEditorSkinView<N extends GraphNode, A extends GraphNodeAdapter<N>> extends SkinViewBase<N, A> {
 
     protected final CommonPropertiesEditor<N, A> control;
 
@@ -35,13 +35,30 @@ public class CommonPropertiesEditorSkinView<N extends GraphNode, A extends Graph
     @FXML private ComboBox<String> arabicFontFamily;
     @FXML private ComboBox<Integer> arabicFontSize;
 
-    public CommonPropertiesEditorSkinView(CommonPropertiesEditor<N, A> control) {
+    CommonPropertiesEditorSkinView(CommonPropertiesEditor<N, A> control) {
         this.control = control;
         try {
-            loadFXML(this, getPath(String.format("fxml.editor.%s.fxml", control.getClass().getSimpleName())).toUri().toURL(), RESOURCE_BUNDLE);
-        } catch (IOException | URISyntaxException e) {
+            loadFXML(this, getFxmlPath(control).toUri().toURL(), RESOURCE_BUNDLE);
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static Path getFxmlPath(CommonPropertiesEditor control) {
+        Path path = null;
+        Class<?> _class = control.getClass();
+        while (path == null) {
+            if (Object.class.getName().equals(_class.getName())) {
+                break;
+            }
+            try {
+                path = getPath(String.format("fxml.editor.%s.fxml", _class.getSimpleName()));
+            } catch (Exception e) {
+                // ignore, we will find our FXML path eventually
+            }
+            _class = _class.getSuperclass();
+        }
+        return path;
     }
 
     @FXML
@@ -52,8 +69,8 @@ public class CommonPropertiesEditorSkinView<N extends GraphNode, A extends Graph
         arabicFontFamily.getSelectionModel().selectFirst();
         arabicFontSize.getSelectionModel().selectFirst();
         arabicFontSize.setConverter(new FontSizeStringConverter());
-        setupField(control.xProperty(), xSpinner, xSlider);
-        setupField(control.yProperty(), ySpinner, ySlider);
+        setupField(control.xProperty(), xSpinner, xSlider, getXSpinnerDefaultMinMaxRange());
+        setupField(control.yProperty(), ySpinner, ySlider, getYSpinnerDefaultMinMaxRange());
         control.arabicFontProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue == null) {
                 return;
