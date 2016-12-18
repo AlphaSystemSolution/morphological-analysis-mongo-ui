@@ -1,7 +1,6 @@
 package com.alphasystem.morphologicalanalysis.ui.dependencygraph.control.editor;
 
 import com.alphasystem.morphologicalanalysis.graph.model.GraphNode;
-import com.alphasystem.morphologicalanalysis.ui.dependencygraph.control.editor.skin.CommonPropertiesEditorSkin;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.GraphNodeAdapter;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.PropertyAccessor;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.accessor.GraphNodePropertyAccessors.XPropertyAccessor;
@@ -10,13 +9,12 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.scene.control.Skin;
 import javafx.scene.text.Font;
 
 /**
  * @author sali
  */
-public class CommonPropertiesEditor<N extends GraphNode, A extends GraphNodeAdapter<N>> extends PropertiesEditor<N, A> {
+public abstract class CommonPropertiesEditor<N extends GraphNode, A extends GraphNodeAdapter<N>> extends PropertiesEditor<N, A> {
 
     private final StringProperty text = new SimpleStringProperty(null, "text");
     private final ObjectProperty<PropertyAccessor<N, A>> x = new SimpleObjectProperty<>(null, "x", new XPropertyAccessor<>(null));
@@ -36,7 +34,6 @@ public class CommonPropertiesEditor<N extends GraphNode, A extends GraphNodeAdap
             }
             getNode().setFont(newValue);
         });
-        setSkin(new CommonPropertiesEditorSkin<>(this));
     }
 
     @Override
@@ -93,11 +90,6 @@ public class CommonPropertiesEditor<N extends GraphNode, A extends GraphNodeAdap
 
     public final void setArabicFont(Font arabicFont) {
         this.arabicFont.set(arabicFont);
-    }
-
-    @Override
-    protected Skin<?> createDefaultSkin() {
-        return new CommonPropertiesEditorSkin<>(this);
     }
 
 }
