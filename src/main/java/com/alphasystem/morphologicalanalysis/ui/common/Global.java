@@ -41,27 +41,27 @@ import static javafx.scene.text.Font.font;
  */
 public class Global {
 
-    public static final File DEFAULT_WORD_BY_WORD_WORKING_DIRECTORY = new File(USER_HOME_DIR, ".wordbyword");
+    private static final File DEFAULT_WORD_BY_WORD_WORKING_DIRECTORY = new File(USER_HOME_DIR, ".wordbyword");
     public static final File DEFAULT_DICTIONARY_DIRECTORY = new File(DEFAULT_WORD_BY_WORD_WORKING_DIRECTORY, "dictionary");
     public static final String DEFAULT_NOTES_FILE_EXTENSION = ".adoc";
     public static final String DEFAULT_CSS_DIRECTORY = "css";
     public static final String SPACE_STR = WORD_SPACE.toUnicode();
     public static final ArabicWord FI_MAHL = ArabicWord.getWord(FA, YA, SPACE, MEEM, HHA, LAM);
-    public static final List<GraphNodeType> TERMINALS = asList(TERMINAL, IMPLIED, HIDDEN, REFERENCE);
+    private static final List<GraphNodeType> TERMINALS = asList(TERMINAL, IMPLIED, HIDDEN, REFERENCE);
     public static final List<GraphNodeType> NON_TERMINALS = asList(IMPLIED, HIDDEN, REFERENCE);
     public static final List<PartOfSpeech> PART_OF_SPEECH_EXCLUDE_LIST = asList(
             DEFINITE_ARTICLE, QURANIC_PUNCTUATION, CONJUNCTION_PARTICLE_WAW, CONJUNCTION_PARTICLE_FA);
     public static final double MIN_WIDTH = 20;
     public static final double MIN_HEIGHT = 20;
-    public static final int AMOUNT_STEP_BY = 20;
+    static final int AMOUNT_STEP_BY = 20;
     public static final int MAX_WIDTH = 1200;
     public static final int MAX_HEIGHT = 1000;
-    public static final double RECTANGLE_WIDTH = 100;
+    public static final double RECTANGLE_WIDTH = 140;
     public static final double RECTANGLE_HEIGHT = 100;
-    public static final double MIN_RECTANGLE_WIDTH = 60;
-    public static final double MIN_RECTANGLE_HEIGHT = 10;
-    public static final double GAP_BETWEEN_TOKENS = 60;
-    public static final double MIN_GAP_BETWEEN_TOKENS = 10;
+    static final double MIN_RECTANGLE_WIDTH = 60;
+    static final double MIN_RECTANGLE_HEIGHT = 10;
+    public static final double GAP_BETWEEN_TOKENS = 80;
+    static final double MIN_GAP_BETWEEN_TOKENS = 10;
     public static final double INITIAL_X = 0;
     public static final double INITIAL_Y = 40;
     public static final int GAP = 10;
@@ -98,6 +98,7 @@ public class Global {
         return TERMINALS.contains(src.getGraphNodeType());
     }
 
+    @SuppressWarnings({"unused"})
     public static AlternateStatus getFromNounStatus(NounStatus nounStatus) {
         return AlternateStatus.valueOf(nounStatus.name());
     }
@@ -119,20 +120,21 @@ public class Global {
         return new FontMetaInfo(src.getFamily(), src.getWeight(), src.getPosture(), size);
     }
 
-    public static Image getImage(String imageFolder, String imageName) {
+    private static Image getImage(String imageFolder, String imageName) {
         imageFolder = (imageFolder == null) ? "" : format("%s.", imageFolder);
         return new Image(getResourceAsStream(format("images.%s%s", imageFolder, imageName)));
     }
 
+    @SuppressWarnings({"unused"})
     public static ImageView getImageView(String imageFolder, String imageName) {
         return getImageView(getImage(imageFolder, imageName));
     }
 
-    public static ImageView getImageView(Image image) {
+    private static ImageView getImageView(Image image) {
         return new ImageView(image);
     }
 
-    public static String getFontDisplayValue(FontMetaInfo fmi) {
+    static String getFontDisplayValue(FontMetaInfo fmi) {
         return (fmi == null) ? "" : format("%s, %s", fmi.getFamily(), fmi.getSize());
     }
 
