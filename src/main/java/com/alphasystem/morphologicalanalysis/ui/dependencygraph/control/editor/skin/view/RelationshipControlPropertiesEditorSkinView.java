@@ -47,10 +47,10 @@ public class RelationshipControlPropertiesEditorSkinView extends SkinViewBase<Re
 
     @FXML
     void initialize() {
-        setupField(control.x1Property(), x1Spinner, x1Slider);
-        setupField(control.y1Property(), y1Spinner, y1Slider);
-        setupField(control.x2Property(), x2Spinner, x2Slider);
-        setupField(control.y2Property(), y2Spinner, y2Slider);
+        setupField(control.x1Property(), x1Spinner, x1Slider, 40, 200);
+        setupField(control.y1Property(), y1Spinner, y1Slider, 40, 200);
+        setupField(control.x2Property(), x2Spinner, x2Slider, 40, 200);
+        setupField(control.y2Property(), y2Spinner, y2Slider, 40, 200);
         setupField(control.t1Property(), t1Spinner);
         setupField(control.t2Property(), t2Spinner);
     }
