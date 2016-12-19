@@ -3,57 +3,47 @@ package com.alphasystem.morphologicalanalysis.ui.dependencygraph.control.editor.
 import com.alphasystem.fx.ui.util.FontConstants;
 import com.alphasystem.morphologicalanalysis.graph.model.FontMetaInfo;
 import com.alphasystem.morphologicalanalysis.graph.model.TerminalNode;
-import com.alphasystem.morphologicalanalysis.ui.dependencygraph.control.editor.TranslationPropertiesEditor;
-import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.GraphNodeAdapter;
+import com.alphasystem.morphologicalanalysis.ui.dependencygraph.control.editor.TerminalPropertiesEditor;
+import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.TerminalNodeAdapter;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.FontSizeStringConverter;
 import javafx.fxml.FXML;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Slider;
-import javafx.scene.control.Spinner;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.text.Font;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-
-import static com.alphasystem.fx.ui.util.UiUtilities.loadFXML;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.*;
-import static com.alphasystem.util.AppUtil.getPath;
 
 /**
  * @author sali
  */
-public class TranslationPropertiesEditorSkinView<N extends TerminalNode, A extends GraphNodeAdapter<N>> extends SkinViewBase<N, A> {
+public class TerminalPropertiesEditorSkinView extends LineSupportPropertiesEditorSkinView<TerminalNode, TerminalNodeAdapter, TerminalPropertiesEditor> {
 
-    private final TranslationPropertiesEditor<N, A> control;
+    @FXML protected Accordion accordion;
 
-    @FXML private TextField textField;
-    @FXML private Spinner<Double> xSpinner;
-    @FXML private Slider xSlider;
-    @FXML private Spinner<Double> ySpinner;
-    @FXML private Slider ySlider;
+    @FXML private TextField translationTextField;
+    @FXML private Spinner<Double> translationXSpinner;
+    @FXML private Slider translationXSlider;
+    @FXML private Spinner<Double> translationYSpinner;
+    @FXML private Slider translationYSlider;
     @FXML private ComboBox<String> translationFontFamily;
     @FXML private ComboBox<Integer> translationFontSize;
+    @FXML private Spinner<Double> groupTranslateXSpinner;
+    @FXML private Slider groupTranslateXSlider;
+    @FXML private Spinner<Double> groupTranslateYSpinner;
+    @FXML private Slider groupTranslateYSlider;
 
-    public TranslationPropertiesEditorSkinView(TranslationPropertiesEditor<N, A> control) {
-        this.control = control;
-        try {
-            loadFXML(this, getPath("fxml.editor.TranslationPropertiesEditor.fxml").toUri().toURL(), RESOURCE_BUNDLE);
-        } catch (IOException | URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
+    public TerminalPropertiesEditorSkinView(TerminalPropertiesEditor control) {
+        super(control);
     }
 
-    @FXML
-    void initialize() {
-        textField.setFont(FontConstants.ENGLISH_FONT_12);
-        textField.textProperty().bindBidirectional(control.textProperty());
+    @Override
+    void initializeValues() {
+        super.initializeValues();
+        translationTextField.setFont(FontConstants.ENGLISH_FONT_12);
+        translationTextField.textProperty().bindBidirectional(control.translationTextProperty());
         translationFontFamily.getItems().addAll(Font.getFontNames());
         translationFontFamily.getSelectionModel().selectFirst();
         translationFontSize.getSelectionModel().selectFirst();
         translationFontSize.setConverter(new FontSizeStringConverter());
-        setupField(control.xProperty(), xSpinner, xSlider);
-        setupField(control.yProperty(), ySpinner, ySlider);
         control.translationFontProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue == null) {
                 return;
@@ -81,5 +71,9 @@ public class TranslationPropertiesEditorSkinView<N extends TerminalNode, A exten
             fontMetaInfo = deriveFromSize(fontMetaInfo, newValue);
             control.setTranslationFont(fromFontMetaInfo(fontMetaInfo));
         });
+        setupSpinnerSliderField(control.translationXProperty(), translationXSpinner, translationXSlider, true);
+        setupSpinnerSliderField(control.translationYProperty(), translationYSpinner, translationYSlider, false);
+        setupSpinnerSliderField(control.xProperty(), groupTranslateXSpinner, groupTranslateXSlider, true);
+        setupSpinnerSliderField(control.yProperty(), groupTranslateYSpinner, groupTranslateYSlider, false);
     }
 }

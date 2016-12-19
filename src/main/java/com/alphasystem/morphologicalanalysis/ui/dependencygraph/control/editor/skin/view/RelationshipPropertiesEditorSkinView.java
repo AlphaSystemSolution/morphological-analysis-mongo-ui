@@ -1,7 +1,7 @@
 package com.alphasystem.morphologicalanalysis.ui.dependencygraph.control.editor.skin.view;
 
 import com.alphasystem.morphologicalanalysis.graph.model.RelationshipNode;
-import com.alphasystem.morphologicalanalysis.ui.dependencygraph.control.editor.RelationshipControlPropertiesEditor;
+import com.alphasystem.morphologicalanalysis.ui.dependencygraph.control.editor.RelationshipPropertiesEditor;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.RelationshipNodeAdapter;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.DecimalFormatStringConverter;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.PropertyAccessor;
@@ -9,21 +9,13 @@ import javafx.beans.property.ObjectProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Slider;
 import javafx.scene.control.Spinner;
-import javafx.scene.control.SpinnerValueFactory.DoubleSpinnerValueFactory;
-
-import java.io.IOException;
-import java.net.URISyntaxException;
-
-import static com.alphasystem.fx.ui.util.UiUtilities.loadFXML;
-import static com.alphasystem.morphologicalanalysis.ui.common.Global.RESOURCE_BUNDLE;
-import static com.alphasystem.util.AppUtil.getPath;
+import javafx.scene.control.SpinnerValueFactory;
 
 /**
  * @author sali
  */
-public class RelationshipControlPropertiesEditorSkinView extends SkinViewBase<RelationshipNode, RelationshipNodeAdapter> {
-
-    private final RelationshipControlPropertiesEditor control;
+public class RelationshipPropertiesEditorSkinView extends EditorSkinView<RelationshipNode, RelationshipNodeAdapter,
+        RelationshipPropertiesEditor> {
 
     @FXML private Spinner<Double> x1Spinner;
     @FXML private Slider x1Slider;
@@ -36,27 +28,23 @@ public class RelationshipControlPropertiesEditorSkinView extends SkinViewBase<Re
     @FXML private Spinner<Double> t1Spinner;
     @FXML private Spinner<Double> t2Spinner;
 
-    public RelationshipControlPropertiesEditorSkinView(RelationshipControlPropertiesEditor control) {
-        this.control = control;
-        try {
-            loadFXML(this, getPath("fxml.editor.RelationshipControlPropertiesEditor.fxml").toUri().toURL(), RESOURCE_BUNDLE);
-        } catch (IOException | URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
+    public RelationshipPropertiesEditorSkinView(RelationshipPropertiesEditor control) {
+        super(control);
     }
 
-    @FXML
-    void initialize() {
-        setupField(control.x1Property(), x1Spinner, x1Slider, 40, 200);
-        setupField(control.y1Property(), y1Spinner, y1Slider, 40, 200);
-        setupField(control.x2Property(), x2Spinner, x2Slider, 40, 200);
-        setupField(control.y2Property(), y2Spinner, y2Slider, 40, 200);
+    @Override
+    void initializeValues() {
+        super.initializeValues();
+        setupSpinnerSliderField(control.x1Property(), x1Spinner, x1Slider, true);
+        setupSpinnerSliderField(control.y1Property(), y1Spinner, y1Slider, false);
+        setupSpinnerSliderField(control.x2Property(), x2Spinner, x2Slider, true);
+        setupSpinnerSliderField(control.y2Property(), y2Spinner, y2Slider, false);
         setupField(control.t1Property(), t1Spinner);
         setupField(control.t2Property(), t2Spinner);
     }
 
     private void setupField(ObjectProperty<? extends PropertyAccessor<RelationshipNode, RelationshipNodeAdapter>> property, Spinner<Double> spinner) {
-        final DoubleSpinnerValueFactory valueFactory = new DoubleSpinnerValueFactory(0, 1.000, property.get().get(), 0.005);
+        final SpinnerValueFactory.DoubleSpinnerValueFactory valueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0, 1.000, property.get().get(), 0.005);
         valueFactory.setConverter(DecimalFormatStringConverter.THREE_DECIMAL_PLACE_CONVERTER);
         spinner.setValueFactory(valueFactory);
         spinner.setOnMouseClicked(event -> property.get().set(spinner.getValue()));

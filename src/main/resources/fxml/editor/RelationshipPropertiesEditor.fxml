@@ -1,9 +1,8 @@
-<?import com.alphasystem.morphologicalanalysis.ui.dependencygraph.control.editor.relationship.RelationshipCommonPropertiesEditor?>
-<?import com.alphasystem.morphologicalanalysis.ui.dependencygraph.control.editor.RelationshipControlPropertiesEditor?>
+<?import javafx.collections.FXCollections?>
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Accordion?>
-<?import javafx.scene.control.TitledPane?>
-<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import java.lang.*?>
 <fx:root xmlns:fx="http://javafx.com/fxml/1" type="javafx.scene.layout.BorderPane">
     <padding>
         <Insets top="5" bottom="5" left="5" right="5"/>
@@ -12,10 +11,74 @@
         <Accordion fx:id="accordion">
             <panes>
                 <TitledPane fx:id="commonPropertiesPane">
-                    <RelationshipCommonPropertiesEditor fx:id="commonPropertiesEditor"/>
+                    <GridPane alignment="TOP_CENTER" hgap="5" vgap="5">
+                        <Label text="%text.label" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                        <TextField fx:id="textField" editable="false" nodeOrientation="RIGHT_TO_LEFT"
+                                   GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                        <Label text="%xIndex.label" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                        <Spinner fx:id="xSpinner" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+                        <Slider fx:id="xSlider" showTickMarks="true" showTickLabels="true" majorTickUnit="5"
+                                minorTickCount="1" blockIncrement="0.5" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
+                        <Label text="%yIndex.label" GridPane.columnIndex="0" GridPane.rowIndex="5"/>
+                        <Spinner fx:id="ySpinner" GridPane.columnIndex="0" GridPane.rowIndex="6"/>
+                        <Slider fx:id="ySlider" showTickMarks="true" showTickLabels="true" majorTickUnit="5"
+                                minorTickCount="1" blockIncrement="0.5" GridPane.columnIndex="0" GridPane.rowIndex="7"/>
+                        <Label text="%font.family.label" GridPane.columnIndex="0" GridPane.rowIndex="8"/>
+                        <ComboBox fx:id="arabicFontFamily" GridPane.columnIndex="0" GridPane.rowIndex="9"/>
+                        <Label text="%font.size.label" GridPane.columnIndex="0" GridPane.rowIndex="10"/>
+                        <ComboBox fx:id="arabicFontSize" editable="true" GridPane.columnIndex="0"
+                                  GridPane.rowIndex="11">
+                            <items>
+                                <FXCollections fx:factory="observableArrayList">
+                                    <Integer fx:value="8"/>
+                                    <Integer fx:value="9"/>
+                                    <Integer fx:value="10"/>
+                                    <Integer fx:value="11"/>
+                                    <Integer fx:value="12"/>
+                                    <Integer fx:value="14"/>
+                                    <Integer fx:value="16"/>
+                                    <Integer fx:value="18"/>
+                                    <Integer fx:value="20"/>
+                                    <Integer fx:value="22"/>
+                                    <Integer fx:value="24"/>
+                                    <Integer fx:value="26"/>
+                                    <Integer fx:value="28"/>
+                                    <Integer fx:value="30"/>
+                                    <Integer fx:value="36"/>
+                                    <Integer fx:value="48"/>
+                                    <Integer fx:value="72"/>
+                                </FXCollections>
+                            </items>
+                        </ComboBox>
+                    </GridPane>
                 </TitledPane>
-                <TitledPane text="%controlPointProperties.label">
-                    <RelationshipControlPropertiesEditor/>
+                <TitledPane text="%groupTranslate.label">
+                    <GridPane alignment="TOP_CENTER" hgap="5" vgap="5">
+                        <Label text="%controlX1.label" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                        <Spinner fx:id="x1Spinner" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                        <Slider fx:id="x1Slider" showTickMarks="true" showTickLabels="true" majorTickUnit="5"
+                                minorTickCount="1"
+                                blockIncrement="0.5" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                        <Label text="%controlY1.label" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+                        <Spinner fx:id="y1Spinner" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
+                        <Slider fx:id="y1Slider" showTickMarks="true" showTickLabels="true" majorTickUnit="5"
+                                minorTickCount="1"
+                                blockIncrement="0.5" GridPane.columnIndex="0" GridPane.rowIndex="5"/>
+                        <Label text="%controlX2.label" GridPane.columnIndex="0" GridPane.rowIndex="6"/>
+                        <Spinner fx:id="x2Spinner" GridPane.columnIndex="0" GridPane.rowIndex="7"/>
+                        <Slider fx:id="x2Slider" showTickMarks="true" showTickLabels="true" majorTickUnit="5"
+                                minorTickCount="1"
+                                blockIncrement="0.5" GridPane.columnIndex="0" GridPane.rowIndex="8"/>
+                        <Label text="%controlY2.label" GridPane.columnIndex="0" GridPane.rowIndex="9"/>
+                        <Spinner fx:id="y2Spinner" GridPane.columnIndex="0" GridPane.rowIndex="10"/>
+                        <Slider fx:id="y2Slider" showTickMarks="true" showTickLabels="true" majorTickUnit="5"
+                                minorTickCount="1"
+                                blockIncrement="0.5" GridPane.columnIndex="0" GridPane.rowIndex="11"/>
+                        <Label text="%t1.label" GridPane.columnIndex="0" GridPane.rowIndex="12"/>
+                        <Spinner fx:id="t1Spinner" GridPane.columnIndex="0" GridPane.rowIndex="13"/>
+                        <Label text="%t2.label" GridPane.columnIndex="0" GridPane.rowIndex="14"/>
+                        <Spinner fx:id="t2Spinner" GridPane.columnIndex="0" GridPane.rowIndex="15"/>
+                    </GridPane>
                 </TitledPane>
             </panes>
         </Accordion>
