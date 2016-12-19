@@ -26,7 +26,7 @@ import static java.lang.String.format;
 /**
  * @author sali
  */
-public abstract class EditorSkinView<N extends GraphNode, A extends GraphNodeAdapter<N>, P extends PropertiesEditor<N, A>> extends BorderPane {
+public abstract class PropertiesEditorSkinView<N extends GraphNode, A extends GraphNodeAdapter<N>, P extends PropertiesEditor<N, A>> extends BorderPane {
 
     protected final P control;
 
@@ -40,7 +40,7 @@ public abstract class EditorSkinView<N extends GraphNode, A extends GraphNodeAda
     @FXML private ComboBox<String> arabicFontFamily;
     @FXML private ComboBox<Integer> arabicFontSize;
 
-    EditorSkinView(P control) {
+    PropertiesEditorSkinView(P control) {
         this.control = control;
         try {
             final URL fxmlURL = AppUtil.getPath(format("fxml.editor.%s.fxml", control.getClass().getSimpleName())).toUri().toURL();

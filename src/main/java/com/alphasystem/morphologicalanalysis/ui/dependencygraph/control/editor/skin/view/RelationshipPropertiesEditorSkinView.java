@@ -14,7 +14,7 @@ import javafx.scene.control.SpinnerValueFactory;
 /**
  * @author sali
  */
-public class RelationshipPropertiesEditorSkinView extends EditorSkinView<RelationshipNode, RelationshipNodeAdapter,
+public class RelationshipPropertiesEditorSkinView extends PropertiesEditorSkinView<RelationshipNode, RelationshipNodeAdapter,
         RelationshipPropertiesEditor> {
 
     @FXML private Spinner<Double> x1Spinner;

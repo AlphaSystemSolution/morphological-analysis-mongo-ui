@@ -11,7 +11,7 @@ import javafx.scene.control.Spinner;
  * @author sali
  */
 public abstract class LineSupportPropertiesEditorSkinView<N extends LineSupport, A extends LineSupportAdapter<N>,
-        P extends LineSupportPropertiesEditor<N, A>> extends EditorSkinView<N, A, P> {
+        P extends LineSupportPropertiesEditor<N, A>> extends PropertiesEditorSkinView<N, A, P> {
 
     @FXML private Spinner<Double> x1Spinner;
     @FXML private Slider x1Slider;
