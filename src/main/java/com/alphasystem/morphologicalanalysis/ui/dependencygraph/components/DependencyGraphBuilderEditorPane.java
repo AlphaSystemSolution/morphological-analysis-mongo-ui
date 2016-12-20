@@ -1,8 +1,12 @@
 package com.alphasystem.morphologicalanalysis.ui.dependencygraph.components;
 
 import com.alphasystem.morphologicalanalysis.graph.model.GraphNode;
+import com.alphasystem.morphologicalanalysis.graph.model.LineSupport;
+import com.alphasystem.morphologicalanalysis.graph.model.LinkSupport;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.*;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.DecimalFormatStringConverter;
+import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.PropertyAccessor;
+import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.accessor.GraphNodePropertyAccessors.*;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -19,7 +23,6 @@ import javafx.scene.text.FontWeight;
 
 import static com.alphasystem.fx.ui.util.FontConstants.ARABIC_FONT_20;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.RESOURCE_BUNDLE;
-import static com.alphasystem.util.AppUtil.isInstanceOf;
 import static java.lang.String.format;
 import static javafx.collections.FXCollections.observableArrayList;
 import static javafx.geometry.Pos.TOP_CENTER;
@@ -28,10 +31,10 @@ import static javafx.scene.text.Font.font;
 /**
  * @author sali
  */
-public class DependencyGraphBuilderEditorPane extends BorderPane {
+class DependencyGraphBuilderEditorPane extends BorderPane {
 
     private static final int DEFAULT_OFFSET = 3;
-    public static final Insets DEFAULT_PADDING = new Insets(DEFAULT_OFFSET, DEFAULT_OFFSET,
+    private static final Insets DEFAULT_PADDING = new Insets(DEFAULT_OFFSET, DEFAULT_OFFSET,
             DEFAULT_OFFSET, DEFAULT_OFFSET);
 
     private final ObjectProperty<GraphNodeAdapter> graphNode = new SimpleObjectProperty<>();
@@ -40,16 +43,10 @@ public class DependencyGraphBuilderEditorPane extends BorderPane {
     private final Accordion accordion;
     private int row = 0;
 
-    public DependencyGraphBuilderEditorPane(GraphNodeAdapter graphNode, int width, int height) {
-        canvasWidthProperty().addListener((observable, oldValue, newValue) -> {
-            initPane();
-        });
-        canvasHeightProperty().addListener((observable, oldValue, newValue) -> {
-            initPane();
-        });
-        graphNodeProperty().addListener((observable, oldValue, newValue) -> {
-            initPane();
-        });
+    DependencyGraphBuilderEditorPane(GraphNodeAdapter graphNode, int width, int height) {
+        canvasWidthProperty().addListener((observable, oldValue, newValue) -> initPane());
+        canvasHeightProperty().addListener((observable, oldValue, newValue) -> initPane());
+        graphNodeProperty().addListener((observable, oldValue, newValue) -> initPane());
 
         setCanvasWidth(width);
         setCanvasHeight(height);
@@ -96,7 +93,7 @@ public class DependencyGraphBuilderEditorPane extends BorderPane {
         requestLayout();
     }
 
-    private TitledPane addCommonProperties(GraphNodeAdapter node) {
+    private <N extends GraphNode, A extends GraphNodeAdapter<N>> TitledPane addCommonProperties(A node) {
         GridPane gridPane = getGridPane();
 
         row = 0;
@@ -115,27 +112,37 @@ public class DependencyGraphBuilderEditorPane extends BorderPane {
         gridPane.add(textField, 0, row);
 
         row++;
-        addFields(gridPane, "xIndex.label", GraphNodeAdapter::getX, GraphNodeAdapter::setX, node,
-                getCanvasWidth());
-        addFields(gridPane, "yIndex.label", GraphNodeAdapter::getY, GraphNodeAdapter::setY, node,
-                getCanvasHeight());
+        addFields(gridPane, "xIndex.label", new XPropertyAccessor<>(node), getCanvasWidth());
+        addFields(gridPane, "yIndex.label", new YPropertyAccessor<>(node), getCanvasHeight());
+
+        row++;
+        final Font font = node.getFont();
+        label = new Label(RESOURCE_BUNDLE.getString("font.family.label"));
+        gridPane.add(label, 0, row);
+        textField = new TextField(font.getFamily());
+        textField.setEditable(false);
+        label.setLabelFor(textField);
+        gridPane.add(textField, 0, ++row);
+
+        label = new Label(RESOURCE_BUNDLE.getString("font.size.label"));
+        gridPane.add(label, 0, ++row);
+        ComboBox<Integer> sizeComboBox = createSizeComboBox(node.fontProperty());
+        label.setLabelFor(sizeComboBox);
+        gridPane.add(sizeComboBox, 0, ++row);
 
         String labelKey = format("%s_node.label", node.getGraphNodeType().name());
         return createTitledPane(labelKey, gridPane, true);
     }
 
-    private TitledPane addLineProperties(LineSupportAdapter node) {
+    private <N extends LineSupport, A extends LineSupportAdapter<N>> TitledPane addLineProperties(A node) {
         GridPane gridPane = getGridPane();
 
         row = 0;
-        addFields(gridPane, "startXIndex.label", LineSupportAdapter::getX1, LineSupportAdapter::setX1,
-                node, getCanvasWidth());
-        addFields(gridPane, "startYIndex.label", LineSupportAdapter::getY1, LineSupportAdapter::setY1,
-                node, getCanvasHeight());
-        addFields(gridPane, "endXIndex.label", LineSupportAdapter::getX2, LineSupportAdapter::setX2,
-                node, getCanvasWidth());
-        addFields(gridPane, "endYIndex.label", LineSupportAdapter::getY2, LineSupportAdapter::setY2,
-                node, getCanvasHeight());
+        //
+        addFields(gridPane, "startXIndex.label", new X1PropertyAccessor<>(node), getCanvasWidth());
+        addFields(gridPane, "startYIndex.label", new Y1PropertyAccessor<>(node), getCanvasHeight());
+        addFields(gridPane, "endXIndex.label", new X2PropertyAccessor<>(node), getCanvasWidth());
+        addFields(gridPane, "endYIndex.label", new Y2PropertyAccessor<>(node), getCanvasHeight());
 
         return createTitledPane("lineProperties.label", gridPane);
     }
@@ -144,11 +151,23 @@ public class DependencyGraphBuilderEditorPane extends BorderPane {
         GridPane gridPane = getGridPane();
 
         row = 0;
-        addFields(gridPane, "translationXIndex.label", TerminalNodeAdapter::getTranslationX,
-                TerminalNodeAdapter::setTranslationX, node, getCanvasWidth());
-        addFields(gridPane, "translationYIndex.label", TerminalNodeAdapter::getTranslationY,
-                TerminalNodeAdapter::setTranslationY, node, getCanvasHeight());
-        //TODO: add Translation Font properties
+        addFields(gridPane, "translationXIndex.label", new TranslationXPropertyAccessor<>(node), getCanvasWidth());
+        addFields(gridPane, "translationYIndex.label", new TranslationYPropertyAccessor<>(node), getCanvasHeight());
+
+        row++;
+        final Font font = node.getFont();
+        Label label = new Label(RESOURCE_BUNDLE.getString("translationFont.family.label"));
+        gridPane.add(label, 0, ++row);
+        TextField textField = new TextField(font.getFamily());
+        textField.setEditable(false);
+        label.setLabelFor(textField);
+        gridPane.add(textField, 0, ++row);
+
+        label = new Label(RESOURCE_BUNDLE.getString("translationFont.size.label"));
+        gridPane.add(label, 0, ++row);
+        ComboBox<Integer> sizeComboBox = createSizeComboBox(node.translationFontProperty());
+        label.setLabelFor(sizeComboBox);
+        gridPane.add(sizeComboBox, 0, ++row);
 
         return createTitledPane("translationProperties.label", gridPane);
     }
@@ -157,53 +176,42 @@ public class DependencyGraphBuilderEditorPane extends BorderPane {
         GridPane gridPane = getGridPane();
 
         row = 0;
-        Spinner<Double> xSpinner = addFields(gridPane, "groupTranslateX.label", TerminalNodeAdapter::getTranslateX,
-                TerminalNodeAdapter::setTranslateX, node, -1 * getCanvasWidth(), getCanvasWidth());
-        node.translateXProperty().addListener((observable, oldValue, newValue) -> {
-            xSpinner.getValueFactory().setValue((Double) newValue);
-        });
-        Spinner<Double> ySpinner = addFields(gridPane, "groupTranslateY.label", TerminalNodeAdapter::getTranslateY,
-                TerminalNodeAdapter::setTranslateY, node, -1 * getCanvasHeight(), getCanvasHeight());
-        node.translateYProperty().addListener((observable, oldValue, newValue) -> {
-            ySpinner.getValueFactory().setValue((Double) newValue);
-        });
+        Spinner<Double> xSpinner = addFields(gridPane, "groupTranslateX.label", new TranslateXPropertyAccessor<>(node),
+                -1 * getCanvasWidth(), getCanvasWidth());
+        node.translateXProperty().addListener((observable, oldValue, newValue) -> xSpinner.getValueFactory().setValue((Double) newValue));
+        Spinner<Double> ySpinner = addFields(gridPane, "groupTranslateY.label", new TranslateYPropertyAccessor<>(node),
+                -1 * getCanvasHeight(), getCanvasHeight());
+        node.translateYProperty().addListener((observable, oldValue, newValue) -> ySpinner.getValueFactory().setValue((Double) newValue));
 
         return createTitledPane("groupTranslate.label", gridPane);
     }
 
-    private TitledPane addRelationshipControlPointProperties(LinkSupportAdapter node) {
+    private <N extends LinkSupport, A extends LinkSupportAdapter<N>> TitledPane addRelationshipControlPointProperties(A node) {
         GridPane gridPane = getGridPane();
 
         row = 0;
-        addFields(gridPane, "posCx.label", LinkSupportAdapter::getCx, LinkSupportAdapter::setCx,
-                node, getCanvasWidth());
-        addFields(gridPane, "posCy.label", LinkSupportAdapter::getCy, LinkSupportAdapter::setCy,
-                node, getCanvasHeight());
+        addFields(gridPane, "posCx.label", new CxPropertyAccessor<>(node), getCanvasWidth());
+        addFields(gridPane, "posCy.label", new CyPropertyAccessor<>(node), getCanvasHeight());
 
         return createTitledPane("controlPointProperties.label", gridPane);
     }
 
     private TitledPane[] addTerminalNodeProperties(TerminalNodeAdapter node) {
-        return new TitledPane[]{addLineProperties(node), addTranslationProperties(node), addFontProperties(node),
-                addGroupTranslateProperties(node)};
+        return new TitledPane[]{addLineProperties(node), addTranslationProperties(node), addGroupTranslateProperties(node)};
     }
 
     private TitledPane[] addPartOfSpeechProperties(PartOfSpeechNodeAdapter node) {
-        return new TitledPane[]{addRelationshipControlPointProperties(node), addFontProperties(node)};
+        return new TitledPane[]{addRelationshipControlPointProperties(node)};
     }
 
     private TitledPane[] addRelationshipNodeProperties(RelationshipNodeAdapter node) {
         GridPane gridPane = getGridPane();
 
         row = 0;
-        addFields(gridPane, "controlX1.label", RelationshipNodeAdapter::getControlX1,
-                RelationshipNodeAdapter::setControlX1, node, getCanvasWidth());
-        addFields(gridPane, "controlY1.label", RelationshipNodeAdapter::getControlY1,
-                RelationshipNodeAdapter::setControlY1, node, getCanvasHeight());
-        addFields(gridPane, "controlX2.label", RelationshipNodeAdapter::getControlX2,
-                RelationshipNodeAdapter::setControlX2, node, getCanvasWidth());
-        addFields(gridPane, "controlY2.label", RelationshipNodeAdapter::getControlY2,
-                RelationshipNodeAdapter::setControlY2, node, getCanvasHeight());
+        addFields(gridPane, "controlX1.label", new ControlX1PropertyAccessor(node), getCanvasWidth());
+        addFields(gridPane, "controlY1.label", new ControlY1PropertyAccessor(node), getCanvasHeight());
+        addFields(gridPane, "controlX2.label", new ControlX2PropertyAccessor(node), getCanvasWidth());
+        addFields(gridPane, "controlY2.label", new ControlY2PropertyAccessor(node), getCanvasHeight());
 
         Label label;
         Spinner<Double> spinner;
@@ -229,48 +237,11 @@ public class DependencyGraphBuilderEditorPane extends BorderPane {
         });
         gridPane.add(spinner, 0, ++row);
 
-        return new TitledPane[]{createTitledPane("controlPointProperties.label", gridPane), addFontProperties(node)};
-    }
-
-    private <T extends GraphNode> TitledPane addFontProperties(GraphNodeAdapter<T> node) {
-        final Font font = node.getFont();
-        GridPane gridPane = getGridPane();
-
-        row = 0;
-        Label label = new Label(RESOURCE_BUNDLE.getString("font.family.label"));
-        gridPane.add(label, 0, row);
-        TextField textField = new TextField(font.getFamily());
-        textField.setEditable(false);
-        label.setLabelFor(textField);
-        gridPane.add(textField, 0, ++row);
-
-        label = new Label(RESOURCE_BUNDLE.getString("font.size.label"));
-        gridPane.add(label, 0, ++row);
-        ComboBox<Integer> sizeComboBox = createSizeComboBox(node.fontProperty());
-        label.setLabelFor(sizeComboBox);
-        gridPane.add(sizeComboBox, 0, ++row);
-
-        if (isInstanceOf(TerminalNodeAdapter.class, node)) {
-            TerminalNodeAdapter tna = (TerminalNodeAdapter) node;
-            label = new Label(RESOURCE_BUNDLE.getString("translationFont.family.label"));
-            gridPane.add(label, 0, ++row);
-            textField = new TextField(font.getFamily());
-            textField.setEditable(false);
-            label.setLabelFor(textField);
-            gridPane.add(textField, 0, ++row);
-
-            label = new Label(RESOURCE_BUNDLE.getString("translationFont.size.label"));
-            gridPane.add(label, 0, ++row);
-            sizeComboBox = createSizeComboBox(tna.translationFontProperty());
-            label.setLabelFor(sizeComboBox);
-            gridPane.add(sizeComboBox, 0, ++row);
-        }
-
-        return createTitledPane("fontProperties.label", gridPane);
+        return new TitledPane[]{createTitledPane("controlPointProperties.label", gridPane)};
     }
 
     private TitledPane[] addPhraseNodeProperties(PhraseNodeAdapter node) {
-        return new TitledPane[]{addLineProperties(node), addRelationshipControlPointProperties(node), addFontProperties(node)};
+        return new TitledPane[]{addLineProperties(node), addRelationshipControlPointProperties(node)};
     }
 
     private TitledPane createTitledPane(String labelKey, GridPane gridPane) {
@@ -283,39 +254,39 @@ public class DependencyGraphBuilderEditorPane extends BorderPane {
         return pane;
     }
 
-    public final double getCanvasWidth() {
+    private double getCanvasWidth() {
         return canvasWidth.get();
     }
 
-    public final void setCanvasWidth(double canvasWidth) {
+    final void setCanvasWidth(double canvasWidth) {
         this.canvasWidth.set(canvasWidth);
     }
 
-    public final DoubleProperty canvasWidthProperty() {
+    private DoubleProperty canvasWidthProperty() {
         return canvasWidth;
     }
 
-    public final double getCanvasHeight() {
+    private double getCanvasHeight() {
         return canvasHeight.get();
     }
 
-    public final void setCanvasHeight(double canvasHeight) {
+    final void setCanvasHeight(double canvasHeight) {
         this.canvasHeight.set(canvasHeight);
     }
 
-    public final DoubleProperty canvasHeightProperty() {
+    private DoubleProperty canvasHeightProperty() {
         return canvasHeight;
     }
 
-    public final GraphNodeAdapter getGraphNode() {
+    private GraphNodeAdapter getGraphNode() {
         return graphNode.get();
     }
 
-    public final void setGraphNode(GraphNodeAdapter graphNode) {
+    final void setGraphNode(GraphNodeAdapter graphNode) {
         this.graphNode.set(graphNode);
     }
 
-    public final ObjectProperty<GraphNodeAdapter> graphNodeProperty() {
+    private ObjectProperty<GraphNodeAdapter> graphNodeProperty() {
         return graphNode;
     }
 
@@ -325,15 +296,14 @@ public class DependencyGraphBuilderEditorPane extends BorderPane {
         return spinner;
     }
 
-    private <T extends GraphNode> ComboBox<Integer> createSizeComboBox(ObjectProperty<Font> fontProperty) {
+    private ComboBox<Integer> createSizeComboBox(ObjectProperty<Font> fontProperty) {
         final Font font = fontProperty.get();
         final ObservableList<Integer> values = observableArrayList(8, 9, 10, 11, 12, 14, 16, 18, 20, 22,
                 24, 26, 28, 30, 36, 48, 72);
         ComboBox<Integer> comboBox = new ComboBox<>(values);
         comboBox.getSelectionModel().select(new Integer(new Double(font.getSize()).intValue()));
-        comboBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            fontProperty.setValue(font(font.getFamily(), FontWeight.NORMAL, FontPosture.REGULAR, newValue));
-        });
+        comboBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
+                fontProperty.setValue(font(font.getFamily(), FontWeight.NORMAL, FontPosture.REGULAR, newValue)));
         return comboBox;
     }
 
@@ -350,20 +320,20 @@ public class DependencyGraphBuilderEditorPane extends BorderPane {
         return slider;
     }
 
-    private <T extends GraphNodeAdapter, G extends GetterAdapter<T>, S extends SetterAdapter<T>> Spinner<Double> addFields(
-            GridPane gridPane, String key, G g, S s, T node, double max) {
-        return addFields(gridPane, key, g, s, node, 0, max);
+    private <N extends GraphNode, A extends GraphNodeAdapter<N>, P extends PropertyAccessor<N, A>> Spinner<Double>
+    addFields(GridPane gridPane, String key, P accessor, double max) {
+        return addFields(gridPane, key, accessor, 0, max);
     }
 
-    private <T extends GraphNodeAdapter, G extends GetterAdapter<T>, S extends SetterAdapter<T>> Spinner<Double> addFields(
-            GridPane gridPane, String key, G g, S s, T node, double min, double max) {
+    private <N extends GraphNode, A extends GraphNodeAdapter<N>, P extends PropertyAccessor<N, A>> Spinner<Double>
+    addFields(GridPane gridPane, String key, P accessor, double min, double max) {
         Label label = new Label(RESOURCE_BUNDLE.getString(key));
         gridPane.add(label, 0, row);
 
         row++;
-        Double initialValue = g.get(node);
+        Double initialValue = accessor.get();
         Spinner<Double> spinner = getSpinner(min, max, initialValue);
-        spinner.setOnMouseClicked(event -> s.set(node, spinner.getValue()));
+        spinner.setOnMouseClicked(event -> accessor.set(spinner.getValue()));
         gridPane.add(spinner, 0, row);
 
         row++;
@@ -375,11 +345,9 @@ public class DependencyGraphBuilderEditorPane extends BorderPane {
             }
             slider.setValue(d);
             spinner.getValueFactory().setValue(d);
-            s.set(node, d);
+            accessor.set(d);
         });
-        spinner.valueProperty().addListener((observable, oldValue, newValue) -> {
-            slider.setValue(newValue);
-        });
+        spinner.valueProperty().addListener((observable, oldValue, newValue) -> slider.setValue(newValue));
         gridPane.add(slider, 0, row);
 
         row++;
@@ -406,11 +374,4 @@ public class DependencyGraphBuilderEditorPane extends BorderPane {
         return spinner;
     }
 
-    private interface GetterAdapter<T extends GraphNodeAdapter> {
-        Double get(T node);
-    }
-
-    private interface SetterAdapter<T extends GraphNodeAdapter> {
-        void set(T node, Double value);
-    }
 }
