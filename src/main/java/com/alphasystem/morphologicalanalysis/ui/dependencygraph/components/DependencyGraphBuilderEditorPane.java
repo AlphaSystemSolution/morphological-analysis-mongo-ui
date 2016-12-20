@@ -28,7 +28,6 @@ import static javafx.scene.text.Font.font;
 /**
  * @author sali
  */
-@Deprecated
 public class DependencyGraphBuilderEditorPane extends BorderPane {
 
     private static final int DEFAULT_OFFSET = 3;
