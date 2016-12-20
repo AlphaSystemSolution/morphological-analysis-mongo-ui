@@ -17,8 +17,8 @@
                                    GridPane.columnIndex="0" GridPane.rowIndex="1"/>
                         <Label text="%xIndex.label" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
                         <Spinner fx:id="xSpinner" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
-                        <Slider fx:id="xSlider" showTickMarks="true" showTickLabels="true" majorTickUnit="5"
-                                minorTickCount="1" blockIncrement="0.5" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
+                        <Slider fx:id="xSlider" showTickMarks="true" showTickLabels="true" majorTickUnit="100"
+                                minorTickCount="5" blockIncrement="0.5" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
                         <Label text="%yIndex.label" GridPane.columnIndex="0" GridPane.rowIndex="5"/>
                         <Spinner fx:id="ySpinner" GridPane.columnIndex="0" GridPane.rowIndex="6"/>
                         <Slider fx:id="ySlider" showTickMarks="true" showTickLabels="true" majorTickUnit="5"

@@ -25,26 +25,33 @@ public abstract class PropertiesEditor<N extends GraphNode, A extends GraphNodeA
     private final ObjectProperty<YPropertyAccessor<N, A>> y = new SimpleObjectProperty<>(null, "y", new YPropertyAccessor<>(null));
     private final ObjectProperty<Font> arabicFont = new SimpleObjectProperty<>(null, "arabicFont");
 
-    PropertiesEditor() {
+    PropertiesEditor(A node) {
         nodeProperty().addListener((observable, oldValue, newValue) -> setValues(newValue));
         textProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue != null) {
+            if (newValue != null && getNode() != null) {
                 getNode().setText(newValue);
             }
         });
         arabicFontProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue == null) {
+            if (newValue == null || getNode() == null) {
                 return;
             }
             getNode().setFont(newValue);
         });
+        setNode(node);
     }
 
-    protected abstract void updateBounds(A node);
+    protected void updateBounds(A node) {
+        setLowerYBound(0);
+        setUpperYBound(getCanvasHeight() / 3);
+    }
 
     protected void setValues(A node) {
         updateBounds(node);
         setText((node == null) ? "" : node.getText());
+        if (node != null) {
+            System.out.println(String.format("<<<<< %s:%s:%s:%s >>>>>", node.getGraphNodeType(), node.getId(), node.getX(), node.getY()));
+        }
         setX(new XPropertyAccessor<>(node));
         setY(new YPropertyAccessor<>(node));
         setArabicFont((node == null) ? null : node.getFont());

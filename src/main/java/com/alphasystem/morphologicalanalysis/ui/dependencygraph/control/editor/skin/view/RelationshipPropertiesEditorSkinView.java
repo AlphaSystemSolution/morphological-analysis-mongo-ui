@@ -33,6 +33,17 @@ public class RelationshipPropertiesEditorSkinView extends PropertiesEditorSkinVi
     }
 
     @Override
+    void initialize(RelationshipNodeAdapter node) {
+        super.initialize(node);
+        x1Slider.setValue(node.getControlX1());
+        x2Slider.setValue(node.getControlX2());
+        y1Slider.setValue(node.getControlY1());
+        y2Slider.setValue(node.getControlY2());
+        t1Spinner.getValueFactory().setValue(node.getT1());
+        t2Spinner.getValueFactory().setValue(node.getT2());
+    }
+
+    @Override
     void initializeValues() {
         super.initializeValues();
         setupSpinnerSliderField(control.x1Property(), x1Spinner, x1Slider, true);

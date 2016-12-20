@@ -10,7 +10,7 @@ import javafx.scene.control.Spinner;
 /**
  * @author sali
  */
-public class LinkSupportPropertiesEditorSkinView<N extends LinkSupport, A extends LinkSupportAdapter<N>,
+class LinkSupportPropertiesEditorSkinView<N extends LinkSupport, A extends LinkSupportAdapter<N>,
         P extends LinkSupportPropertiesEditor<N, A>> extends LineSupportPropertiesEditorSkinView<N, A, P> {
 
     @FXML private Spinner<Double> cxSpinner;
@@ -20,6 +20,13 @@ public class LinkSupportPropertiesEditorSkinView<N extends LinkSupport, A extend
 
     LinkSupportPropertiesEditorSkinView(P control) {
         super(control);
+    }
+
+    @Override
+    void initialize(A node) {
+        super.initialize(node);
+        cxSlider.setValue(node.getCx());
+        cySlider.setValue(node.getCy());
     }
 
     @Override

@@ -27,8 +27,8 @@ public class TerminalPropertiesEditor extends LineSupportPropertiesEditor<Termin
     private final ObjectProperty<TranslateXPropertyAccessor<TerminalNode, TerminalNodeAdapter>> groupTranslateX = new SimpleObjectProperty<>(null, "translationX", new TranslateXPropertyAccessor<>(null));
     private final ObjectProperty<TranslateYPropertyAccessor<TerminalNode, TerminalNodeAdapter>> groupTranslateY = new SimpleObjectProperty<>(null, "translationY", new TranslateYPropertyAccessor<>(null));
 
-    public TerminalPropertiesEditor() {
-        super();
+    public TerminalPropertiesEditor(TerminalNodeAdapter node) {
+        super(node);
         translationTextProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
                 getNode().setTranslationText(newValue);
@@ -40,6 +40,7 @@ public class TerminalPropertiesEditor extends LineSupportPropertiesEditor<Termin
             }
             getNode().setTranslationFont(newValue);
         });
+        setSkin(createDefaultSkin());
     }
 
     @Override

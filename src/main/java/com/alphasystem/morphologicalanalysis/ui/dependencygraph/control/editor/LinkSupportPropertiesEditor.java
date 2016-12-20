@@ -16,6 +16,10 @@ public abstract class LinkSupportPropertiesEditor<N extends LinkSupport, A exten
     private final ObjectProperty<CxPropertyAccessor<N, A>> cx = new SimpleObjectProperty<>(null, "cx", new CxPropertyAccessor<>(null));
     private final ObjectProperty<CyPropertyAccessor<N, A>> cy = new SimpleObjectProperty<>(null, "cy", new CyPropertyAccessor<>(null));
 
+    LinkSupportPropertiesEditor(A node) {
+        super(node);
+    }
+
     @Override
     protected void setValues(A node) {
         super.setValues(node);

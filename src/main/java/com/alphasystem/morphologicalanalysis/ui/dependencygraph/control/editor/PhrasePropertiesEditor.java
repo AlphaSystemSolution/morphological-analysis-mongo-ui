@@ -11,8 +11,9 @@ import javafx.scene.control.SkinBase;
  */
 public class PhrasePropertiesEditor extends LinkSupportPropertiesEditor<PhraseNode, PhraseNodeAdapter> {
 
-    public PhrasePropertiesEditor() {
-        super();
+    public PhrasePropertiesEditor(PhraseNodeAdapter node) {
+        super(node);
+        setSkin(createDefaultSkin());
     }
 
     @Override

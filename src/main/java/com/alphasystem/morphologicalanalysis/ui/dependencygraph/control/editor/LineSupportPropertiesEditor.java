@@ -19,11 +19,13 @@ public abstract class LineSupportPropertiesEditor<N extends LineSupport, A exten
     private final ObjectProperty<X2PropertyAccessor<N, A>> x2 = new SimpleObjectProperty<>(null, "x2", new X2PropertyAccessor<>(null));
     private final ObjectProperty<Y2PropertyAccessor<N, A>> y2 = new SimpleObjectProperty<>(null, "y2", new Y2PropertyAccessor<>(null));
 
+    LineSupportPropertiesEditor(A node){
+        super(node);
+    }
+
     @Override
     protected void updateBounds(A node) {
-        if (node == null) {
-            return;
-        }
+        super.updateBounds(node);
         setLowerXBound(node.getX1());
         setUpperXBound(node.getX2());
     }

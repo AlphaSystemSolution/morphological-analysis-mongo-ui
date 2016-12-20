@@ -21,12 +21,14 @@ public class RelationshipPropertiesEditor extends PropertiesEditor<RelationshipN
     private final ObjectProperty<T1PropertyAccessor> t1 = new SimpleObjectProperty<>(null, "t1", new T1PropertyAccessor(null));
     private final ObjectProperty<T2PropertyAccessor> t2 = new SimpleObjectProperty<>(null, "t2", new T2PropertyAccessor(null));
 
-    public RelationshipPropertiesEditor() {
-        super();
+    public RelationshipPropertiesEditor(RelationshipNodeAdapter node) {
+        super(node);
+        setSkin(createDefaultSkin());
     }
 
     @Override
     protected void updateBounds(RelationshipNodeAdapter node) {
+        super.updateBounds(node);
         setLowerXBound(node.getControlX1());
         setUpperXBound(node.getControlX2());
     }

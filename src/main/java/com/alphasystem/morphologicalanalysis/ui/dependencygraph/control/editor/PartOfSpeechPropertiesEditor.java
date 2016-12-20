@@ -12,15 +12,14 @@ import javafx.scene.control.SkinBase;
  */
 public class PartOfSpeechPropertiesEditor extends LinkSupportPropertiesEditor<PartOfSpeechNode, PartOfSpeechNodeAdapter> {
 
-    public PartOfSpeechPropertiesEditor() {
-        super();
+    public PartOfSpeechPropertiesEditor(PartOfSpeechNodeAdapter node) {
+        super(node);
+        setSkin(createDefaultSkin());
     }
 
     @Override
     protected void updateBounds(PartOfSpeechNodeAdapter node) {
-        if (node == null) {
-            return;
-        }
+        super.updateBounds(node);
         final TerminalNodeAdapter parent = (TerminalNodeAdapter) node.getParent();
         setLowerXBound(parent.getX1());
         setUpperXBound(parent.getX2());

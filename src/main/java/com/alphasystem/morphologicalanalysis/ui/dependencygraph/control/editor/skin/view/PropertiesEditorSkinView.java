@@ -26,12 +26,12 @@ import static java.lang.String.format;
 /**
  * @author sali
  */
-public abstract class PropertiesEditorSkinView<N extends GraphNode, A extends GraphNodeAdapter<N>, P extends PropertiesEditor<N, A>> extends BorderPane {
+abstract class PropertiesEditorSkinView<N extends GraphNode, A extends GraphNodeAdapter<N>, P extends PropertiesEditor<N, A>> extends BorderPane {
 
     protected final P control;
 
-    @FXML protected Accordion accordion;
-    @FXML protected TitledPane commonPropertiesPane;
+    @FXML private Accordion accordion;
+    @FXML private TitledPane commonPropertiesPane;
     @FXML private TextField textField;
     @FXML private Spinner<Double> xSpinner;
     @FXML private Slider xSlider;
@@ -95,25 +95,50 @@ public abstract class PropertiesEditorSkinView<N extends GraphNode, A extends Gr
         setupSpinnerSliderField(control.yProperty(), ySpinner, ySlider, false);
     }
 
-    @SuppressWarnings({"unchecked"})
-    protected void initialize(A node) {
+    void initialize(A node) {
         if (node == null) {
             return;
         }
         final String labelKey = format("%s_node.label", node.getGraphNodeType().name());
         commonPropertiesPane.setText(RESOURCE_BUNDLE.getString(labelKey));
+        System.out.println(String.format("{{{{{ %s:%s:%s:%s }}}}}", node.getGraphNodeType(), node.getId(), node.getX(), node.getY()));
+        xSpinner.getValueFactory().setValue(node.getX());
+        ySpinner.getValueFactory().setValue(node.getY());
+        setFont(arabicFontFamily, arabicFontSize, node.getFont());
+    }
+
+    void setFont(ComboBox<String> familyComboBox, ComboBox<Integer> sizeComboBox, Font font) {
+        final String family = font.getFamily();
+        familyComboBox.setValue(family);
+        familyComboBox.getSelectionModel().select(family);
+        final Integer size = new Double(font.getSize()).intValue();
+        sizeComboBox.setValue(size);
+        sizeComboBox.getSelectionModel().select(size);
     }
 
     void setupSpinnerSliderField(final ObjectProperty<? extends PropertyAccessor<N, A>> property, final Spinner<Double> spinner,
                                  final Slider slider, boolean xAxis) {
-        final DoubleSpinnerValueFactory valueFactory = new DoubleSpinnerValueFactory(-100, 100, 0, 0.5);
-        if(xAxis){
-            control.lowerXBoundProperty().addListener((observable, oldValue, newValue) -> {
+        if (spinner == null || slider == null) {
+            System.out.println("|||||||||||||||||||||||||");
+            return;
+        }
+        spinner.setValueFactory(new DoubleSpinnerValueFactory(-100, 100, property.get().get(), 0.5));
+        slider.setMin(-100);
+        slider.setMin(100);
+        slider.setValue(property.get().get());
+
+        if (xAxis) {
+            control.canvasWidthProperty().addListener((observable, oldValue, newValue) -> {
+                final Double max = (Double) newValue;
+                ((DoubleSpinnerValueFactory) spinner.getValueFactory()).setMax(max);
+                slider.setMax(max);
+            });
+            /*control.lowerXBoundProperty().addListener((observable, oldValue, newValue) -> {
                 if (newValue == null) {
                     return;
                 }
                 final double min = ((Double) newValue) - 30;
-                valueFactory.setMin(min);
+                ((DoubleSpinnerValueFactory) spinner.getValueFactory()).setMin(min);
                 slider.setMin(min);
             });
             control.upperXBoundProperty().addListener((observable, oldValue, newValue) -> {
@@ -122,16 +147,21 @@ public abstract class PropertiesEditorSkinView<N extends GraphNode, A extends Gr
                 }
                 double max = ((Double) newValue) + 30;
                 max = max > control.getCanvasWidth() ? control.getCanvasWidth() : max;
-                valueFactory.setMax(max);
+                ((DoubleSpinnerValueFactory) spinner.getValueFactory()).setMax(max);
+                slider.setMax(max);
+            });*/
+        } else {
+            control.canvasHeightProperty().addListener((observable, oldValue, newValue) -> {
+                final Double max = (Double) newValue;
+                ((DoubleSpinnerValueFactory) spinner.getValueFactory()).setMax(max);
                 slider.setMax(max);
             });
-        } else {
-            control.lowerYBoundProperty().addListener((observable, oldValue, newValue) -> {
+            /*control.lowerYBoundProperty().addListener((observable, oldValue, newValue) -> {
                 if (newValue == null) {
                     return;
                 }
                 final double min = ((Double) newValue) - 30;
-                valueFactory.setMin(min);
+                ((DoubleSpinnerValueFactory) spinner.getValueFactory()).setMin(min);
                 slider.setMin(min);
             });
             control.upperYBoundProperty().addListener((observable, oldValue, newValue) -> {
@@ -140,21 +170,21 @@ public abstract class PropertiesEditorSkinView<N extends GraphNode, A extends Gr
                 }
                 double max = ((Double) newValue) + 30;
                 max = max > control.getCanvasHeight() ? control.getCanvasHeight() : max;
-                valueFactory.setMax(max);
+                ((DoubleSpinnerValueFactory) spinner.getValueFactory()).setMax(max);
                 slider.setMax(max);
-            });
+            });*/
         }
 
-        spinner.setValueFactory(valueFactory);
         property.addListener((observable, oldValue, newValue) -> {
             if (newValue == null) {
                 return;
             }
             double value = newValue.get();
-            valueFactory.setValue(value);
+            System.out.println(String.format("[[[[[ %s:%s:%s:%s ]]]]]", control.getNode().getGraphNodeType(),control.getNode().getId(), value, xAxis));
+            spinner.getValueFactory().setValue(value);
             slider.setValue(value);
         });
-        slider.valueProperty().addListener((observable, oldValue, newValue) -> {
+        /*slider.valueProperty().addListener((observable, oldValue, newValue) -> {
             Double d = (Double) newValue;
             if (d % 1 != 0.0 && d % 0.5 != 0.0) {
                 d = StrictMath.ceil(d);
@@ -163,7 +193,7 @@ public abstract class PropertiesEditorSkinView<N extends GraphNode, A extends Gr
             spinner.getValueFactory().setValue(d);
             property.get().set(d);
         });
-        spinner.valueProperty().addListener((observable, oldValue, newValue) -> slider.setValue(newValue));
+        spinner.valueProperty().addListener((observable, oldValue, newValue) -> slider.setValue(newValue));*/
     }
 
 }

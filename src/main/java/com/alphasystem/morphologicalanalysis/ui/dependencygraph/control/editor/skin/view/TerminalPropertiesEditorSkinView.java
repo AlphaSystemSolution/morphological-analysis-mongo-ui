@@ -36,6 +36,16 @@ public class TerminalPropertiesEditorSkinView extends LineSupportPropertiesEdito
     }
 
     @Override
+    void initialize(TerminalNodeAdapter node) {
+        super.initialize(node);
+        translationXSlider.setValue(node.getTranslationX());
+        translationYSlider.setValue(node.getTranslationY());
+        groupTranslateXSlider.setValue(node.getTranslateX());
+        groupTranslateYSlider.setValue(node.getTranslationY());
+        setFont(translationFontFamily,translationFontSize,node.getTranslationFont());
+    }
+
+    @Override
     void initializeValues() {
         super.initializeValues();
         translationTextField.setFont(FontConstants.ENGLISH_FONT_12);
