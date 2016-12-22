@@ -2,10 +2,10 @@ package com.alphasystem.morphologicalanalysis.util;
 
 import com.alphasystem.arabic.model.ProNoun;
 import com.alphasystem.morphologicalanalysis.common.model.VerseTokenPairGroup;
-import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
-import com.alphasystem.morphologicalanalysis.graph.model.GraphMetaInfo;
-import com.alphasystem.morphologicalanalysis.graph.model.TerminalNode;
+import com.alphasystem.morphologicalanalysis.graph.model.*;
+import com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType;
 import com.alphasystem.morphologicalanalysis.graph.repository.DependencyGraphRepository;
+import com.alphasystem.morphologicalanalysis.graph.repository.PartOfSpeechNodeRepository;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.GraphBuilder;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.*;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.*;
@@ -36,6 +36,7 @@ public class RepositoryTool {
     private MorphologicalAnalysisRepositoryUtil repositoryUtil;
     private TokenRepository tokenRepository;
     private LocationRepository locationRepository;
+    private PartOfSpeechNodeRepository partOfSpeechNodeRepository;
     private DependencyGraphRepository dependencyGraphRepository;
 
     /**
@@ -46,6 +47,7 @@ public class RepositoryTool {
                 .getInstance().getBean(MorphologicalAnalysisRepositoryUtil.class);
         tokenRepository = repositoryUtil.getTokenRepository();
         locationRepository = repositoryUtil.getLocationRepository();
+        partOfSpeechNodeRepository = repositoryUtil.getPartOfSpeechNodeRepository();
         dependencyGraphRepository = repositoryUtil.getDependencyGraphRepository();
         graphBuilder = GraphBuilder.getInstance();
     }
@@ -137,6 +139,63 @@ public class RepositoryTool {
         }
 
         return dependencyGraph;
+    }
+
+    public boolean deleteDependencyGraph(String displayName) {
+        final DependencyGraph dependencyGraph = repositoryUtil.getDependencyGraph(displayName);
+        if (dependencyGraph == null) {
+            return false;
+        }
+        final List<GraphNode> nodes = dependencyGraph.getNodes();
+        if (nodes != null && !nodes.isEmpty()) {
+            nodes.forEach(graphNode -> {
+                final GraphNodeType graphNodeType = graphNode.getGraphNodeType();
+                System.out.println(graphNode);
+                switch (graphNodeType) {
+                    case TERMINAL:
+                    case REFERENCE:
+                        TerminalNode terminalNode = (TerminalNode) graphNode;
+                        deletePartOfSpeechNodes(terminalNode);
+                        break;
+                    case PHRASE:
+                    case RELATIONSHIP:
+                        repositoryUtil.getRepository(graphNode.getGraphNodeType()).delete(graphNode);
+                        break;
+                    case HIDDEN:
+                    case IMPLIED:
+                        TerminalNode node = (TerminalNode) graphNode;
+                        deleteToken(node.getToken());
+                        deletePartOfSpeechNodes(node);
+                        break;
+                    case ROOT:
+                        break;
+                }
+            });
+        }
+        dependencyGraphRepository.delete(dependencyGraph);
+        return true;
+    }
+
+    private void deletePartOfSpeechNodes(TerminalNode terminalNode) {
+        final List<PartOfSpeechNode> partOfSpeechNodes = terminalNode.getPartOfSpeechNodes();
+        partOfSpeechNodes.forEach(partOfSpeechNode -> {
+            if (partOfSpeechNode != null) {
+                System.out.println(format("    POS: %s", partOfSpeechNode));
+                partOfSpeechNodeRepository.delete(partOfSpeechNode);
+            }
+        });
+        repositoryUtil.getRepository(terminalNode.getGraphNodeType()).delete(terminalNode);
+    }
+
+    private void deleteToken(Token token){
+        System.out.println(format("    Token: %s", token));
+        token.getLocations().forEach(location -> {
+            if(location != null){
+                System.out.println(format("        Location: %s", location));
+                locationRepository.delete(location);
+            }
+        });
+        tokenRepository.delete(token);
     }
 
     public boolean isTransientGraph(String displayName) {
