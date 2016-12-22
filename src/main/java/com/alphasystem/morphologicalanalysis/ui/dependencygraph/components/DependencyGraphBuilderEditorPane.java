@@ -1,15 +1,12 @@
 package com.alphasystem.morphologicalanalysis.ui.dependencygraph.components;
 
-import com.alphasystem.morphologicalanalysis.graph.model.GraphNode;
-import com.alphasystem.morphologicalanalysis.graph.model.LineSupport;
-import com.alphasystem.morphologicalanalysis.graph.model.LinkSupport;
+import com.alphasystem.morphologicalanalysis.graph.model.*;
+import com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.*;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.DecimalFormatStringConverter;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.PropertyAccessor;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.accessor.GraphNodePropertyAccessors.*;
-import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -20,9 +17,11 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 
 import static com.alphasystem.fx.ui.util.FontConstants.ARABIC_FONT_20;
-import static com.alphasystem.morphologicalanalysis.ui.common.Global.RESOURCE_BUNDLE;
+import static com.alphasystem.morphologicalanalysis.ui.common.Global.*;
 import static java.lang.String.format;
 import static javafx.collections.FXCollections.observableArrayList;
 import static javafx.geometry.Pos.TOP_CENTER;
@@ -38,18 +37,20 @@ class DependencyGraphBuilderEditorPane extends BorderPane {
             DEFAULT_OFFSET, DEFAULT_OFFSET);
 
     private final ObjectProperty<GraphNodeAdapter> graphNode = new SimpleObjectProperty<>();
-    private final DoubleProperty canvasWidth = new SimpleDoubleProperty();
-    private final DoubleProperty canvasHeight = new SimpleDoubleProperty();
+    private final ObjectProperty<GraphMetaInfoAdapter> metaInfo = new SimpleObjectProperty<>(null, "metaInfo",
+            new GraphMetaInfoAdapter(new GraphMetaInfo()));
     private final Accordion accordion;
     private int row = 0;
 
-    DependencyGraphBuilderEditorPane(GraphNodeAdapter graphNode, int width, int height) {
-        canvasWidthProperty().addListener((observable, oldValue, newValue) -> initPane());
-        canvasHeightProperty().addListener((observable, oldValue, newValue) -> initPane());
+    DependencyGraphBuilderEditorPane(GraphNodeAdapter graphNode) {
+        metaInfo.addListener((observable, oldValue, newValue) -> {
+            if (metaInfo == null) {
+                return;
+            }
+            initPane();
+        });
         graphNodeProperty().addListener((observable, oldValue, newValue) -> initPane());
 
-        setCanvasWidth(width);
-        setCanvasHeight(height);
         setGraphNode(graphNode);
 
         accordion = new Accordion();
@@ -112,17 +113,28 @@ class DependencyGraphBuilderEditorPane extends BorderPane {
         gridPane.add(textField, 0, row);
 
         row++;
-        addFields(gridPane, "xIndex.label", new XPropertyAccessor<>(node), getCanvasWidth());
+        final Pair<Double, Double> bound = getBound(node, true);
+        double min = bound.getLeft() - 30;
+        double max = bound.getRight();
+        max = max>getCanvasWidth() ? getCanvasWidth() : max;
+        addFields(gridPane, "xIndex.label", new XPropertyAccessor<>(node), min, max);
+        System.out.println(getMetaInfo().getTokenHeight() + " : " + getMetaInfo().getTokenWidth());
         addFields(gridPane, "yIndex.label", new YPropertyAccessor<>(node), getCanvasHeight());
 
         row++;
         final Font font = node.getFont();
         label = new Label(RESOURCE_BUNDLE.getString("font.family.label"));
         gridPane.add(label, 0, row);
-        textField = new TextField(font.getFamily());
-        textField.setEditable(false);
-        label.setLabelFor(textField);
-        gridPane.add(textField, 0, ++row);
+        ComboBox<String> fontFamilyComboBox = new ComboBox<>();
+        fontFamilyComboBox.getItems().addAll(Font.getFamilies());
+        fontFamilyComboBox.getSelectionModel().select(font.getFamily());
+        label.setLabelFor(fontFamilyComboBox);
+        fontFamilyComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
+            FontMetaInfo fontMetaInfo = fromFont(font);
+            fontMetaInfo = deriveFromFamily(fontMetaInfo, newValue);
+            node.setFont(fromFontMetaInfo(fontMetaInfo));
+        });
+        gridPane.add(fontFamilyComboBox, 0, ++row);
 
         label = new Label(RESOURCE_BUNDLE.getString("font.size.label"));
         gridPane.add(label, 0, ++row);
@@ -155,13 +167,19 @@ class DependencyGraphBuilderEditorPane extends BorderPane {
         addFields(gridPane, "translationYIndex.label", new TranslationYPropertyAccessor<>(node), getCanvasHeight());
 
         row++;
-        final Font font = node.getFont();
+        final Font font = node.getTranslationFont();
         Label label = new Label(RESOURCE_BUNDLE.getString("translationFont.family.label"));
         gridPane.add(label, 0, ++row);
-        TextField textField = new TextField(font.getFamily());
-        textField.setEditable(false);
-        label.setLabelFor(textField);
-        gridPane.add(textField, 0, ++row);
+        ComboBox<String> fontFamilyComboBox = new ComboBox<>();
+        fontFamilyComboBox.getItems().addAll(Font.getFamilies());
+        fontFamilyComboBox.getSelectionModel().select(font.getFamily());
+        label.setLabelFor(fontFamilyComboBox);
+        fontFamilyComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
+            FontMetaInfo fontMetaInfo = fromFont(font);
+            fontMetaInfo = deriveFromFamily(fontMetaInfo, newValue);
+            node.setTranslationFont(fromFontMetaInfo(fontMetaInfo));
+        });
+        gridPane.add(fontFamilyComboBox, 0, ++row);
 
         label = new Label(RESOURCE_BUNDLE.getString("translationFont.size.label"));
         gridPane.add(label, 0, ++row);
@@ -254,28 +272,12 @@ class DependencyGraphBuilderEditorPane extends BorderPane {
         return pane;
     }
 
-    private double getCanvasWidth() {
-        return canvasWidth.get();
+    private GraphMetaInfoAdapter getMetaInfo() {
+        return metaInfo.get();
     }
 
-    final void setCanvasWidth(double canvasWidth) {
-        this.canvasWidth.set(canvasWidth);
-    }
-
-    private DoubleProperty canvasWidthProperty() {
-        return canvasWidth;
-    }
-
-    private double getCanvasHeight() {
-        return canvasHeight.get();
-    }
-
-    final void setCanvasHeight(double canvasHeight) {
-        this.canvasHeight.set(canvasHeight);
-    }
-
-    private DoubleProperty canvasHeightProperty() {
-        return canvasHeight;
+    final void setMetaInfo(GraphMetaInfoAdapter metaInfo) {
+        this.metaInfo.set(metaInfo);
     }
 
     private GraphNodeAdapter getGraphNode() {
@@ -314,9 +316,9 @@ class DependencyGraphBuilderEditorPane extends BorderPane {
         slider.setValue(value);
         slider.setShowTickLabels(true);
         slider.setShowTickMarks(true);
-        slider.setMajorTickUnit(100);
-        slider.setMinorTickCount(20);
-        slider.setBlockIncrement(20);
+        slider.setMajorTickUnit(20);
+        slider.setMinorTickCount(5);
+        slider.setBlockIncrement(5);
         return slider;
     }
 
@@ -374,4 +376,45 @@ class DependencyGraphBuilderEditorPane extends BorderPane {
         return spinner;
     }
 
+    private <N extends GraphNode, A extends GraphNodeAdapter<N>> Pair<Double, Double> getBound(A node, boolean x) {
+        Pair<Double, Double> pair = null;
+        final GraphNodeType type = node.getGraphNodeType();
+        switch (type) {
+            case TERMINAL:
+            case IMPLIED:
+            case REFERENCE:
+            case HIDDEN:
+                pair = getBound((TerminalNodeAdapter) node, x);
+                break;
+            case PART_OF_SPEECH:
+                PartOfSpeechNodeAdapter posNde = (PartOfSpeechNodeAdapter) node;
+                pair = getBound((TerminalNodeAdapter) posNde.getParent(), x);
+                break;
+            case RELATIONSHIP:
+                pair = getRelationshipBound((RelationshipNodeAdapter) node, x);
+                break;
+            case PHRASE:
+                pair = getBound((PhraseNodeAdapter) node, x);
+                break;
+            default:
+                break;
+        }
+        return pair;
+    }
+
+    private static <N extends LineSupport, A extends LineSupportAdapter<N>> Pair<Double, Double> getBound(A node, boolean x) {
+        return x ? new ImmutablePair<>(node.getX1(), node.getX2()) : new ImmutablePair<>(node.getY1(), node.getY2());
+    }
+
+    private static Pair<Double, Double> getRelationshipBound(RelationshipNodeAdapter node, boolean x) {
+        return x ? new ImmutablePair<>(node.getControlX1(), node.getControlX2()) : new ImmutablePair<>(node.getControlX1(), node.getControlY2());
+    }
+
+    private double getCanvasWidth() {
+        return getMetaInfo().getWidth();
+    }
+
+    private double getCanvasHeight() {
+        return getMetaInfo().getHeight();
+    }
 }

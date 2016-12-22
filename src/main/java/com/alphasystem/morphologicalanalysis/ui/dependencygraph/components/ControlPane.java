@@ -25,7 +25,7 @@ public class ControlPane extends BorderPane {
 
     @SuppressWarnings({"unchecked"})
     public ControlPane(DependencyGraphAdapter dependencyGraph) {
-        editorPane = new DependencyGraphBuilderEditorPane(null, 0, 0);
+        editorPane = new DependencyGraphBuilderEditorPane(null);
         final GlobalPropertiesView globalPropertiesView = new GlobalPropertiesView(dependencyGraph);
 
         dependencyGraphProperty().addListener((observable, oldValue, newValue) -> {
@@ -63,8 +63,7 @@ public class ControlPane extends BorderPane {
         if (dependencyGraph != null && !dependencyGraph.isEmpty()) {
             GraphNodeAdapter node = dependencyGraph.getGraphNodes().get(0);
             GraphMetaInfoAdapter graphMetaInfo = dependencyGraph.getGraphMetaInfo();
-            editorPane.setCanvasWidth(graphMetaInfo.getWidth());
-            editorPane.setCanvasHeight(graphMetaInfo.getHeight());
+            editorPane.setMetaInfo(graphMetaInfo);
             editorPane.setGraphNode(node);
         }
         requestLayout();
