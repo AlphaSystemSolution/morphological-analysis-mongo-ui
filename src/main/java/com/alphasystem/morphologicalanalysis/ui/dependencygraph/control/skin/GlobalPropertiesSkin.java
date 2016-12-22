@@ -110,9 +110,7 @@ public class GlobalPropertiesSkin extends SkinBase<GlobalPropertiesView> {
             accordion.setExpandedPane(accordion.getPanes().get(0));
             final GlobalPropertiesView control = getSkinnable();
             colorPicker.setValue((Color) control.getBackgroundColor());
-            colorPicker.setOnAction(event1 -> {
-                control.setBackgroundColor(colorPicker.getValue());
-            });
+            colorPicker.setOnAction(event1 -> control.setBackgroundColor(colorPicker.getValue()));
 
             setupCanvasWidth(control);
             setupCanvasHeight(control);
