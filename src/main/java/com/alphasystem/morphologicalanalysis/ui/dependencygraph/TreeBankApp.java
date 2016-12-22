@@ -38,6 +38,7 @@ public class TreeBankApp extends Application {
 
     private static final String OPEN_ARG = "open";
     private static final String CREATE_ARG = "create";
+    private static final String DELETE_ARG = "delete";
 
     static {
         SpringContextHelper.getInstance();
@@ -71,6 +72,8 @@ public class TreeBankApp extends Application {
                     open(primaryStage, value);
                 } else if (CREATE_ARG.equalsIgnoreCase(name)) {
                     create(primaryStage, value);
+                } else if (DELETE_ARG.equalsIgnoreCase(name)) {
+                    delete(value);
                 }
             }
         }
@@ -132,5 +135,10 @@ public class TreeBankApp extends Application {
             showStage(stage, dependencyGraphAdapter);
         });
 
+    }
+
+    private void delete(String displayName) {
+        repositoryTool.deleteDependencyGraph(displayName);
+        System.exit(0);
     }
 }
