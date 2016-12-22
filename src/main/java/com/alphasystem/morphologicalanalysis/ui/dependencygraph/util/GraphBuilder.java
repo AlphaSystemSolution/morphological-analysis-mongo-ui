@@ -106,11 +106,21 @@ public class GraphBuilder {
                 throw new IllegalArgumentException(format("Invalid node type {%s} for token {%s}", nodeType,
                         token.getDisplayName()));
         }
-        Long count = repositoryUtil.getRepository(terminalNode.getGraphNodeType())
-                .countByChapterNumberAndVerseNumberAndTokenNumber(token.getChapterNumber(),
+        int version = -1;
+        final List<GraphNode> tokens = repositoryUtil.getRepository(terminalNode.getGraphNodeType())
+                .findByChapterNumberAndVerseNumberAndTokenNumber(token.getChapterNumber(),
                         token.getVerseNumber(), token.getTokenNumber());
-        count = (count == null) ? 0L : count + 1;
-        terminalNode.setVersion(count.intValue());
+        if (tokens != null && !tokens.isEmpty()) {
+            for (GraphNode node : tokens) {
+                int _v = node.getVersion();
+                if (_v > version) {
+                    version = _v;
+                }
+            }
+        }
+        version++;
+        terminalNode.setVersion(version);
+        terminalNode.initDisplayName();
         terminalNode.setX(textX);
         terminalNode.setY(textY);
         terminalNode.setX1(x1);
@@ -119,7 +129,7 @@ public class GraphBuilder {
         terminalNode.setY2(y2);
         terminalNode.setTranslationX(x3);
         terminalNode.setTranslationY(y3);
-        terminalNode.setTranslateY(-85.0);
+        terminalNode.setTranslateY(-80.0);
         terminalNode.setFont(terminalFont);
         terminalNode.setTranslationFont(translationFont);
 
@@ -221,12 +231,22 @@ public class GraphBuilder {
 
     private PartOfSpeechNode buildPartOfSpeechNode(Location location, Double posX) {
         PartOfSpeechNode partOfSpeechNode = new PartOfSpeechNode(location);
-        Long count = repositoryUtil.getPartOfSpeechNodeRepository()
-                .countByChapterNumberAndVerseNumberAndTokenNumberAndLocationNumber(
+        final List<PartOfSpeechNode> list = repositoryUtil.getPartOfSpeechNodeRepository()
+                .findByChapterNumberAndVerseNumberAndTokenNumberAndLocationNumber(
                         location.getChapterNumber(), location.getVerseNumber(), location.getTokenNumber(),
                         location.getLocationNumber());
-        count = (count == null) ? 0 : count + 1;
-        partOfSpeechNode.setVersion(count.intValue());
+        int version = -1;
+        if (list != null && !list.isEmpty()) {
+            for (PartOfSpeechNode posNode : list) {
+                int _v = posNode.getVersion();
+                if (_v > version) {
+                    version = _v;
+                }
+            }
+        }
+        version++;
+        partOfSpeechNode.setVersion(version);
+        partOfSpeechNode.initDisplayName();
         partOfSpeechNode.setX(posX);
         partOfSpeechNode.setY(textY);
         double x = posX + 20;
