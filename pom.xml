@@ -102,9 +102,9 @@
             <version>${arabic-ui-support.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.alphasystem.sarf-engine</groupId>
-            <artifactId>engine-base</artifactId>
-            <version>${sarf-engine.version}</version>
+            <groupId>com.alphasystem.arabic</groupId>
+            <artifactId>morphological-engine</artifactId>
+            <version>${morphological-engine.version}</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
@@ -142,6 +142,7 @@
     <properties>
         <svg-model.version>${project.version}</svg-model.version>
         <ma-repository.version>${project.version}</ma-repository.version>
+        <morphological-engine.version>${project.version}</morphological-engine.version>
         <sarf-engine.version>${project.version}</sarf-engine.version>
         <arabic-ui-support.version>${project.version}</arabic-ui-support.version>
         <asciidoctor-editor.version>${project.version}</asciidoctor-editor.version>
