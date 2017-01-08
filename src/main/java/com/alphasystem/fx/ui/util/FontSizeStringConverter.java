@@ -1,4 +1,4 @@
-package com.alphasystem.morphologicalanalysis.ui.dependencygraph.util;
+package com.alphasystem.fx.ui.util;
 
 import javafx.util.StringConverter;
 
