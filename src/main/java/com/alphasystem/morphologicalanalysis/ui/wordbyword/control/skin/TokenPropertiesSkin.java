@@ -3,23 +3,23 @@ package com.alphasystem.morphologicalanalysis.ui.wordbyword.control.skin;
 import com.alphasystem.app.asciidoctoreditor.ui.ApplicationController;
 import com.alphasystem.app.asciidoctoreditor.ui.control.AsciiDoctorEditor;
 import com.alphasystem.app.asciidoctoreditor.ui.model.ApplicationMode;
-import com.alphasystem.app.sarfengine.conjugation.builder.ConjugationBuilder;
-import com.alphasystem.app.sarfengine.conjugation.model.SarfChart;
-import com.alphasystem.app.sarfengine.guice.GuiceSupport;
+import com.alphasystem.app.morphologicalengine.conjugation.builder.ConjugationBuilder;
+import com.alphasystem.app.morphologicalengine.conjugation.builder.ConjugationHelper;
+import com.alphasystem.app.morphologicalengine.conjugation.builder.ConjugationRoots;
+import com.alphasystem.app.morphologicalengine.conjugation.model.MorphologicalChart;
+import com.alphasystem.app.morphologicalengine.conjugation.model.NounRootBase;
+import com.alphasystem.app.morphologicalengine.guice.GuiceSupport;
+import com.alphasystem.app.morphologicalengine.ui.MorphologicalChartControl;
 import com.alphasystem.arabic.ui.ArabicLabelToggleGroup;
 import com.alphasystem.arabic.ui.ArabicLabelView;
 import com.alphasystem.asciidoc.model.AsciiDocumentInfo;
 import com.alphasystem.fx.ui.Browser;
-import com.alphasystem.morphologicalanalysis.morphology.model.ConjugationConfiguration;
 import com.alphasystem.morphologicalanalysis.morphology.model.DictionaryNotes;
 import com.alphasystem.morphologicalanalysis.morphology.model.MorphologicalEntry;
 import com.alphasystem.morphologicalanalysis.morphology.model.RootLetters;
-import com.alphasystem.morphologicalanalysis.morphology.model.support.NounOfPlaceAndTime;
-import com.alphasystem.morphologicalanalysis.morphology.model.support.VerbalNoun;
 import com.alphasystem.morphologicalanalysis.morphology.repository.DictionaryNotesRepository;
 import com.alphasystem.morphologicalanalysis.ui.common.LocationListCell;
 import com.alphasystem.morphologicalanalysis.ui.wordbyword.control.LocationPropertiesView;
-import com.alphasystem.morphologicalanalysis.ui.wordbyword.control.SarfChartView;
 import com.alphasystem.morphologicalanalysis.ui.wordbyword.control.TokenPropertiesView;
 import com.alphasystem.morphologicalanalysis.util.MorphologicalAnalysisRepositoryUtil;
 import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
@@ -40,7 +40,6 @@ import javafx.scene.layout.VBox;
 
 import java.io.*;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.alphasystem.app.asciidoctoreditor.ui.model.Action.SAVE;
@@ -72,15 +71,14 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
     private final BorderPane lettersPane;
     private final TabPane tabPane;
     private final Browser browser;
-    private final SarfChartView conjugationViewer;
     private final AsciiDoctorEditor asciiDoctorEditor;
+    private final MorphologicalChartControl conjugationViewer;
     private final Tab browseDictionaryTab;
     private final Tab morphologicalConjugationTab;
     private final Tab dictionaryNotesTab;
     private final MorphologicalAnalysisRepositoryUtil repositoryUtil = RepositoryTool.getInstance().getRepositoryUtil();
     private final DictionaryNotesRepository dictionaryNotesRepository = repositoryUtil.getDictionaryNotesRepository();
-    private ConjugationBuilder conjugationBuilder = GuiceSupport.getInstance().getConjugationBuilderFactory()
-            .getConjugationBuilder();
+    private ConjugationBuilder conjugationBuilder = GuiceSupport.getInstance().getConjugationBuilder();
 
     public TokenPropertiesSkin(TokenPropertiesView control) {
         super(control);
@@ -89,7 +87,7 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
         lettersPane.setBorder(BORDER);
 
         browser = new Browser();
-        conjugationViewer = new SarfChartView();
+        conjugationViewer = new MorphologicalChartControl();
         asciiDoctorEditor = new AsciiDoctorEditor(ApplicationMode.EMBEDDED);
 
         tabPane = new TabPane();
@@ -292,7 +290,7 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
         propertyInfo.setDocumentType(ARTICLE.getType());
         propertyInfo.setDocumentName(dictionaryNotes.getName());
         propertyInfo.setDocumentTitle(format("[arabic-heading1]#%s#",
-                dictionaryNotes.getRootLetters().getLabel().toHtmlCode()));
+                dictionaryNotes.getRootLetters().toLabel().toHtmlCode()));
         propertyInfo.setStylesDir(DEFAULT_CSS_DIRECTORY);
         propertyInfo.setLinkCss(true);
         propertyInfo.setIcons(FONT.getValue());
@@ -314,40 +312,37 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
 
     private void loadConjugation(final MorphologicalEntry entry) {
         if (entry != null && !morphologicalConjugationTab.isDisabled()) {
-            Service<SarfChart> service = new Service<SarfChart>() {
+            Service<MorphologicalChart> service = new Service<MorphologicalChart>() {
                 @Override
-                protected Task<SarfChart> createTask() {
-                    return new Task<SarfChart>() {
+                protected Task<MorphologicalChart> createTask() {
+                    return new Task<MorphologicalChart>() {
                         @Override
-                        protected SarfChart call() throws Exception {
+                        protected MorphologicalChart call() throws Exception {
                             waitCursor(getSkinnable());
-                            ConjugationConfiguration configuration = entry.getConfiguration();
-                            boolean removePassiveLine = false;
-                            boolean skipRuleProcessing = false;
-                            if (configuration != null) {
-                                removePassiveLine = configuration.isRemovePassiveLine();
-                                skipRuleProcessing = configuration.isSkipRuleProcessing();
-                            }
                             RootLetters rootLetters = entry.getRootLetters();
-                            List<VerbalNoun> verbalNouns = new ArrayList<>(entry.getVerbalNouns());
-                            List<NounOfPlaceAndTime> nounOfPlaceAndTimes = new ArrayList<>(entry.getNounOfPlaceAndTimes());
-                            return conjugationBuilder.doConjugation(entry.getForm(), entry.getShortTranslation(),
-                                    removePassiveLine, skipRuleProcessing, rootLetters.getFirstRadical(),
-                                    rootLetters.getSecondRadical(), rootLetters.getThirdRadical(),
-                                    rootLetters.getFourthRadical(), verbalNouns, nounOfPlaceAndTimes);
+                            // TODO: add verbal noun and noun of place and time
+                            final ConjugationRoots conjugationRoots = ConjugationHelper.getConjugationRoots(
+                                    entry.getForm(), entry.getShortTranslation()).conjugationConfiguration(entry.getConfiguration());
+                            return conjugationBuilder.doConjugation(conjugationRoots, rootLetters.getFirstRadical(),
+                                    rootLetters.getSecondRadical(), rootLetters.getThirdRadical(), rootLetters.getFourthRadical());
                         }
                     };
                 }
             };
             service.setOnSucceeded(event -> {
                 defaultCursor(getSkinnable());
-                SarfChart sarfChart = (SarfChart) event.getSource().getValue();
-                conjugationViewer.setSarfChart(null);
-                conjugationViewer.setSarfChart(sarfChart);
+                MorphologicalChart morphologicalChart = (MorphologicalChart) event.getSource().getValue();
+                conjugationViewer.setMorphologicalChart(null);
+                conjugationViewer.setMorphologicalChart(morphologicalChart);
             });
             service.setOnFailed(event -> defaultCursor(getSkinnable()));
             service.start();
         }
+    }
+
+    private NounRootBase[] getNounRootBases() {
+
+        return null;
     }
 
     private void updateLocations(Token token) {
