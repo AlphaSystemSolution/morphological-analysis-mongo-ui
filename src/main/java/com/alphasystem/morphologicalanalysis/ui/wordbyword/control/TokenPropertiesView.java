@@ -220,13 +220,13 @@ public class TokenPropertiesView extends Control {
         }
 
         @Override
-        public ArabicWord getLabel() {
-            return getLetter().getLabel();
+        public ArabicWord toLabel() {
+            return getLetter().toLabel();
         }
 
         @Override
         public String toString() {
-            return format("{'label': '%s', 'status': '%s', 'index': %s}", getLabel().toBuckWalter(), getStatus(), getIndex());
+            return format("{'label': '%s', 'status': '%s', 'index': %s}", toLabel().toBuckWalter(), getStatus(), getIndex());
         }
     }
 }
