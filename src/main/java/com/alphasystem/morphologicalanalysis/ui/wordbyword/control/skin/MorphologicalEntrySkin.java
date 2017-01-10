@@ -1,10 +1,8 @@
 package com.alphasystem.morphologicalanalysis.ui.wordbyword.control.skin;
 
 import com.alphasystem.arabic.model.NamedTemplate;
-import com.alphasystem.arabic.ui.NounOfPlaceTimesPicker;
 import com.alphasystem.arabic.ui.RootLettersPicker;
 import com.alphasystem.arabic.ui.VerbalNounsPicker;
-import com.alphasystem.morphologicalanalysis.morphology.model.support.NounOfPlaceAndTime;
 import com.alphasystem.morphologicalanalysis.morphology.model.support.VerbalNoun;
 import com.alphasystem.morphologicalanalysis.ui.wordbyword.control.MorphologicalEntryView;
 import javafx.collections.ListChangeListener;
@@ -18,7 +16,6 @@ import javafx.scene.layout.BorderPane;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.Collection;
 
 import static com.alphasystem.fx.ui.util.UiUtilities.loadFXML;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.RESOURCE_BUNDLE;
@@ -39,19 +36,6 @@ public class MorphologicalEntrySkin extends SkinBase<MorphologicalEntryView> {
 
     public void updateVerbalNounsAndNounOfPlaceTimes() {
         updateVerbalNouns();
-        updateNounOfPlaceTimes();
-    }
-
-    private void updateNounOfPlaceTimes() {
-        MorphologicalEntryView control = getSkinnable();
-        NamedTemplate template = control.getForm();
-        skinView.nounOfPlaceTimesPicker.getValues().clear();
-        ObservableSet<NounOfPlaceAndTime> nounOfPlaceAndTimesFromControl = control.getNounOfPlaceAndTimes();
-        if (nounOfPlaceAndTimesFromControl != null && !nounOfPlaceAndTimesFromControl.isEmpty()) {
-            skinView.nounOfPlaceTimesPicker.getValues().addAll(nounOfPlaceAndTimesFromControl);
-        } else {
-            skinView.nounOfPlaceTimesPicker.getValues().addAll(NounOfPlaceAndTime.getByTemplate(template));
-        }
     }
 
     private void updateVerbalNouns() {
@@ -76,9 +60,6 @@ public class MorphologicalEntrySkin extends SkinBase<MorphologicalEntryView> {
 
         @FXML
         private VerbalNounsPicker verbalNounsPicker;
-
-        @FXML
-        private NounOfPlaceTimesPicker nounOfPlaceTimesPicker;
 
         @FXML
         private TextArea translationField;
@@ -116,18 +97,7 @@ public class MorphologicalEntrySkin extends SkinBase<MorphologicalEntryView> {
                         view.getVerbalNouns().removeAll(c.getRemoved());
                     }
                     if (c.wasAdded()) {
-                        view.getVerbalNouns().addAll((Collection<? extends VerbalNoun>) c.getAddedSubList());
-                    }
-                }
-            });
-            nounOfPlaceTimesPicker.getValues().addAll(view.getNounOfPlaceAndTimes());
-            nounOfPlaceTimesPicker.getValues().addListener((ListChangeListener<? super NounOfPlaceAndTime>) c -> {
-                while (c.next()) {
-                    if (c.wasRemoved()) {
-                        view.getNounOfPlaceAndTimes().removeAll(c.getRemoved());
-                    }
-                    if (c.getAddedSize() > 0) {
-                        view.getNounOfPlaceAndTimes().addAll((Collection<? extends NounOfPlaceAndTime>) c.getAddedSubList());
+                        view.getVerbalNouns().addAll(c.getAddedSubList());
                     }
                 }
             });

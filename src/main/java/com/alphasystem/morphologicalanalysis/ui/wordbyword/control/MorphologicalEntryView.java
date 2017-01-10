@@ -4,7 +4,6 @@ import com.alphasystem.arabic.model.NamedTemplate;
 import com.alphasystem.morphologicalanalysis.morphology.model.ConjugationConfiguration;
 import com.alphasystem.morphologicalanalysis.morphology.model.MorphologicalEntry;
 import com.alphasystem.morphologicalanalysis.morphology.model.RootLetters;
-import com.alphasystem.morphologicalanalysis.morphology.model.support.NounOfPlaceAndTime;
 import com.alphasystem.morphologicalanalysis.morphology.model.support.VerbalNoun;
 import com.alphasystem.morphologicalanalysis.ui.wordbyword.control.skin.MorphologicalEntrySkin;
 import javafx.beans.property.*;
@@ -28,7 +27,6 @@ public class MorphologicalEntryView extends Control {
     private final ObjectProperty<NamedTemplate> form = new SimpleObjectProperty<>(null, "form");
     private final StringProperty shortTranslation = new SimpleStringProperty(null, "shortTranslation");
     private final ObservableSet<VerbalNoun> verbalNouns = observableSet();
-    private final ObservableSet<NounOfPlaceAndTime> nounOfPlaceAndTimes = observableSet();
     private final BooleanProperty removePassiveLine = new SimpleBooleanProperty(false, "removePassiveLine");
     private final BooleanProperty skipRuleProcessing = new SimpleBooleanProperty(false, "skipRuleProcessing");
 
@@ -55,22 +53,12 @@ public class MorphologicalEntryView extends Control {
         });
         getVerbalNouns().addListener((SetChangeListener<? super VerbalNoun>) c -> {
             if (c.wasRemoved()) {
-                VerbalNoun elementRemoved = (VerbalNoun) c.getElementRemoved();
+                VerbalNoun elementRemoved = c.getElementRemoved();
                 getMorphologicalEntry().getVerbalNouns().remove(elementRemoved);
             }
             if (c.wasAdded()) {
-                VerbalNoun elementAdded = (VerbalNoun) c.getElementAdded();
+                VerbalNoun elementAdded = c.getElementAdded();
                 getMorphologicalEntry().getVerbalNouns().add(elementAdded);
-            }
-        });
-        getNounOfPlaceAndTimes().addListener((SetChangeListener<? super NounOfPlaceAndTime>) c -> {
-            if (c.wasRemoved()) {
-                NounOfPlaceAndTime elementRemoved = (NounOfPlaceAndTime) c.getElementRemoved();
-                getMorphologicalEntry().getNounOfPlaceAndTimes().remove(elementRemoved);
-            }
-            if (c.wasAdded()) {
-                NounOfPlaceAndTime elementAdded = (NounOfPlaceAndTime) c.getElementAdded();
-                getMorphologicalEntry().getNounOfPlaceAndTimes().add(elementAdded);
             }
         });
     }
@@ -83,10 +71,6 @@ public class MorphologicalEntryView extends Control {
             Set<VerbalNoun> verbalNouns = morphologicalEntry.getVerbalNouns();
             this.verbalNouns.clear();
             this.verbalNouns.addAll(verbalNouns);
-
-            Set<NounOfPlaceAndTime> nounOfPlaceAndTimes = morphologicalEntry.getNounOfPlaceAndTimes();
-            this.nounOfPlaceAndTimes.clear();
-            this.nounOfPlaceAndTimes.addAll(nounOfPlaceAndTimes);
 
             setForm(morphologicalEntry.getForm());
 
@@ -161,10 +145,6 @@ public class MorphologicalEntryView extends Control {
 
     public final ObservableSet<VerbalNoun> getVerbalNouns() {
         return verbalNouns;
-    }
-
-    public final ObservableSet<NounOfPlaceAndTime> getNounOfPlaceAndTimes() {
-        return nounOfPlaceAndTimes;
     }
 
     public final boolean getRemovePassiveLine() {
