@@ -66,10 +66,9 @@ public class CanvasPane extends Pane {
     private static final Color NON_TERMINAL_COLOR = LIGHTGRAY.darker();
     private static final double RADIUS = 2.0;
 
-    private final ObjectProperty<DependencyGraphAdapter> dependencyGraph;
+    private final ObjectProperty<DependencyGraphAdapter> dependencyGraph = new SimpleObjectProperty<>();
     private final ContextMenu contextMenu;
 
-    private GraphMetaInfoAdapter metaInfo = new GraphMetaInfoAdapter(new GraphMetaInfo());
     private DependencyGraphGraphicTool tool = DependencyGraphGraphicTool.getInstance();
     private RepositoryTool repositoryTool = RepositoryTool.getInstance();
     private CanvasUtil canvasUtil = CanvasUtil.getInstance();
@@ -87,47 +86,18 @@ public class CanvasPane extends Pane {
         phraseSelectionDialog = new PhraseSelectionDialog();
         referenceSelectionDialog = new ReferenceSelectionDialog();
         contextMenu = new ContextMenu();
-        dependencyGraph = new SimpleObjectProperty<>();
         src = (src == null) ? new DependencyGraphAdapter(new DependencyGraph()) : src;
-        metaInfo = src.getGraphMetaInfo();
 
-        Double canvasWidth = metaInfo.getWidth();
-        Double canvasHeight = metaInfo.getHeight();
+        Double canvasWidth = src.getGraphMetaInfo().getWidth();
+        Double canvasHeight = src.getGraphMetaInfo().getHeight();
 
         canvasPane = new Pane();
         canvasPane.setMinSize(USE_PREF_SIZE, USE_PREF_SIZE);
         canvasPane.setMaxSize(USE_PREF_SIZE, USE_PREF_SIZE);
         canvasPane.setPrefSize(canvasWidth, canvasHeight);
-        canvasPane.setBackground(new Background(new BackgroundFill(Color.web(metaInfo.getBackgroundColor()), null, null)));
-        metaInfo.backgroundColorProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue != null) {
-                canvasPane.setBackground(new Background(new BackgroundFill(Color.web(newValue), null, null)));
-            }
-        });
+
         initListeners();
         setDependencyGraph(src);
-
-        GraphMetaInfoAdapter graphMetaInfo = getDependencyGraph().getGraphMetaInfo();
-        graphMetaInfo.widthProperty().addListener((observable, oldValue, newValue) -> {
-            metaInfo.setWidth((Double) newValue);
-            initCanvas();
-        });
-        graphMetaInfo.heightProperty().addListener((observable, oldValue, newValue) -> {
-            metaInfo.setHeight((Double) newValue);
-            initCanvas();
-        });
-        graphMetaInfo.showGridLinesProperty().addListener((observable, oldValue, newValue) -> {
-            metaInfo.setShowGridLines(newValue);
-            toggleGridLines();
-        });
-        graphMetaInfo.showOutLinesProperty().addListener((observable, oldValue, newValue) -> {
-            metaInfo.setShowOutLines(newValue);
-            toggleGridLines();
-        });
-        graphMetaInfo.debugModeProperty().addListener((observable, oldValue, newValue) -> {
-            metaInfo.setDebugMode(newValue);
-            toggleGridLines();
-        });
 
         getChildren().add(canvasPane);
         setMinSize(USE_PREF_SIZE, USE_PREF_SIZE);
@@ -147,7 +117,19 @@ public class CanvasPane extends Pane {
     private void initListeners() {
         dependencyGraphProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
-                metaInfo = newValue.getGraphMetaInfo();
+                canvasPane.setBackground(new Background(new BackgroundFill(Color.web(newValue.getGraphMetaInfo().getBackgroundColor()), null, null)));
+                newValue.getGraphMetaInfo().backgroundColorProperty().addListener((o, ov, nv) -> {
+                    if (nv != null) {
+                        canvasPane.setBackground(new Background(new BackgroundFill(Color.web(nv), null, null)));
+                    }
+                });
+
+                newValue.getGraphMetaInfo().widthProperty().addListener((o, ov, nv) -> initCanvas());
+                newValue.getGraphMetaInfo().heightProperty().addListener((o, ov, nv) -> initCanvas());
+                newValue.getGraphMetaInfo().showGridLinesProperty().addListener((o, ov, nv) -> toggleGridLines());
+                newValue.getGraphMetaInfo().showOutLinesProperty().addListener((o, ov, nv) -> toggleGridLines());
+                newValue.getGraphMetaInfo().debugModeProperty().addListener((o, ov, nv) -> toggleGridLines());
+
                 initCanvas();
             }
         });
@@ -181,6 +163,7 @@ public class CanvasPane extends Pane {
         // clear canvas content
         removeAll(true);
 
+        GraphMetaInfoAdapter metaInfo = getDependencyGraph().getGraphMetaInfo();
         Double canvasWidth = metaInfo.getWidth();
         Double canvasHeight = metaInfo.getHeight();
         // resize the canvas
@@ -241,6 +224,7 @@ public class CanvasPane extends Pane {
     }
 
     private void toggleGridLines() {
+        GraphMetaInfoAdapter metaInfo = getDependencyGraph().getGraphMetaInfo();
         boolean showGridLines = metaInfo.isShowGridLines();
         boolean showOutline = metaInfo.isShowOutLines();
         canvasPane.getChildren().remove(gridLines);
@@ -910,7 +894,7 @@ public class CanvasPane extends Pane {
     }
 
     private Menu createNounAddImpliedNodeMenu(int index) {
-        Text text = new Text(NOUN.getLabel().toUnicode());
+        Text text = new Text(NOUN.toLabel().toUnicode());
         text.setFont(ARABIC_FONT_20);
         Menu menu = new Menu("", text);
 
@@ -921,7 +905,7 @@ public class CanvasPane extends Pane {
     }
 
     private Menu createVerbAddImpliedNodeMenu(int index) {
-        Text text = new Text(VERB.getLabel().toUnicode());
+        Text text = new Text(VERB.toLabel().toUnicode());
         text.setFont(ARABIC_FONT_20);
         Menu menu = new Menu("", text);
 
@@ -931,7 +915,7 @@ public class CanvasPane extends Pane {
     }
 
     private Menu createProNounAddImpliedNodeMenu(int index) {
-        Text text = new Text(PRONOUN.getLabel().toUnicode());
+        Text text = new Text(PRONOUN.toLabel().toUnicode());
         text.setFont(ARABIC_FONT_20);
         Menu menu = new Menu("", text);
 
@@ -943,7 +927,7 @@ public class CanvasPane extends Pane {
     }
 
     private MenuItem createNounAddImpliedNodeMenuItem(int index, NounStatus nounStatus) {
-        Text text = new Text(nounStatus.getLabel().toUnicode());
+        Text text = new Text(nounStatus.toLabel().toUnicode());
         text.setFont(ARABIC_FONT_20);
         MenuItem menuItem = new MenuItem("", text);
         menuItem.setOnAction(event -> addImpliedNode(index, NOUN, nounStatus));
@@ -951,7 +935,7 @@ public class CanvasPane extends Pane {
     }
 
     private MenuItem createVerbAddImpliedNodeMenuItem(int index, VerbType verbType) {
-        Text text = new Text(verbType.getLabel().toUnicode());
+        Text text = new Text(verbType.toLabel().toUnicode());
         text.setFont(ARABIC_FONT_20);
         MenuItem menuItem = new MenuItem("", text);
         menuItem.setOnAction(event -> addImpliedNode(index, VERB, verbType));
@@ -1081,8 +1065,6 @@ public class CanvasPane extends Pane {
         }
 
         final List<TerminalNode> terminalNodes = graphBuilder.recreateNodes(existingNodes);
-//        terminalNodes.forEach(terminalNode -> System.out.println(format("{{{{{ %s:%s:%s }}}}}", terminalNode.getGraphNodeType(),
-//                terminalNode.getId(), terminalNode.getToken().getDisplayName())));
 
         final boolean transientGraph = repositoryTool.isTransientGraph(dg.getDisplayName());
 
