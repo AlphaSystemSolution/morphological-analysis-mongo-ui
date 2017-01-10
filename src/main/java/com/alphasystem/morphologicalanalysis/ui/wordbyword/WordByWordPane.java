@@ -10,10 +10,12 @@ import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.Dependency
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.GraphMetaInfoAdapter;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.CanvasUtil;
 import com.alphasystem.morphologicalanalysis.ui.wordbyword.model.TableCellModel;
+import com.alphasystem.morphologicalanalysis.util.MorphologicalAnalysisPreferences;
 import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Verse;
 import com.alphasystem.morphologicalanalysis.wordbyword.repository.VerseRepository;
+import com.alphasystem.util.GenericPreferences;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
@@ -31,7 +33,6 @@ import javafx.stage.Stage;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.alphasystem.fx.ui.util.FontConstants.ARABIC_FONT_30;
 import static java.lang.String.format;
 import static javafx.geometry.NodeOrientation.RIGHT_TO_LEFT;
 import static javafx.scene.control.Alert.AlertType.ERROR;
@@ -47,6 +48,7 @@ import static javafx.scene.text.TextAlignment.CENTER;
  */
 public class WordByWordPane extends BorderPane {
 
+    private final MorphologicalAnalysisPreferences preferences = GenericPreferences.getInstance(MorphologicalAnalysisPreferences.class);
     private static Map<String, List<Token>> cache = new LinkedHashMap<>();
     private final ObjectProperty<Action> action = new SimpleObjectProperty<>();
     private ChapterVerseSelectionPane chapterVerseSelectionPane;
@@ -79,7 +81,7 @@ public class WordByWordPane extends BorderPane {
             {
                 setContentDisplay(GRAPHIC_ONLY);
                 text = new Text();
-                text.setFont(ARABIC_FONT_30);
+                text.setFont(preferences.getArabicFont30());
                 text.setTextAlignment(CENTER);
                 text.setNodeOrientation(RIGHT_TO_LEFT);
             }
@@ -107,7 +109,7 @@ public class WordByWordPane extends BorderPane {
             {
                 setContentDisplay(GRAPHIC_ONLY);
                 text = new Text();
-                text.setFont(ARABIC_FONT_30);
+                text.setFont(preferences.getArabicFont30());
                 text.setTextAlignment(CENTER);
                 text.setNodeOrientation(RIGHT_TO_LEFT);
             }

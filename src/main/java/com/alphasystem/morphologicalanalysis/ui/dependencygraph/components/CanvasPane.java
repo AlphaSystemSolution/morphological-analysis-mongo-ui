@@ -9,6 +9,7 @@ import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.*;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.CanvasUtil;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.DependencyGraphGraphicTool;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.GraphBuilder;
+import com.alphasystem.morphologicalanalysis.util.MorphologicalAnalysisPreferences;
 import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
@@ -17,6 +18,7 @@ import com.alphasystem.morphologicalanalysis.wordbyword.model.support.NounStatus
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.RelationshipType;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.VerbType;
+import com.alphasystem.util.GenericPreferences;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
@@ -32,8 +34,6 @@ import javafx.scene.text.Text;
 
 import java.util.*;
 
-import static com.alphasystem.fx.ui.util.FontConstants.ARABIC_FONT_20;
-import static com.alphasystem.fx.ui.util.FontConstants.ARABIC_FONT_24;
 import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.*;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.*;
 import static com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.CanvasUtil.getIndex;
@@ -69,6 +69,7 @@ public class CanvasPane extends Pane {
     private final ObjectProperty<DependencyGraphAdapter> dependencyGraph = new SimpleObjectProperty<>();
     private final ContextMenu contextMenu;
 
+    private final MorphologicalAnalysisPreferences preferences = GenericPreferences.getInstance(MorphologicalAnalysisPreferences.class);
     private DependencyGraphGraphicTool tool = DependencyGraphGraphicTool.getInstance();
     private RepositoryTool repositoryTool = RepositoryTool.getInstance();
     private CanvasUtil canvasUtil = CanvasUtil.getInstance();
@@ -764,7 +765,7 @@ public class CanvasPane extends Pane {
                                           final PartOfSpeechNodeAdapter lastPartOfSpeech) {
         Text text = new Text(canvasUtil.getRelationshipMenuItemText(lastPartOfSpeech));
         text.setNodeOrientation(RIGHT_TO_LEFT);
-        text.setFont(ARABIC_FONT_24);
+        text.setFont(preferences.getArabicFont24());
         MenuItem menuItem = new MenuItem("", text);
         menuItem.setUserData(lastPartOfSpeech);
         menuItem.setOnAction(event -> makePhrase(firstPartOfSpeech, lastPartOfSpeech));
@@ -846,7 +847,7 @@ public class CanvasPane extends Pane {
                                                 final LinkSupportAdapter currentNode) {
         Text text = new Text(canvasUtil.getRelationshipMenuItemText(dependentNode));
         text.setNodeOrientation(RIGHT_TO_LEFT);
-        text.setFont(ARABIC_FONT_24);
+        text.setFont(preferences.getArabicFont24());
         MenuItem menuItem = new MenuItem("", text);
         menuItem.setUserData(dependentNode);
         menuItem.setOnAction(event -> {
@@ -895,7 +896,7 @@ public class CanvasPane extends Pane {
 
     private Menu createNounAddImpliedNodeMenu(int index) {
         Text text = new Text(NOUN.toLabel().toUnicode());
-        text.setFont(ARABIC_FONT_20);
+        text.setFont(preferences.getArabicFont20());
         Menu menu = new Menu("", text);
 
         for (NounStatus nounStatus : NounStatus.values()) {
@@ -906,7 +907,7 @@ public class CanvasPane extends Pane {
 
     private Menu createVerbAddImpliedNodeMenu(int index) {
         Text text = new Text(VERB.toLabel().toUnicode());
-        text.setFont(ARABIC_FONT_20);
+        text.setFont(preferences.getArabicFont20());
         Menu menu = new Menu("", text);
 
         menu.getItems().addAll(createVerbAddImpliedNodeMenuItem(index, PERFECT),
@@ -916,7 +917,7 @@ public class CanvasPane extends Pane {
 
     private Menu createProNounAddImpliedNodeMenu(int index) {
         Text text = new Text(PRONOUN.toLabel().toUnicode());
-        text.setFont(ARABIC_FONT_20);
+        text.setFont(preferences.getArabicFont20());
         Menu menu = new Menu("", text);
 
         for (ProNoun proNoun : ProNoun.values()) {
@@ -928,7 +929,7 @@ public class CanvasPane extends Pane {
 
     private MenuItem createNounAddImpliedNodeMenuItem(int index, NounStatus nounStatus) {
         Text text = new Text(nounStatus.toLabel().toUnicode());
-        text.setFont(ARABIC_FONT_20);
+        text.setFont(preferences.getArabicFont20());
         MenuItem menuItem = new MenuItem("", text);
         menuItem.setOnAction(event -> addImpliedNode(index, NOUN, nounStatus));
         return menuItem;
@@ -936,7 +937,7 @@ public class CanvasPane extends Pane {
 
     private MenuItem createVerbAddImpliedNodeMenuItem(int index, VerbType verbType) {
         Text text = new Text(verbType.toLabel().toUnicode());
-        text.setFont(ARABIC_FONT_20);
+        text.setFont(preferences.getArabicFont20());
         MenuItem menuItem = new MenuItem("", text);
         menuItem.setOnAction(event -> addImpliedNode(index, VERB, verbType));
         return menuItem;
@@ -944,7 +945,7 @@ public class CanvasPane extends Pane {
 
     private MenuItem createProNounAddImpliedNodeMenuItem(int index, ProNoun proNoun) {
         Text text = new Text(proNoun.getLabel().toUnicode());
-        text.setFont(ARABIC_FONT_20);
+        text.setFont(preferences.getArabicFont20());
         MenuItem menuItem = new MenuItem("", text);
         menuItem.setOnAction(event -> addImpliedNode(index, PRONOUN, proNoun));
         return menuItem;

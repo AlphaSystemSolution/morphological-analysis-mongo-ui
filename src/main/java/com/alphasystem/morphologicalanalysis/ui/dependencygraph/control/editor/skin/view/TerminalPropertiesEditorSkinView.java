@@ -1,11 +1,10 @@
 package com.alphasystem.morphologicalanalysis.ui.dependencygraph.control.editor.skin.view;
 
-import com.alphasystem.fx.ui.util.FontConstants;
+import com.alphasystem.fx.ui.util.FontSizeStringConverter;
 import com.alphasystem.morphologicalanalysis.graph.model.FontMetaInfo;
 import com.alphasystem.morphologicalanalysis.graph.model.TerminalNode;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.control.editor.TerminalPropertiesEditor;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.TerminalNodeAdapter;
-import com.alphasystem.fx.ui.util.FontSizeStringConverter;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.text.Font;
@@ -48,7 +47,7 @@ public class TerminalPropertiesEditorSkinView extends LineSupportPropertiesEdito
     @Override
     void initializeValues() {
         super.initializeValues();
-        translationTextField.setFont(FontConstants.ENGLISH_FONT_12);
+        translationTextField.setFont(preferences.getEnglishFont12());
         translationTextField.textProperty().bindBidirectional(control.translationTextProperty());
         translationFontFamily.getItems().addAll(Font.getFontNames());
         translationFontFamily.getSelectionModel().selectFirst();

@@ -4,8 +4,10 @@ import com.alphasystem.arabic.ui.ArabicSupportEnumCellFactory;
 import com.alphasystem.morphologicalanalysis.graph.model.PhraseNode;
 import com.alphasystem.morphologicalanalysis.ui.common.ComboBoxFactory;
 import com.alphasystem.morphologicalanalysis.ui.common.Global;
+import com.alphasystem.morphologicalanalysis.util.MorphologicalAnalysisPreferences;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.AlternateStatus;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.RelationshipType;
+import com.alphasystem.util.GenericPreferences;
 import javafx.collections.ObservableList;
 import javafx.event.EventType;
 import javafx.geometry.Insets;
@@ -16,8 +18,6 @@ import javafx.scene.text.Text;
 import org.controlsfx.control.ListSelectionView;
 
 import static com.alphasystem.arabic.ui.ListType.LABEL_ONLY;
-import static com.alphasystem.fx.ui.util.FontConstants.ARABIC_FONT_24;
-import static com.alphasystem.fx.ui.util.FontConstants.ARABIC_FONT_30;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.FI_MAHL;
 import static javafx.scene.control.ButtonType.CANCEL;
 import static javafx.scene.control.ButtonType.OK;
@@ -28,6 +28,7 @@ import static javafx.scene.control.DialogEvent.DIALOG_CLOSE_REQUEST;
  */
 public class PhraseSelectionDialog extends Dialog<PhraseNode> {
 
+    private final MorphologicalAnalysisPreferences preferences = GenericPreferences.getInstance(MorphologicalAnalysisPreferences.class);
     private final Label phraseLabel;
     private final ComboBox<AlternateStatus> alternateStatusComboBox;
     private final ListSelectionView<RelationshipType> relationshipsListView;
@@ -41,10 +42,10 @@ public class PhraseSelectionDialog extends Dialog<PhraseNode> {
         relationshipsListView.setRetainSourceValue(true);
         relationshipsListView.getSourceItems().addAll(RelationshipType.values());
         phraseLabel = new Label();
-        phraseLabel.setFont(ARABIC_FONT_30);
+        phraseLabel.setFont(preferences.getArabicFont30());
         reset();
         initDialog();
-        setResultConverter(param -> createResult(param));
+        setResultConverter(this::createResult);
     }
 
     private static String getLabel(String label) {
@@ -99,7 +100,7 @@ public class PhraseSelectionDialog extends Dialog<PhraseNode> {
 
     private Label getAlternateNounStatusLabel() {
         Text text = new Text(FI_MAHL.toUnicode());
-        text.setFont(ARABIC_FONT_24);
+        text.setFont(preferences.getArabicFont24());
         Label label = new Label("", text);
         return label;
     }

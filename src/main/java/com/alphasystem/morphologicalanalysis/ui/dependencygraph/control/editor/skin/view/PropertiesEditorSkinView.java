@@ -1,6 +1,5 @@
 package com.alphasystem.morphologicalanalysis.ui.dependencygraph.control.editor.skin.view;
 
-import com.alphasystem.fx.ui.util.FontConstants;
 import com.alphasystem.fx.ui.util.FontSizeStringConverter;
 import com.alphasystem.fx.ui.util.UiUtilities;
 import com.alphasystem.morphologicalanalysis.graph.model.FontMetaInfo;
@@ -8,7 +7,9 @@ import com.alphasystem.morphologicalanalysis.graph.model.GraphNode;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.control.editor.PropertiesEditor;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.GraphNodeAdapter;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.PropertyAccessor;
+import com.alphasystem.morphologicalanalysis.util.MorphologicalAnalysisPreferences;
 import com.alphasystem.util.AppUtil;
+import com.alphasystem.util.GenericPreferences;
 import javafx.beans.property.ObjectProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -40,6 +41,8 @@ abstract class PropertiesEditorSkinView<N extends GraphNode, A extends GraphNode
     @FXML private ComboBox<String> arabicFontFamily;
     @FXML private ComboBox<Long> arabicFontSize;
 
+    protected final MorphologicalAnalysisPreferences preferences = GenericPreferences.getInstance(MorphologicalAnalysisPreferences.class);
+
     PropertiesEditorSkinView(P control) {
         this.control = control;
         try {
@@ -58,7 +61,7 @@ abstract class PropertiesEditorSkinView<N extends GraphNode, A extends GraphNode
     }
 
     void initializeValues() {
-        textField.setFont(FontConstants.ARABIC_FONT_24);
+        textField.setFont(preferences.getArabicFont24());
         textField.textProperty().bindBidirectional(control.textProperty());
         arabicFontFamily.getItems().addAll(Font.getFontNames());
         arabicFontFamily.getSelectionModel().selectFirst();

@@ -3,12 +3,12 @@ package com.alphasystem.morphologicalanalysis.ui.common;
 import com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.*;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.CanvasUtil;
+import com.alphasystem.morphologicalanalysis.util.MorphologicalAnalysisPreferences;
+import com.alphasystem.util.GenericPreferences;
 import javafx.scene.control.TreeCell;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
-import static com.alphasystem.fx.ui.util.FontConstants.ARABIC_FONT_24;
-import static com.alphasystem.fx.ui.util.FontConstants.ENGLISH_FONT_14;
 import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.ROOT;
 import static java.lang.String.format;
 import static javafx.scene.control.ContentDisplay.GRAPHIC_ONLY;
@@ -20,6 +20,7 @@ public class GraphNodeTreeCell extends TreeCell<GraphNodeAdapter> {
 
     private final Text label;
     private final CanvasUtil canvasUtil = CanvasUtil.getInstance();
+    private final MorphologicalAnalysisPreferences preferences = GenericPreferences.getInstance(MorphologicalAnalysisPreferences.class);
 
     public GraphNodeTreeCell() {
         label = new Text();
@@ -53,7 +54,7 @@ public class GraphNodeTreeCell extends TreeCell<GraphNodeAdapter> {
                     break;
             }
             label.setText(builder.toString());
-            Font font = nodeType.equals(ROOT) ? ENGLISH_FONT_14 : ARABIC_FONT_24;
+            Font font = nodeType.equals(ROOT) ? preferences.getEnglishFont14() : preferences.getArabicFont24();
             label.setFont(font);
             setGraphic(label);
         }

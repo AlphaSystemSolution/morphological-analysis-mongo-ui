@@ -2,13 +2,14 @@ package com.alphasystem.morphologicalanalysis.ui.common;
 
 import com.alphasystem.morphologicalanalysis.common.model.VerseTokenPairGroup;
 import com.alphasystem.morphologicalanalysis.common.model.VerseTokensPair;
+import com.alphasystem.morphologicalanalysis.util.MorphologicalAnalysisPreferences;
+import com.alphasystem.util.GenericPreferences;
 import javafx.scene.control.ListCell;
 import javafx.scene.text.Text;
 
 import java.util.List;
 
-import static com.alphasystem.arabic.model.ArabicWord.getArabicNumber;
-import static com.alphasystem.fx.ui.util.FontConstants.ARABIC_FONT_24;
+import static com.alphasystem.arabic.model.ArabicTool.getArabicNumberWord;
 import static javafx.scene.control.ContentDisplay.GRAPHIC_ONLY;
 
 /**
@@ -21,7 +22,8 @@ public class VerseTokenPairGroupListCell extends ListCell<VerseTokenPairGroup> {
     public VerseTokenPairGroupListCell() {
         setContentDisplay(GRAPHIC_ONLY);
         label = new Text();
-        label.setFont(ARABIC_FONT_24);
+        MorphologicalAnalysisPreferences preferences = GenericPreferences.getInstance(MorphologicalAnalysisPreferences.class);
+        label.setFont(preferences.getArabicFont24());
     }
 
     @Override
@@ -33,9 +35,9 @@ public class VerseTokenPairGroupListCell extends ListCell<VerseTokenPairGroup> {
             if (pairs != null && !pairs.isEmpty()) {
                 StringBuilder builder = new StringBuilder();
                 int size = pairs.size();
-                builder.append(getArabicNumber(pairs.get(size - 1).getVerseNumber()).toUnicode());
+                builder.append(getArabicNumberWord(pairs.get(size - 1).getVerseNumber()).toUnicode());
                 if (size > 1) {
-                    builder.append(" - ").append(getArabicNumber(pairs.get(0).getVerseNumber()).toUnicode());
+                    builder.append(" - ").append(getArabicNumberWord(pairs.get(0).getVerseNumber()).toUnicode());
                 }
 
                 label.setText(builder.toString());

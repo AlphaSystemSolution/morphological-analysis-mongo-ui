@@ -3,16 +3,16 @@ package com.alphasystem.morphologicalanalysis.ui.dependencygraph.components;
 import com.alphasystem.morphologicalanalysis.graph.model.RelationshipNode;
 import com.alphasystem.morphologicalanalysis.ui.common.ComboBoxFactory;
 import com.alphasystem.morphologicalanalysis.ui.common.Global;
+import com.alphasystem.morphologicalanalysis.util.MorphologicalAnalysisPreferences;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.AlternateStatus;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.RelationshipType;
+import com.alphasystem.util.GenericPreferences;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
 
-import static com.alphasystem.fx.ui.util.FontConstants.ARABIC_FONT_20;
-import static com.alphasystem.fx.ui.util.FontConstants.ARABIC_FONT_24;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.FI_MAHL;
 import static javafx.scene.control.ButtonType.CANCEL;
 import static javafx.scene.control.ButtonType.OK;
@@ -26,15 +26,16 @@ public class RelationshipSelectionDialog extends Dialog<RelationshipNode> {
     private final Label ownerLabel;
     private final ComboBox<RelationshipType> relationshipTypeComboBox;
     private final ComboBox<AlternateStatus> alternateStatusComboBox;
+    private final MorphologicalAnalysisPreferences preferences = GenericPreferences.getInstance(MorphologicalAnalysisPreferences.class);
 
     public RelationshipSelectionDialog() {
         setTitle(getLabel("title"));
         relationshipTypeComboBox = ComboBoxFactory.getRelationshipTypeComboBox();
         alternateStatusComboBox = ComboBoxFactory.getAlternateStatusComboBox();
         dependentLabel = new Label();
-        dependentLabel.setFont(ARABIC_FONT_20);
+        dependentLabel.setFont(preferences.getArabicFont20());
         ownerLabel = new Label();
-        ownerLabel.setFont(ARABIC_FONT_20);
+        ownerLabel.setFont(preferences.getArabicFont20());
 
         reset();
         initDialogPane();
@@ -90,7 +91,7 @@ public class RelationshipSelectionDialog extends Dialog<RelationshipNode> {
 
     private Label getAlternateNounStatusLabel() {
         Text text = new Text(FI_MAHL.toUnicode());
-        text.setFont(ARABIC_FONT_24);
+        text.setFont(preferences.getArabicFont24());
         return new Label("", text);
     }
 

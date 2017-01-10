@@ -3,10 +3,12 @@ package com.alphasystem.morphologicalanalysis.ui.common;
 import com.alphasystem.arabic.model.ArabicWord;
 import com.alphasystem.morphologicalanalysis.common.model.VerseTokensPair;
 import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
+import com.alphasystem.morphologicalanalysis.util.MorphologicalAnalysisPreferences;
 import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Verse;
 import com.alphasystem.morphologicalanalysis.wordbyword.repository.VerseRepository;
+import com.alphasystem.util.GenericPreferences;
 import javafx.scene.control.ListCell;
 import javafx.scene.text.Text;
 
@@ -15,7 +17,6 @@ import java.util.List;
 
 import static com.alphasystem.arabic.model.ArabicLetters.WORD_SPACE;
 import static com.alphasystem.arabic.model.ArabicWord.getVerseNumber;
-import static com.alphasystem.fx.ui.util.FontConstants.ARABIC_FONT_30;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.SPACE_STR;
 import static javafx.scene.control.ContentDisplay.GRAPHIC_ONLY;
 
@@ -30,7 +31,8 @@ public class DependencyGraphListCell extends ListCell<DependencyGraph> {
     public DependencyGraphListCell() {
         setContentDisplay(GRAPHIC_ONLY);
         label = new Text();
-        label.setFont(ARABIC_FONT_30);
+        MorphologicalAnalysisPreferences preferences = GenericPreferences.getInstance(MorphologicalAnalysisPreferences.class);
+        label.setFont(preferences.getArabicFont30());
     }
 
     @Override

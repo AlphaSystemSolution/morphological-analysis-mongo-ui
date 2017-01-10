@@ -1,11 +1,12 @@
 package com.alphasystem.morphologicalanalysis.ui.common;
 
+import com.alphasystem.arabic.model.ArabicTool;
+import com.alphasystem.morphologicalanalysis.util.MorphologicalAnalysisPreferences;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Chapter;
+import com.alphasystem.util.GenericPreferences;
 import javafx.scene.control.ListCell;
 import javafx.scene.text.Text;
 
-import static com.alphasystem.arabic.model.ArabicWord.getArabicNumber;
-import static com.alphasystem.fx.ui.util.FontConstants.ARABIC_FONT_24;
 import static java.lang.String.format;
 import static javafx.scene.control.ContentDisplay.GRAPHIC_ONLY;
 
@@ -19,12 +20,13 @@ public class ChapterListCell extends ListCell<Chapter> {
     public ChapterListCell() {
         setContentDisplay(GRAPHIC_ONLY);
         label = new Text();
-        label.setFont(ARABIC_FONT_24);
+        MorphologicalAnalysisPreferences preferences = GenericPreferences.getInstance(MorphologicalAnalysisPreferences.class);
+        label.setFont(preferences.getArabicFont24());
     }
 
     private static String getChapterNumber(Chapter chapter) {
         int chapterNumber = chapter.getChapterNumber();
-        return getArabicNumber(chapterNumber).toUnicode();
+        return ArabicTool.getArabicNumberWord(chapterNumber).toUnicode();
     }
 
     @Override

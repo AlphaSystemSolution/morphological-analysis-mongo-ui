@@ -21,10 +21,12 @@ import com.alphasystem.morphologicalanalysis.morphology.repository.DictionaryNot
 import com.alphasystem.morphologicalanalysis.ui.common.LocationListCell;
 import com.alphasystem.morphologicalanalysis.ui.wordbyword.control.LocationPropertiesView;
 import com.alphasystem.morphologicalanalysis.ui.wordbyword.control.TokenPropertiesView;
+import com.alphasystem.morphologicalanalysis.util.MorphologicalAnalysisPreferences;
 import com.alphasystem.morphologicalanalysis.util.MorphologicalAnalysisRepositoryUtil;
 import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
+import com.alphasystem.util.GenericPreferences;
 import javafx.beans.binding.BooleanBinding;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
@@ -46,7 +48,6 @@ import static com.alphasystem.app.asciidoctoreditor.ui.model.Action.SAVE;
 import static com.alphasystem.app.asciidoctoreditor.ui.model.DocumentType.ARTICLE;
 import static com.alphasystem.app.asciidoctoreditor.ui.model.IconFontName.FONT_AWESOME;
 import static com.alphasystem.app.asciidoctoreditor.ui.model.Icons.FONT;
-import static com.alphasystem.fx.ui.util.FontConstants.ARABIC_FONT_36;
 import static com.alphasystem.fx.ui.util.UiUtilities.*;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.*;
 import static com.alphasystem.morphologicalanalysis.ui.wordbyword.control.TokenPropertiesView.SelectionStatus.*;
@@ -119,7 +120,8 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
         group = new ArabicLabelToggleGroup();
         group.setWidth(64);
         group.setHeight(64);
-        group.setFont(ARABIC_FONT_36);
+        MorphologicalAnalysisPreferences preferences = GenericPreferences.getInstance(MorphologicalAnalysisPreferences.class);
+        group.setFont(preferences.getArabicFont36());
 
         initializeSkin();
 
@@ -137,9 +139,7 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
         browseDictionaryTab.disableProperty().bind(disableTab);
         morphologicalConjugationTab.disableProperty().bind(disableTab.and(locationPropertiesView.formProperty().isNull()));
         dictionaryNotesTab.disableProperty().bind(disableTab);
-        morphologicalConjugationTab.selectedProperty().addListener((o, ov, nv) -> {
-            loadConjugation(locationPropertiesView.getLocation().getMorphologicalEntry());
-        });
+        morphologicalConjugationTab.selectedProperty().addListener((o, ov, nv) -> loadConjugation(locationPropertiesView.getLocation().getMorphologicalEntry()));
     }
 
     private static void setDictionaryNotesFile(final DictionaryNotes dictionaryNotes) {

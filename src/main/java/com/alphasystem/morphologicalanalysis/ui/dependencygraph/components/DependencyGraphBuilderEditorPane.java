@@ -6,6 +6,8 @@ import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.*;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.DecimalFormatStringConverter;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.PropertyAccessor;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.accessor.GraphNodePropertyAccessors.*;
+import com.alphasystem.morphologicalanalysis.util.MorphologicalAnalysisPreferences;
+import com.alphasystem.util.GenericPreferences;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
@@ -20,7 +22,6 @@ import javafx.scene.text.FontWeight;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
-import static com.alphasystem.fx.ui.util.FontConstants.ARABIC_FONT_20;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.*;
 import static java.lang.String.format;
 import static javafx.collections.FXCollections.observableArrayList;
@@ -36,6 +37,7 @@ class DependencyGraphBuilderEditorPane extends BorderPane {
     private static final Insets DEFAULT_PADDING = new Insets(DEFAULT_OFFSET, DEFAULT_OFFSET,
             DEFAULT_OFFSET, DEFAULT_OFFSET);
 
+    private final MorphologicalAnalysisPreferences preferences = GenericPreferences.getInstance(MorphologicalAnalysisPreferences.class);
     private final ObjectProperty<GraphNodeAdapter> graphNode = new SimpleObjectProperty<>();
     private final ObjectProperty<GraphMetaInfoAdapter> metaInfo = new SimpleObjectProperty<>(null, "metaInfo",
             new GraphMetaInfoAdapter(new GraphMetaInfo()));
@@ -108,7 +110,7 @@ class DependencyGraphBuilderEditorPane extends BorderPane {
             node.setText(source.getText());
         });
         row++;
-        textField.setFont(ARABIC_FONT_20);
+        textField.setFont(preferences.getArabicFont20());
         label.setLabelFor(textField);
         gridPane.add(textField, 0, row);
 

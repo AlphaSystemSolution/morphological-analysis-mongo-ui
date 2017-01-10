@@ -7,7 +7,14 @@ import com.alphasystem.app.morphologicalengine.ui.util.MorphologicalEnginePrefer
  */
 public class MorphologicalAnalysisPreferences extends MorphologicalEnginePreferences {
 
+    private static final String NODE_PREFIX = "MorphologicalAnalysis";
+
     public MorphologicalAnalysisPreferences() {
         super(MorphologicalAnalysisPreferences.class);
+    }
+
+    @Override
+    protected String nodePrefix() {
+        return NODE_PREFIX;
     }
 }

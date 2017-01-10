@@ -1,10 +1,11 @@
 package com.alphasystem.morphologicalanalysis.ui.common;
 
+import com.alphasystem.morphologicalanalysis.util.MorphologicalAnalysisPreferences;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
+import com.alphasystem.util.GenericPreferences;
 import javafx.scene.control.ListCell;
 import javafx.scene.text.Text;
 
-import static com.alphasystem.fx.ui.util.FontConstants.ARABIC_FONT_24;
 import static javafx.scene.control.ContentDisplay.GRAPHIC_ONLY;
 
 /**
@@ -17,7 +18,8 @@ public class TokenListCell extends ListCell<Token> {
     public TokenListCell() {
         setContentDisplay(GRAPHIC_ONLY);
         label = new Text();
-        label.setFont(ARABIC_FONT_24);
+        MorphologicalAnalysisPreferences preferences = GenericPreferences.getInstance(MorphologicalAnalysisPreferences.class);
+        label.setFont(preferences.getArabicFont24());
     }
 
     @Override

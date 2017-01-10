@@ -7,10 +7,12 @@ import com.alphasystem.morphologicalanalysis.common.model.VerseTokenPairGroup;
 import com.alphasystem.morphologicalanalysis.graph.model.*;
 import com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.*;
+import com.alphasystem.morphologicalanalysis.util.MorphologicalAnalysisPreferences;
 import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.*;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.*;
 import com.alphasystem.morphologicalanalysis.wordbyword.repository.LocationRepository;
+import com.alphasystem.util.GenericPreferences;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
@@ -22,8 +24,6 @@ import javafx.scene.text.Text;
 import java.util.List;
 
 import static com.alphasystem.arabic.model.ArabicWord.getSubWord;
-import static com.alphasystem.fx.ui.util.FontConstants.ARABIC_FONT_24;
-import static com.alphasystem.fx.ui.util.FontConstants.ENGLISH_FONT_14;
 import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.ROOT;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.*;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.IncompleteVerbCategory.KANA_AND_ITS_SISTERS;
@@ -45,6 +45,8 @@ public class CanvasUtil {
     private RepositoryTool repositoryTool = RepositoryTool.getInstance();
 
     private LocationRepository locationRepository = repositoryTool.getRepositoryUtil().getLocationRepository();
+
+    private final MorphologicalAnalysisPreferences preferences = GenericPreferences.getInstance(MorphologicalAnalysisPreferences.class);
 
     private CanvasUtil() {
     }
@@ -373,7 +375,7 @@ public class CanvasUtil {
         StringBuilder builder = new StringBuilder();
         if (item != null) {
             GraphNodeType nodeType = item.getGraphNodeType();
-            label.setFont(nodeType.equals(ROOT) ? ENGLISH_FONT_14 : ARABIC_FONT_24);
+            label.setFont(nodeType.equals(ROOT) ? preferences.getEnglishFont14() : preferences.getArabicFont24());
             String text = item.getText();
             switch (nodeType) {
                 case PART_OF_SPEECH:
