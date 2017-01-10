@@ -113,12 +113,8 @@ class DependencyGraphBuilderEditorPane extends BorderPane {
         gridPane.add(textField, 0, row);
 
         row++;
-        final Pair<Double, Double> bound = getBound(node, true);
-        double min = bound.getLeft() - 30;
-        double max = bound.getRight();
-        max = max>getCanvasWidth() ? getCanvasWidth() : max;
-        addFields(gridPane, "xIndex.label", new XPropertyAccessor<>(node), min, max);
-        System.out.println(getMetaInfo().getTokenHeight() + " : " + getMetaInfo().getTokenWidth());
+        Pair<Double, Double> bound = getBound(node, true);
+        addFields(gridPane, "xIndex.label", new XPropertyAccessor<>(node), bound.getLeft(), bound.getRight());
         addFields(gridPane, "yIndex.label", new YPropertyAccessor<>(node), getCanvasHeight());
 
         row++;
@@ -384,11 +380,11 @@ class DependencyGraphBuilderEditorPane extends BorderPane {
             case IMPLIED:
             case REFERENCE:
             case HIDDEN:
-                pair = getBound((TerminalNodeAdapter) node, x);
+                pair = getTerminalNodeBounds((TerminalNodeAdapter) node, x, false);
                 break;
             case PART_OF_SPEECH:
                 PartOfSpeechNodeAdapter posNde = (PartOfSpeechNodeAdapter) node;
-                pair = getBound((TerminalNodeAdapter) posNde.getParent(), x);
+                pair = getTerminalNodeBounds((TerminalNodeAdapter) posNde.getParent(), x, true);
                 break;
             case RELATIONSHIP:
                 pair = getRelationshipBound((RelationshipNodeAdapter) node, x);
@@ -400,6 +396,25 @@ class DependencyGraphBuilderEditorPane extends BorderPane {
                 break;
         }
         return pair;
+    }
+
+    private Pair<Double, Double> getTerminalNodeBounds(TerminalNodeAdapter node, boolean x, boolean pos) {
+        double left;
+        double right;
+        final double canvasWidth = getCanvasWidth();
+        if (pos) {
+            left = node.getX1() - 30;
+            right = node.getX2() + 30;
+        } else if (x) {
+            left = node.getX1();
+            right = node.getX2();
+            right = right > canvasWidth ? canvasWidth : right;
+        } else {
+            left = node.getY1() - getMetaInfo().getTokenHeight();
+            right = node.getY2();
+        }
+
+        return new ImmutablePair<>(left, right);
     }
 
     private static <N extends LineSupport, A extends LineSupportAdapter<N>> Pair<Double, Double> getBound(A node, boolean x) {
