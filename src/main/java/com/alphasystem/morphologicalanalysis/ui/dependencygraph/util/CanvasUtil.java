@@ -145,31 +145,33 @@ public class CanvasUtil {
         Location location = partOfSpeechNode.getLocation();
         PartOfSpeech partOfSpeech = location.getPartOfSpeech();
         AbstractProperties properties = location.getProperties();
-        StringBuilder builder = new StringBuilder(partOfSpeech.getLabel().toUnicode());
+        StringBuilder builder = new StringBuilder(partOfSpeech.toLabel().toUnicode());
         switch (partOfSpeech) {
             case NOUN:
             case DEMONSTRATIVE_PRONOUN:
-            case RELATIVE_PRONOUN:
             case LOCATION_ADVERB:
             case TIME_ADVERB:
             case PROPER_NOUN:
                 NounProperties np = (NounProperties) properties;
-                builder.append(SPACE_STR).append(np.getStatus().getLabel().toUnicode());
+                builder.append(SPACE_STR).append(np.getStatus().toLabel().toUnicode());
+                break;
+            case RELATIVE_PRONOUN:
+                np = (NounProperties) properties;
+                builder.append(SPACE_STR).append(FI_MAHL.toUnicode()).append(SPACE_STR)
+                        .append(getFromNounStatus(np.getStatus()).toLabel().toUnicode());
                 break;
             case VERB:
                 VerbProperties vp = (VerbProperties) properties;
-                builder.append(SPACE_STR).append(vp.getVerbType().getLabel().toUnicode());
+                builder.append(SPACE_STR).append(vp.getVerbType().toLabel().toUnicode());
                 final VerbMode mode = vp.getMode();
                 if (mode != null) {
-                    builder.append(SPACE_STR).append(mode.getLabel().toUnicode());
+                    builder.append(SPACE_STR).append(mode.toLabel().toUnicode());
                 }
                 break;
             case PRONOUN:
                 ProNounProperties pp = (ProNounProperties) properties;
-                /*builder.append(SPACE).append(pp.getProNounType().getLabel().toUnicode()).append(NEW_LINE)
-                        .append(SPACE).append(FI_MAHL.toUnicode()).append(SPACE)
-                        .append(getFromNounStatus(pp.getStatus()).getLabel().toUnicode());*/
-                builder.append(SPACE_STR).append("(").append(pp.getStatus().getLabel().toUnicode()).append(")");
+                builder.append(SPACE_STR).append(FI_MAHL.toUnicode()).append(SPACE_STR)
+                        .append(getFromNounStatus(pp.getStatus()).toLabel().toUnicode());
                 break;
         }
         return builder.toString();
@@ -177,7 +179,7 @@ public class CanvasUtil {
 
     private String getRelationshipNodeText(RelationshipNode rn) {
         RelationshipType type = rn.getRelationshipType();
-        String text = type.getLabel().toUnicode();
+        String text = type.toLabel().toUnicode();
         Linkable owner = rn.getOwner().getLinkable();
         Location ol = locationRepository.findByDisplayName(owner.getDisplayName());
         if (ol != null) {
@@ -185,7 +187,7 @@ public class CanvasUtil {
             switch (pos) {
                 case ACCUSSATIVE_PARTICLE:
                     if (!type.equals(_KAF)) {
-                        text = format("%s %s %s %s", type.getLabel().toUnicode(),
+                        text = format("%s %s %s %s", type.toLabel().toUnicode(),
                                 LEFT_POINTING_DOUBLE_ANGLE_QUOTATION_MARK, ol.getLocationWord().toUnicode(),
                                 RIGHT_POINTING_DOUBLE_ANGLE_QUOTATION_MARK);
                     }
@@ -197,8 +199,8 @@ public class CanvasUtil {
                         IncompleteVerbCategory category = incompleteVerb.getCategory();
                         IncompleteVerbType incompleteVerbType = incompleteVerb.getType();
                         if (category.equals(KANA_AND_ITS_SISTERS)) {
-                            text = format("%s %s %s %s", type.getLabel().toUnicode(),
-                                    LEFT_POINTING_DOUBLE_ANGLE_QUOTATION_MARK, incompleteVerbType.getLabel().toUnicode(),
+                            text = format("%s %s %s %s", type.toLabel().toUnicode(),
+                                    LEFT_POINTING_DOUBLE_ANGLE_QUOTATION_MARK, incompleteVerbType.toLabel().toUnicode(),
                                     RIGHT_POINTING_DOUBLE_ANGLE_QUOTATION_MARK);
                         }
                     }
@@ -208,7 +210,7 @@ public class CanvasUtil {
 
         AlternateStatus alternateStatus = rn.getAlternateStatus();
         if (alternateStatus != null) {
-            text = format("%s %s %s", text, FI_MAHL.toUnicode(), alternateStatus.getLabel().toUnicode());
+            text = format("%s %s %s", text, FI_MAHL.toUnicode(), alternateStatus.toLabel().toUnicode());
         }
 
         return text;
@@ -218,16 +220,16 @@ public class CanvasUtil {
         StringBuilder builder = new StringBuilder("");
         List<RelationshipType> relationships = phraseNode.getRelationships();
         if (relationships != null && !relationships.isEmpty()) {
-            builder.append(relationships.get(0).getLabel().toUnicode());
+            builder.append(relationships.get(0).toLabel().toUnicode());
             for (int i = 1; i < relationships.size(); i++) {
                 builder.append(SPACE_STR).append(ArabicLetterType.WAW.toUnicode()).append(SPACE_STR)
-                        .append(relationships.get(i).getLabel().toUnicode());
+                        .append(relationships.get(i).toLabel().toUnicode());
             }
         }
         String text = builder.toString();
         AlternateStatus alternateStatus = phraseNode.getAlternateStatus();
         if (alternateStatus != null) {
-            text = format("%s %s %s", text, FI_MAHL.toUnicode(), alternateStatus.getLabel().toUnicode());
+            text = format("%s %s %s", text, FI_MAHL.toUnicode(), alternateStatus.toLabel().toUnicode());
         }
         return text;
     }
@@ -254,10 +256,10 @@ public class CanvasUtil {
         ObservableList<RelationshipType> relationships = phraseNodeAdapter.getRelationships();
         StringBuilder builder = new StringBuilder("");
         if (relationships != null && !relationships.isEmpty()) {
-            builder.append(relationships.get(0).getLabel().toUnicode());
+            builder.append(relationships.get(0).toLabel().toUnicode());
             for (int i = 1; i < relationships.size(); i++) {
                 builder.append(SPACE_STR).append(ArabicLetterType.WAW.toUnicode()).append(SPACE_STR)
-                        .append(relationships.get(i).getLabel().toUnicode());
+                        .append(relationships.get(i).toLabel().toUnicode());
             }
         }
         return format("%s (%s) ", getPhraseText(phraseNodeAdapter.getFragments()), builder.toString());
@@ -271,7 +273,7 @@ public class CanvasUtil {
             Location location = partOfSpeechNodeAdapter.getSrc().getLocation();
             Token token = terminalNode.getSrc().getToken();
             ArabicWord locationWord = getLocationWord(token, location);
-            text = format("%s (%s)", locationWord.toUnicode(), location.getPartOfSpeech().getLabel().toUnicode());
+            text = format("%s (%s)", locationWord.toUnicode(), location.getPartOfSpeech().toLabel().toUnicode());
         } else if (isInstanceOf(PhraseNodeAdapter.class, linkSupportAdapter)) {
             PhraseNodeAdapter phraseNodeAdapter = (PhraseNodeAdapter) linkSupportAdapter;
             text = getPhraseMenuItemText(phraseNodeAdapter);
