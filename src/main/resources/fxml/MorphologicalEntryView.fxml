@@ -33,24 +33,20 @@
                    labelFor="$verbalNounsPicker" GridPane.halignment="RIGHT"/>
             <VerbalNounsPicker fx:id="verbalNounsPicker" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
 
-            <Label text="%nounOfPlaceAndTime.label" GridPane.columnIndex="0" GridPane.rowIndex="3"
-                   labelFor="$nounOfPlaceTimesPicker" GridPane.halignment="RIGHT"/>
-            <NounOfPlaceTimesPicker fx:id="nounOfPlaceTimesPicker" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
-
-            <Label text="%translation.label" GridPane.columnIndex="0" GridPane.rowIndex="4"
+            <Label text="%translation.label" GridPane.columnIndex="0" GridPane.rowIndex="3"
                    labelFor="$translationField" GridPane.halignment="RIGHT"/>
             <ScrollPane vbarPolicy="AS_NEEDED" hbarPolicy="AS_NEEDED" fitToWidth="true" fitToHeight="true"
-                        GridPane.columnIndex="1" GridPane.rowIndex="4">
+                        GridPane.columnIndex="1" GridPane.rowIndex="3">
                 <TextArea fx:id="translationField" prefRowCount="5" prefColumnCount="15"/>
             </ScrollPane>
 
-            <Label text="%removePassiveLine.label" GridPane.columnIndex="0" GridPane.rowIndex="5"
+            <Label text="%removePassiveLine.label" GridPane.columnIndex="0" GridPane.rowIndex="4"
                    labelFor="$removePassiveLine" GridPane.halignment="RIGHT"/>
-            <CheckBox fx:id="removePassiveLine" GridPane.columnIndex="1" GridPane.rowIndex="5"/>
+            <CheckBox fx:id="removePassiveLine" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
 
-            <Label text="%skipRuleProcessing.label" GridPane.columnIndex="0" GridPane.rowIndex="6"
+            <Label text="%skipRuleProcessing.label" GridPane.columnIndex="0" GridPane.rowIndex="5"
                    labelFor="$skipRuleProcessing" GridPane.halignment="RIGHT"/>
-            <CheckBox fx:id="skipRuleProcessing" GridPane.columnIndex="1" GridPane.rowIndex="6"/>
+            <CheckBox fx:id="skipRuleProcessing" GridPane.columnIndex="1" GridPane.rowIndex="5"/>
         </GridPane>
     </center>
 </fx:root>
