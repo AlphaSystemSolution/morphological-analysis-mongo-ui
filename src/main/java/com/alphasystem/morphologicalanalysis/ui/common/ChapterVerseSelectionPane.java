@@ -30,7 +30,7 @@ import static javafx.geometry.Pos.CENTER;
  */
 public class ChapterVerseSelectionPane extends BorderPane {
 
-    Map<Integer, List<VerseTokenPairGroup>> groupMap;
+    private Map<Integer, List<VerseTokenPairGroup>> groupMap;
     private Label chapterNameLabel;
     private ComboBox<Chapter> chapterNameComboBox;
     private Label verseNumberLabel;
@@ -77,9 +77,7 @@ public class ChapterVerseSelectionPane extends BorderPane {
         chapterNameComboBox.getItems().addAll(chapters.toArray(new Chapter[chapters.size()]));
         chapterNameComboBox.getSelectionModel().select(0);
         chapterNameComboBox.getSelectionModel().selectedItemProperty().addListener(
-                (observable, oldValue, newValue) -> {
-                    initVerseComboBox(newValue);
-                });
+                (observable, oldValue, newValue) -> initVerseComboBox(newValue));
         chapterNameLabel.setLabelFor(chapterNameComboBox);
         grid.add(chapterNameComboBox, 0, 1);
 
