@@ -1,12 +1,12 @@
 package com.alphasystem.morphologicalanalysis.ui.dependencygraph.control.editor.skin.view;
 
 import com.alphasystem.fx.ui.util.FontConstants;
+import com.alphasystem.fx.ui.util.FontSizeStringConverter;
 import com.alphasystem.fx.ui.util.UiUtilities;
 import com.alphasystem.morphologicalanalysis.graph.model.FontMetaInfo;
 import com.alphasystem.morphologicalanalysis.graph.model.GraphNode;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.control.editor.PropertiesEditor;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.GraphNodeAdapter;
-import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.FontSizeStringConverter;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.PropertyAccessor;
 import com.alphasystem.util.AppUtil;
 import javafx.beans.property.ObjectProperty;
@@ -38,7 +38,7 @@ abstract class PropertiesEditorSkinView<N extends GraphNode, A extends GraphNode
     @FXML private Spinner<Double> ySpinner;
     @FXML private Slider ySlider;
     @FXML private ComboBox<String> arabicFontFamily;
-    @FXML private ComboBox<Integer> arabicFontSize;
+    @FXML private ComboBox<Long> arabicFontSize;
 
     PropertiesEditorSkinView(P control) {
         this.control = control;
@@ -71,7 +71,7 @@ abstract class PropertiesEditorSkinView<N extends GraphNode, A extends GraphNode
             final String family = newValue.getFamily();
             arabicFontFamily.setValue(family);
             arabicFontFamily.getSelectionModel().select(family);
-            final Integer size = new Double(newValue.getSize()).intValue();
+            final Long size = new Double(newValue.getSize()).longValue();
             arabicFontSize.setValue(size);
             arabicFontSize.getSelectionModel().select(size);
         });
@@ -107,11 +107,11 @@ abstract class PropertiesEditorSkinView<N extends GraphNode, A extends GraphNode
         setFont(arabicFontFamily, arabicFontSize, node.getFont());
     }
 
-    void setFont(ComboBox<String> familyComboBox, ComboBox<Integer> sizeComboBox, Font font) {
+    void setFont(ComboBox<String> familyComboBox, ComboBox<Long> sizeComboBox, Font font) {
         final String family = font.getFamily();
         familyComboBox.setValue(family);
         familyComboBox.getSelectionModel().select(family);
-        final Integer size = new Double(font.getSize()).intValue();
+        final Long size = new Double(font.getSize()).longValue();
         sizeComboBox.setValue(size);
         sizeComboBox.getSelectionModel().select(size);
     }

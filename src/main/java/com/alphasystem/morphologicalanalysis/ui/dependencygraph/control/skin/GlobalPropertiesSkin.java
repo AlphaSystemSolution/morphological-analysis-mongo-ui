@@ -1,7 +1,7 @@
 package com.alphasystem.morphologicalanalysis.ui.dependencygraph.control.skin;
 
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.control.GlobalPropertiesView;
-import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.FontSizeStringConverter;
+import com.alphasystem.fx.ui.util.FontSizeStringConverter;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.SpinnerValueFactory.DoubleSpinnerValueFactory;
@@ -76,19 +76,19 @@ public class GlobalPropertiesSkin extends SkinBase<GlobalPropertiesView> {
         private ComboBox<String> terminalFontFamily;
 
         @FXML
-        private ComboBox<Integer> terminalFontSize;
+        private ComboBox<Long> terminalFontSize;
 
         @FXML
         private ComboBox<String> translationFontFamily;
 
         @FXML
-        private ComboBox<Integer> translationFontSize;
+        private ComboBox<Long> translationFontSize;
 
         @FXML
         private ComboBox<String> partOfSpeechFontFamily;
 
         @FXML
-        private ComboBox<Integer> partOfSpeechFontSize;
+        private ComboBox<Long> partOfSpeechFontSize;
 
         @FXML
         private ColorPicker colorPicker;
@@ -228,7 +228,7 @@ public class GlobalPropertiesSkin extends SkinBase<GlobalPropertiesView> {
             translationFontSize.setConverter(new FontSizeStringConverter());
             control.translationFontProperty().addListener((observable, oldValue, newValue) -> {
                 translationFontFamily.getSelectionModel().select(newValue.getFamily());
-                translationFontSize.getSelectionModel().select(new Integer(new Double(newValue.getSize()).intValue()));
+                translationFontSize.getSelectionModel().select(new Double(newValue.getSize()).longValue());
             });
             translationFontFamily.valueProperty().addListener((observable, oldValue, newValue) ->
                     control.setTranslationFont(deriveFromFamily(control.getTranslationFont(), newValue)));
@@ -243,7 +243,7 @@ public class GlobalPropertiesSkin extends SkinBase<GlobalPropertiesView> {
             terminalFontSize.setConverter(new FontSizeStringConverter());
             control.terminalFontProperty().addListener((observable, oldValue, newValue) -> {
                 terminalFontFamily.getSelectionModel().select(newValue.getFamily());
-                terminalFontSize.getSelectionModel().select(new Integer(new Double(newValue.getSize()).intValue()));
+                terminalFontSize.getSelectionModel().select(new Double(newValue.getSize()).longValue());
             });
             terminalFontFamily.valueProperty().addListener((observable, oldValue, newValue) ->
                     control.setTerminalFont(deriveFromFamily(control.getTerminalFont(), newValue)));
@@ -258,7 +258,7 @@ public class GlobalPropertiesSkin extends SkinBase<GlobalPropertiesView> {
             partOfSpeechFontSize.setConverter(new FontSizeStringConverter());
             control.posFontProperty().addListener((observable, oldValue, newValue) -> {
                 partOfSpeechFontFamily.getSelectionModel().select(newValue.getFamily());
-                partOfSpeechFontSize.getSelectionModel().select(new Integer(new Double(newValue.getSize()).intValue()));
+                partOfSpeechFontSize.getSelectionModel().select(new Double(newValue.getSize()).longValue());
             });
             partOfSpeechFontFamily.valueProperty().addListener((observable, oldValue, newValue) ->
                     control.setPosFont(deriveFromFamily(control.getPosFont(), newValue)));

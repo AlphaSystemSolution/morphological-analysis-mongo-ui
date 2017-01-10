@@ -5,7 +5,7 @@ import com.alphasystem.morphologicalanalysis.graph.model.FontMetaInfo;
 import com.alphasystem.morphologicalanalysis.graph.model.TerminalNode;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.control.editor.TerminalPropertiesEditor;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.TerminalNodeAdapter;
-import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.FontSizeStringConverter;
+import com.alphasystem.fx.ui.util.FontSizeStringConverter;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.text.Font;
@@ -25,7 +25,7 @@ public class TerminalPropertiesEditorSkinView extends LineSupportPropertiesEdito
     @FXML private Spinner<Double> translationYSpinner;
     @FXML private Slider translationYSlider;
     @FXML private ComboBox<String> translationFontFamily;
-    @FXML private ComboBox<Integer> translationFontSize;
+    @FXML private ComboBox<Long> translationFontSize;
     @FXML private Spinner<Double> groupTranslateXSpinner;
     @FXML private Slider groupTranslateXSlider;
     @FXML private Spinner<Double> groupTranslateYSpinner;
@@ -61,7 +61,7 @@ public class TerminalPropertiesEditorSkinView extends LineSupportPropertiesEdito
             final String family = newValue.getFamily();
             translationFontFamily.setValue(family);
             translationFontFamily.getSelectionModel().select(family);
-            final Integer size = new Double(newValue.getSize()).intValue();
+            final Long size = new Double(newValue.getSize()).longValue();
             translationFontSize.setValue(size);
             translationFontSize.getSelectionModel().select(size);
         });
