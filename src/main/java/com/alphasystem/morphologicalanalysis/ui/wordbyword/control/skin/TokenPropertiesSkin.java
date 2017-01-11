@@ -320,9 +320,8 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
                         protected MorphologicalChart call() throws Exception {
                             waitCursor(getSkinnable());
                             RootLetters rootLetters = entry.getRootLetters();
-                            // TODO: add verbal noun and noun of place and time
-                            final ConjugationRoots conjugationRoots = ConjugationHelper.getConjugationRoots(
-                                    entry.getForm(), entry.getShortTranslation()).conjugationConfiguration(entry.getConfiguration());
+                            final ConjugationRoots conjugationRoots = ConjugationHelper.getConjugationRoots(entry)
+                                    .conjugationConfiguration(entry.getConfiguration());
                             return conjugationBuilder.doConjugation(conjugationRoots, rootLetters.getFirstRadical(),
                                     rootLetters.getSecondRadical(), rootLetters.getThirdRadical(), rootLetters.getFourthRadical());
                         }
