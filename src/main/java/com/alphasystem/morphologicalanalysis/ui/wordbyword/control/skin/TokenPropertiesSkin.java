@@ -239,7 +239,7 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
         if (!disableDictionaryTab) {
             // not sure whether display is initialized or not
             rootLetters.initDisplayName();
-            searchString = rootLetters.getDisplayName();
+            searchString = rootLetters.toMawridSearchString();
         }
         disableDictionaryTab = searchString == null;
         if (!disableDictionaryTab) {
