@@ -1,14 +1,30 @@
 package com.alphasystem.morphologicalanalysis.util;
 
+import com.alphasystem.arabic.model.ArabicWord;
 import com.alphasystem.arabic.model.ProNoun;
 import com.alphasystem.morphologicalanalysis.common.model.VerseTokenPairGroup;
-import com.alphasystem.morphologicalanalysis.graph.model.*;
+import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
+import com.alphasystem.morphologicalanalysis.graph.model.GraphMetaInfo;
+import com.alphasystem.morphologicalanalysis.graph.model.GraphNode;
+import com.alphasystem.morphologicalanalysis.graph.model.PartOfSpeechNode;
+import com.alphasystem.morphologicalanalysis.graph.model.TerminalNode;
 import com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType;
 import com.alphasystem.morphologicalanalysis.graph.repository.DependencyGraphRepository;
 import com.alphasystem.morphologicalanalysis.graph.repository.PartOfSpeechNodeRepository;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.GraphBuilder;
-import com.alphasystem.morphologicalanalysis.wordbyword.model.*;
-import com.alphasystem.morphologicalanalysis.wordbyword.model.support.*;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.AbstractProperties;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.Chapter;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.NounProperties;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.ProNounProperties;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.VerbProperties;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.support.ConversationType;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.support.GenderType;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.support.NounStatus;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.support.NumberType;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.support.VerbType;
 import com.alphasystem.morphologicalanalysis.wordbyword.repository.LocationRepository;
 import com.alphasystem.morphologicalanalysis.wordbyword.repository.TokenRepository;
 import com.alphasystem.persistence.mongo.spring.support.ApplicationContextProvider;
@@ -20,7 +36,9 @@ import java.util.List;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.ConversationType.FIRST_PERSON;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.GenderType.MASCULINE;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.NounStatus.NOMINATIVE;
-import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.*;
+import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.NOUN;
+import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.PRONOUN;
+import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.VERB;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.ProNounType.DETACHED;
 import static java.lang.String.format;
 import static java.util.Collections.singletonList;
@@ -113,6 +131,10 @@ public class RepositoryTool {
         }
 
         return tokenRepository.save(token);
+    }
+
+    public ArabicWord getLocationWord(Location location){
+        return repositoryUtil.getLocationWord(location);
     }
 
     public DependencyGraph createDependencyGraph(VerseTokenPairGroup group, GraphMetaInfo graphMetaInfo)
