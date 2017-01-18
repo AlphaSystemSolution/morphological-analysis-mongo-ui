@@ -22,10 +22,21 @@ import java.io.File;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import static com.alphasystem.arabic.model.ArabicLetterType.*;
+import static com.alphasystem.arabic.model.ArabicLetterType.FA;
+import static com.alphasystem.arabic.model.ArabicLetterType.HHA;
+import static com.alphasystem.arabic.model.ArabicLetterType.LAM;
+import static com.alphasystem.arabic.model.ArabicLetterType.MEEM;
+import static com.alphasystem.arabic.model.ArabicLetterType.SPACE;
+import static com.alphasystem.arabic.model.ArabicLetterType.YA;
 import static com.alphasystem.arabic.model.ArabicLetters.WORD_SPACE;
-import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.*;
-import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.*;
+import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.HIDDEN;
+import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.IMPLIED;
+import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.REFERENCE;
+import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.TERMINAL;
+import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.CONJUNCTION_PARTICLE_FA;
+import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.CONJUNCTION_PARTICLE_WAW;
+import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.DEFINITE_ARTICLE;
+import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.QURANIC_PUNCTUATION;
 import static com.alphasystem.util.AppUtil.USER_HOME_DIR;
 import static com.alphasystem.util.AppUtil.getResourceAsStream;
 import static java.lang.String.format;
@@ -67,7 +78,7 @@ public class Global {
     public static final int GAP = 10;
     public static final Border BORDER = new Border(new BorderStroke(LIGHTGREY, SOLID, EMPTY, THIN));
     public static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("resources");
-    public static final String MAWRID_READER_URL = System.getProperty("mawrid-reader.url");
+    public static final String MAWRID_READER_URL = System.getProperty("mawrid-reader.url", "http://ejtaal.net/");
     private static Global instance;
 
     private Global() {
