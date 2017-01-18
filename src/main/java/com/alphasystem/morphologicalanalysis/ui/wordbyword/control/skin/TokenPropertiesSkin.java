@@ -7,7 +7,6 @@ import com.alphasystem.app.morphologicalengine.conjugation.builder.ConjugationBu
 import com.alphasystem.app.morphologicalengine.conjugation.builder.ConjugationHelper;
 import com.alphasystem.app.morphologicalengine.conjugation.builder.ConjugationRoots;
 import com.alphasystem.app.morphologicalengine.conjugation.model.MorphologicalChart;
-import com.alphasystem.app.morphologicalengine.conjugation.model.NounRootBase;
 import com.alphasystem.app.morphologicalengine.guice.GuiceSupport;
 import com.alphasystem.app.morphologicalengine.ui.MorphologicalChartControl;
 import com.alphasystem.arabic.ui.ArabicLabelToggleGroup;
@@ -34,13 +33,22 @@ import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
-import javafx.scene.control.*;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.SkinBase;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
+import javafx.scene.control.TitledPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.UncheckedIOException;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -48,12 +56,25 @@ import static com.alphasystem.app.asciidoctoreditor.ui.model.Action.SAVE;
 import static com.alphasystem.app.asciidoctoreditor.ui.model.DocumentType.ARTICLE;
 import static com.alphasystem.app.asciidoctoreditor.ui.model.IconFontName.FONT_AWESOME;
 import static com.alphasystem.app.asciidoctoreditor.ui.model.Icons.FONT;
-import static com.alphasystem.fx.ui.util.UiUtilities.*;
-import static com.alphasystem.morphologicalanalysis.ui.common.Global.*;
-import static com.alphasystem.morphologicalanalysis.ui.wordbyword.control.TokenPropertiesView.SelectionStatus.*;
+import static com.alphasystem.fx.ui.util.UiUtilities.defaultCursor;
+import static com.alphasystem.fx.ui.util.UiUtilities.waitCursor;
+import static com.alphasystem.fx.ui.util.UiUtilities.wrapInScrollPane;
+import static com.alphasystem.morphologicalanalysis.ui.common.Global.BORDER;
+import static com.alphasystem.morphologicalanalysis.ui.common.Global.DEFAULT_CSS_DIRECTORY;
+import static com.alphasystem.morphologicalanalysis.ui.common.Global.DEFAULT_DICTIONARY_DIRECTORY;
+import static com.alphasystem.morphologicalanalysis.ui.common.Global.DEFAULT_NOTES_FILE_EXTENSION;
+import static com.alphasystem.morphologicalanalysis.ui.common.Global.GAP;
+import static com.alphasystem.morphologicalanalysis.ui.common.Global.MAWRID_READER_URL;
+import static com.alphasystem.morphologicalanalysis.ui.common.Global.RESOURCE_BUNDLE;
+import static com.alphasystem.morphologicalanalysis.ui.wordbyword.control.TokenPropertiesView.SelectionStatus.AVAILABLE;
+import static com.alphasystem.morphologicalanalysis.ui.wordbyword.control.TokenPropertiesView.SelectionStatus.NOT_AVAILABLE;
+import static com.alphasystem.morphologicalanalysis.ui.wordbyword.control.TokenPropertiesView.SelectionStatus.SELECTED;
 import static com.alphasystem.util.nio.NIOFileUtils.fastCopy;
 import static java.lang.String.format;
-import static java.nio.file.Files.*;
+import static java.nio.file.Files.createFile;
+import static java.nio.file.Files.exists;
+import static java.nio.file.Files.newInputStream;
+import static java.nio.file.Files.newOutputStream;
 import static java.nio.file.Paths.get;
 import static java.nio.file.StandardOpenOption.CREATE;
 import static java.nio.file.StandardOpenOption.WRITE;
@@ -203,7 +224,7 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
         locationComboBox.setDisable(true);
         locationComboBox.setButtonCell(new LocationListCell());
         locationComboBox.setCellFactory(param -> new LocationListCell());
-        gridPane.add(locationComboBox, 1, 0);
+        gridPane.add(locationComboBox, 0, 1);
 
         TokenPropertiesView view = getSkinnable();
         view.tokenProperty().addListener((o, ov, nv) -> {
@@ -339,11 +360,6 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
         }
     }
 
-    private NounRootBase[] getNounRootBases() {
-
-        return null;
-    }
-
     private void updateLocations(Token token) {
         tabPane.getSelectionModel().select(0);
         locationComboBox.getItems().clear();
@@ -369,8 +385,10 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
 
         createLettersPane();
 
-        VBox subBox = new VBox();
+        HBox subBox = new HBox();
         subBox.setSpacing(GAP);
+        subBox.setAlignment(CENTER);
+        subBox.setBorder(BORDER);
         subBox.getChildren().addAll(lettersPane, createLocationsPane());
 
         TitledPane titledPane = new TitledPane("Token Letters and Locations", subBox);
