@@ -3,8 +3,6 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import java.lang.*?>
-<?import javafx.scene.text.Text?>
-<?import javafx.scene.shape.Rectangle?>
 <fx:root xmlns:fx="http://javafx.com/fxml/1" type="javafx.scene.layout.BorderPane"
          xmlns="http://javafx.com/javafx/8.0.40">
     <styleClass>border</styleClass>
@@ -78,23 +76,23 @@
                                   editable="true">
                             <items>
                                 <FXCollections fx:factory="observableArrayList">
-                                    <Integer fx:value="8"/>
-                                    <Integer fx:value="9"/>
-                                    <Integer fx:value="10"/>
-                                    <Integer fx:value="11"/>
-                                    <Integer fx:value="12"/>
-                                    <Integer fx:value="14"/>
-                                    <Integer fx:value="16"/>
-                                    <Integer fx:value="18"/>
-                                    <Integer fx:value="20"/>
-                                    <Integer fx:value="22"/>
-                                    <Integer fx:value="24"/>
-                                    <Integer fx:value="26"/>
-                                    <Integer fx:value="28"/>
-                                    <Integer fx:value="30"/>
-                                    <Integer fx:value="36"/>
-                                    <Integer fx:value="48"/>
-                                    <Integer fx:value="72"/>
+                                    <Long fx:value="8"/>
+                                    <Long fx:value="9"/>
+                                    <Long fx:value="10"/>
+                                    <Long fx:value="11"/>
+                                    <Long fx:value="12"/>
+                                    <Long fx:value="14"/>
+                                    <Long fx:value="16"/>
+                                    <Long fx:value="18"/>
+                                    <Long fx:value="20"/>
+                                    <Long fx:value="22"/>
+                                    <Long fx:value="24"/>
+                                    <Long fx:value="26"/>
+                                    <Long fx:value="28"/>
+                                    <Long fx:value="30"/>
+                                    <Long fx:value="36"/>
+                                    <Long fx:value="48"/>
+                                    <Long fx:value="72"/>
                                 </FXCollections>
                             </items>
                         </ComboBox>
@@ -107,23 +105,23 @@
                                   editable="true">
                             <items>
                                 <FXCollections fx:factory="observableArrayList">
-                                    <Integer fx:value="8"/>
-                                    <Integer fx:value="9"/>
-                                    <Integer fx:value="10"/>
-                                    <Integer fx:value="11"/>
-                                    <Integer fx:value="12"/>
-                                    <Integer fx:value="14"/>
-                                    <Integer fx:value="16"/>
-                                    <Integer fx:value="18"/>
-                                    <Integer fx:value="20"/>
-                                    <Integer fx:value="22"/>
-                                    <Integer fx:value="24"/>
-                                    <Integer fx:value="26"/>
-                                    <Integer fx:value="28"/>
-                                    <Integer fx:value="30"/>
-                                    <Integer fx:value="36"/>
-                                    <Integer fx:value="48"/>
-                                    <Integer fx:value="72"/>
+                                    <Long fx:value="8"/>
+                                    <Long fx:value="9"/>
+                                    <Long fx:value="10"/>
+                                    <Long fx:value="11"/>
+                                    <Long fx:value="12"/>
+                                    <Long fx:value="14"/>
+                                    <Long fx:value="16"/>
+                                    <Long fx:value="18"/>
+                                    <Long fx:value="20"/>
+                                    <Long fx:value="22"/>
+                                    <Long fx:value="24"/>
+                                    <Long fx:value="26"/>
+                                    <Long fx:value="28"/>
+                                    <Long fx:value="30"/>
+                                    <Long fx:value="36"/>
+                                    <Long fx:value="48"/>
+                                    <Long fx:value="72"/>
                                 </FXCollections>
                             </items>
                         </ComboBox>
@@ -136,23 +134,23 @@
                                   editable="true">
                             <items>
                                 <FXCollections fx:factory="observableArrayList">
-                                    <Integer fx:value="8"/>
-                                    <Integer fx:value="9"/>
-                                    <Integer fx:value="10"/>
-                                    <Integer fx:value="11"/>
-                                    <Integer fx:value="12"/>
-                                    <Integer fx:value="14"/>
-                                    <Integer fx:value="16"/>
-                                    <Integer fx:value="18"/>
-                                    <Integer fx:value="20"/>
-                                    <Integer fx:value="22"/>
-                                    <Integer fx:value="24"/>
-                                    <Integer fx:value="26"/>
-                                    <Integer fx:value="28"/>
-                                    <Integer fx:value="30"/>
-                                    <Integer fx:value="36"/>
-                                    <Integer fx:value="48"/>
-                                    <Integer fx:value="72"/>
+                                    <Long fx:value="8"/>
+                                    <Long fx:value="9"/>
+                                    <Long fx:value="10"/>
+                                    <Long fx:value="11"/>
+                                    <Long fx:value="12"/>
+                                    <Long fx:value="14"/>
+                                    <Long fx:value="16"/>
+                                    <Long fx:value="18"/>
+                                    <Long fx:value="20"/>
+                                    <Long fx:value="22"/>
+                                    <Long fx:value="24"/>
+                                    <Long fx:value="26"/>
+                                    <Long fx:value="28"/>
+                                    <Long fx:value="30"/>
+                                    <Long fx:value="36"/>
+                                    <Long fx:value="48"/>
+                                    <Long fx:value="72"/>
                                 </FXCollections>
                             </items>
                         </ComboBox>
