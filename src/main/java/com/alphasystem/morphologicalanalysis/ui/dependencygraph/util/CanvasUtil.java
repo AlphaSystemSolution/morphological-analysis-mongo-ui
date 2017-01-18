@@ -20,6 +20,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 
@@ -81,9 +82,14 @@ public class CanvasUtil {
             throw new RuntimeException(format("Null terminal node for {%s}", partOfSpeechNodeAdapter));
         }
         Location location = partOfSpeechNodeAdapter.getSrc().getLocation();
-        Token token = terminalNode.getSrc().getToken();
-        ArabicWord locationWord = getLocationWord(token, location);
-        return format("%s", locationWord.toUnicode());
+        String text = location.getText();
+        if (StringUtils.isBlank(text)) {
+            Token token = terminalNode.getSrc().getToken();
+            ArabicWord locationWord = getLocationWord(token, location);
+            text = locationWord.toUnicode();
+            location.setText(text);
+        }
+        return text;
     }
 
     public String getNodeText(GraphNode graphNode) {
@@ -273,9 +279,14 @@ public class CanvasUtil {
             PartOfSpeechNodeAdapter partOfSpeechNodeAdapter = (PartOfSpeechNodeAdapter) linkSupportAdapter;
             TerminalNodeAdapter terminalNode = (TerminalNodeAdapter) partOfSpeechNodeAdapter.getParent();
             Location location = partOfSpeechNodeAdapter.getSrc().getLocation();
-            Token token = terminalNode.getSrc().getToken();
-            ArabicWord locationWord = getLocationWord(token, location);
-            text = format("%s (%s)", locationWord.toUnicode(), location.getPartOfSpeech().toLabel().toUnicode());
+            text = location.getText();
+            if (StringUtils.isBlank(text)) {
+                Token token = terminalNode.getSrc().getToken();
+                ArabicWord locationWord = getLocationWord(token, location);
+                text = locationWord.toUnicode();
+                location.setText(text);
+            }
+            text = format("%s (%s)", text, location.getPartOfSpeech().toLabel().toUnicode());
         } else if (isInstanceOf(PhraseNodeAdapter.class, linkSupportAdapter)) {
             PhraseNodeAdapter phraseNodeAdapter = (PhraseNodeAdapter) linkSupportAdapter;
             text = getPhraseMenuItemText(phraseNodeAdapter);
