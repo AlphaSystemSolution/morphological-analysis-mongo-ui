@@ -1,12 +1,15 @@
 package com.alphasystem.morphologicalanalysis.ui.wordbyword.control.skin;
 
+import com.alphasystem.arabic.ui.util.FontUtilities;
 import com.alphasystem.morphologicalanalysis.ui.wordbyword.control.CommonPropertiesView;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.NamedTag;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech;
 import javafx.fxml.FXML;
+import javafx.geometry.NodeOrientation;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.SkinBase;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 
 import java.io.IOException;
@@ -27,6 +30,9 @@ public class CommonPropertiesSkin extends SkinBase<CommonPropertiesView> {
     }
 
     private class SkinView extends BorderPane {
+
+        @FXML
+        private TextField textField;
 
         @FXML
         private TextArea translationField;
@@ -54,6 +60,9 @@ public class CommonPropertiesSkin extends SkinBase<CommonPropertiesView> {
         @FXML
         void initialize() {
             final CommonPropertiesView view = getSkinnable();
+            textField.setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
+            textField.setFont(FontUtilities.ARABIC_FONT_24);
+            textField.textProperty().bindBidirectional(view.textProperty());
             translationField.textProperty().bindBidirectional(view.translationProperty());
             partOfSpeechComboBox.valueProperty().bindBidirectional(view.partOfSpeechProperty());
             namedTagComboBox.valueProperty().bindBidirectional(view.namedTagProperty());
