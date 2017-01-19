@@ -30,10 +30,10 @@ public class CommonPropertiesView extends Control {
 
     public CommonPropertiesView() {
         locationProperty().addListener((o, ov, nv) -> setValues(nv));
-        partOfSpeechProperty().addListener((o, ov, nv) -> getLocation().setPartOfSpeech(nv));
-        namedTagProperty().addListener((o, ov, nv) -> getLocation().setNamedTag(nv));
-        textProperty().addListener((o, ov, nv) -> getLocation().setText(nv));
-        translationProperty().addListener((o, ov, nv) -> getLocation().setTranslation(nv));
+        partOfSpeechProperty().addListener((o, ov, nv) -> updatePartOfSpeech(nv));
+        namedTagProperty().addListener((o, ov, nv) -> updateNamedTag(nv));
+        textProperty().addListener((o, ov, nv) -> updateText(nv));
+        translationProperty().addListener((o, ov, nv) -> updateTranslation(nv));
     }
 
     private void setValues(Location location) {
@@ -41,6 +41,34 @@ public class CommonPropertiesView extends Control {
         setNamedTag((location == null) ? null : location.getNamedTag());
         setTranslation((location == null) ? null : location.getTranslation());
         setText(getLocationText(location));
+    }
+
+    private void updatePartOfSpeech(PartOfSpeech partOfSpeech) {
+        final Location location = getLocation();
+        if (location != null) {
+            location.setPartOfSpeech(partOfSpeech);
+        }
+    }
+
+    private void updateNamedTag(NamedTag nv) {
+        final Location location = getLocation();
+        if (location != null) {
+            location.setNamedTag(nv);
+        }
+    }
+
+    private void updateText(String text) {
+        final Location location = getLocation();
+        if (location != null) {
+            location.setText(text);
+        }
+    }
+
+    private void updateTranslation(String translation) {
+        final Location location = getLocation();
+        if (location != null) {
+            location.setTranslation(translation);
+        }
     }
 
     private String getLocationText(Location location) {
@@ -51,10 +79,8 @@ public class CommonPropertiesView extends Control {
                 final ArabicWord locationWord = repositoryTool.getLocationWord(location);
                 if (locationWord != null) {
                     text = locationWord.toUnicode();
+                    location.setText(text);
                 }
-            }
-            if (text != null) {
-                location.setText(text);
             }
         }
         return text;
