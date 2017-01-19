@@ -17,7 +17,11 @@ import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.TitledPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 
@@ -93,9 +97,7 @@ public class TokenEditorPane extends VBox {
                 Alert alert = new Alert(ERROR);
                 alert.setContentText(builder.toString());
                 Optional<ButtonType> result = alert.showAndWait();
-                result.ifPresent(buttonType -> {
-                    System.err.println("Nothing to save");
-                });
+                result.ifPresent(buttonType -> System.err.println("Nothing to save"));
                 return;
             }
         }
@@ -103,10 +105,7 @@ public class TokenEditorPane extends VBox {
         Alert alert = new Alert(INFORMATION);
         alert.setContentText(format("Token \"%s\" has been saved.", token));
         alert.showAndWait();
-        int selectedLocationIndex = tokenPropertiesView.getSelectedLocationIndex();
-        updateToken(null);
-        updateToken(token);
-        tokenPropertiesView.setSelectedLocation(selectedLocationIndex);
+        tokenPropertiesView.setReload(true);
     }
 
     public void loadNextToken() {
