@@ -146,6 +146,7 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
 
         initializeSkin();
 
+        control.reloadProperty().addListener((o, ov, nv) -> locationPropertiesView.setReload(nv));
         locationPropertiesView.rootLettersProperty().addListener((o, ov, nv) -> {
             loadDictionary(nv);
             loadDictionaryNotes(nv);

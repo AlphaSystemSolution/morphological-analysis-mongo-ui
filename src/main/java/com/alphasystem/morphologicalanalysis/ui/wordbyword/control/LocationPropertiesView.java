@@ -3,10 +3,13 @@ package com.alphasystem.morphologicalanalysis.ui.wordbyword.control;
 import com.alphasystem.arabic.model.NamedTemplate;
 import com.alphasystem.morphologicalanalysis.morphology.model.RootLetters;
 import com.alphasystem.morphologicalanalysis.ui.wordbyword.control.skin.LocationPropertiesSkin;
+import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanWrapper;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
@@ -16,14 +19,26 @@ import javafx.scene.control.Skin;
  */
 public class LocationPropertiesView extends Control {
 
+    private final RepositoryTool repositoryTool = RepositoryTool.getInstance();
     private final ObjectProperty<Location> location = new SimpleObjectProperty<>(null, "location");
     private final ObjectProperty<RootLetters> rootLetters = new SimpleObjectProperty<>(null, "rootLetters");
     private final ReadOnlyBooleanWrapper emptyRootLetters = new ReadOnlyBooleanWrapper(true, "emptyRootLetters");
     private final ObjectProperty<NamedTemplate> form = new SimpleObjectProperty<>(null, "form");
+    private final BooleanProperty reload = new SimpleBooleanProperty(null, "reload");
 
     public LocationPropertiesView() {
         rootLettersProperty().addListener((o, ov, nv) -> emptyRootLetters.setValue(nv == null || nv.isEmpty()));
         emptyRootLetters.set(true);
+        reloadProperty().addListener((o, ov, nv) -> {
+            if (nv) {
+                Location location = getLocation();
+                if (location != null) {
+                    location = repositoryTool.getLocation(location.getDisplayName());
+                    setLocation(null);
+                    setLocation(location);
+                }
+            }
+        });
     }
 
     public final Location getLocation() {
@@ -56,6 +71,14 @@ public class LocationPropertiesView extends Control {
 
     public final void setForm(NamedTemplate form) {
         this.form.set(form);
+    }
+
+    public final BooleanProperty reloadProperty() {
+        return reload;
+    }
+
+    public final void setReload(boolean reload) {
+        this.reload.set(reload);
     }
 
     @Override

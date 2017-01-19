@@ -6,7 +6,9 @@ import com.alphasystem.arabic.model.ArabicWord;
 import com.alphasystem.morphologicalanalysis.ui.wordbyword.control.skin.TokenPropertiesSkin;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Control;
@@ -24,6 +26,7 @@ public class TokenPropertiesView extends Control {
 
     private final ObjectProperty<Token> token = new SimpleObjectProperty<>(null, "token");
     private final ObjectProperty<Location> selectedLocation = new SimpleObjectProperty<>(null, "selectedLocation");
+    private final BooleanProperty reload = new SimpleBooleanProperty(null, "reload");
     private final ObservableList<LocationLabel> labels = observableArrayList();
 
     public TokenPropertiesView() {
@@ -45,6 +48,14 @@ public class TokenPropertiesView extends Control {
                 }
             }
         });
+    }
+
+    public final BooleanProperty reloadProperty() {
+        return reload;
+    }
+
+    public final void setReload(boolean reload) {
+        this.reload.set(reload);
     }
 
     public final Token getToken() {
