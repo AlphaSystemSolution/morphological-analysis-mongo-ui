@@ -119,12 +119,10 @@ public class LocationPropertiesSkin extends SkinBase<LocationPropertiesView> {
             commonPropertiesView.setLocation(location);
             view.locationProperty().addListener((o, ov, nv) -> {
                 commonPropertiesView.setLocation(nv);
-                changePropertiesView(nv.getProperties());
+                changePropertiesView(nv);
                 changeMorphologicalEntryView(nv);
             });
-            commonPropertiesView.partOfSpeechProperty().addListener((o, ov, nv) -> {
-                changePropertiesView(view.getLocation().getProperties());
-            });
+            commonPropertiesView.partOfSpeechProperty().addListener((o, ov, nv) -> changePropertiesView(view.getLocation()));
 
             morphologicalEntryView.setMorphologicalEntry(getMorphologicalEntry(location));
             morphologicalEntryView.rootLettersProperty().addListener((o, ov, nv) -> {
@@ -201,7 +199,13 @@ public class LocationPropertiesSkin extends SkinBase<LocationPropertiesView> {
             service.start();
         }
 
-        private void changePropertiesView(AbstractProperties properties) {
+        private void changePropertiesView(Location location) {
+            AbstractProperties properties;
+            if (location == null) {
+                properties = new NounProperties();
+            } else {
+                properties = location.getProperties();
+            }
             propertiesTitledPane.setContent(getPropertiesView(properties));
             propertiesTitledPane.setText(getPropertiesPaneTitle(properties));
         }
