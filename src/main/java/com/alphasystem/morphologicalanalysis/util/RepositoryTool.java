@@ -93,6 +93,10 @@ public class RepositoryTool {
         }; // end of new "Service"
     }
 
+    public Location getLocation(String displayName){
+        return locationRepository.findByDisplayName(displayName);
+    }
+
     public Token getTokenByDisplayName(String displayName) {
         return tokenRepository.findByDisplayName(displayName);
     }
