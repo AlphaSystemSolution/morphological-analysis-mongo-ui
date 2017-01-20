@@ -21,7 +21,12 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
@@ -29,14 +34,21 @@ import javafx.scene.layout.Pane;
 import javafx.scene.text.Text;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import org.apache.commons.lang3.ArrayUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static javafx.geometry.NodeOrientation.RIGHT_TO_LEFT;
+import static javafx.scene.control.Alert.AlertType.CONFIRMATION;
 import static javafx.scene.control.Alert.AlertType.ERROR;
 import static javafx.scene.control.Alert.AlertType.INFORMATION;
+import static javafx.scene.control.ButtonType.CANCEL;
 import static javafx.scene.control.ButtonType.OK;
 import static javafx.scene.control.ContentDisplay.GRAPHIC_ONLY;
 import static javafx.scene.control.ScrollPane.ScrollBarPolicy.AS_NEEDED;
@@ -144,10 +156,10 @@ public class WordByWordPane extends BorderPane {
         setCenter(scrollPane);
     }
 
-    private static List<Token> getTokens(VerseTokenPairGroup group) {
+    private static List<Token> getTokens(VerseTokenPairGroup group, boolean refresh) {
         Integer chapterNumber = group.getChapterNumber();
         String key = group.toString();
-        List<Token> tokens = cache.get(key);
+        List<Token> tokens = refresh ? null : cache.get(key);
         if (tokens == null || tokens.isEmpty()) {
             tokens = new ArrayList<>();
             VerseRepository verseRepository = RepositoryTool.getInstance().getRepositoryUtil().getVerseRepository();
@@ -168,6 +180,9 @@ public class WordByWordPane extends BorderPane {
         switch (action) {
             case CREATE_DEPENDENCY_GRAPH:
                 exportTokens();
+                break;
+            case MERGE_TOKENS:
+                mergeTokens();
                 break;
         }
     }
@@ -227,6 +242,86 @@ public class WordByWordPane extends BorderPane {
         });
     }
 
+    private void mergeTokens() {
+        ObservableList<TableCellModel> items = tableView.getItems();
+        List<Token> tokens = new ArrayList<>();
+        items.forEach(tcm -> {
+            if (tcm.isChecked()) {
+                tokens.add(tcm.getToken());
+            }
+        });
+        if (tokens.isEmpty()) {
+            Alert alert = new Alert(ERROR);
+            alert.setContentText("Nothing selected to merge.");
+            alert.showAndWait();
+            return;
+        }
+        boolean differentChapter = false;
+        boolean differentVerse = false;
+        boolean consecutive = true;
+        Token token = tokens.get(0);
+        final int chapterNumber = token.getChapterNumber();
+        final int verseNumber = token.getVerseNumber();
+        int first = token.getTokenNumber();
+        for (int i = 1; i < tokens.size(); i++) {
+            token = tokens.get(i);
+            int second = token.getTokenNumber();
+            if (token.getChapterNumber() != chapterNumber) {
+                differentChapter = true;
+                break;
+            }
+            if (token.getVerseNumber() != verseNumber) {
+                differentVerse = true;
+                break;
+            }
+            if (first + 1 != second) {
+                consecutive = false;
+                break;
+            }
+        }
+        if (differentChapter) {
+            Alert alert = new Alert(ERROR);
+            alert.setContentText("Tokens selected are belongs to different chapters.");
+            alert.showAndWait();
+            return;
+        }
+        if (differentVerse) {
+            Alert alert = new Alert(ERROR);
+            alert.setContentText("Tokens selected are belongs to different verses.");
+            alert.showAndWait();
+            return;
+        }
+        if (!consecutive) {
+            Alert alert = new Alert(ERROR);
+            alert.setContentText("Tokens selected are not consecutive.");
+            alert.showAndWait();
+            return;
+        }
+        Alert alert = new Alert(CONFIRMATION);
+        alert.setContentText(String.format("Following tokens will be merged: %s", tokens));
+        final Optional<ButtonType> result = alert.showAndWait();
+        result.filter(buttonType -> buttonType == OK).ifPresent(buttonType -> {
+            int[] tokenNumbers = new int[0];
+            for (Token token1 : tokens) {
+                tokenNumbers = ArrayUtils.add(tokenNumbers, token1.getTokenNumber());
+            }
+            RepositoryTool.getInstance().getRepositoryUtil().mergeTokens(chapterNumber, verseNumber, tokenNumbers);
+            refreshTable(true);
+            items.forEach(tableCellModel -> {
+                if (tableCellModel.isChecked()) {
+                    tableCellModel.setChecked(false);
+                }
+            });
+        });
+        result.filter(buttonType -> buttonType == CANCEL).ifPresent(buttonType -> items.forEach(tableCellModel -> {
+            if (tableCellModel.isChecked()) {
+                tableCellModel.setChecked(false);
+            }
+        }));
+
+        setAction(Action.DUMMY);
+    }
+
     private void openTreeBankApp(DependencyGraphAdapter dependencyGraphAdapter) {
         Stage stage = new Stage();
         stage.setTitle("Quranic Morphological Dependency Graph Builder");
@@ -255,16 +350,14 @@ public class WordByWordPane extends BorderPane {
 
         //topPane.setLeft(left);
         topPane.setCenter(chapterVerseSelectionPane);
-        chapterVerseSelectionPane.selectedVerseProperty().addListener((observable, oldValue, newValue) -> {
-            refreshTable();
-        });
+        chapterVerseSelectionPane.selectedVerseProperty().addListener((observable, oldValue, newValue) -> refreshTable(false));
         setTop(topPane);
 
-        refreshTable();
+        refreshTable(false);
     }
 
     @SuppressWarnings({"unchecked"})
-    private void refreshTable() {
+    private void refreshTable(boolean refresh) {
         VerseTokenPairGroup selectedGrroup = chapterVerseSelectionPane.getSelectedVerse();
         if (selectedGrroup == null) {
             return;
@@ -272,7 +365,7 @@ public class WordByWordPane extends BorderPane {
         ObservableList items = tableView.getItems();
         items.remove(0, items.size());
 
-        List<Token> tokens = getTokens(selectedGrroup);
+        List<Token> tokens = getTokens(selectedGrroup, refresh);
 
         items.addAll(tokens.stream().map(TableCellModel::new).collect(Collectors.toList()));
 
@@ -280,6 +373,6 @@ public class WordByWordPane extends BorderPane {
     }
 
     public enum Action {
-        CREATE_DEPENDENCY_GRAPH
+        CREATE_DEPENDENCY_GRAPH, MERGE_TOKENS, DUMMY
     }
 }

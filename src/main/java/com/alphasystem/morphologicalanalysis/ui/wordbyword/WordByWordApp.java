@@ -14,9 +14,13 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 import static com.alphasystem.morphologicalanalysis.ui.wordbyword.WordByWordPane.Action.CREATE_DEPENDENCY_GRAPH;
-import static javafx.scene.input.KeyCode.*;
+import static com.alphasystem.morphologicalanalysis.ui.wordbyword.WordByWordPane.Action.MERGE_TOKENS;
+import static javafx.scene.input.KeyCode.C;
+import static javafx.scene.input.KeyCode.F;
+import static javafx.scene.input.KeyCode.F4;
+import static javafx.scene.input.KeyCode.M;
 import static javafx.scene.input.KeyCombination.ALT_DOWN;
-import static javafx.scene.input.KeyCombination.CONTROL_DOWN;
+import static javafx.scene.input.KeyCombination.SHORTCUT_DOWN;
 
 /**
  * @author sali
@@ -40,8 +44,13 @@ public class WordByWordApp extends Application {
         menu.setAccelerator(new KeyCodeCombination(F));
 
         menuItem = new MenuItem("Create Dependency Graph");
-        menuItem.setAccelerator(new KeyCodeCombination(C, CONTROL_DOWN, ALT_DOWN));
+        menuItem.setAccelerator(new KeyCodeCombination(C, SHORTCUT_DOWN, ALT_DOWN));
         menuItem.setOnAction(e -> root.setAction(CREATE_DEPENDENCY_GRAPH));
+        menu.getItems().add(menuItem);
+
+        menuItem = new MenuItem("Merge Tokens");
+        menuItem.setAccelerator(new KeyCodeCombination(M, SHORTCUT_DOWN, ALT_DOWN));
+        menuItem.setOnAction(e -> root.setAction(MERGE_TOKENS));
         menu.getItems().add(menuItem);
 
         menu.getItems().add(new SeparatorMenuItem());
