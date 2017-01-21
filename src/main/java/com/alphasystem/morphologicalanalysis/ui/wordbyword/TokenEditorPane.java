@@ -105,6 +105,11 @@ public class TokenEditorPane extends VBox {
         Alert alert = new Alert(INFORMATION);
         alert.setContentText(format("Token \"%s\" has been saved.", token));
         alert.showAndWait();
+        int selectedLocationIndex = tokenPropertiesView.getSelectedLocationIndex();
+        updateToken(null);
+        updateToken(token);
+        tokenPropertiesView.setSelectedLocation(selectedLocationIndex);
+        tokenPropertiesView.setReload(false);
         tokenPropertiesView.setReload(true);
     }
 
