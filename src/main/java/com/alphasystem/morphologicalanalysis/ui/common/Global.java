@@ -39,6 +39,7 @@ import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.Par
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.QURANIC_PUNCTUATION;
 import static com.alphasystem.util.AppUtil.USER_HOME_DIR;
 import static com.alphasystem.util.AppUtil.getResourceAsStream;
+import static java.lang.Math.max;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static javafx.scene.layout.BorderStroke.THIN;
@@ -76,6 +77,8 @@ public class Global {
     public static final double INITIAL_X = 0;
     public static final double INITIAL_Y = 40;
     public static final int GAP = 10;
+    private static final double DEFAULT_MIN_HEIGHT = 500.0;
+    public static final double ROW_SIZE = 55.0;
     public static final Border BORDER = new Border(new BorderStroke(LIGHTGREY, SOLID, EMPTY, THIN));
     public static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("resources");
     public static final String MAWRID_READER_URL = System.getProperty("mawrid-reader.url", "http://ejtaal.net/");
@@ -147,6 +150,16 @@ public class Global {
 
     static String getFontDisplayValue(FontMetaInfo fmi) {
         return (fmi == null) ? "" : format("%s, %s", fmi.getFamily(), fmi.getSize());
+    }
+
+    private static double roundTo100(double srcValue) {
+        return (double) ((((int) srcValue) + 99) / 100) * 100;
+    }
+
+    public static double calculateTableHeight(int numOfRows) {
+        double height = (numOfRows * ROW_SIZE) + ROW_SIZE;
+        height = roundTo100(height);
+        return max(height, DEFAULT_MIN_HEIGHT) + 100;
     }
 
     public static String getColorValue(Color color) {

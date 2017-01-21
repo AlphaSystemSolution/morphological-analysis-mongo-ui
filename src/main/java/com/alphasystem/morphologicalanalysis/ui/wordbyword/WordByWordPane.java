@@ -4,6 +4,7 @@ import com.alphasystem.morphologicalanalysis.common.model.VerseTokenPairGroup;
 import com.alphasystem.morphologicalanalysis.common.model.VerseTokensPair;
 import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
 import com.alphasystem.morphologicalanalysis.ui.common.ChapterVerseSelectionPane;
+import com.alphasystem.morphologicalanalysis.ui.common.Global;
 import com.alphasystem.morphologicalanalysis.ui.common.GraphMetaInfoSelectionDialog;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.TreeBankPane;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.model.DependencyGraphAdapter;
@@ -145,6 +146,9 @@ public class WordByWordPane extends BorderPane {
         checkBoxColumn.setCellFactory(CheckBoxTableCell.forTableColumn(checkBoxColumn));
 
         tableView = new TableView<>();
+        tableView.setFixedCellSize(Global.ROW_SIZE);
+        final int numOfRows = Math.max(20, tableView.getItems().size());
+        tableView.setPrefSize(Screen.getPrimary().getVisualBounds().getWidth(), Global.calculateTableHeight(numOfRows));
         tableView.setEditable(true);
         tableView.getColumns().addAll(descriptionColumn, tokenColumn, tokenNumberColumn, checkBoxColumn);
 
@@ -369,6 +373,7 @@ public class WordByWordPane extends BorderPane {
 
         items.addAll(tokens.stream().map(TableCellModel::new).collect(Collectors.toList()));
 
+        tableView.setPrefHeight(Global.calculateTableHeight(tableView.getItems().size()));
         tableView.requestLayout();
     }
 
