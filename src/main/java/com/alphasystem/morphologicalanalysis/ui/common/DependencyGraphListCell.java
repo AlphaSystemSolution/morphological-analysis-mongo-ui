@@ -9,6 +9,7 @@ import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Verse;
 import com.alphasystem.morphologicalanalysis.wordbyword.repository.VerseRepository;
 import com.alphasystem.util.GenericPreferences;
+import javafx.geometry.NodeOrientation;
 import javafx.scene.control.ListCell;
 import javafx.scene.text.Text;
 
@@ -30,6 +31,7 @@ public class DependencyGraphListCell extends ListCell<DependencyGraph> {
 
     public DependencyGraphListCell() {
         setContentDisplay(GRAPHIC_ONLY);
+        setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
         label = new Text();
         MorphologicalAnalysisPreferences preferences = GenericPreferences.getInstance(MorphologicalAnalysisPreferences.class);
         label.setFont(preferences.getArabicFont30());
