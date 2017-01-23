@@ -29,7 +29,7 @@ public class DependencyGraphSelectionDialog extends Dialog<DependencyGraph> {
         setTitle(getLabel("title"));
 
         dependencyGraphComboBox = new ComboBox<>();
-        dependencyGraphComboBox.setPrefWidth(350);
+        dependencyGraphComboBox.setPrefWidth(550);
         dependencyGraphComboBox.setCellFactory(param -> new DependencyGraphListCell());
         dependencyGraphComboBox.setButtonCell(new DependencyGraphListCell());
 
