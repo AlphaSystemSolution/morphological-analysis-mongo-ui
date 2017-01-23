@@ -46,7 +46,12 @@ public class CommonPropertiesView extends Control {
     private void updatePartOfSpeech(PartOfSpeech partOfSpeech) {
         final Location location = getLocation();
         if (location != null) {
-            location.setPartOfSpeech(partOfSpeech);
+            PartOfSpeech currentPartOfSpeech = location.getPartOfSpeech();
+            if (!currentPartOfSpeech.equals(partOfSpeech)) {
+                location.updatePartOfSpeech(partOfSpeech);
+            } else {
+                location.setPartOfSpeech(partOfSpeech);
+            }
         }
     }
 
