@@ -104,6 +104,11 @@ class DependencyGraphBuilderEditorPane extends BorderPane {
         gridPane.add(label, 0, row);
         String value = node.getText();
         value = value == null ? "" : value;
+        if (GraphNodeType.PART_OF_SPEECH.equals(node.getGraphNodeType())) {
+            PartOfSpeechNodeAdapter posNode = (PartOfSpeechNodeAdapter) node;
+            final String locationText = posNode.getLocationText();
+            value = (locationText == null) ? value : format("%s (%s)", locationText, value);
+        }
         TextField textField = new TextField(value);
         textField.setOnAction(event -> {
             TextField source = (TextField) event.getSource();
