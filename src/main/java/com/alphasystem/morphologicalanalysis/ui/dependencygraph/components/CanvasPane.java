@@ -536,8 +536,8 @@ public class CanvasPane extends Pane {
 
         TerminalNodeAdapter parent = (TerminalNodeAdapter) src.getParent();
         GraphNodeType parentNodeType = parent.getGraphNodeType();
-        // If current part of speech has parent which is Reference, or Hidden, we will not display menu
-        if (parentNodeType.equals(TERMINAL) || parentNodeType.equals(IMPLIED)) {
+        // If current part of speech has parent which is Hidden, we will not display menu
+        if (parentNodeType.equals(TERMINAL) || parentNodeType.equals(IMPLIED) || parentNodeType.equals(REFERENCE)) {
             menu = new Menu("Make Phrase");
             addPhraseMenuItems(src, menu);
             menuItems.add(menu);
@@ -780,7 +780,7 @@ public class CanvasPane extends Pane {
         outer:
         for (GraphNodeAdapter graphNode : graphNodes) {
             GraphNodeType graphNodeType = graphNode.getGraphNodeType();
-            if (graphNodeType.equals(TERMINAL) || graphNodeType.equals(IMPLIED)) {
+            if (graphNodeType.equals(TERMINAL) || graphNodeType.equals(IMPLIED) || graphNodeType.equals(REFERENCE)) {
                 TerminalNodeAdapter node = (TerminalNodeAdapter) graphNode;
                 ObservableList<PartOfSpeechNodeAdapter> partOfSpeeches = copyPartOfSpeechNodes(node);
                 for (PartOfSpeechNodeAdapter partOfSpeech : partOfSpeeches) {
