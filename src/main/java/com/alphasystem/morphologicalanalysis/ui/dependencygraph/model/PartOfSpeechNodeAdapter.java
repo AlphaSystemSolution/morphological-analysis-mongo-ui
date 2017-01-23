@@ -1,7 +1,9 @@
 package com.alphasystem.morphologicalanalysis.ui.dependencygraph.model;
 
 import com.alphasystem.morphologicalanalysis.graph.model.PartOfSpeechNode;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
 
 /**
@@ -9,6 +11,7 @@ import javafx.beans.property.SimpleBooleanProperty;
  */
 public class PartOfSpeechNodeAdapter extends LinkSupportAdapter<PartOfSpeechNode> {
 
+    private final ReadOnlyStringWrapper locationText = new ReadOnlyStringWrapper(this, "locationText");
     private final BooleanProperty hidden = new SimpleBooleanProperty();
 
     public PartOfSpeechNodeAdapter() {
@@ -18,8 +21,18 @@ public class PartOfSpeechNodeAdapter extends LinkSupportAdapter<PartOfSpeechNode
     @Override
     protected void initValues(PartOfSpeechNode graphNode) {
         super.initValues(graphNode);
+        if (graphNode != null) {
+            final Location location = graphNode.getLocation();
+            if (location != null) {
+                locationText.setValue(location.getText());
+            }
+        }
         setHidden(graphNode != null && graphNode.isHidden());
         hiddenProperty().addListener((observable, oldValue, newValue) -> getSrc().setHidden(newValue));
+    }
+
+    public final String getLocationText() {
+        return locationText.get();
     }
 
     public boolean isHidden() {
