@@ -18,18 +18,20 @@ import com.alphasystem.morphologicalanalysis.wordbyword.model.Verse;
 import com.alphasystem.morphologicalanalysis.wordbyword.repository.VerseRepository;
 import com.alphasystem.util.GenericPreferences;
 import javafx.collections.ObservableList;
-import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.Pane;
 import javafx.scene.text.Text;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
@@ -51,13 +53,18 @@ import static javafx.scene.control.ButtonType.CANCEL;
 import static javafx.scene.control.ButtonType.OK;
 import static javafx.scene.control.ContentDisplay.GRAPHIC_ONLY;
 import static javafx.scene.control.ScrollPane.ScrollBarPolicy.AS_NEEDED;
+import static javafx.scene.input.KeyCode.C;
+import static javafx.scene.input.KeyCode.F;
+import static javafx.scene.input.KeyCode.M;
+import static javafx.scene.input.KeyCombination.ALT_DOWN;
+import static javafx.scene.input.KeyCombination.SHORTCUT_DOWN;
 import static javafx.scene.text.TextAlignment.CENTER;
 
 
 /**
  * @author sali
  */
-public class WordByWordPane extends BorderPane {
+class WordByWordPane extends BorderPane {
 
     private final MorphologicalAnalysisPreferences preferences = GenericPreferences.getInstance(MorphologicalAnalysisPreferences.class);
     private static Map<String, List<Token>> cache = new LinkedHashMap<>();
@@ -66,7 +73,9 @@ public class WordByWordPane extends BorderPane {
     private TableView<TableCellModel> tableView;
 
     @SuppressWarnings({"unchecked"})
-    public WordByWordPane() {
+    WordByWordPane() {
+        BorderPane topPane = new BorderPane();
+        topPane.setTop(createMenuBar());
         chapterVerseSelectionPane = new ChapterVerseSelectionPane();
         chapterVerseSelectionPane.availableProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue) {
@@ -153,6 +162,8 @@ public class WordByWordPane extends BorderPane {
         scrollPane.setVbarPolicy(AS_NEEDED);
         scrollPane.setHbarPolicy(AS_NEEDED);
 
+        topPane.setCenter(chapterVerseSelectionPane);
+        setTop(topPane);
         setCenter(scrollPane);
     }
 
@@ -173,7 +184,31 @@ public class WordByWordPane extends BorderPane {
         return tokens;
     }
 
-    void exportTokens() {
+    private MenuBar createMenuBar() {
+        MenuBar menuBar = new MenuBar();
+        menuBar.setUseSystemMenuBar(true);
+
+        MenuItem menuItem;
+
+        Menu menu = new Menu("File");
+        menu.setAccelerator(new KeyCodeCombination(F));
+
+        menuItem = new MenuItem("Create Dependency Graph");
+        menuItem.setAccelerator(new KeyCodeCombination(C, SHORTCUT_DOWN, ALT_DOWN));
+        menuItem.setOnAction(e -> exportTokens());
+        menu.getItems().add(menuItem);
+
+        menuItem = new MenuItem("Merge Tokens");
+        menuItem.setAccelerator(new KeyCodeCombination(M, SHORTCUT_DOWN, ALT_DOWN));
+        menuItem.setOnAction(e -> mergeTokens());
+        menu.getItems().add(menuItem);
+
+        menuBar.getMenus().add(menu);
+
+        return menuBar;
+    }
+
+    private void exportTokens() {
         ObservableList<TableCellModel> items = tableView.getItems();
         List<Token> tokens = new ArrayList<>();
         items.forEach(tcm -> {
@@ -228,7 +263,7 @@ public class WordByWordPane extends BorderPane {
         });
     }
 
-    void mergeTokens() {
+    private void mergeTokens() {
         ObservableList<TableCellModel> items = tableView.getItems();
         List<Token> tokens = new ArrayList<>();
         items.forEach(tcm -> {
@@ -317,18 +352,7 @@ public class WordByWordPane extends BorderPane {
 
     private void initPane() {
         // top pane for Menu bar and chapter verse selection
-        BorderPane topPane = new BorderPane();
-        Pane left = new Pane();
-        Screen screen = Screen.getPrimary();
-        Rectangle2D bounds = screen.getVisualBounds();
-        double width = bounds.getWidth();
-        left.setPrefWidth(width / 3);
-
-        //topPane.setLeft(left);
-        topPane.setCenter(chapterVerseSelectionPane);
         chapterVerseSelectionPane.selectedVerseProperty().addListener((observable, oldValue, newValue) -> refreshTable(false));
-        setTop(topPane);
-
         refreshTable(false);
     }
 
