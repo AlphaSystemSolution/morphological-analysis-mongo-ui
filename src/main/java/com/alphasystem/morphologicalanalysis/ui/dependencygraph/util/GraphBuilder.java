@@ -34,12 +34,18 @@ public class GraphBuilder {
     private FontMetaInfo translationFont;
     private FontMetaInfo posFont;
     private double rectX;
+
+    // x & y coordinates of text
     private double textX;
     private double textY;
+
+    // Line (x1, y1) & (x2 y2)
     private double x1;
     private double y1;
     private double x2;
     private double y2;
+
+    // translation x & y
     private double x3;
     private double y3;
 
@@ -145,7 +151,7 @@ public class GraphBuilder {
 
     private void buildPartOfSpeechNodes(List<TerminalNode> terminalNodes) {
         reset();
-        textY = 150;
+        textY = 155;
 
         for (TerminalNode terminalNode : terminalNodes) {
             List<PartOfSpeechNode> partOfSpeechNodes = buildPartOfSpeechNodes(terminalNode);
@@ -175,11 +181,11 @@ public class GraphBuilder {
         LinkSupport owner = (LinkSupport) ownerNode.getSrc();
         relationshipNode.setOwner(owner);
         double startX = dependent.getCx() + dependent.getTranslateX();
-        double startY = dependent.getCy() + dependent.getTranslateY();
+        double startY = dependent.getCy() + dependent.getTranslateY() + 5d;
         double endX = owner.getCx() + owner.getTranslateX();
         double endY = owner.getCy() + owner.getTranslateY();
-        double controlY1 = startY + 80d;
-        double controlY2 = endY + 80d;
+        double controlY1 = startY + 65d;
+        double controlY2 = endY + 65d;
         if (controlY1 != controlY2) {
             Double max = StrictMath.max(controlY1, controlY2);
             controlY1 = max;
@@ -196,7 +202,7 @@ public class GraphBuilder {
     }
 
     public void buildPhraseNode(PhraseNode phraseNode, List<PartOfSpeechNodeAdapter> fragments) {
-        double yOffset = 100.0;
+        double yOffset = 120.0;
         PartOfSpeechNodeAdapter firstNode = fragments.get(fragments.size() - 1);
         PartOfSpeechNodeAdapter lastNode = fragments.get(0);
         TerminalNodeAdapter firstNodeParent = (TerminalNodeAdapter) firstNode.getParent();
@@ -276,6 +282,6 @@ public class GraphBuilder {
         x2 = tokenWidth + rectX;
         y2 = y1;
         x3 = rectX + 30;
-        y3 = 100;
+        y3 = 95;
     }
 }
