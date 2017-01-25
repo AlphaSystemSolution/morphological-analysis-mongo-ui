@@ -64,7 +64,7 @@ import static javafx.scene.text.TextAlignment.CENTER;
 /**
  * @author sali
  */
-class WordByWordPane extends BorderPane {
+public class WordByWordPane extends BorderPane {
 
     private final MorphologicalAnalysisPreferences preferences = GenericPreferences.getInstance(MorphologicalAnalysisPreferences.class);
     private static Map<String, List<Token>> cache = new LinkedHashMap<>();
@@ -73,7 +73,7 @@ class WordByWordPane extends BorderPane {
     private TableView<TableCellModel> tableView;
 
     @SuppressWarnings({"unchecked"})
-    WordByWordPane() {
+    public WordByWordPane() {
         BorderPane topPane = new BorderPane();
         topPane.setTop(createMenuBar());
         chapterVerseSelectionPane = new ChapterVerseSelectionPane();
