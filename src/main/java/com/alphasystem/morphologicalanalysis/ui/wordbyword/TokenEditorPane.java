@@ -17,13 +17,12 @@ import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TitledPane;
+import javafx.scene.control.*;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,16 +33,27 @@ import static com.alphasystem.fx.ui.util.UiUtilities.waitCursor;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.GAP;
 import static com.alphasystem.morphologicalanalysis.ui.common.Global.RESOURCE_BUNDLE;
 import static com.alphasystem.util.AppUtil.NEW_LINE;
+import static de.jensd.fx.glyphs.GlyphsDude.setIcon;
+import static de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon.ANGLE_DOUBLE_LEFT;
+import static de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon.ANGLE_DOUBLE_RIGHT;
+import static de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon.SAVE;
 import static java.lang.String.format;
 import static java.util.Collections.binarySearch;
 import static javafx.geometry.Pos.CENTER;
 import static javafx.scene.control.Alert.AlertType.ERROR;
 import static javafx.scene.control.Alert.AlertType.INFORMATION;
+import static javafx.scene.input.KeyCode.F;
+import static javafx.scene.input.KeyCode.F4;
+import static javafx.scene.input.KeyCode.LEFT;
+import static javafx.scene.input.KeyCode.RIGHT;
+import static javafx.scene.input.KeyCode.S;
+import static javafx.scene.input.KeyCombination.ALT_DOWN;
+import static javafx.scene.input.KeyCombination.SHORTCUT_DOWN;
 
 /**
  * @author sali
  */
-public class TokenEditorPane extends VBox {
+public class TokenEditorPane extends BorderPane {
 
     public static final int DEFAULT_INDEX = 0;
     private final RepositoryTool repositoryTool = RepositoryTool.getInstance();
@@ -72,7 +82,8 @@ public class TokenEditorPane extends VBox {
         chapterComboBox.valueProperty().addListener((o, ov, nv) -> updateVerseComboBox(nv));
 
         initializeChapterVerseTokenPane();
-        getChildren().add(tokenPropertiesView);
+        setTop(createTopPane());
+        setCenter(tokenPropertiesView);
 
         Service<List<Chapter>> chapterService = repositoryTool.getAllChapters();
         chapterService.setOnReady(event -> waitCursor(this));
@@ -80,6 +91,81 @@ public class TokenEditorPane extends VBox {
         chapterService.setOnSucceeded(this::loadChapters);
         chapterService.start();
 
+    }
+
+    private VBox createTopPane() {
+        VBox vBox = new VBox();
+        vBox.getChildren().addAll(createMenuBar(), createToolBar());
+        return vBox;
+    }
+
+    private ToolBar createToolBar() {
+        ToolBar toolBar = new ToolBar();
+
+        Button toolbarButton;
+
+        toolbarButton = new Button();
+        toolbarButton.setTooltip(new Tooltip("Save current token"));
+        setIcon(toolbarButton, SAVE, "2em");
+        toolbarButton.disableProperty().bind(token().isNull());
+        toolbarButton.setOnAction(event -> saveToken());
+        toolBar.getItems().add(toolbarButton);
+
+        toolbarButton = new Button();
+        toolbarButton.setTooltip(new Tooltip("Go to next token"));
+        setIcon(toolbarButton, ANGLE_DOUBLE_RIGHT, "2em");
+        toolbarButton.disableProperty().bind(nextToken().isNull());
+        toolbarButton.setOnAction(event -> loadNextToken());
+        toolBar.getItems().add(toolbarButton);
+
+        toolbarButton = new Button();
+        toolbarButton.setTooltip(new Tooltip("Go to previous token"));
+        setIcon(toolbarButton, ANGLE_DOUBLE_LEFT, "2em");
+        toolbarButton.disableProperty().bind(previousToken().isNull());
+        toolbarButton.setOnAction(event -> loadPreviousToken());
+        toolBar.getItems().add(toolbarButton);
+
+        return toolBar;
+    }
+
+    private MenuBar createMenuBar() {
+        MenuBar menuBar = new MenuBar();
+
+        MenuItem menuItem;
+
+        Menu menu = new Menu("File");
+        menu.setAccelerator(new KeyCodeCombination(F));
+
+        menuItem = new MenuItem("Save");
+        setIcon(menuItem, SAVE);
+        menuItem.disableProperty().bind(token().isNull());
+        menuItem.setAccelerator(new KeyCodeCombination(S, SHORTCUT_DOWN));
+        menuItem.setOnAction(event -> saveToken());
+        menu.getItems().add(menuItem);
+
+        menuItem = new MenuItem("Next");
+        setIcon(menuItem, ANGLE_DOUBLE_RIGHT);
+        menuItem.disableProperty().bind(nextToken().isNull());
+        menuItem.setAccelerator(new KeyCodeCombination(RIGHT, SHORTCUT_DOWN));
+        menuItem.setOnAction(event -> loadNextToken());
+        menu.getItems().add(menuItem);
+
+        menuItem = new MenuItem("Previous");
+        setIcon(menuItem, ANGLE_DOUBLE_LEFT);
+        menuItem.disableProperty().bind(previousToken().isNull());
+        menuItem.setAccelerator(new KeyCodeCombination(LEFT, SHORTCUT_DOWN));
+        menuItem.setOnAction(event -> loadPreviousToken());
+        menu.getItems().add(menuItem);
+
+        menu.getItems().add(new SeparatorMenuItem());
+
+        menuItem = new MenuItem("Exit");
+        menuItem.setAccelerator(new KeyCodeCombination(F4, ALT_DOWN));
+        menuItem.setOnAction(event -> ((Stage) getScene().getWindow()).close());
+        menu.getItems().add(menuItem);
+
+        menuBar.getMenus().add(menu);
+        return menuBar;
     }
 
     public void saveToken() {
