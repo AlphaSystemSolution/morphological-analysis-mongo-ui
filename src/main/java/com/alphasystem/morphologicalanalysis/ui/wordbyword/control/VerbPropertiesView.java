@@ -51,7 +51,9 @@ public class VerbPropertiesView extends AbstractPropertiesView<VerbProperties> {
             VerbProperties verbProperties = getLocationProperties();
             if (verbProperties != null) {
                 IncompleteVerb incompleteVerb = verbProperties.getIncompleteVerb();
-                incompleteVerb.setType(nv);
+                if (incompleteVerb != null) {
+                    incompleteVerb.setType(nv);
+                }
             }
         });
     }
@@ -63,10 +65,10 @@ public class VerbPropertiesView extends AbstractPropertiesView<VerbProperties> {
         setVerbType((nv == null) ? null : nv.getVerbType());
         setVerbMode((nv == null) ? null : nv.getMode());
         IncompleteVerb incompleteVerb = (nv == null) ? null : nv.getIncompleteVerb();
-        if (incompleteVerb != null) {
-            setIncompleteVerbCategory(incompleteVerb.getCategory());
-            setIncompleteVerbType(incompleteVerb.getType());
-        }
+        final IncompleteVerbCategory category = (incompleteVerb == null) ? null : incompleteVerb.getCategory();
+        final IncompleteVerbType type = (incompleteVerb == null) ? null : incompleteVerb.getType();
+        setIncompleteVerbCategory(category);
+        setIncompleteVerbType(type);
     }
 
     public final ConversationType getConversationType() {
