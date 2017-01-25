@@ -17,7 +17,7 @@ public class GraphMetaInfoAdapter {
 
     private static final TerminalNode DUMMY_TERMINAL_NODE = new TerminalNode();
     private static final PartOfSpeechNode DUMMY_POS_NODE = new PartOfSpeechNode();
-    private static final String DEFAULT_COLOR = getColorValue(Color.BEIGE);
+    private static final String DEFAULT_COLOR = getColorValue(Color.WHITE);
 
     private final ObjectProperty<GraphMetaInfo> graphMetaInfo = new SimpleObjectProperty<>();
     private final DoubleProperty width = new SimpleDoubleProperty();
