@@ -17,8 +17,6 @@ import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Verse;
 import com.alphasystem.morphologicalanalysis.wordbyword.repository.VerseRepository;
 import com.alphasystem.util.GenericPreferences;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
@@ -63,7 +61,6 @@ public class WordByWordPane extends BorderPane {
 
     private final MorphologicalAnalysisPreferences preferences = GenericPreferences.getInstance(MorphologicalAnalysisPreferences.class);
     private static Map<String, List<Token>> cache = new LinkedHashMap<>();
-    private final ObjectProperty<Action> action = new SimpleObjectProperty<>();
     private ChapterVerseSelectionPane chapterVerseSelectionPane;
     private GraphMetaInfoSelectionDialog graphMetaInfoSelectionDialog;
     private TableView<TableCellModel> tableView;
@@ -77,7 +74,6 @@ public class WordByWordPane extends BorderPane {
             }
         });
         graphMetaInfoSelectionDialog = new GraphMetaInfoSelectionDialog();
-        actionProperty().addListener((observable, oldValue, newValue) -> performAction(newValue));
 
         TableColumn descriptionColumn = new TableColumn<>();
         descriptionColumn.setMinWidth(800);
@@ -177,21 +173,7 @@ public class WordByWordPane extends BorderPane {
         return tokens;
     }
 
-    private void performAction(Action action) {
-        if (action == null) {
-            return;
-        }
-        switch (action) {
-            case CREATE_DEPENDENCY_GRAPH:
-                exportTokens();
-                break;
-            case MERGE_TOKENS:
-                mergeTokens();
-                break;
-        }
-    }
-
-    private void exportTokens() {
+    void exportTokens() {
         ObservableList<TableCellModel> items = tableView.getItems();
         List<Token> tokens = new ArrayList<>();
         items.forEach(tcm -> {
@@ -246,7 +228,7 @@ public class WordByWordPane extends BorderPane {
         });
     }
 
-    private void mergeTokens() {
+    void mergeTokens() {
         ObservableList<TableCellModel> items = tableView.getItems();
         List<Token> tokens = new ArrayList<>();
         items.forEach(tcm -> {
@@ -322,8 +304,6 @@ public class WordByWordPane extends BorderPane {
                 tableCellModel.setChecked(false);
             }
         }));
-
-        setAction(Action.DUMMY);
     }
 
     private void openTreeBankApp(DependencyGraphAdapter dependencyGraphAdapter) {
@@ -333,14 +313,6 @@ public class WordByWordPane extends BorderPane {
         stage.setMaximized(true);
         stage.setScene(scene);
         stage.show();
-    }
-
-    public final void setAction(Action action) {
-        this.action.set(action);
-    }
-
-    public final ObjectProperty<Action> actionProperty() {
-        return action;
     }
 
     private void initPane() {
@@ -377,7 +349,4 @@ public class WordByWordPane extends BorderPane {
         tableView.requestLayout();
     }
 
-    public enum Action {
-        CREATE_DEPENDENCY_GRAPH, MERGE_TOKENS, DUMMY
-    }
 }
