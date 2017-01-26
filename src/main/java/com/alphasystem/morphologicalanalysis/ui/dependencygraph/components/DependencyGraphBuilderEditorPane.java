@@ -411,7 +411,7 @@ class DependencyGraphBuilderEditorPane extends BorderPane {
         final double canvasWidth = getCanvasWidth();
         if (pos) {
             left = node.getX1() - 30;
-            right = node.getX2() + 30;
+            right = node.getX2() + 130;
         } else if (x) {
             left = node.getX1();
             right = node.getX2();
