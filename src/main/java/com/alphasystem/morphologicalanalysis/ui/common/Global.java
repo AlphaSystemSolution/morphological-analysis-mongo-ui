@@ -105,7 +105,7 @@ public class Global {
     }
 
     public static boolean isTerminal(GraphNodeAdapter src) {
-        return TERMINALS.contains(src.getGraphNodeType());
+        return src != null && TERMINALS.contains(src.getGraphNodeType());
     }
 
     public static boolean isTerminal(GraphNode src) {
