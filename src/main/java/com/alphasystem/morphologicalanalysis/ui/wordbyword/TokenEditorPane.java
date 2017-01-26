@@ -81,7 +81,6 @@ public class TokenEditorPane extends BorderPane {
         chapterComboBox.setCellFactory(param -> new ChapterListCell());
         chapterComboBox.valueProperty().addListener((o, ov, nv) -> updateVerseComboBox(nv));
 
-        initializeChapterVerseTokenPane();
         setTop(createTopPane());
         setCenter(tokenPropertiesView);
 
@@ -95,7 +94,7 @@ public class TokenEditorPane extends BorderPane {
 
     private VBox createTopPane() {
         VBox vBox = new VBox();
-        vBox.getChildren().addAll(createMenuBar(), createToolBar());
+        vBox.getChildren().addAll(createMenuBar(), createToolBar(), initializeChapterVerseTokenPane());
         return vBox;
     }
 
@@ -293,7 +292,7 @@ public class TokenEditorPane extends BorderPane {
         this.token.setValue(t);
     }
 
-    private void initializeChapterVerseTokenPane() {
+    private TitledPane initializeChapterVerseTokenPane() {
         GridPane gridPane = new GridPane();
         gridPane.setHgap(GAP);
         gridPane.setAlignment(CENTER);
@@ -313,7 +312,7 @@ public class TokenEditorPane extends BorderPane {
         gridPane.add(label, 4, DEFAULT_INDEX);
         gridPane.add(tokenComboBox, 5, DEFAULT_INDEX);
 
-        getChildren().add(new TitledPane(RESOURCE_BUNDLE.getString("chapterVerseToken.title.label"), gridPane));
+        return new TitledPane(RESOURCE_BUNDLE.getString("chapterVerseToken.title.label"), gridPane);
     }
 
     private void getPreviousToken(Token newToken) {
