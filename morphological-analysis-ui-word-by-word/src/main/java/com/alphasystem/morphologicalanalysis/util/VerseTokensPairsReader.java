@@ -31,13 +31,13 @@ public class VerseTokensPairsReader {
                 String line = listIterator.next();
                 try {
                     // if no exception occurs then this the start of new chapter line
-                    int cn = parseInt(line);
-                    chapterNumber = cn;
+                    chapterNumber = parseInt(line);
                     currentGroupList = new ArrayList<>();
                     resultMap.put(chapterNumber, currentGroupList);
                     listIterator.remove();
                     line = listIterator.next();
                 } catch (NumberFormatException e) {
+                    // ignore
                 }
 
                 currentGroupList.add(createGroup(chapterNumber, line));
@@ -50,7 +50,7 @@ public class VerseTokensPairsReader {
         return resultMap;
     }
 
-    public static VerseTokenPairGroup createGroup(Integer chapterNumber, String line) {
+    private static VerseTokenPairGroup createGroup(Integer chapterNumber, String line) {
         VerseTokenPairGroup group = new VerseTokenPairGroup();
         String[] pairs = line.split("\\|");
         group.setChapterNumber(chapterNumber);
