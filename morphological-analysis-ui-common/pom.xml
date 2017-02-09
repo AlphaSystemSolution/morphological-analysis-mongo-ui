@@ -11,33 +11,52 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
+            <version>1.5.1.RELEASE</version>
         </dependency>
         <dependency>
             <groupId>com.alphasystem.arabic</groupId>
             <artifactId>morphological-analysis-model</artifactId>
+            <version>${ma-model.version}</version>
+            <classifier>clean</classifier>
         </dependency>
         <dependency>
             <groupId>com.alphasystem.arabic</groupId>
             <artifactId>arabic-ui-support</artifactId>
+            <version>${arabic-ui-support.version}</version>
         </dependency>
         <dependency>
             <groupId>com.alphasystem.arabic</groupId>
             <artifactId>morphological-engine</artifactId>
+            <version>${morphological-engine.version}</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
+            <version>2.4</version>
         </dependency>
         <dependency>
             <groupId>org.controlsfx</groupId>
             <artifactId>controlsfx</artifactId>
+            <version>8.40.10</version>
         </dependency>
         <dependency>
             <groupId>com.alphasystem.app</groupId>
             <artifactId>asciidoctor-editor</artifactId>
+            <version>${asciidoctor-editor.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>5.2.4.Final</version>
         </dependency>
     </dependencies>
     <properties>
+        <base.version>3.0.0-SNAPSHOT</base.version>
+        <ma-model.version>4.1.0-SNAPSHOT</ma-model.version>
+        <morphological-engine.version>${base.version}</morphological-engine.version>
+        <arabic-ui-support.version>${base.version}</arabic-ui-support.version>
+        <asciidoctor-editor.version>${base.version}</asciidoctor-editor.version>
+        <morphological-analysis-ui-preloader.version>${project.version}</morphological-analysis-ui-preloader.version>
         <maven.test.skip>true</maven.test.skip>
     </properties>
 </project>
