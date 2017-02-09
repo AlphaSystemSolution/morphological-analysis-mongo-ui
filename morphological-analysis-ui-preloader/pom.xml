@@ -1,0 +1,16 @@
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.alphasystem.project</groupId>
+        <artifactId>jar</artifactId>
+        <version>3.0.0-SNAPSHOT</version>
+    </parent>
+    <groupId>com.alphasystem.arabic</groupId>
+    <artifactId>morphological-analysis-ui-preloader</artifactId>
+    <version>4.0.0-SNAPSHOT</version>
+    <properties>
+        <maven.test.skip>true</maven.test.skip>
+    </properties>
+</project>
