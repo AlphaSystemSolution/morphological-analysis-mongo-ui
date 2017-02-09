@@ -5,7 +5,11 @@ import com.alphasystem.morphologicalanalysis.common.model.VerseTokensPair;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
 
 import static com.alphasystem.util.AppUtil.readAllLines;
 import static java.lang.Integer.parseInt;

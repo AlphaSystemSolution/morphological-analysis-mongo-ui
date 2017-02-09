@@ -7,14 +7,14 @@
         <version>4.0.0-SNAPSHOT</version>
     </parent>
     <artifactId>morphological-analysis-ui-word-by-word</artifactId>
-    <!--<build>
+    <build>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
         </plugins>
-    </build>-->
+    </build>
     <dependencies>
         <dependency>
             <groupId>com.alphasystem.arabic</groupId>
