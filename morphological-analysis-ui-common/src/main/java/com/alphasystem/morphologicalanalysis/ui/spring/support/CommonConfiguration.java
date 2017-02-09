@@ -8,7 +8,7 @@ import org.springframework.web.client.RestTemplate;
  * @author sali
  */
 @Configuration
-public class MainConfiguration {
+public class CommonConfiguration {
 
     @Bean
     public RestTemplate restTemplate(){

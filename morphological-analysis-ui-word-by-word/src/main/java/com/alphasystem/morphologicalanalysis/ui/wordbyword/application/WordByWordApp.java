@@ -1,7 +1,7 @@
 package com.alphasystem.morphologicalanalysis.ui.wordbyword.application;
 
 import com.alphasystem.morphologicalanalysis.ui.application.AbstractJavaFxApplicationSupport;
-import com.alphasystem.morphologicalanalysis.ui.spring.support.MainConfiguration;
+import com.alphasystem.morphologicalanalysis.ui.spring.support.CommonConfiguration;
 import javafx.application.Preloader;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
@@ -16,7 +16,7 @@ import org.springframework.context.annotation.Lazy;
  */
 @Lazy
 @SpringBootApplication
-@Import(MainConfiguration.class)
+@Import(CommonConfiguration.class)
 public class WordByWordApp extends AbstractJavaFxApplicationSupport {
 
     @Value("${app.ui.title}")
