@@ -1,4 +1,4 @@
-package com.alphasystem.morphologicalanalysis.ui.wordbyword.util;
+package com.alphasystem.morphologicalanalysis.ui.util;
 
 import com.alphasystem.morphologicalanalysis.common.model.VerseTokenPairGroup;
 import com.alphasystem.morphologicalanalysis.common.model.VerseTokensPair;
