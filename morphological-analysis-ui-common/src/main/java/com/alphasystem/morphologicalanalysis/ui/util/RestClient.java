@@ -1,17 +1,23 @@
 package com.alphasystem.morphologicalanalysis.ui.util;
 
+import com.alphasystem.morphologicalanalysis.common.model.VerseTokenPairGroup;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Chapter;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
+import java.net.URI;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author sali
@@ -20,14 +26,17 @@ import java.util.List;
 public class RestClient {
 
     private static final String CHAPTERS_PATH_SUFFIX = "/chapters";
+    private static final String TOKENS_PATH_SUFFIX = "/tokens";
+
     @Autowired private RestTemplate restTemplate;
     @Value("${service.url}") private String urlPath;
-    private ObjectMapper objectMapper = new ObjectMapper();
+
+    private Map<String, List<Token>> cache = new LinkedHashMap<>();
     private List<Chapter> chapters;
 
-    private static String getServicePath(String pathPrefix, String uri, Object... pathVariables) {
+    private static URI getServicePath(String pathPrefix, String uri, Object... pathVariables) {
         String pathSuffix = ArrayUtils.isEmpty(pathVariables) ? uri : String.format(uri, pathVariables);
-        return String.format("%s%s", pathPrefix, pathSuffix);
+        return URI.create(String.format("%s%s", pathPrefix, pathSuffix));
     }
 
     @PostConstruct
@@ -38,10 +47,30 @@ public class RestClient {
     @SuppressWarnings("unchecked")
     public List<Chapter> getChapters() {
         if (chapters == null) {
-            final List<LinkedHashMap> list = restTemplate.getForObject(getServicePath(urlPath, CHAPTERS_PATH_SUFFIX), List.class);
-            chapters = new ArrayList<>();
-            list.forEach(linkedHashMap -> chapters.add(objectMapper.convertValue(linkedHashMap, Chapter.class)));
+            final URI uri = getServicePath(urlPath, CHAPTERS_PATH_SUFFIX);
+            final ResponseEntity<List<Chapter>> responseEntity = restTemplate.exchange(uri, HttpMethod.GET, null, new ChapterListType());
+            chapters = responseEntity.getBody();
         }
         return chapters;
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<Token> getTokens(VerseTokenPairGroup group, boolean refresh) {
+        final String key = group.toString();
+        List<Token> tokens = refresh ? null : cache.get(key);
+        if (tokens == null || tokens.isEmpty()) {
+            final URI uri = getServicePath(urlPath, TOKENS_PATH_SUFFIX);
+            final HttpEntity<VerseTokenPairGroup> entity = new HttpEntity<>(group);
+            final ResponseEntity<List<Token>> responseEntity = restTemplate.exchange(uri, HttpMethod.POST, entity, new TokenListType());
+            tokens = responseEntity.getBody();
+            cache.put(key, tokens);
+        }
+        return tokens;
+    }
+
+    private static class ChapterListType extends ParameterizedTypeReference<List<Chapter>> {
+    }
+
+    private static class TokenListType extends ParameterizedTypeReference<List<Token>> {
     }
 }
