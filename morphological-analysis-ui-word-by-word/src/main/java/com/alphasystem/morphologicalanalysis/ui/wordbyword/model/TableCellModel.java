@@ -49,14 +49,6 @@ public final class TableCellModel {
         this.token = token;
     }
 
-    public final boolean isChecked() {
-        return checked.get();
-    }
-
-    public final void setChecked(boolean checked) {
-        this.checked.set(checked);
-    }
-
     public final BooleanProperty checkedProperty() {
         return checked;
     }
