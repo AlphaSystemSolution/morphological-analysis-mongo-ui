@@ -32,7 +32,7 @@ public class RestClient {
     @Value("${service.url}") private String urlPath;
 
     private Map<String, List<Token>> cache = new LinkedHashMap<>();
-    private List<Chapter> chapters;
+    private Chapter[] chapters;
 
     private static URI getServicePath(String pathPrefix, String uri, Object... pathVariables) {
         String pathSuffix = ArrayUtils.isEmpty(pathVariables) ? uri : String.format(uri, pathVariables);
@@ -45,10 +45,10 @@ public class RestClient {
     }
 
     @SuppressWarnings("unchecked")
-    public List<Chapter> getChapters() {
+    public Chapter[] getChapters() {
         if (chapters == null) {
             final URI uri = getServicePath(urlPath, CHAPTERS_PATH_SUFFIX);
-            final ResponseEntity<List<Chapter>> responseEntity = restTemplate.exchange(uri, HttpMethod.GET, null, new ChapterListType());
+            final ResponseEntity<Chapter[]> responseEntity = restTemplate.exchange(uri, HttpMethod.GET, null, new ChapterListType());
             chapters = responseEntity.getBody();
         }
         return chapters;
@@ -68,7 +68,7 @@ public class RestClient {
         return tokens;
     }
 
-    private static class ChapterListType extends ParameterizedTypeReference<List<Chapter>> {
+    private static class ChapterListType extends ParameterizedTypeReference<Chapter[]> {
     }
 
     private static class TokenListType extends ParameterizedTypeReference<List<Token>> {

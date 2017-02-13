@@ -47,11 +47,7 @@ public class ChapterVerseSelectionPane extends BorderPane {
 
     @PostConstruct
     public void postConstruct() {
-        final List<Chapter> chapterList = restClient.getChapters();
-        chapters = new Chapter[chapterList.size()];
-        for (int i = 0; i < chapterList.size(); i++) {
-            chapters[i] = new Chapter(chapterList.get(i));
-        }
+        chapters = restClient.getChapters();
         initPane();
     }
 
