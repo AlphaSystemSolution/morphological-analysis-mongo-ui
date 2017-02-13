@@ -2,7 +2,6 @@ package com.alphasystem.morphologicalanalysis.ui.wordbyword.model;
 
 
 import com.alphasystem.arabic.model.ArabicTool;
-import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
@@ -40,17 +39,6 @@ public final class TableCellModel {
         String verseNumber = ArabicTool.getArabicNumberWord(token.getVerseNumber()).toUnicode();
         String tokenNumber = ArabicTool.getArabicNumberWord(token.getTokenNumber()).toUnicode();
         return format("(%s:%s:%s)", chapterNumber, verseNumber, tokenNumber);
-    }
-
-    private static String getLocationNumber(Location location) {
-        if (location == null) {
-            return "";
-        }
-        String chapterNumber = ArabicTool.getArabicNumberWord(location.getChapterNumber()).toUnicode();
-        String verseNumber = ArabicTool.getArabicNumberWord(location.getVerseNumber()).toUnicode();
-        String tokenNumber = ArabicTool.getArabicNumberWord(location.getTokenNumber()).toUnicode();
-        String locationNumber = ArabicTool.getArabicNumberWord(location.getLocationNumber()).toUnicode();
-        return format("(%s:%s:%s:%s)", chapterNumber, verseNumber, tokenNumber, locationNumber);
     }
 
     public Token getToken() {
