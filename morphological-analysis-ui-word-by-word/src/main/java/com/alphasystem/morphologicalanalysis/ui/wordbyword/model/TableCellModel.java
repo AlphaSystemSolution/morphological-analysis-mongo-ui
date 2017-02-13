@@ -23,21 +23,12 @@ public final class TableCellModel {
     private final ReadOnlyStringWrapper text;
     private final StringProperty morphologicalDescription;
     private Token token;
-    private Location location;
 
     public TableCellModel(Token token) {
         this.token = token;
         checked = new SimpleBooleanProperty(false);
         displayName = new ReadOnlyStringWrapper(getTokenNumber(this.token));
         text = new ReadOnlyStringWrapper((token == null) ? "" : token.tokenWord().toUnicode());
-        morphologicalDescription = new SimpleStringProperty();
-    }
-
-    public TableCellModel(Location location) {
-        this.location = location;
-        checked = new SimpleBooleanProperty(false);
-        displayName = new ReadOnlyStringWrapper(getLocationNumber(this.location));
-        text = new ReadOnlyStringWrapper((this.location == null) ? "" : this.location.getText());
         morphologicalDescription = new SimpleStringProperty();
     }
 
@@ -68,14 +59,6 @@ public final class TableCellModel {
 
     public void setToken(Token token) {
         this.token = token;
-    }
-
-    public Location getLocation() {
-        return location;
-    }
-
-    public void setLocation(Location location) {
-        this.location = location;
     }
 
     public final boolean isChecked() {
