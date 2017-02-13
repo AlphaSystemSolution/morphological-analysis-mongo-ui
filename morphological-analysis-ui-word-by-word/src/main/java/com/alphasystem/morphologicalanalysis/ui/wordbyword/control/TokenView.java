@@ -73,13 +73,13 @@ public class TokenView extends BorderPane {
         tokenColumn.setMinWidth(300);
         tokenColumn.setText("Text");
         tokenColumn.setCellValueFactory(param -> param.getValue().textProperty());
-        tokenColumn.setCellFactory(TextTreeTableCell::new);
+        tokenColumn.setCellFactory(TextTableCell::new);
 
         TableColumn<TableCellModel, String> tokenNumberColumn = new TableColumn<>();
         tokenNumberColumn.setMinWidth(200);
         tokenNumberColumn.setText("Token Number");
         tokenNumberColumn.setCellValueFactory(param -> param.getValue().displayNameProperty());
-        tokenNumberColumn.setCellFactory(TextTreeTableCell::new);
+        tokenNumberColumn.setCellFactory(TextTableCell::new);
 
         TableColumn<TableCellModel, Boolean> checkBoxColumn = new TableColumn<>();
         checkBoxColumn.setMaxWidth(50);
@@ -121,10 +121,10 @@ public class TokenView extends BorderPane {
         this.refresh.set(refresh);
     }
 
-    private class TextTreeTableCell extends TableCell<TableCellModel, String> {
+    private class TextTableCell extends TableCell<TableCellModel, String> {
         private final Text text;
 
-        private TextTreeTableCell(TableColumn<TableCellModel, String> column) {
+        private TextTableCell(TableColumn<TableCellModel, String> column) {
             setContentDisplay(GRAPHIC_ONLY);
             text = new Text();
             text.setFont(preferences.getArabicFont30());
