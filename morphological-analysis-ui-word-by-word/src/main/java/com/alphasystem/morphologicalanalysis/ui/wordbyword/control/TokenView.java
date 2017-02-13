@@ -13,6 +13,7 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.geometry.NodeOrientation;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -22,6 +23,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Screen;
+import javafx.util.Callback;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -64,27 +66,36 @@ public class TokenView extends BorderPane {
     @PostConstruct
     @SuppressWarnings("unchecked")
     public void postConstruct() {
-        TableColumn<TableCellModel, String> descriptionColumn = new TableColumn<>();
+        final TableColumn<TableCellModel, String> descriptionColumn = new TableColumn<>();
         descriptionColumn.setMinWidth(1000);
         descriptionColumn.setText("Description");
         descriptionColumn.setCellValueFactory(param -> param.getValue().morphologicalDescriptionProperty());
 
-        TableColumn<TableCellModel, String> tokenColumn = new TableColumn<>();
+        final TableColumn<TableCellModel, String> tokenColumn = new TableColumn<>();
         tokenColumn.setMinWidth(300);
         tokenColumn.setText("Text");
         tokenColumn.setCellValueFactory(param -> param.getValue().textProperty());
         tokenColumn.setCellFactory(TextTableCell::new);
 
-        TableColumn<TableCellModel, String> tokenNumberColumn = new TableColumn<>();
+        final TableColumn<TableCellModel, String> tokenNumberColumn = new TableColumn<>();
         tokenNumberColumn.setMinWidth(200);
         tokenNumberColumn.setText("Token Number");
         tokenNumberColumn.setCellValueFactory(param -> param.getValue().displayNameProperty());
         tokenNumberColumn.setCellFactory(TextTableCell::new);
 
-        TableColumn<TableCellModel, Boolean> checkBoxColumn = new TableColumn<>();
+        final TableColumn<TableCellModel, Boolean> checkBoxColumn = new TableColumn<>();
         checkBoxColumn.setMaxWidth(50);
         checkBoxColumn.setCellValueFactory(param -> param.getValue().checkedProperty());
-        checkBoxColumn.setCellFactory(CheckBoxTableCell.forTableColumn(checkBoxColumn));
+        Callback<Integer, ObservableValue<Boolean>> cb = index -> {
+            final TableCellModel tableModel = checkBoxColumn.getTableView().getItems().get(index);
+            final BooleanProperty checkedProperty = tableModel.checkedProperty();
+            if (checkedProperty.get()) {
+                System.out.println(">>>>>>>>>>>>>>>>>>>>>>: " + tableModel.getToken());
+            }
+            checkedProperty.setValue(false);
+            return checkedProperty;
+        };
+        checkBoxColumn.setCellFactory(param -> new CheckBoxTableCell<>(cb));
 
         tableView.getColumns().addAll(checkBoxColumn, tokenColumn, tokenNumberColumn, descriptionColumn);
 
