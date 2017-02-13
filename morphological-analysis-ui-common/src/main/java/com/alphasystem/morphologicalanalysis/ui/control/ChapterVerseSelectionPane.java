@@ -5,7 +5,9 @@ import com.alphasystem.morphologicalanalysis.common.model.VerseTokenPairGroup;
 import com.alphasystem.morphologicalanalysis.ui.util.RestClient;
 import com.alphasystem.morphologicalanalysis.ui.util.VerseTokensPairsReader;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Chapter;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.control.ComboBox;
@@ -33,6 +35,7 @@ public class ChapterVerseSelectionPane extends BorderPane {
     private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(ChapterVerseSelectionPane.class.getSimpleName());
 
     @Autowired private RestClient restClient;
+    private ObjectProperty<LayoutPolicy> layoutPolicy = new SimpleObjectProperty<>(this, "", LayoutPolicy.HORIZONTAL);
     private Map<Integer, List<VerseTokenPairGroup>> groupMap;
     private Label chapterNameLabel;
     private ComboBox<Chapter> chapterNameComboBox;
@@ -49,6 +52,7 @@ public class ChapterVerseSelectionPane extends BorderPane {
     public void postConstruct() {
         chapters = restClient.getChapters();
         initPane();
+        layoutPolicy.addListener((observable, oldValue, newValue) -> initPane());
     }
 
     private void initPane() {
@@ -75,9 +79,17 @@ public class ChapterVerseSelectionPane extends BorderPane {
         grid.add(chapterNameComboBox, 0, 1);
 
         verseNumberLabel = new Label(RESOURCE_BUNDLE.getString("verseNumber.label"));
-        grid.add(verseNumberLabel, 1, 0);
+
+        final LayoutPolicy layoutPolicy = this.layoutPolicy.get();
+        final boolean horizontalPolicy = LayoutPolicy.HORIZONTAL.equals(layoutPolicy);
+        int columnIndex = horizontalPolicy ? 1 : 0;
+        int rowIndex = horizontalPolicy ? 0 : 2;
+        grid.add(verseNumberLabel, columnIndex, rowIndex);
         initVerseComboBox(chapterNameComboBox.getItems().get(0));
-        grid.add(verseComboBox, 1, 1);
+
+        columnIndex = horizontalPolicy ? 1 : 0;
+        rowIndex = horizontalPolicy ? 1 : 3;
+        grid.add(verseComboBox, columnIndex, rowIndex);
 
         HBox hBox = new HBox();
         hBox.setAlignment(CENTER);
@@ -107,6 +119,10 @@ public class ChapterVerseSelectionPane extends BorderPane {
         return verseComboBox.getSelectionModel().selectedItemProperty();
     }
 
+    public final void setLayoutPolicy(LayoutPolicy layoutPolicy) {
+        this.layoutPolicy.set(layoutPolicy);
+    }
+
     public VerseTokenPairGroup getSelectedVerse() {
         return selectedVerseProperty().get();
     }
@@ -125,5 +141,9 @@ public class ChapterVerseSelectionPane extends BorderPane {
 
     public ComboBox<VerseTokenPairGroup> getVerseComboBox() {
         return verseComboBox;
+    }
+
+    public enum LayoutPolicy {
+        HORIZONTAL, VERTICAL;
     }
 }
