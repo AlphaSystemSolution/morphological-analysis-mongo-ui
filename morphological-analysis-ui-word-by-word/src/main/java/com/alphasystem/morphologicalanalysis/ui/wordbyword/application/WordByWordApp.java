@@ -20,7 +20,7 @@ import org.springframework.context.annotation.Lazy;
 @Import({MainConfiguration.class})
 public class WordByWordApp extends AbstractJavaFxApplicationSupport {
 
-    @Value("${app.ui.title}")     private String windowTitle;
+    @Value("${app.ui.title}") private String windowTitle;
     @Autowired private WordByWordPane mainPane;
 
     @Override
