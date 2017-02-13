@@ -7,7 +7,6 @@ import com.alphasystem.morphologicalanalysis.ui.util.ApplicationHelper;
 import com.alphasystem.morphologicalanalysis.ui.util.RestClient;
 import com.alphasystem.morphologicalanalysis.ui.wordbyword.model.TableCellModel;
 import com.alphasystem.morphologicalanalysis.util.MorphologicalAnalysisPreferences;
-import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
 import com.alphasystem.util.GenericPreferences;
 import javafx.beans.property.BooleanProperty;
@@ -15,11 +14,10 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.NodeOrientation;
-import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeTableCell;
-import javafx.scene.control.TreeTableColumn;
-import javafx.scene.control.TreeTableView;
-import javafx.scene.control.cell.CheckBoxTreeTableCell;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
@@ -39,7 +37,6 @@ import static javafx.scene.control.ContentDisplay.GRAPHIC_ONLY;
 @Component
 public class TokenView extends BorderPane {
 
-    private static TableCellModel rootElement = new TableCellModel((Token) null);
     private static VerseTokenPairGroup initialGroup = new VerseTokenPairGroup();
 
     static {
@@ -53,47 +50,43 @@ public class TokenView extends BorderPane {
     private final MorphologicalAnalysisPreferences preferences = GenericPreferences.getInstance(MorphologicalAnalysisPreferences.class);
     private final ObjectProperty<VerseTokenPairGroup> verseTokenPairGroup = new SimpleObjectProperty<>(this, "verseTokenPairGroup", initialGroup);
     private final BooleanProperty refresh = new SimpleBooleanProperty(this, "refresh", true);
-    private TreeTableView<TableCellModel> treeTableView = new TreeTableView<>();
-    private final TreeItem<TableCellModel> root = new TreeItem<>(rootElement);
+    private TableView<TableCellModel> tableView = new TableView<>();
     @Autowired private RestClient restClient;
 
     public TokenView() {
-        treeTableView.setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
-        treeTableView.setShowRoot(false);
-        treeTableView.setFixedCellSize(ApplicationHelper.ROW_SIZE);
-        treeTableView.setPrefSize(Screen.getPrimary().getVisualBounds().getWidth(), ApplicationHelper.calculateTableHeight(root.getChildren().size()));
-        treeTableView.setEditable(true);
-        treeTableView.setRoot(root);
-        root.setExpanded(true);
-        setCenter(UiUtilities.wrapInScrollPane(treeTableView));
+        tableView.setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
+        tableView.setFixedCellSize(ApplicationHelper.ROW_SIZE);
+        tableView.setPrefSize(Screen.getPrimary().getVisualBounds().getWidth(), ApplicationHelper.calculateTableHeight(tableView.getItems().size()));
+        tableView.setEditable(true);
+        setCenter(UiUtilities.wrapInScrollPane(tableView));
     }
 
     @PostConstruct
     @SuppressWarnings("unchecked")
     public void postConstruct() {
-        TreeTableColumn<TableCellModel, String> descriptionColumn = new TreeTableColumn<>();
+        TableColumn<TableCellModel, String> descriptionColumn = new TableColumn<>();
         descriptionColumn.setMinWidth(1000);
         descriptionColumn.setText("Description");
-        descriptionColumn.setCellValueFactory(param -> param.getValue().getValue().morphologicalDescriptionProperty());
+        descriptionColumn.setCellValueFactory(param -> param.getValue().morphologicalDescriptionProperty());
 
-        TreeTableColumn<TableCellModel, String> tokenColumn = new TreeTableColumn<>();
+        TableColumn<TableCellModel, String> tokenColumn = new TableColumn<>();
         tokenColumn.setMinWidth(300);
         tokenColumn.setText("Text");
-        tokenColumn.setCellValueFactory(param -> param.getValue().getValue().textProperty());
+        tokenColumn.setCellValueFactory(param -> param.getValue().textProperty());
         tokenColumn.setCellFactory(TextTreeTableCell::new);
 
-        TreeTableColumn<TableCellModel, String> tokenNumberColumn = new TreeTableColumn<>();
+        TableColumn<TableCellModel, String> tokenNumberColumn = new TableColumn<>();
         tokenNumberColumn.setMinWidth(200);
         tokenNumberColumn.setText("Token Number");
-        tokenNumberColumn.setCellValueFactory(param -> param.getValue().getValue().displayNameProperty());
+        tokenNumberColumn.setCellValueFactory(param -> param.getValue().displayNameProperty());
         tokenNumberColumn.setCellFactory(TextTreeTableCell::new);
 
-        TreeTableColumn<TableCellModel, Boolean> checkBoxColumn = new TreeTableColumn<>();
+        TableColumn<TableCellModel, Boolean> checkBoxColumn = new TableColumn<>();
         checkBoxColumn.setMaxWidth(50);
-        checkBoxColumn.setCellValueFactory(param -> param.getValue().getValue().checkedProperty());
-        checkBoxColumn.setCellFactory(CheckBoxTreeTableCell.forTreeTableColumn(checkBoxColumn));
+        checkBoxColumn.setCellValueFactory(param -> param.getValue().checkedProperty());
+        checkBoxColumn.setCellFactory(CheckBoxTableCell.forTableColumn(checkBoxColumn));
 
-        treeTableView.getColumns().addAll(checkBoxColumn, tokenColumn, tokenNumberColumn, descriptionColumn);
+        tableView.getColumns().addAll(checkBoxColumn, tokenColumn, tokenNumberColumn, descriptionColumn);
 
         refresh.addListener((observable, oldValue, newValue) -> refreshTable(getVerseTokenPairGroup(), newValue));
         verseTokenPairGroup.addListener((observable, oldValue, newValue) -> refreshTable(newValue, isRefresh()));
@@ -101,26 +94,15 @@ public class TokenView extends BorderPane {
     }
 
     private void refreshTable(VerseTokenPairGroup group, boolean refresh) {
-        root.getChildren().remove(0, root.getChildren().size());
+        tableView.getItems().remove(0, tableView.getItems().size());
         if (group != null) {
             final List<Token> tokens = restClient.getTokens(group, refresh);
             if (tokens != null && !tokens.isEmpty()) {
-                tokens.forEach(this::addTokenToTree);
-                treeTableView.setPrefHeight(ApplicationHelper.calculateTableHeight(root.getChildren().size()));
+                tokens.forEach(token -> tableView.getItems().add(new TableCellModel(token)));
+                tableView.setPrefHeight(ApplicationHelper.calculateTableHeight(tableView.getItems().size()));
             }
         }
-        treeTableView.requestLayout();
-    }
-
-    private void addTokenToTree(Token token) {
-        TreeItem<TableCellModel> tokenTreeItem = new TreeItem<>(new TableCellModel(token));
-        // token.getLocations().forEach(location -> addLocationToTree(tokenTreeItem, location));
-        root.getChildren().add(tokenTreeItem);
-    }
-
-    private void addLocationToTree(TreeItem<TableCellModel> tokenTreeItem, Location location) {
-        TreeItem<TableCellModel> locationTeeItem = new TreeItem<>(new TableCellModel(location));
-        tokenTreeItem.getChildren().add(locationTeeItem);
+        tableView.requestLayout();
     }
 
     private VerseTokenPairGroup getVerseTokenPairGroup() {
@@ -139,10 +121,10 @@ public class TokenView extends BorderPane {
         this.refresh.set(refresh);
     }
 
-    private class TextTreeTableCell extends TreeTableCell<TableCellModel, String> {
+    private class TextTreeTableCell extends TableCell<TableCellModel, String> {
         private final Text text;
 
-        private TextTreeTableCell(TreeTableColumn<TableCellModel, String> column) {
+        private TextTreeTableCell(TableColumn<TableCellModel, String> column) {
             setContentDisplay(GRAPHIC_ONLY);
             text = new Text();
             text.setFont(preferences.getArabicFont30());
