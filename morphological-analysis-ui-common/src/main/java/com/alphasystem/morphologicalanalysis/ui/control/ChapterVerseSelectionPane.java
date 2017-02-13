@@ -30,7 +30,7 @@ import static javafx.geometry.Pos.CENTER;
 @Component
 public class ChapterVerseSelectionPane extends BorderPane {
 
-    private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("resources");
+    private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(ChapterVerseSelectionPane.class.getSimpleName());
 
     @Autowired private RestClient restClient;
     private Map<Integer, List<VerseTokenPairGroup>> groupMap;
