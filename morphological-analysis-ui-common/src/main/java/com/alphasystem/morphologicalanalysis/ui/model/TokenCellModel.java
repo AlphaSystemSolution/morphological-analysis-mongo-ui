@@ -49,6 +49,10 @@ public final class TokenCellModel {
         this.token = token;
     }
 
+    public boolean isChecked() {
+        return checked.get();
+    }
+
     public final BooleanProperty checkedProperty() {
         return checked;
     }
