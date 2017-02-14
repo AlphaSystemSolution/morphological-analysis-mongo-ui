@@ -38,6 +38,7 @@ public class TokenListView extends Control {
     @Autowired private RestClient restClient;
     private final ObjectProperty<VerseTokenPairGroup> verseTokenPairGroup = new SimpleObjectProperty<>(this, "verseTokenPairGroup", initialGroup);
     private final BooleanProperty refresh = new SimpleBooleanProperty(this, "refresh", true);
+    private final ObjectProperty<Token> selectedToken = new SimpleObjectProperty<>(this, "selectedToken");
 
     @PostConstruct
     public void postConstruct() {
@@ -71,6 +72,18 @@ public class TokenListView extends Control {
 
     public final void setRefresh(boolean refresh) {
         this.refresh.set(refresh);
+    }
+
+    public final Token getSelectedToken() {
+        return selectedToken.get();
+    }
+
+    public final ObjectProperty<Token> selectedTokenProperty() {
+        return selectedToken;
+    }
+
+    public final void setSelectedToken(Token selectedToken) {
+        this.selectedToken.set(selectedToken);
     }
 
     public final RestClient getRestClient() {

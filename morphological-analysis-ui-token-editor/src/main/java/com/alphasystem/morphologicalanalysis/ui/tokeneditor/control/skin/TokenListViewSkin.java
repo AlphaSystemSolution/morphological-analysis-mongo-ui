@@ -50,6 +50,8 @@ public class TokenListViewSkin extends SkinBase<TokenListView> {
             listView.setCellFactory(param -> new TokenCheckBoxListCell());
             setCenter(UiUtilities.wrapInScrollPane(listView));
 
+            listView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
+                    control.setSelectedToken((newValue == null) ? null : newValue.getToken()));
             control.refreshProperty().addListener((observable, oldValue, newValue) -> refreshList(control.getVerseTokenPairGroup(), newValue));
             control.verseTokenPairGroupProperty().addListener((observable, oldValue, newValue) -> refreshList(newValue, control.isRefresh()));
             refreshList(control.getVerseTokenPairGroup(), control.isRefresh());
@@ -62,6 +64,8 @@ public class TokenListViewSkin extends SkinBase<TokenListView> {
                 if (tokens != null && !tokens.isEmpty()) {
                     tokens.forEach(token -> listView.getItems().add(new TokenCellModel(token)));
                     listView.getSelectionModel().selectFirst();
+                    control.setSelectedToken(null);
+                    control.setSelectedToken(tokens.get(0));
                     listView.setPrefHeight(ApplicationHelper.calculateTableHeight(listView.getItems().size()));
                 }
             }
