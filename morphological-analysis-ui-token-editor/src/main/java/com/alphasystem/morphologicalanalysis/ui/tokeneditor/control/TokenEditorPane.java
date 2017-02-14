@@ -4,7 +4,6 @@ import com.alphasystem.morphologicalanalysis.ui.control.ChapterVerseSelectionPan
 import javafx.geometry.Pos;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -15,10 +14,11 @@ import javax.annotation.PostConstruct;
  * @author sali
  */
 @Component
-public class TokenEditorMainPane extends BorderPane {
+public class TokenEditorPane extends BorderPane {
 
     @Autowired private ChapterVerseSelectionPane chapterVerseSelectionPane;
     @Autowired private TokenListView tokenListView;
+    @Autowired private TokenEditorView tokenEditorView;
 
     @PostConstruct
     public void postConstruct() {
@@ -33,7 +33,7 @@ public class TokenEditorMainPane extends BorderPane {
         rightPane.setCenter(vBox);
 
         SplitPane splitPane = new SplitPane();
-        splitPane.getItems().addAll(new Pane(), rightPane);
+        splitPane.getItems().addAll(tokenEditorView, rightPane);
 
         setCenter(splitPane);
     }

@@ -1,7 +1,7 @@
 package com.alphasystem.morphologicalanalysis.ui.tokeneditor.application;
 
 import com.alphasystem.morphologicalanalysis.ui.application.AbstractJavaFxApplicationSupport;
-import com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.TokenEditorMainPane;
+import com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.TokenEditorPane;
 import com.alphasystem.morphologicalanalysis.ui.tokeneditor.spring.TokenEditorConfiguration;
 import javafx.application.Preloader;
 import javafx.scene.Scene;
@@ -21,7 +21,7 @@ import org.springframework.context.annotation.Lazy;
 public class TokenEditorApp extends AbstractJavaFxApplicationSupport {
 
     @Value("${app.ui.title}") private String windowTitle;
-    @Autowired private TokenEditorMainPane mainPane;
+    @Autowired private TokenEditorPane mainPane;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
