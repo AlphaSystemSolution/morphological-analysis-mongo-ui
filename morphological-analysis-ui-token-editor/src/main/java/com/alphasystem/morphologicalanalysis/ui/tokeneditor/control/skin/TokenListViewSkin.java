@@ -64,8 +64,6 @@ public class TokenListViewSkin extends SkinBase<TokenListView> {
                 if (tokens != null && !tokens.isEmpty()) {
                     tokens.forEach(token -> listView.getItems().add(new TokenCellModel(token)));
                     listView.getSelectionModel().selectFirst();
-                    control.setSelectedToken(null);
-                    control.setSelectedToken(tokens.get(0));
                     listView.setPrefHeight(ApplicationHelper.calculateTableHeight(listView.getItems().size()));
                 }
             }
