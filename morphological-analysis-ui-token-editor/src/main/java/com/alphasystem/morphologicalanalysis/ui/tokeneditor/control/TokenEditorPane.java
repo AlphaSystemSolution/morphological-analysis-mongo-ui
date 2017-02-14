@@ -24,6 +24,7 @@ public class TokenEditorPane extends BorderPane {
     public void postConstruct() {
         chapterVerseSelectionPane.selectedVerseProperty().addListener((observable, oldValue, newValue) ->
                 tokenListView.setVerseTokenPairGroup(newValue));
+        tokenEditorView.tokenProperty().bind(tokenListView.selectedTokenProperty());
         VBox vBox = new VBox();
         vBox.setAlignment(Pos.TOP_CENTER);
         vBox.setSpacing(5);
