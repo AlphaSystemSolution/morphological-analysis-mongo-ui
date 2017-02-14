@@ -1,4 +1,4 @@
-package com.alphasystem.morphologicalanalysis.ui.wordbyword.model;
+package com.alphasystem.morphologicalanalysis.ui.model;
 
 
 import com.alphasystem.arabic.model.ArabicTool;

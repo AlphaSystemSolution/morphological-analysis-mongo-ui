@@ -6,7 +6,7 @@ import com.alphasystem.morphologicalanalysis.common.model.VerseTokensPair;
 import com.alphasystem.morphologicalanalysis.ui.util.ApplicationHelper;
 import com.alphasystem.morphologicalanalysis.ui.util.MorphologicalAnalysisPreferences;
 import com.alphasystem.morphologicalanalysis.ui.util.RestClient;
-import com.alphasystem.morphologicalanalysis.ui.wordbyword.model.TokenCellModel;
+import com.alphasystem.morphologicalanalysis.ui.model.TokenCellModel;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
 import com.alphasystem.util.GenericPreferences;
 import javafx.beans.property.BooleanProperty;
