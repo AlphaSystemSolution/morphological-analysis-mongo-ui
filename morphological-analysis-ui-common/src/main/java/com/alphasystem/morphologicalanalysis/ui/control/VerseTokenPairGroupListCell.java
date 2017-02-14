@@ -2,7 +2,7 @@ package com.alphasystem.morphologicalanalysis.ui.control;
 
 import com.alphasystem.morphologicalanalysis.common.model.VerseTokenPairGroup;
 import com.alphasystem.morphologicalanalysis.common.model.VerseTokensPair;
-import com.alphasystem.morphologicalanalysis.util.MorphologicalAnalysisPreferences;
+import com.alphasystem.morphologicalanalysis.ui.util.MorphologicalAnalysisPreferences;
 import com.alphasystem.util.GenericPreferences;
 import javafx.scene.control.ListCell;
 import javafx.scene.text.Text;

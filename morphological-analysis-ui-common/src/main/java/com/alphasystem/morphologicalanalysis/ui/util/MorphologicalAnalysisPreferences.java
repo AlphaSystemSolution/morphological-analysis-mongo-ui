@@ -1,4 +1,4 @@
-package com.alphasystem.morphologicalanalysis.util;
+package com.alphasystem.morphologicalanalysis.ui.util;
 
 import com.alphasystem.app.morphologicalengine.ui.util.MorphologicalEnginePreferences;
 

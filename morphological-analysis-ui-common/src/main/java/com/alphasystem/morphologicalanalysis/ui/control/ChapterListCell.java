@@ -1,7 +1,7 @@
 package com.alphasystem.morphologicalanalysis.ui.control;
 
 import com.alphasystem.arabic.model.ArabicTool;
-import com.alphasystem.morphologicalanalysis.util.MorphologicalAnalysisPreferences;
+import com.alphasystem.morphologicalanalysis.ui.util.MorphologicalAnalysisPreferences;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Chapter;
 import com.alphasystem.util.GenericPreferences;
 import javafx.scene.control.ListCell;
