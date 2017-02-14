@@ -15,7 +15,7 @@ import static java.lang.String.format;
 /**
  * @author sali
  */
-public final class TableCellModel {
+public final class TokenCellModel {
 
     private final BooleanProperty checked;
     private final ReadOnlyStringWrapper displayName;
@@ -23,7 +23,7 @@ public final class TableCellModel {
     private final StringProperty morphologicalDescription;
     private Token token;
 
-    public TableCellModel(Token token) {
+    public TokenCellModel(Token token) {
         this.token = token;
         checked = new SimpleBooleanProperty(false);
         displayName = new ReadOnlyStringWrapper(getTokenNumber(this.token));

@@ -4,9 +4,9 @@ import com.alphasystem.fx.ui.util.UiUtilities;
 import com.alphasystem.morphologicalanalysis.common.model.VerseTokenPairGroup;
 import com.alphasystem.morphologicalanalysis.common.model.VerseTokensPair;
 import com.alphasystem.morphologicalanalysis.ui.util.ApplicationHelper;
+import com.alphasystem.morphologicalanalysis.ui.util.MorphologicalAnalysisPreferences;
 import com.alphasystem.morphologicalanalysis.ui.util.RestClient;
-import com.alphasystem.morphologicalanalysis.ui.wordbyword.model.TableCellModel;
-import com.alphasystem.morphologicalanalysis.util.MorphologicalAnalysisPreferences;
+import com.alphasystem.morphologicalanalysis.ui.wordbyword.model.TokenCellModel;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
 import com.alphasystem.util.GenericPreferences;
 import javafx.beans.property.BooleanProperty;
@@ -52,7 +52,7 @@ public class TokenView extends BorderPane {
     private final MorphologicalAnalysisPreferences preferences = GenericPreferences.getInstance(MorphologicalAnalysisPreferences.class);
     private final ObjectProperty<VerseTokenPairGroup> verseTokenPairGroup = new SimpleObjectProperty<>(this, "verseTokenPairGroup", initialGroup);
     private final BooleanProperty refresh = new SimpleBooleanProperty(this, "refresh", true);
-    private TableView<TableCellModel> tableView = new TableView<>();
+    private TableView<TokenCellModel> tableView = new TableView<>();
     @Autowired private RestClient restClient;
 
     public TokenView() {
@@ -66,28 +66,28 @@ public class TokenView extends BorderPane {
     @PostConstruct
     @SuppressWarnings("unchecked")
     public void postConstruct() {
-        final TableColumn<TableCellModel, String> descriptionColumn = new TableColumn<>();
+        final TableColumn<TokenCellModel, String> descriptionColumn = new TableColumn<>();
         descriptionColumn.setMinWidth(1000);
         descriptionColumn.setText("Description");
         descriptionColumn.setCellValueFactory(param -> param.getValue().morphologicalDescriptionProperty());
 
-        final TableColumn<TableCellModel, String> tokenColumn = new TableColumn<>();
+        final TableColumn<TokenCellModel, String> tokenColumn = new TableColumn<>();
         tokenColumn.setMinWidth(300);
         tokenColumn.setText("Text");
         tokenColumn.setCellValueFactory(param -> param.getValue().textProperty());
         tokenColumn.setCellFactory(TextTableCell::new);
 
-        final TableColumn<TableCellModel, String> tokenNumberColumn = new TableColumn<>();
+        final TableColumn<TokenCellModel, String> tokenNumberColumn = new TableColumn<>();
         tokenNumberColumn.setMinWidth(200);
         tokenNumberColumn.setText("Token Number");
         tokenNumberColumn.setCellValueFactory(param -> param.getValue().displayNameProperty());
         tokenNumberColumn.setCellFactory(TextTableCell::new);
 
-        final TableColumn<TableCellModel, Boolean> checkBoxColumn = new TableColumn<>();
+        final TableColumn<TokenCellModel, Boolean> checkBoxColumn = new TableColumn<>();
         checkBoxColumn.setMaxWidth(50);
         checkBoxColumn.setCellValueFactory(param -> param.getValue().checkedProperty());
         Callback<Integer, ObservableValue<Boolean>> cb = index -> {
-            final TableCellModel tableModel = checkBoxColumn.getTableView().getItems().get(index);
+            final TokenCellModel tableModel = checkBoxColumn.getTableView().getItems().get(index);
             final BooleanProperty checkedProperty = tableModel.checkedProperty();
             if (checkedProperty.get()) {
                 System.out.println(">>>>>>>>>>>>>>>>>>>>>>: " + tableModel.getToken());
@@ -109,7 +109,7 @@ public class TokenView extends BorderPane {
         if (group != null) {
             final List<Token> tokens = restClient.getTokens(group, refresh);
             if (tokens != null && !tokens.isEmpty()) {
-                tokens.forEach(token -> tableView.getItems().add(new TableCellModel(token)));
+                tokens.forEach(token -> tableView.getItems().add(new TokenCellModel(token)));
                 tableView.setPrefHeight(ApplicationHelper.calculateTableHeight(tableView.getItems().size()));
             }
         }
@@ -132,10 +132,10 @@ public class TokenView extends BorderPane {
         this.refresh.set(refresh);
     }
 
-    private class TextTableCell extends TableCell<TableCellModel, String> {
+    private class TextTableCell extends TableCell<TokenCellModel, String> {
         private final Text text;
 
-        private TextTableCell(TableColumn<TableCellModel, String> column) {
+        private TextTableCell(TableColumn<TokenCellModel, String> column) {
             setContentDisplay(GRAPHIC_ONLY);
             text = new Text();
             text.setFont(preferences.getArabicFont30());
