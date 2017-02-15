@@ -22,9 +22,6 @@ public class TokenEditorView extends Control {
     @PostConstruct
     void postConstruct() {
         setSkin(createDefaultSkin());
-        tokenProperty().addListener((observable, oldValue, newValue) -> {
-            System.out.println("NEW TOKEN: " + newValue);
-        });
     }
 
     @Override
