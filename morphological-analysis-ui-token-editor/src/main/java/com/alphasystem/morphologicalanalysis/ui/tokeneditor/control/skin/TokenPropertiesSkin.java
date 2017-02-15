@@ -16,9 +16,13 @@ import javafx.geometry.Pos;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.SkinBase;
+import javafx.scene.control.TextArea;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
+import javafx.scene.text.FontWeight;
 
 import java.util.List;
 import java.util.ResourceBundle;
@@ -58,6 +62,8 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
         }
 
         private void initializeSkin() {
+            MorphologicalAnalysisPreferences preferences = GenericPreferences.getInstance(MorphologicalAnalysisPreferences.class);
+            final Font labelFont = Font.font(preferences.getEnglishFontName(), FontWeight.BOLD, FontPosture.REGULAR, 14);
             locationComboBox.valueProperty().addListener((observable, oldValue, newValue) ->
                     control.setSelectedLocation(newValue));
             locationComboBox.setDisable(true);
@@ -68,6 +74,7 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
             gridPane.setHgap(5);
 
             Label label = new Label(RESOURCE_BUNDLE.getString("location.label"));
+            label.setFont(labelFont);
             label.setMnemonicParsing(true);
             gridPane.add(label, 0, 0);
             label.setLabelFor(locationComboBox);
@@ -84,11 +91,21 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
 
             lettersGroup.setWidth(64);
             lettersGroup.setHeight(64);
-            MorphologicalAnalysisPreferences preferences = GenericPreferences.getInstance(MorphologicalAnalysisPreferences.class);
             lettersGroup.setFont(preferences.getArabicFont36());
             createLettersPane(null, null);
 
             gridPane.add(lettersPane, 1, 0, 1, 2);
+
+            label = new Label(RESOURCE_BUNDLE.getString("translation.label"));
+            label.setFont(labelFont);
+            label.setMnemonicParsing(true);
+            gridPane.add(label, 2, 0);
+
+            TextArea translationArea = new TextArea();
+            translationArea.setFont(preferences.getEnglishFont14());
+            translationArea.setPrefRowCount(5);
+            label.setLabelFor(translationArea);
+            gridPane.add(translationArea, 2, 1);
         }
 
         private void refresh(Token token) {
