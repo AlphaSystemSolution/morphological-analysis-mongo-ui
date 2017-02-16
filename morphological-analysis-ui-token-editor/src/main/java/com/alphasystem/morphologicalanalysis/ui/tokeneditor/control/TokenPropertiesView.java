@@ -21,7 +21,6 @@ import javax.annotation.PostConstruct;
 public class TokenPropertiesView extends Control {
 
     private final ObjectProperty<Token> token = new SimpleObjectProperty<>(this, "token");
-    private final StringProperty tokenText = new SimpleStringProperty(this, "tokenText");
     private final StringProperty translationText = new SimpleStringProperty(this, "translationText");
     private final ObjectProperty<Location> selectedLocation = new SimpleObjectProperty<>(this, "selectedLocation");
 
@@ -29,13 +28,11 @@ public class TokenPropertiesView extends Control {
     void postConstruct() {
         setSkin(createDefaultSkin());
         tokenProperty().addListener((observable, oldValue, newValue) -> initValues(newValue));
-        tokenTextProperty().addListener((observable, oldValue, newValue) -> setTokenTextInternal(newValue));
         translationTextProperty().addListener((observable, oldValue, newValue) -> setTokenTextInternal(newValue));
         getStyleClass().add("border");
     }
 
     private void initValues(Token token) {
-        setTokenText((token == null) ? null : token.getToken());
         setTranslationText((token == null) ? null : token.getTranslation());
     }
 
@@ -56,27 +53,11 @@ public class TokenPropertiesView extends Control {
         this.token.set(token);
     }
 
-    public final String getTokenText() {
-        return tokenText.get();
-    }
-
-    public final StringProperty tokenTextProperty() {
-        return tokenText;
-    }
-
-    public final void setTokenText(String tokenText) {
-        this.tokenText.set(tokenText);
-    }
-
     private void setTokenTextInternal(String tokenText) {
         final Token token = getToken();
         if (token != null) {
             token.setToken(tokenText);
         }
-    }
-
-    public final String getTranslationText() {
-        return translationText.get();
     }
 
     public final StringProperty translationTextProperty() {
