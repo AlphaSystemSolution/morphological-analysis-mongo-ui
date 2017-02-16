@@ -30,14 +30,11 @@ public class TokenEditorPane extends BorderPane {
         vBox.setSpacing(5);
         vBox.getChildren().addAll(chapterVerseSelectionPane, tokenListView);
 
-        BorderPane rightPane = new BorderPane();
-        rightPane.setCenter(vBox);
-
         SplitPane splitPane = new SplitPane();
-        splitPane.getItems().addAll(tokenEditorView, rightPane);
+        splitPane.getItems().addAll(tokenEditorView, vBox);
         // during initialization split pane resize it self and thus reset divider position to default value, in order
         // to set desired divider position listen to width property change event and set the divider position
-        splitPane.widthProperty().addListener((observable, oldValue, newValue) -> splitPane.setDividerPosition(0, 0.75f));
+        splitPane.widthProperty().addListener((observable, oldValue, newValue) -> splitPane.setDividerPosition(0, 0.78f));
 
         setCenter(splitPane);
     }
