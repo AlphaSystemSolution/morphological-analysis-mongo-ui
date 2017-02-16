@@ -3,17 +3,13 @@ package com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.skin;
 import com.alphasystem.arabic.model.ArabicWord;
 import com.alphasystem.arabic.ui.ArabicLabelToggleGroup;
 import com.alphasystem.arabic.ui.ArabicLabelView;
-import com.alphasystem.morphologicalanalysis.ui.tokeneditor.application.ApplicationController;
 import com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.LocationListCell;
 import com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.TokenPropertiesView;
 import com.alphasystem.morphologicalanalysis.ui.util.ApplicationHelper;
 import com.alphasystem.morphologicalanalysis.ui.util.MorphologicalAnalysisPreferences;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
-import com.alphasystem.morphologicalanalysis.wordbyword.model.support.WordType;
 import com.alphasystem.util.GenericPreferences;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.NodeOrientation;
@@ -39,7 +35,6 @@ import java.util.ResourceBundle;
 public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
 
     private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(TokenPropertiesView.class.getSimpleName());
-    private final ApplicationController applicationController = ApplicationController.getInstance();
 
     /**
      * Constructor for all SkinBase instances.
@@ -167,7 +162,7 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
                     arabicLabelView.setSelect(selected);
                     arabicLabelView.setDisable(!selected);
                     lettersBox.getChildren().add(arabicLabelView);
-                    Model model = new Model().control(control).location(location).labelView(arabicLabelView)
+                    LabelSelectionModel model = new LabelSelectionModel().control(control).location(location).labelView(arabicLabelView)
                             .group(lettersGroup);
                     final LabelSelectionChangeListener listener = new LabelSelectionChangeListener(model);
                     // save the reference of listener
@@ -176,83 +171,5 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
                 }
             }
         }
-    }
-
-    private class LabelSelectionChangeListener implements ChangeListener<Boolean> {
-
-        private final Model model;
-
-        private LabelSelectionChangeListener(Model model) {
-            this.model = model;
-        }
-
-        @Override
-        public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-            if (!newValue) {
-                int index = 0;
-                final ObservableList<ArabicLabelView> toggles = model.getGroup().getToggles();
-                for (int j = 0; j < toggles.size(); j++) {
-                    if (toggles.get(j).getId().equals(model.getLabelView().getId())) {
-                        index = j;
-                        break;
-                    }
-                } // end of "for"
-                // TODO: validate
-                // update current location, create new, add location to token, and finally re-initialize
-                final Token token = model.getControl().getToken();
-                final ArabicWord tokenWord = token.tokenWord();
-                applicationController.updateLocation(model.getLocation(), index, tokenWord);
-                final Location newLocation = applicationController.createNewLocation(model.getLocation(), index,
-                        tokenWord, WordType.NOUN);
-                token.addLocation(newLocation);
-                model.getControl().setToken(null);
-                model.getControl().setToken(token);
-            }
-        }
-    }
-
-    private class Model {
-
-        private TokenPropertiesView control;
-        private Location location;
-        private ArabicLabelView labelView;
-        private ArabicLabelToggleGroup group;
-
-        public TokenPropertiesView getControl() {
-            return control;
-        }
-
-        Location getLocation() {
-            return location;
-        }
-
-        ArabicLabelView getLabelView() {
-            return labelView;
-        }
-
-        ArabicLabelToggleGroup getGroup() {
-            return group;
-        }
-
-        Model control(TokenPropertiesView control) {
-            this.control = control;
-            return this;
-        }
-
-        Model location(Location location) {
-            this.location = location;
-            return this;
-        }
-
-        Model labelView(ArabicLabelView labelView) {
-            this.labelView = labelView;
-            return this;
-        }
-
-        Model group(ArabicLabelToggleGroup group) {
-            this.group = group;
-            return this;
-        }
-
     }
 }
