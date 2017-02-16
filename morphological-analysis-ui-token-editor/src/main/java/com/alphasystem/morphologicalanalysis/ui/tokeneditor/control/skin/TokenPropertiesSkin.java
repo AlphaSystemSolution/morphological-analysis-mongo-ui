@@ -167,8 +167,8 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
                     arabicLabelView.setSelect(selected);
                     arabicLabelView.setDisable(!selected);
                     lettersBox.getChildren().add(arabicLabelView);
-                    Model model = new Model().location(location).labelView(arabicLabelView).group(lettersGroup)
-                            .arabicWord(control.getToken().tokenWord());
+                    Model model = new Model().control(control).location(location).labelView(arabicLabelView)
+                            .group(lettersGroup);
                     final LabelSelectionChangeListener listener = new LabelSelectionChangeListener(model);
                     // save the reference of listener
                     listeners.add(listener);
@@ -197,20 +197,30 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
                         break;
                     }
                 } // end of "for"
-                System.out.println(model.getLocation() + " : " + model.getLabelView() + " : " + index + " : " + newValue);
-                applicationController.updateLocation(model.getLocation(), index, model.getArabicWord());
+                // TODO: validate
+                // update current location, create new, add location to token, and finally re-initialize
+                final Token token = model.getControl().getToken();
+                final ArabicWord tokenWord = token.tokenWord();
+                applicationController.updateLocation(model.getLocation(), index, tokenWord);
                 final Location newLocation = applicationController.createNewLocation(model.getLocation(), index,
-                        model.getArabicWord(), WordType.NOUN);
+                        tokenWord, WordType.NOUN);
+                token.addLocation(newLocation);
+                model.getControl().setToken(null);
+                model.getControl().setToken(token);
             }
         }
     }
 
     private class Model {
 
+        private TokenPropertiesView control;
         private Location location;
         private ArabicLabelView labelView;
         private ArabicLabelToggleGroup group;
-        private ArabicWord arabicWord;
+
+        public TokenPropertiesView getControl() {
+            return control;
+        }
 
         Location getLocation() {
             return location;
@@ -224,8 +234,9 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
             return group;
         }
 
-        ArabicWord getArabicWord() {
-            return arabicWord;
+        Model control(TokenPropertiesView control) {
+            this.control = control;
+            return this;
         }
 
         Model location(Location location) {
@@ -243,9 +254,5 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
             return this;
         }
 
-        Model arabicWord(ArabicWord arabicWord) {
-            this.arabicWord = arabicWord;
-            return this;
-        }
     }
 }
