@@ -67,8 +67,13 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
         private void initializeSkin() {
             MorphologicalAnalysisPreferences preferences = GenericPreferences.getInstance(MorphologicalAnalysisPreferences.class);
             final Font labelFont = Font.font(preferences.getEnglishFontName(), FontWeight.BOLD, FontPosture.REGULAR, 14);
-            locationComboBox.valueProperty().addListener((observable, oldValue, newValue) ->
-                    control.setSelectedLocation(newValue));
+            locationComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
+                control.setSelectedLocation(newValue);
+                final Token token = control.getToken();
+                if (token != null) {
+                    createLettersPane(token.tokenWord(), newValue);
+                }
+            });
             locationComboBox.setDisable(true);
             locationComboBox.setButtonCell(new LocationListCell());
             locationComboBox.setCellFactory(param -> new LocationListCell());
