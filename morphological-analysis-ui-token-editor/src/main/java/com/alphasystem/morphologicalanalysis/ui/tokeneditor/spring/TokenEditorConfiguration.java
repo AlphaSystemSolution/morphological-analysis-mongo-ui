@@ -10,7 +10,8 @@ import org.springframework.context.annotation.Import;
  */
 @Configuration
 @ComponentScan({"com.alphasystem.morphologicalanalysis.ui.tokeneditor.spring.support",
-        "com.alphasystem.morphologicalanalysis.ui.tokeneditor.control"})
+        "com.alphasystem.morphologicalanalysis.ui.tokeneditor.control",
+        "com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.controller"})
 @Import({CommonConfiguration.class})
 public class TokenEditorConfiguration {
 }
