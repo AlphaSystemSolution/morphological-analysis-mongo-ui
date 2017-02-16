@@ -27,7 +27,7 @@ public class TokenEditorController extends BorderPane {
 
     @PostConstruct
     void postConstruct() {
-        TitledPane tokenPropertiesViewPane = new TitledPane();;
+        TitledPane tokenPropertiesViewPane = new TitledPane();
         tokenPropertiesViewPane.setText(getTokenPropertiesViewPaneTitle(this.control.getToken()));
         control.tokenProperty().addListener((observable, oldValue, newValue) -> {
             tokenPropertiesViewPane.setText(getTokenPropertiesViewPaneTitle(newValue));
