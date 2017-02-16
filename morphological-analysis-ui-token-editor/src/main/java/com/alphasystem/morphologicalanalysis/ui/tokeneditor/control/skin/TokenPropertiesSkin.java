@@ -3,13 +3,18 @@ package com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.skin;
 import com.alphasystem.arabic.model.ArabicWord;
 import com.alphasystem.arabic.ui.ArabicLabelToggleGroup;
 import com.alphasystem.arabic.ui.ArabicLabelView;
+import com.alphasystem.morphologicalanalysis.ui.tokeneditor.application.ApplicationController;
 import com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.LocationListCell;
 import com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.TokenPropertiesView;
 import com.alphasystem.morphologicalanalysis.ui.util.ApplicationHelper;
 import com.alphasystem.morphologicalanalysis.ui.util.MorphologicalAnalysisPreferences;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.support.WordType;
 import com.alphasystem.util.GenericPreferences;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.NodeOrientation;
 import javafx.geometry.Pos;
@@ -24,6 +29,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -33,6 +39,7 @@ import java.util.ResourceBundle;
 public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
 
     private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(TokenPropertiesView.class.getSimpleName());
+    private final ApplicationController applicationController = ApplicationController.getInstance();
 
     /**
      * Constructor for all SkinBase instances.
@@ -51,6 +58,7 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
         private final ComboBox<Location> locationComboBox = new ComboBox<>();
         private final HBox lettersBox = new HBox();
         private final ArabicLabelToggleGroup lettersGroup = new ArabicLabelToggleGroup();
+        private final List<LabelSelectionChangeListener> listeners = new ArrayList<>();
 
         private SkinView(TokenPropertiesView control) {
             this.control = control;
@@ -111,8 +119,8 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
         private void refresh(Token token) {
             locationComboBox.getItems().remove(0, locationComboBox.getItems().size());
             locationComboBox.setDisable(true);
-            createLettersPane(null, null);
             if (token == null) {
+                createLettersPane(null, null);
                 return;
             }
             final List<Location> locations = token.getLocations();
@@ -126,7 +134,19 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
         }
 
         private void createLettersPane(ArabicWord arabicWord, Location location) {
-            lettersGroup.getToggles().clear();
+            // "LabelSelectionChangeListener" is used to detect when a particular label is getting unselected,
+            // by default all the labels selected, when a particular label is getting unselected a new "Location"
+            // is getting created, problem arises when new "Token" is getting selected from the list, which is firing
+            // "un-select" event for the previously selected "Token", which we don't want, remove the listeners from
+            // the current set of labels before clearing.
+            final ObservableList<ArabicLabelView> toggles = lettersGroup.getToggles();
+            if (!listeners.isEmpty()) {
+                for (int i = 0; i < toggles.size(); i++) {
+                    toggles.get(i).selectedProperty().removeListener(listeners.get(i));
+                }
+                listeners.clear();
+            }
+            toggles.clear();
             lettersBox.getChildren().clear();
             if (arabicWord == null || location == null) {
                 // both values are null, display empty values
@@ -147,8 +167,85 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
                     arabicLabelView.setSelect(selected);
                     arabicLabelView.setDisable(!selected);
                     lettersBox.getChildren().add(arabicLabelView);
+                    Model model = new Model().location(location).labelView(arabicLabelView).group(lettersGroup)
+                            .arabicWord(control.getToken().tokenWord());
+                    final LabelSelectionChangeListener listener = new LabelSelectionChangeListener(model);
+                    // save the reference of listener
+                    listeners.add(listener);
+                    arabicLabelView.selectedProperty().addListener(listener);
                 }
             }
+        }
+    }
+
+    private class LabelSelectionChangeListener implements ChangeListener<Boolean> {
+
+        private final Model model;
+
+        private LabelSelectionChangeListener(Model model) {
+            this.model = model;
+        }
+
+        @Override
+        public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+            if (!newValue) {
+                int index = 0;
+                final ObservableList<ArabicLabelView> toggles = model.getGroup().getToggles();
+                for (int j = 0; j < toggles.size(); j++) {
+                    if (toggles.get(j).getId().equals(model.getLabelView().getId())) {
+                        index = j;
+                        break;
+                    }
+                } // end of "for"
+                System.out.println(model.getLocation() + " : " + model.getLabelView() + " : " + index + " : " + newValue);
+                applicationController.updateLocation(model.getLocation(), index, model.getArabicWord());
+                final Location newLocation = applicationController.createNewLocation(model.getLocation(), index,
+                        model.getArabicWord(), WordType.NOUN);
+            }
+        }
+    }
+
+    private class Model {
+
+        private Location location;
+        private ArabicLabelView labelView;
+        private ArabicLabelToggleGroup group;
+        private ArabicWord arabicWord;
+
+        Location getLocation() {
+            return location;
+        }
+
+        ArabicLabelView getLabelView() {
+            return labelView;
+        }
+
+        ArabicLabelToggleGroup getGroup() {
+            return group;
+        }
+
+        ArabicWord getArabicWord() {
+            return arabicWord;
+        }
+
+        Model location(Location location) {
+            this.location = location;
+            return this;
+        }
+
+        Model labelView(ArabicLabelView labelView) {
+            this.labelView = labelView;
+            return this;
+        }
+
+        Model group(ArabicLabelToggleGroup group) {
+            this.group = group;
+            return this;
+        }
+
+        Model arabicWord(ArabicWord arabicWord) {
+            this.arabicWord = arabicWord;
+            return this;
         }
     }
 }
