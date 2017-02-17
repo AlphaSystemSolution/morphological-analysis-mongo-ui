@@ -1,5 +1,6 @@
 package com.alphasystem.morphologicalanalysis.ui.util;
 
+import com.alphasystem.util.AppUtil;
 import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderStroke;
 import javafx.scene.layout.BorderStrokeStyle;
@@ -12,6 +13,7 @@ import javafx.scene.paint.Color;
 public final class ApplicationHelper {
 
     public static final Border BORDER = new Border(new BorderStroke(Color.LIGHTGREY, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderStroke.THIN));
+    public static final String STYLE_SHEET_PATH = AppUtil.getResource("styles/application.css").toExternalForm();
     public static final double ROW_SIZE = 55.0;
 
     private static final double DEFAULT_MIN_HEIGHT = 500.0;
