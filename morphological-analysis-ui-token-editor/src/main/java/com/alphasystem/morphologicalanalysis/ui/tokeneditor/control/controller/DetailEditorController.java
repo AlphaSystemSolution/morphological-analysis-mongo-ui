@@ -16,18 +16,19 @@ import javax.annotation.PostConstruct;
 public class DetailEditorController extends BorderPane {
 
     @Autowired private DetailEditorView control;
+    private final TabPane tabPane = new TabPane();
 
     @PostConstruct
     void postConstruct() {
         control.locationProperty().addListener((observable, oldValue, newValue) -> refresh(newValue));
-        TabPane tabPane = new TabPane();
         setCenter(tabPane);
+        initializeSkin();
         refresh(control.getLocation());
     }
 
+    private void initializeSkin(){
+    }
+
     private void refresh(Location location) {
-        if (location == null) {
-            return;
-        }
     }
 }
