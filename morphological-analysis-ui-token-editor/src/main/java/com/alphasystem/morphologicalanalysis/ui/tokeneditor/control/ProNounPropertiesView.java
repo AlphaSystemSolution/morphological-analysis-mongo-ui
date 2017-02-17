@@ -1,11 +1,13 @@
 package com.alphasystem.morphologicalanalysis.ui.tokeneditor.control;
 
+import com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.skin.ProNounPropertiesSkin;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.ProNounProperties;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.ConversationType;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.ProNounPartOfSpeechType;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.ProNounType;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.scene.control.Skin;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -37,6 +39,12 @@ public class ProNounPropertiesView extends AbstractNounPropertiesView<ProNounPar
 
     @PostConstruct
     void postConstruct(){
+        setSkin(createDefaultSkin());
+    }
+
+    @Override
+    protected Skin<?> createDefaultSkin() {
+        return new ProNounPropertiesSkin(this);
     }
 
     @Override

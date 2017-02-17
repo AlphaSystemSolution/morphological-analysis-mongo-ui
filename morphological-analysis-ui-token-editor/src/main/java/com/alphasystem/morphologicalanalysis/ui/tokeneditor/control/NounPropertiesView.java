@@ -1,11 +1,13 @@
 package com.alphasystem.morphologicalanalysis.ui.tokeneditor.control;
 
+import com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.skin.NounPropertiesSkin;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.NounProperties;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.NounKind;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.NounPartOfSpeechType;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.NounType;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.scene.control.Skin;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -37,6 +39,12 @@ public class NounPropertiesView extends AbstractNounPropertiesView<NounPartOfSpe
 
     @PostConstruct
     void postConstruct(){
+        setSkin(createDefaultSkin());
+    }
+
+    @Override
+    protected Skin<?> createDefaultSkin() {
+        return new NounPropertiesSkin(this);
     }
 
     @Override

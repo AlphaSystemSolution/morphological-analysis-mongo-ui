@@ -1,5 +1,6 @@
 package com.alphasystem.morphologicalanalysis.ui.tokeneditor.control;
 
+import com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.skin.VerbPropertiesSkin;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.VerbProperties;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.ConversationType;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.IncompleteVerb;
@@ -10,6 +11,7 @@ import com.alphasystem.morphologicalanalysis.wordbyword.model.support.VerbPartOf
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.VerbType;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.scene.control.Skin;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -66,6 +68,12 @@ public class VerbPropertiesView extends AbstractPropertiesView<VerbPartOfSpeechT
 
     @PostConstruct
     void postConstruct(){
+        setSkin(createDefaultSkin());
+    }
+
+    @Override
+    protected Skin<?> createDefaultSkin() {
+        return new VerbPropertiesSkin(this);
     }
 
     @Override
