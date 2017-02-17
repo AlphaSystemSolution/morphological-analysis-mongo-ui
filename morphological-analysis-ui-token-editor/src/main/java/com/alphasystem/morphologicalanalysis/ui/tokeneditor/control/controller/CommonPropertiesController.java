@@ -1,7 +1,7 @@
 package com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.controller;
 
 import com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.CommonPropertiesView;
-import com.alphasystem.morphologicalanalysis.ui.tokeneditor.spring.support.ApplicationContextProvider;
+import com.alphasystem.morphologicalanalysis.ui.util.ApplicationContextProvider;
 import com.alphasystem.morphologicalanalysis.ui.util.MorphologicalAnalysisPreferences;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.NamedTag;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.WordType;

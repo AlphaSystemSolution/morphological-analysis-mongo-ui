@@ -2,7 +2,7 @@ package com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.skin;
 
 import com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.DetailEditorView;
 import com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.controller.DetailEditorController;
-import com.alphasystem.morphologicalanalysis.ui.tokeneditor.spring.support.ApplicationContextProvider;
+import com.alphasystem.morphologicalanalysis.ui.util.ApplicationContextProvider;
 import javafx.scene.control.SkinBase;
 
 /**

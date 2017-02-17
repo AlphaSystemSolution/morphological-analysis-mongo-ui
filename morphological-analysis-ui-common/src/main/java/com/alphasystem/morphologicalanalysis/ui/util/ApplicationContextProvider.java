@@ -1,4 +1,4 @@
-package com.alphasystem.morphologicalanalysis.ui.tokeneditor.spring.support;
+package com.alphasystem.morphologicalanalysis.ui.util;
 
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
