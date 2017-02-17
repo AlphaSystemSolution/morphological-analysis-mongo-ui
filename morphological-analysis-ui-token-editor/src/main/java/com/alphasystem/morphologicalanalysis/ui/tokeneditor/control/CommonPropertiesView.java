@@ -24,7 +24,7 @@ import javax.annotation.PostConstruct;
 public class CommonPropertiesView extends Control {
 
     private final ObjectProperty<Location> location = new SimpleObjectProperty<>(this, "location");
-    private final ObjectProperty<WordType> wordType = new SimpleObjectProperty<>(this, "wordType");
+    private final ObjectProperty<WordType> wordType = new SimpleObjectProperty<>(this, "wordType", WordType.NOUN);
     private final ObjectProperty<NamedTag> namedTag = new SimpleObjectProperty<>(this, "namedTag");
     private final StringProperty text = new SimpleStringProperty(this, "text");
     private final ReadOnlyStringWrapper derivedText = new ReadOnlyStringWrapper(this, "derivedText");
