@@ -1,11 +1,19 @@
 package com.alphasystem.morphologicalanalysis.ui.util;
 
 import com.alphasystem.util.AppUtil;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.control.Control;
 import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderStroke;
 import javafx.scene.layout.BorderStrokeStyle;
 import javafx.scene.layout.CornerRadii;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.ResourceBundle;
 
 /**
  * @author sali
@@ -23,6 +31,16 @@ public final class ApplicationHelper {
         double height = (numOfRows * ROW_SIZE) + ROW_SIZE;
         height = roundTo100(height);
         return Math.max(height, DEFAULT_MIN_HEIGHT) + 100;
+    }
+
+    public static <T extends Control, P extends Pane> void loadFxml(T control, P pane) throws IOException, URISyntaxException {
+        final String resourcePrefix = control.getClass().getSimpleName();
+        final URL url = AppUtil.getPath(String.format("fxml/%s.fxml", resourcePrefix)).toUri().toURL();
+        final ResourceBundle resourceBundle = ResourceBundle.getBundle(String.format("fxml.%s", resourcePrefix));
+        FXMLLoader fxmlLoader = new FXMLLoader(url, resourceBundle);
+        fxmlLoader.setControllerFactory(ApplicationContextProvider::getBean);
+        fxmlLoader.setRoot(pane);
+        fxmlLoader.load();
     }
 
     private static double roundTo100(double srcValue) {
