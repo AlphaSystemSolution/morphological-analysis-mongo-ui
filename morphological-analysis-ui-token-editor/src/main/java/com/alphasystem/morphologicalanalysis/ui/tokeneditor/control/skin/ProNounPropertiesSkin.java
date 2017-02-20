@@ -1,7 +1,7 @@
 package com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.skin;
 
 import com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.ProNounPropertiesView;
-import com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.controller.ParticlePropertiesController;
+import com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.controller.ProNounPropertiesController;
 import com.alphasystem.morphologicalanalysis.ui.util.ApplicationContextProvider;
 import javafx.scene.control.SkinBase;
 
@@ -17,6 +17,6 @@ public class ProNounPropertiesSkin extends SkinBase<ProNounPropertiesView> {
      */
     public ProNounPropertiesSkin(ProNounPropertiesView control) {
         super(control);
-        getChildren().setAll(ApplicationContextProvider.getBean(ParticlePropertiesController.class));
+        getChildren().setAll(ApplicationContextProvider.getBean(ProNounPropertiesController.class));
     }
 }
