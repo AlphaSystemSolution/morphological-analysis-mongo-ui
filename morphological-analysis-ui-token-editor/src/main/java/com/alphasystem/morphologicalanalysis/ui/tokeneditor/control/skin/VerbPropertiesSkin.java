@@ -1,6 +1,7 @@
 package com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.skin;
 
 import com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.VerbPropertiesView;
+import com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.controller.VerbPropertiesController;
 import com.alphasystem.morphologicalanalysis.ui.util.ApplicationContextProvider;
 import javafx.scene.control.SkinBase;
 
@@ -16,6 +17,6 @@ public class VerbPropertiesSkin extends SkinBase<VerbPropertiesView> {
      */
     public VerbPropertiesSkin(VerbPropertiesView control) {
         super(control);
-        getChildren().setAll(ApplicationContextProvider.getBean(VerbPropertiesView.class));
+        getChildren().setAll(ApplicationContextProvider.getBean(VerbPropertiesController.class));
     }
 }
