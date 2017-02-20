@@ -1,6 +1,8 @@
 package com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.skin;
 
 import com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.NounPropertiesView;
+import com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.controller.NounPropertiesController;
+import com.alphasystem.morphologicalanalysis.ui.util.ApplicationContextProvider;
 import javafx.scene.control.SkinBase;
 
 /**
@@ -15,5 +17,6 @@ public class NounPropertiesSkin extends SkinBase<NounPropertiesView> {
      */
     public NounPropertiesSkin(NounPropertiesView control) {
         super(control);
+        getChildren().setAll(ApplicationContextProvider.getBean(NounPropertiesController.class));
     }
 }
