@@ -2,10 +2,8 @@ package com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.controller;
 
 import com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.CommonPropertiesView;
 import com.alphasystem.morphologicalanalysis.ui.util.ApplicationHelper;
-import com.alphasystem.morphologicalanalysis.ui.util.MorphologicalAnalysisPreferences;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.NamedTag;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.WordType;
-import com.alphasystem.util.GenericPreferences;
 import javafx.fxml.FXML;
 import javafx.geometry.NodeOrientation;
 import javafx.scene.control.ComboBox;
@@ -18,6 +16,8 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.net.URISyntaxException;
+
+import static com.alphasystem.morphologicalanalysis.ui.util.ApplicationHelper.PREFERENCES;
 
 /**
  * @author sali
@@ -39,12 +39,11 @@ public class CommonPropertiesController extends BorderPane {
 
     @FXML
     void initialize() {
-        final MorphologicalAnalysisPreferences preferences = GenericPreferences.getInstance(MorphologicalAnalysisPreferences.class);
         textField.setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
-        textField.setFont(preferences.getArabicFont24());
+        textField.setFont(PREFERENCES.getArabicFont24());
         textField.textProperty().bindBidirectional(control.textProperty());
         derivedTextField.setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
-        derivedTextField.setFont(preferences.getArabicFont24());
+        derivedTextField.setFont(PREFERENCES.getArabicFont24());
         derivedTextField.textProperty().bind(control.derivedTextProperty());
         translationField.textProperty().bindBidirectional(control.translationProperty());
         wordTypeComboBox.valueProperty().bindBidirectional(control.wordTypeProperty());

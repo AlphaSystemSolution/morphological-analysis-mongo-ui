@@ -1,6 +1,7 @@
 package com.alphasystem.morphologicalanalysis.ui.util;
 
 import com.alphasystem.util.AppUtil;
+import com.alphasystem.util.GenericPreferences;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Control;
 import javafx.scene.layout.Border;
@@ -20,6 +21,7 @@ import java.util.ResourceBundle;
  */
 public final class ApplicationHelper {
 
+    public static final MorphologicalAnalysisPreferences PREFERENCES = GenericPreferences.getInstance(MorphologicalAnalysisPreferences.class);
     public static final Border BORDER = new Border(new BorderStroke(Color.LIGHTGREY, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderStroke.THIN));
     public static final String STYLE_SHEET_PATH = AppUtil.getResource("styles/application.css").toExternalForm();
     public static final double ROW_SIZE = 55.0;

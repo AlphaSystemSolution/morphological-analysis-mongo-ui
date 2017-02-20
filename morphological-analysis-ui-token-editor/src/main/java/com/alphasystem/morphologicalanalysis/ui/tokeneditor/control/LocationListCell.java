@@ -1,9 +1,8 @@
 package com.alphasystem.morphologicalanalysis.ui.tokeneditor.control;
 
 import com.alphasystem.arabic.model.ArabicWord;
-import com.alphasystem.morphologicalanalysis.ui.util.MorphologicalAnalysisPreferences;
+import com.alphasystem.morphologicalanalysis.ui.util.ApplicationHelper;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
-import com.alphasystem.util.GenericPreferences;
 import javafx.scene.control.ListCell;
 import javafx.scene.text.Text;
 
@@ -21,8 +20,7 @@ public class LocationListCell extends ListCell<Location> {
     public LocationListCell() {
         setContentDisplay(GRAPHIC_ONLY);
         label = new Text();
-        MorphologicalAnalysisPreferences preferences = GenericPreferences.getInstance(MorphologicalAnalysisPreferences.class);
-        label.setFont(preferences.getArabicFont24());
+        label.setFont(ApplicationHelper.PREFERENCES.getArabicFont24());
     }
 
     @Override

@@ -6,10 +6,8 @@ import com.alphasystem.arabic.ui.ArabicLabelView;
 import com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.LocationListCell;
 import com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.TokenPropertiesView;
 import com.alphasystem.morphologicalanalysis.ui.util.ApplicationHelper;
-import com.alphasystem.morphologicalanalysis.ui.util.MorphologicalAnalysisPreferences;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
-import com.alphasystem.util.GenericPreferences;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.NodeOrientation;
@@ -28,6 +26,8 @@ import javafx.scene.text.FontWeight;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+
+import static com.alphasystem.morphologicalanalysis.ui.util.ApplicationHelper.PREFERENCES;
 
 /**
  * @author sali
@@ -65,8 +65,7 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
         }
 
         private void initializeSkin() {
-            MorphologicalAnalysisPreferences preferences = GenericPreferences.getInstance(MorphologicalAnalysisPreferences.class);
-            final Font labelFont = Font.font(preferences.getEnglishFontName(), FontWeight.BOLD, FontPosture.REGULAR, 14);
+            final Font labelFont = Font.font(PREFERENCES.getEnglishFontName(), FontWeight.BOLD, FontPosture.REGULAR, 14);
             locationComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
                 control.setSelectedLocation(newValue);
                 final Token token = control.getToken();
@@ -99,7 +98,7 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
 
             lettersGroup.setWidth(64);
             lettersGroup.setHeight(64);
-            lettersGroup.setFont(preferences.getArabicFont36());
+            lettersGroup.setFont(PREFERENCES.getArabicFont36());
             createLettersPane(null, null);
 
             gridPane.add(lettersPane, 1, 0, 1, 2);
@@ -110,7 +109,7 @@ public class TokenPropertiesSkin extends SkinBase<TokenPropertiesView> {
             gridPane.add(label, 2, 0);
 
             TextArea translationArea = new TextArea();
-            translationArea.setFont(preferences.getEnglishFont14());
+            translationArea.setFont(PREFERENCES.getEnglishFont14());
             translationArea.setPrefRowCount(5);
             label.setLabelFor(translationArea);
             gridPane.add(translationArea, 2, 1);

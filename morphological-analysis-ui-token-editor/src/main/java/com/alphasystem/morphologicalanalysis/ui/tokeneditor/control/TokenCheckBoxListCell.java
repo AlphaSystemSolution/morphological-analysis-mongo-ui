@@ -1,8 +1,6 @@
 package com.alphasystem.morphologicalanalysis.ui.tokeneditor.control;
 
 import com.alphasystem.morphologicalanalysis.ui.model.TokenCellModel;
-import com.alphasystem.morphologicalanalysis.ui.util.MorphologicalAnalysisPreferences;
-import com.alphasystem.util.GenericPreferences;
 import javafx.beans.property.BooleanProperty;
 import javafx.geometry.NodeOrientation;
 import javafx.scene.control.CheckBox;
@@ -12,12 +10,13 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
+import static com.alphasystem.morphologicalanalysis.ui.util.ApplicationHelper.PREFERENCES;
+
 /**
  * @author sali
  */
 public class TokenCheckBoxListCell extends ListCell<TokenCellModel> {
 
-    private static MorphologicalAnalysisPreferences preferences = GenericPreferences.getInstance(MorphologicalAnalysisPreferences.class);
     private final CheckBox checkBox;
     private final TextFlow label;
 
@@ -52,10 +51,10 @@ public class TokenCheckBoxListCell extends ListCell<TokenCellModel> {
     private void createLabel(TokenCellModel item) {
         label.getChildren().remove(0, label.getChildren().size());
         Text tokenText = new Text(item.getText());
-        tokenText.setFont(preferences.getArabicFont30());
+        tokenText.setFont(PREFERENCES.getArabicFont30());
 
         Text tokenNumber = new Text(item.getDisplayName());
-        tokenNumber.setFont(preferences.getArabicFont24());
+        tokenNumber.setFont(PREFERENCES.getArabicFont24());
 
         label.getChildren().addAll(tokenNumber, new Text(" "), tokenText);
     }
