@@ -1,6 +1,8 @@
 package com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.skin;
 
 import com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.ParticlePropertiesView;
+import com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.controller.ParticlePropertiesController;
+import com.alphasystem.morphologicalanalysis.ui.util.ApplicationContextProvider;
 import javafx.scene.control.SkinBase;
 
 /**
@@ -15,5 +17,6 @@ public class ParticlePropertiesSkin extends SkinBase<ParticlePropertiesView> {
      */
     public ParticlePropertiesSkin(ParticlePropertiesView control) {
         super(control);
+        getChildren().setAll(ApplicationContextProvider.getBean(ParticlePropertiesController.class));
     }
 }

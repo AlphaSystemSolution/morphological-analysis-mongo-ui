@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import java.lang.Double?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.control.MenuButton?>
+<fx:root xmlns:fx="http://javafx.com/fxml/1" type="javafx.scene.layout.BorderPane"
+         xmlns="http://javafx.com/javafx/8.0.40"
+         fx:controller="com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.controller.ParticlePropertiesController">
+    <fx:define>
+        <Double fx:id="GAP" fx:value="10.0"/>
+    </fx:define>
+    <styleClass>border</styleClass>
+    <center>
+        <GridPane vgap="$GAP" hgap="$GAP">
+            <padding>
+                <Insets top="$GAP" bottom="$GAP" left="$GAP" right="$GAP"/>
+            </padding>
+        </GridPane>
+    </center>
+</fx:root>
