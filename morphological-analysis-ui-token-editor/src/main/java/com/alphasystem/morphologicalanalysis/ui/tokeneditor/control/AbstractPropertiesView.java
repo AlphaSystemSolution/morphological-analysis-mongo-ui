@@ -19,7 +19,7 @@ public abstract class AbstractPropertiesView<P extends Enum<P> & PartOfSpeechTyp
     private final ObjectProperty<NumberType> numberType = new SimpleObjectProperty<>(this, "numberType");
     private final ObjectProperty<GenderType> genderType = new SimpleObjectProperty<>(this, "genderType");
 
-    public AbstractPropertiesView() {
+    AbstractPropertiesView() {
         locationPropertiesProperty().addListener((o, ov, nv) -> setValues(nv));
         partOfSpeechTypeProperty().addListener((observable, oldValue, newValue) -> {
             T properties = getLocationProperties();

@@ -9,12 +9,12 @@ import javafx.beans.property.SimpleObjectProperty;
 /**
  * @author sali
  */
-public abstract class AbstractNounPropertiesView<P extends Enum<P> & PartOfSpeechType, T extends
+abstract class AbstractNounPropertiesView<P extends Enum<P> & PartOfSpeechType, T extends
         AbstractNounProperties<P>> extends AbstractPropertiesView<P, T> {
 
     private final ObjectProperty<NounStatus> nounStatus = new SimpleObjectProperty<>(this, "nounStatus");
 
-    public AbstractNounPropertiesView() {
+    AbstractNounPropertiesView() {
         super();
         nounStatusProperty().addListener((o, ov, nv) -> {
             T properties = getLocationProperties();
