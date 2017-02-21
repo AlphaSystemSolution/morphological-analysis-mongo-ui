@@ -6,6 +6,7 @@
 <?import javafx.scene.layout.*?>
 <?import java.lang.Double?>
 <fx:root xmlns:fx="http://javafx.com/fxml/1" type="javafx.scene.layout.BorderPane"
+         fx:controller="com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.controller.VerbPropertiesController"
          xmlns="http://javafx.com/javafx/8.0.40">
     <fx:define>
         <Double fx:id="GAP" fx:value="10.0"/>
@@ -56,7 +57,7 @@
             <Label text="%incompleteVerbType.label" GridPane.columnIndex="0" GridPane.rowIndex="7"
                    labelFor="$incompleteVerbTypeComboBox"/>
             <ArabicSupportEnumComboBox fx:id="incompleteVerbTypeComboBox" required="false" type="LABEL_ONLY"
-                                       GridPane.columnIndex="1" GridPane.rowIndex="7"
+                                       GridPane.columnIndex="1" GridPane.rowIndex="7" disable="true"
                                        clazz="com.alphasystem.morphologicalanalysis.wordbyword.model.support.DummyFamily"/>
         </GridPane>
     </center>

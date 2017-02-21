@@ -38,7 +38,6 @@ public class VerbPropertiesController extends BorderPane {
     @FXML private ComboBox<IncompleteVerbCategory> incompleteVerbCategoryComboBox;
     @FXML private ComboBox<IncompleteVerbType> incompleteVerbTypeComboBox;
 
-
     @PostConstruct
     void postConstruct() throws IOException, URISyntaxException {
         ApplicationHelper.loadFxml(control, this);
@@ -52,32 +51,15 @@ public class VerbPropertiesController extends BorderPane {
         numberTypeComboBox.valueProperty().bindBidirectional(control.numberTypeProperty());
         genderTypeComboBox.valueProperty().bindBidirectional(control.genderTypeProperty());
         verbModeComboBox.valueProperty().bindBidirectional(control.verbModeProperty());
-
-        incompleteVerbCategoryComboBox.getSelectionModel().selectFirst();
-        setIncompleteVerbCategoryComboBoxValue(false, control.getIncompleteVerbCategory(), control.getIncompleteVerbType());
-        control.incompleteVerbCategoryProperty().addListener((observable, oldValue, newValue) ->
-                setIncompleteVerbCategoryComboBoxValue(false, newValue, null));
-        control.incompleteVerbTypeProperty().addListener((observable, oldValue, newValue) -> {
-            if (!incompleteVerbTypeComboBox.isDisabled()) {
-                incompleteVerbTypeComboBox.setValue(newValue);
-            }
-        });
-
-        incompleteVerbTypeComboBox.setDisable(true);
-        incompleteVerbCategoryComboBox.valueProperty().addListener((o, ov, nv) -> {
-            control.setIncompleteVerbCategory(nv);
-            setIncompleteVerbCategoryComboBoxValue(true, nv, null);
-        });
-        incompleteVerbTypeComboBox.valueProperty().addListener((observable, oldValue, newValue) -> control.setIncompleteVerbType(newValue));
+        incompleteVerbCategoryComboBox.valueProperty().bindBidirectional(control.incompleteVerbCategoryProperty());
+        incompleteVerbCategoryComboBox.valueProperty().addListener((observable, oldValue, newValue) ->
+                setIncompleteVerbCategoryComboBoxValue(newValue, null));
     }
 
-    private void setIncompleteVerbCategoryComboBoxValue(boolean self, final IncompleteVerbCategory incompleteVerbCategory,
+    private void setIncompleteVerbCategoryComboBoxValue(final IncompleteVerbCategory incompleteVerbCategory,
                                                         final IncompleteVerbType incompleteVerbType) {
         IncompleteVerbCategory newValue = ((incompleteVerbCategory == null) || DUMMY.equals(incompleteVerbCategory)) ?
                 null : incompleteVerbCategory;
-        if (!self) {
-            incompleteVerbCategoryComboBox.setValue(newValue);
-        }
         boolean disable = newValue == null;
         incompleteVerbTypeComboBox.getItems().clear();
         incompleteVerbTypeComboBox.setDisable(disable);

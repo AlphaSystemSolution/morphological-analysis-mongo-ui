@@ -51,8 +51,14 @@ public class VerbPropertiesView extends AbstractPropertiesView<VerbPartOfSpeechT
         });
         incompleteVerbCategoryProperty().addListener((o, ov, nv) -> {
             VerbProperties verbProperties = getLocationProperties();
-            if ((verbProperties != null) && ((nv != null) && !nv.equals(IncompleteVerbCategory.DUMMY))) {
-                verbProperties.setIncompleteVerb(createIncompleteVerb(nv));
+            if (verbProperties != null) {
+                if (nv == null || IncompleteVerbCategory.DUMMY.equals(nv)) {
+                    verbProperties.setIncompleteVerb(null);
+                } else {
+                    final IncompleteVerb incompleteVerb = createIncompleteVerb(nv);
+                    verbProperties.setIncompleteVerb(incompleteVerb);
+                    setIncompleteVerbType(incompleteVerb.getType());
+                }
             }
         });
         incompleteVerbTypeProperty().addListener((o, ov, nv) -> {
@@ -67,7 +73,7 @@ public class VerbPropertiesView extends AbstractPropertiesView<VerbPartOfSpeechT
     }
 
     @PostConstruct
-    void postConstruct(){
+    void postConstruct() {
         setSkin(createDefaultSkin());
     }
 
@@ -83,7 +89,7 @@ public class VerbPropertiesView extends AbstractPropertiesView<VerbPartOfSpeechT
         setVerbType((nv == null) ? null : nv.getVerbType());
         setVerbMode((nv == null) ? null : nv.getMode());
         IncompleteVerb incompleteVerb = (nv == null) ? null : nv.getIncompleteVerb();
-        final IncompleteVerbCategory category = (incompleteVerb == null) ? null : incompleteVerb.getCategory();
+        final IncompleteVerbCategory category = (incompleteVerb == null) ? IncompleteVerbCategory.DUMMY : incompleteVerb.getCategory();
         final IncompleteVerbType type = (incompleteVerb == null) ? null : incompleteVerb.getType();
         setIncompleteVerbCategory(category);
         setIncompleteVerbType(type);
