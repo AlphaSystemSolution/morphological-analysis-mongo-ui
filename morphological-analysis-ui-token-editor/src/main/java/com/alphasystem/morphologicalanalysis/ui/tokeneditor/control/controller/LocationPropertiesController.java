@@ -34,26 +34,39 @@ public class LocationPropertiesController extends AnchorPane {
     void postConstruct() {
         refresh(control.getLocation());
         control.locationProperty().addListener((observable, oldValue, newValue) -> refresh(newValue));
+        commonPropertiesView.wordTypeProperty().addListener((observable, oldValue, newValue) -> refreshPropertiesView(newValue));
     }
 
+    @SuppressWarnings({"unchecked"})
     private void refresh(Location location) {
         getChildren().clear();
         commonPropertiesView.setLocation(location);
-        final AbstractPropertiesView propertiesView = getPropertiesView(location);
+        getChildren().addAll(commonPropertiesView, refreshPropertiesView(location));
+    }
+
+    @SuppressWarnings({"unchecked"})
+    private AbstractPropertiesView refreshPropertiesView(Location location){
+        final WordType wordType = (location == null) ? WordType.NOUN : location.getWordType();
+        final AbstractPropertiesView propertiesView = getPropertiesView(wordType);
         setLeftAnchor(commonPropertiesView, DEFAULT_OFFSET);
         setTopAnchor(commonPropertiesView, DEFAULT_OFFSET);
         setLeftAnchor(propertiesView, 470 + DEFAULT_OFFSET);
         setTopAnchor(propertiesView, DEFAULT_OFFSET);
-        getChildren().addAll(commonPropertiesView, propertiesView);
+        if(location != null){
+            if (!WordType.PARTICLE.equals(wordType)) {
+                propertiesView.setLocationProperties(location.getProperties().get(0));
+            }
+        }
+        return propertiesView;
     }
 
-    @SuppressWarnings({"unchecked"})
-    private AbstractPropertiesView getPropertiesView(Location location) {
-        if (location == null) {
-            return nounPropertiesView;
-        }
+    private void refreshPropertiesView(WordType wordType) {
+        control.getLocation().setWordType(wordType);
+        getChildren().set(1, refreshPropertiesView(control.getLocation()));
+    }
+
+    private AbstractPropertiesView getPropertiesView(WordType wordType) {
         AbstractPropertiesView node = null;
-        final WordType wordType = location.getWordType();
         switch (wordType) {
             case NOUN:
                 node = nounPropertiesView;
@@ -67,9 +80,6 @@ public class LocationPropertiesController extends AnchorPane {
             case PARTICLE:
                 node = particlePropertiesView;
                 break;
-        }
-        if (!WordType.PARTICLE.equals(wordType)) {
-            node.setLocationProperties(location.getProperties().get(0));
         }
         return node;
     }
