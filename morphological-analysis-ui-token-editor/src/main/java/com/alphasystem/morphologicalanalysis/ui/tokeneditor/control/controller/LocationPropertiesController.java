@@ -45,18 +45,14 @@ public class LocationPropertiesController extends AnchorPane {
     }
 
     @SuppressWarnings({"unchecked"})
-    private AbstractPropertiesView refreshPropertiesView(Location location){
+    private AbstractPropertiesView refreshPropertiesView(Location location) {
         final WordType wordType = (location == null) ? WordType.NOUN : location.getWordType();
         final AbstractPropertiesView propertiesView = getPropertiesView(wordType);
         setLeftAnchor(commonPropertiesView, DEFAULT_OFFSET);
         setTopAnchor(commonPropertiesView, DEFAULT_OFFSET);
         setLeftAnchor(propertiesView, 470 + DEFAULT_OFFSET);
         setTopAnchor(propertiesView, DEFAULT_OFFSET);
-        if(location != null){
-            if (!WordType.PARTICLE.equals(wordType)) {
-                propertiesView.setLocation(location);
-            }
-        }
+        propertiesView.setLocation(location);
         return propertiesView;
     }
 
