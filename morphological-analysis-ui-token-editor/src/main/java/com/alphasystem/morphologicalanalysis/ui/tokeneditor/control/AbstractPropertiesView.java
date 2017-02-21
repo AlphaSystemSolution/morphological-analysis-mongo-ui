@@ -10,6 +10,8 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.control.Control;
 
+import java.util.List;
+
 /**
  * @author sali
  */
@@ -42,9 +44,14 @@ public abstract class AbstractPropertiesView<P extends Enum<P> & PartOfSpeechTyp
         });
     }
 
-    private void setValues(Location location) {
-        final T properties = getLocationProperties();
-        setValues(properties);
+    @SuppressWarnings({"unchecked"})
+    protected void setValues(Location location) {
+        if (location == null) {
+            setValues((T) null);
+            return;
+        }
+        final List<AbstractProperties> properties = location.getProperties();
+        setValues((T) properties.get(0));
     }
 
     void setValues(T nv) {
