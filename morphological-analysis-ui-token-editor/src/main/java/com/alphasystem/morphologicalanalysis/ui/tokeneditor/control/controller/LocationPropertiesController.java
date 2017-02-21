@@ -54,7 +54,7 @@ public class LocationPropertiesController extends AnchorPane {
         setTopAnchor(propertiesView, DEFAULT_OFFSET);
         if(location != null){
             if (!WordType.PARTICLE.equals(wordType)) {
-                propertiesView.setLocationProperties(location.getProperties().get(0));
+                propertiesView.setLocation(location);
             }
         }
         return propertiesView;

@@ -2,6 +2,7 @@ package com.alphasystem.morphologicalanalysis.ui.tokeneditor.control;
 
 import com.alphasystem.morphologicalanalysis.ui.util.ApplicationHelper;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.AbstractProperties;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.GenderType;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.NumberType;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeechType;
@@ -14,13 +15,13 @@ import javafx.scene.control.Control;
  */
 public abstract class AbstractPropertiesView<P extends Enum<P> & PartOfSpeechType, T extends AbstractProperties<P>> extends Control {
 
-    private final ObjectProperty<T> locationProperties = new SimpleObjectProperty<>(this, "locationProperties");
+    private final ObjectProperty<Location> location = new SimpleObjectProperty<>(this, "location");
     private final ObjectProperty<P> partOfSpeechType = new SimpleObjectProperty<>(this, "partOfSpeechType");
     private final ObjectProperty<NumberType> numberType = new SimpleObjectProperty<>(this, "numberType");
     private final ObjectProperty<GenderType> genderType = new SimpleObjectProperty<>(this, "genderType");
 
     AbstractPropertiesView() {
-        locationPropertiesProperty().addListener((o, ov, nv) -> setValues(nv));
+        locationProperty().addListener((observable, oldValue, newValue) -> setValues(newValue));
         partOfSpeechTypeProperty().addListener((observable, oldValue, newValue) -> {
             T properties = getLocationProperties();
             if (properties != null) {
@@ -41,6 +42,11 @@ public abstract class AbstractPropertiesView<P extends Enum<P> & PartOfSpeechTyp
         });
     }
 
+    private void setValues(Location location) {
+        final T properties = getLocationProperties();
+        setValues(properties);
+    }
+
     void setValues(T nv) {
         setPartOfSpeechType((nv == null) ? getDefaultPartOfSpeechType() : nv.getPartOfSpeech());
         setNumberType((nv == null) ? null : nv.getNumber());
@@ -54,16 +60,25 @@ public abstract class AbstractPropertiesView<P extends Enum<P> & PartOfSpeechTyp
         return ApplicationHelper.STYLE_SHEET_PATH;
     }
 
-    public final T getLocationProperties() {
-        return locationProperties.get();
+    public final Location getLocation() {
+        return location.get();
     }
 
-    public final void setLocationProperties(T locationProperties) {
-        this.locationProperties.set(locationProperties);
+    public final ObjectProperty<Location> locationProperty() {
+        return location;
     }
 
-    public final ObjectProperty<T> locationPropertiesProperty() {
-        return locationProperties;
+    public final void setLocation(Location location) {
+        this.location.set(location);
+    }
+
+    @SuppressWarnings({"unchecked"})
+    final T getLocationProperties() {
+        final Location location = getLocation();
+        if (location == null) {
+            return null;
+        }
+        return (T) location.getProperties().get(0);
     }
 
     public final P getPartOfSpeechType() {
