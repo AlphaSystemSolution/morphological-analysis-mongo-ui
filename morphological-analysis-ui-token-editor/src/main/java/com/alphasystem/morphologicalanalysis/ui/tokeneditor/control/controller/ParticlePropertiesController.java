@@ -100,7 +100,11 @@ public class ParticlePropertiesController extends BorderPane {
             if (tableModel.isChecked()) {
                 control.getLocation().addProperties(newProperties);
             } else {
+                final boolean lasItem = control.getLocation().getProperties().size() == 1;
                 control.getLocation().removeProperties(newProperties);
+                if (lasItem) {
+                    modelList.get(0).setChecked(true);
+                }
             }
             return checkedProperty;
         };
@@ -129,7 +133,6 @@ public class ParticlePropertiesController extends BorderPane {
                 }
             }
         });
-
         control.locationProperty().addListener((observable, oldValue, newValue) -> updateTable(newValue));
     }
 
