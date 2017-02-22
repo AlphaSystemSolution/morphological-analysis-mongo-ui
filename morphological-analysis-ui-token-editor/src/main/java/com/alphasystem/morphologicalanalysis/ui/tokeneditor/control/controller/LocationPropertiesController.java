@@ -52,13 +52,17 @@ public class LocationPropertiesController extends AnchorPane {
         setTopAnchor(commonPropertiesView, DEFAULT_OFFSET);
         setLeftAnchor(propertiesView, 470 + DEFAULT_OFFSET);
         setTopAnchor(propertiesView, DEFAULT_OFFSET);
+        propertiesView.setLocation(null);
         propertiesView.setLocation(location);
         return propertiesView;
     }
 
     private void refreshPropertiesView(WordType wordType) {
-        control.getLocation().setWordType(wordType);
-        getChildren().set(1, refreshPropertiesView(control.getLocation()));
+        final Location location = control.getLocation();
+        if (location != null) {
+            location.setWordType(wordType);
+            getChildren().set(1, refreshPropertiesView(location));
+        }
     }
 
     private AbstractPropertiesView getPropertiesView(WordType wordType) {
