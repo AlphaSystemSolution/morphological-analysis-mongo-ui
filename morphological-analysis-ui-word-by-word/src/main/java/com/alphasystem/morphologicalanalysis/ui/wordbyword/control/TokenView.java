@@ -14,6 +14,7 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
 import javafx.geometry.NodeOrientation;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -26,6 +27,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author sali
@@ -106,15 +108,19 @@ public class TokenView extends BorderPane {
     }
 
     private void refreshTable(VerseTokenPairGroup group, boolean refresh) {
-        tableView.getItems().remove(0, tableView.getItems().size());
+        tableView.getItems().clear();
         if (group != null) {
             final List<Token> tokens = restClient.getTokens(group, refresh);
             if (tokens != null && !tokens.isEmpty()) {
-                tokens.forEach(token -> tableView.getItems().add(new TokenCellModel(token)));
-                tableView.setPrefHeight(ApplicationHelper.calculateTableHeight(tableView.getItems().size()));
+                tableView.setItems(FXCollections.observableArrayList(tokens.stream().map(TokenCellModel::new).collect(Collectors.toList())));
+                tableView.getSelectionModel().selectFirst();
+                final double height = ApplicationHelper.calculateTableHeight(tableView.getItems().size());
+                tableView.setMinHeight(height);
+                tableView.setMaxHeight(height);
+                tableView.setPrefHeight(height);
             }
         }
-        tableView.requestLayout();
+        tableView.refresh();
     }
 
     private VerseTokenPairGroup getVerseTokenPairGroup() {
