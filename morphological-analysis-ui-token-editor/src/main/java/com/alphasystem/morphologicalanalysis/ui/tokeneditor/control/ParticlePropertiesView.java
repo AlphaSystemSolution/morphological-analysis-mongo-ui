@@ -1,6 +1,7 @@
 package com.alphasystem.morphologicalanalysis.ui.tokeneditor.control;
 
 import com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.skin.ParticlePropertiesSkin;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.ParticleProperties;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.ParticlePartOfSpeechType;
 import javafx.scene.control.Skin;
@@ -19,13 +20,18 @@ public class ParticlePropertiesView extends AbstractPropertiesView<ParticlePartO
     }
 
     @PostConstruct
-    void postConstruct(){
+    void postConstruct() {
         setSkin(createDefaultSkin());
     }
 
     @Override
     protected Skin<?> createDefaultSkin() {
         return new ParticlePropertiesSkin(this);
+    }
+
+    @Override
+    protected void setValues(Location location) {
+        super.setValues(location);
     }
 
     @Override
