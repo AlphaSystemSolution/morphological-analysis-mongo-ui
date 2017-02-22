@@ -9,12 +9,15 @@
          fx:controller="com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.controller.ParticlePropertiesController">
     <fx:define>
         <Double fx:id="GAP" fx:value="10.0"/>
-        <Double fx:id="WIDTH" fx:value="300.0"/>
+        <Double fx:id="WIDTH" fx:value="320.0"/>
     </fx:define>
     <center>
         <GridPane vgap="$GAP" hgap="$GAP">
-            <ScrollPane fitToWidth="true" fitToHeight="true" GridPane.columnIndex="0"
-                        GridPane.rowIndex="0" GridPane.columnSpan="2" GridPane.rowSpan="2">
+            <GridPane vgap="$GAP" hgap="$GAP" fx:id="selectedPartOfSpeechPane" GridPane.columnIndex="0"
+                      GridPane.rowIndex="0" GridPane.columnSpan="2" GridPane.rowSpan="2"
+                      nodeOrientation="RIGHT_TO_LEFT"/>
+            <ScrollPane fitToWidth="true" fitToHeight="true" GridPane.columnIndex="2"
+                        GridPane.rowIndex="2" GridPane.columnSpan="2" GridPane.rowSpan="2">
                 <TableView fx:id="tableView" nodeOrientation="RIGHT_TO_LEFT"/>
             </ScrollPane>
         </GridPane>

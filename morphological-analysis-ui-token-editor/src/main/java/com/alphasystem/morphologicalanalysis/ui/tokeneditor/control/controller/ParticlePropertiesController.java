@@ -17,6 +17,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -42,6 +43,7 @@ public class ParticlePropertiesController extends BorderPane {
 
     @Autowired private ParticlePropertiesView control;
     @FXML private TableView<ParticlePartOfSpeechCellModel> tableView;
+    @FXML public GridPane selectedPartOfSpeechPane;
     private final List<ParticlePartOfSpeechCellModel> modelList;
 
     public ParticlePropertiesController() {
@@ -100,7 +102,6 @@ public class ParticlePropertiesController extends BorderPane {
             } else {
                 control.getLocation().removeProperties(newProperties);
             }
-            control.getLocation().getProperties().forEach(abstractProperties -> System.out.println(">>>> " + abstractProperties.getPartOfSpeech()));
             return checkedProperty;
         };
         checkBoxColumn.setCellFactory(param -> new CheckBoxTableCell<>(cb));
