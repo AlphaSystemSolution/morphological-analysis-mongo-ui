@@ -103,6 +103,7 @@ public class ParticlePropertiesController extends BorderPane {
                 final boolean lasItem = control.getLocation().getProperties().size() == 1;
                 control.getLocation().removeProperties(newProperties);
                 if (lasItem) {
+                    control.getLocation().getProperties();
                     modelList.get(0).setChecked(true);
                 }
             }
