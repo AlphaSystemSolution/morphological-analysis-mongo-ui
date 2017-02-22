@@ -24,15 +24,10 @@ public final class ApplicationHelper {
     public static final MorphologicalAnalysisPreferences PREFERENCES = GenericPreferences.getInstance(MorphologicalAnalysisPreferences.class);
     public static final Border BORDER = new Border(new BorderStroke(Color.LIGHTGREY, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderStroke.THIN));
     public static final String STYLE_SHEET_PATH = AppUtil.getResource("styles/application.css").toExternalForm();
-    public static final double ROW_SIZE = 55.0;
-
-    private static final double DEFAULT_MIN_HEIGHT = 500.0;
+    public static final double ROW_SIZE = 40.0;
 
     public static double calculateTableHeight(int size) {
-        int numOfRows = Math.max(20, size);
-        double height = (numOfRows * ROW_SIZE) + ROW_SIZE;
-        height = roundTo100(height);
-        return Math.max(height, DEFAULT_MIN_HEIGHT) + 100;
+        return roundTo100(((size + 7) * ROW_SIZE) + ROW_SIZE) + 100;
     }
 
     public static <T extends Control, P extends Pane> void loadFxml(T control, P pane) throws IOException, URISyntaxException {
