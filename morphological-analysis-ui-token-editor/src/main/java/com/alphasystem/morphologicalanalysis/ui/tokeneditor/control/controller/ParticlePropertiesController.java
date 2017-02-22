@@ -69,6 +69,7 @@ public class ParticlePropertiesController extends BorderPane {
 
     @FXML
     void initialize() {
+        // initialize table, hide header
         tableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         tableView.getItems().addAll(modelList);
         tableView.setEditable(true);
@@ -83,12 +84,14 @@ public class ParticlePropertiesController extends BorderPane {
             }
         });
 
+        // initialize PartOfSpeech column
         final TableColumn<ParticlePartOfSpeechCellModel, ParticlePartOfSpeechType> partOfSpeechTypeColumn = new TableColumn<>();
         partOfSpeechTypeColumn.setMinWidth(250);
         partOfSpeechTypeColumn.setText("Value");
         partOfSpeechTypeColumn.setCellValueFactory(param -> param.getValue().particlePartOfSpeechTypeProperty());
         partOfSpeechTypeColumn.setCellFactory(TextTableCell::new);
 
+        // // initialize CheckBox column
         final TableColumn<ParticlePartOfSpeechCellModel, Boolean> checkBoxColumn = new TableColumn<>();
         checkBoxColumn.setMaxWidth(30);
         checkBoxColumn.setCellValueFactory(param -> param.getValue().checkedProperty());
@@ -111,13 +114,18 @@ public class ParticlePropertiesController extends BorderPane {
         };
         checkBoxColumn.setCellFactory(param -> new CheckBoxTableCell<>(cb));
 
+        // add columns
         tableView.getColumns().add(checkBoxColumn);
         tableView.getColumns().add(partOfSpeechTypeColumn);
+
+        // listener to update model when selecting table row
         tableView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
                 newValue.setChecked(true);
             }
         });
+
+        // update entire table when removing or adding elements
         tableView.getSelectionModel().getSelectedItems().addListener((ListChangeListener<? super ParticlePartOfSpeechCellModel>) c -> {
             while (c.next()) {
                 if (c.wasRemoved()) {
@@ -134,6 +142,8 @@ public class ParticlePropertiesController extends BorderPane {
                 }
             }
         });
+
+        // update table when location changes
         control.locationProperty().addListener((observable, oldValue, newValue) -> updateTable(newValue));
     }
 
