@@ -1,6 +1,7 @@
 package com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.controller;
 
 import com.alphasystem.arabic.ui.ArabicLabelView;
+import com.alphasystem.morphologicalanalysis.ui.control.TextTableCell;
 import com.alphasystem.morphologicalanalysis.ui.model.ParticlePartOfSpeechCellModel;
 import com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.ParticlePropertiesView;
 import com.alphasystem.morphologicalanalysis.ui.util.ApplicationHelper;
@@ -13,7 +14,6 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
 import javafx.scene.control.SelectionMode;
-import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.CheckBoxTableCell;
@@ -21,8 +21,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.Font;
-import javafx.scene.text.Text;
-import javafx.scene.text.TextAlignment;
 import javafx.util.Callback;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -32,9 +30,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-
-import static javafx.geometry.NodeOrientation.RIGHT_TO_LEFT;
-import static javafx.scene.control.ContentDisplay.GRAPHIC_ONLY;
 
 /**
  * @author sali
@@ -90,7 +85,11 @@ public class ParticlePropertiesController extends BorderPane {
         partOfSpeechTypeColumn.setMinWidth(250);
         partOfSpeechTypeColumn.setText("Value");
         partOfSpeechTypeColumn.setCellValueFactory(param -> param.getValue().particlePartOfSpeechTypeProperty());
-        partOfSpeechTypeColumn.setCellFactory(TextTableCell::new);
+        partOfSpeechTypeColumn.setCellFactory(param -> {
+            TextTableCell cell = new TextTableCell<>(param);
+            cell.setFont(Font.font(ApplicationHelper.PREFERENCES.getArabicFontName(), 16));
+            return cell;
+        });
 
         // // initialize CheckBox column
         final TableColumn<ParticlePartOfSpeechCellModel, Boolean> checkBoxColumn = new TableColumn<>();
@@ -191,27 +190,4 @@ public class ParticlePropertiesController extends BorderPane {
         return label;
     }
 
-    private class TextTableCell extends TableCell<ParticlePartOfSpeechCellModel, ParticlePartOfSpeechType> {
-        private final Text text;
-
-        private TextTableCell(TableColumn<ParticlePartOfSpeechCellModel, ParticlePartOfSpeechType> column) {
-            setContentDisplay(GRAPHIC_ONLY);
-            text = new Text();
-            text.setFont(Font.font(ApplicationHelper.PREFERENCES.getArabicFontName(), 16));
-            text.setTextAlignment(TextAlignment.RIGHT);
-            text.setNodeOrientation(RIGHT_TO_LEFT);
-        }
-
-        @Override
-        protected void updateItem(ParticlePartOfSpeechType item, boolean empty) {
-            super.updateItem(item, empty);
-
-            BorderPane borderPane = new BorderPane();
-            if (item != null && !empty) {
-                text.setText(item.toLabel().toUnicode());
-                borderPane.setLeft(text);
-            }
-            setGraphic(borderPane);
-        }
-    }
 }
