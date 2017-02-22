@@ -1,5 +1,6 @@
 package com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.controller;
 
+import com.alphasystem.arabic.ui.ArabicLabelView;
 import com.alphasystem.morphologicalanalysis.ui.model.ParticlePartOfSpeechCellModel;
 import com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.ParticlePropertiesView;
 import com.alphasystem.morphologicalanalysis.ui.util.ApplicationHelper;
@@ -110,6 +111,7 @@ public class ParticlePropertiesController extends BorderPane {
                     modelList.get(0).setChecked(true);
                 }
             }
+            updateViewSelected();
             return checkedProperty;
         };
         checkBoxColumn.setCellFactory(param -> new CheckBoxTableCell<>(cb));
@@ -157,6 +159,36 @@ public class ParticlePropertiesController extends BorderPane {
             final ParticlePartOfSpeechType partOfSpeech = ((ParticleProperties) abstractProperties).getPartOfSpeech();
             modelList.stream().filter(model -> model.getParticlePartOfSpeechType().equals(partOfSpeech)).forEachOrdered(model -> model.setChecked(true));
         });
+        updateViewSelected();
+    }
+
+    private void updateViewSelected() {
+        selectedPartOfSpeechPane.getChildren().clear();
+        final Location location = control.getLocation();
+        if (location != null) {
+            final List<AbstractProperties> properties = location.getProperties();
+            int col = 0;
+            int row = 0;
+            for (AbstractProperties property : properties) {
+                ParticleProperties particleProperties = (ParticleProperties) property;
+                selectedPartOfSpeechPane.add(createLabel(particleProperties.getPartOfSpeech()), col, row);
+                col++;
+                if (col % 2 == 0) {
+                    col = 0;
+                    row++;
+                }
+            }
+        }
+    }
+
+    private static ArabicLabelView createLabel(ParticlePartOfSpeechType partOfSpeech) {
+        ArabicLabelView label = new ArabicLabelView();
+        label.setLabel(partOfSpeech);
+        label.setDisable(true);
+        label.setFont(Font.font(ApplicationHelper.PREFERENCES.getArabicFontName(), 16));
+        label.setHeight(48);
+        label.setWidth(144);
+        return label;
     }
 
     private class TextTableCell extends TableCell<ParticlePartOfSpeechCellModel, ParticlePartOfSpeechType> {
