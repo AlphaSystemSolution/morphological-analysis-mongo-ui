@@ -13,12 +13,12 @@ import javafx.collections.ObservableList;
 /**
  * @author sali
  */
-class LabelSelectionChangeListener implements ChangeListener<Boolean> {
+public class LabelSelectionChangeListener implements ChangeListener<Boolean> {
 
     private final ApplicationController applicationController = ApplicationController.getInstance();
     private final LabelSelectionModel model;
 
-    LabelSelectionChangeListener(LabelSelectionModel model) {
+    public LabelSelectionChangeListener(LabelSelectionModel model) {
         this.model = model;
     }
 

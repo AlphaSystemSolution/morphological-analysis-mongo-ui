@@ -10,7 +10,7 @@ import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
  *
  * @author sali
  */
-class LabelSelectionModel {
+public class LabelSelectionModel {
 
     private TokenPropertiesView control;
     private Location location;
@@ -49,22 +49,22 @@ class LabelSelectionModel {
         this.group = group;
     }
 
-    LabelSelectionModel control(TokenPropertiesView control) {
+    public LabelSelectionModel control(TokenPropertiesView control) {
         setControl(control);
         return this;
     }
 
-    LabelSelectionModel location(Location location) {
+    public LabelSelectionModel location(Location location) {
         setLocation(location);
         return this;
     }
 
-    LabelSelectionModel labelView(ArabicLabelView labelView) {
+    public LabelSelectionModel labelView(ArabicLabelView labelView) {
         setLabelView(labelView);
         return this;
     }
 
-    LabelSelectionModel group(ArabicLabelToggleGroup group) {
+    public LabelSelectionModel group(ArabicLabelToggleGroup group) {
         setGroup(group);
         return this;
     }
