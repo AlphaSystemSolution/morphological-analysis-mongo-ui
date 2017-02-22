@@ -50,10 +50,10 @@ public class TokenCheckBoxListCell extends ListCell<TokenCellModel> {
 
     private void createLabel(TokenCellModel item) {
         label.getChildren().remove(0, label.getChildren().size());
-        Text tokenText = new Text(item.getText());
+        Text tokenText = new Text(item.getText().toUnicode());
         tokenText.setFont(PREFERENCES.getArabicFont30());
 
-        Text tokenNumber = new Text(item.getDisplayName());
+        Text tokenNumber = new Text(item.getDisplayName().toUnicode());
         tokenNumber.setFont(PREFERENCES.getArabicFont24());
 
         label.getChildren().addAll(tokenNumber, new Text(" "), tokenText);
