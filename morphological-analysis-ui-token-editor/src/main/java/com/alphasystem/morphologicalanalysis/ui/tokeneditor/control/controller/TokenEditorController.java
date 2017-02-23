@@ -1,5 +1,6 @@
 package com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.controller;
 
+import com.alphasystem.fx.ui.util.UiUtilities;
 import com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.DetailEditorView;
 import com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.TokenEditorView;
 import com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.TokenPropertiesView;
@@ -62,6 +63,14 @@ public class TokenEditorController extends BorderPane {
 
     @FXML
     private void onSave() {
-        restClient.saveToken(control.getToken());
+        UiUtilities.waitCursor(control);
+        try {
+            restClient.saveToken(control.getToken());
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            UiUtilities.defaultCursor(control);
+        }
+
     }
 }
