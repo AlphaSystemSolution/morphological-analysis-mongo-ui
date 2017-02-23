@@ -71,6 +71,15 @@ public class TokenEditorController extends BorderPane {
         } finally {
             UiUtilities.defaultCursor(control);
         }
+    }
+
+    @FXML
+    private void onNext(){
+
+    }
+
+    @FXML
+    private void onPrevious(){
 
     }
 }
