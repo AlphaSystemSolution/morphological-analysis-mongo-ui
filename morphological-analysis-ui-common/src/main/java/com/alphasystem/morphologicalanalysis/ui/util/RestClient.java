@@ -27,6 +27,7 @@ public class RestClient {
 
     private static final String CHAPTERS_PATH_SUFFIX = "/chapters";
     private static final String TOKENS_PATH_SUFFIX = "/tokens";
+    private static final String SAVE_TOKEN_PATH_SUFFIX = "/saveToken";
 
     @Autowired private RestTemplate restTemplate;
     @Value("${service.url}") private String urlPath;
@@ -44,7 +45,6 @@ public class RestClient {
         getChapters();
     }
 
-    @SuppressWarnings("unchecked")
     public Chapter[] getChapters() {
         if (chapters == null) {
             final URI uri = getServicePath(urlPath, CHAPTERS_PATH_SUFFIX);
@@ -54,7 +54,6 @@ public class RestClient {
         return chapters;
     }
 
-    @SuppressWarnings("unchecked")
     public List<Token> getTokens(VerseTokenPairGroup group, boolean refresh) {
         final String key = group.toString();
         List<Token> tokens = refresh ? null : cache.get(key);
@@ -68,9 +67,29 @@ public class RestClient {
         return tokens;
     }
 
+    /**
+     * Saves given <code>token</code>.
+     *
+     * @param token {@link Token} to save
+     * @return Saved token.
+     * @throws NullPointerException if given <code>token</code> is null.
+     */
+    public Token saveToken(Token token) throws NullPointerException{
+        if ((token == null)) {
+            throw new NullPointerException("token cannot be null.");
+        }
+        final URI uri = getServicePath(urlPath, SAVE_TOKEN_PATH_SUFFIX);
+        final HttpEntity<Token> entity = new HttpEntity<>(token);
+        final ResponseEntity<Token> responseEntity = restTemplate.exchange(uri, HttpMethod.POST, entity, new TokenType());
+        return responseEntity.getBody();
+    }
+
     private static class ChapterListType extends ParameterizedTypeReference<Chapter[]> {
     }
 
     private static class TokenListType extends ParameterizedTypeReference<List<Token>> {
+    }
+
+    private static class TokenType extends ParameterizedTypeReference<Token> {
     }
 }
