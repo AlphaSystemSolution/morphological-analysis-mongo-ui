@@ -29,7 +29,9 @@ public class TokenEditorApp extends AbstractJavaFxApplicationSupport {
         notifyPreloader(new Preloader.StateChangeNotification(Preloader.StateChangeNotification.Type.BEFORE_START));
 
         primaryStage.setTitle(windowTitle);
-        primaryStage.setScene(new Scene(mainPane));
+        final Scene scene = new Scene(mainPane);
+        scene.getStylesheets().addAll("/styles/glyphs_custom.css");
+        primaryStage.setScene(scene);
         primaryStage.setResizable(true);
         primaryStage.centerOnScreen();
         primaryStage.setMaximized(true);
