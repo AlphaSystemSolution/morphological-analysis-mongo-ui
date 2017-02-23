@@ -4,6 +4,7 @@ import com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.DetailEditor
 import com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.TokenEditorView;
 import com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.TokenPropertiesView;
 import com.alphasystem.morphologicalanalysis.ui.util.ApplicationHelper;
+import com.alphasystem.morphologicalanalysis.ui.util.RestClient;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
 import javafx.fxml.FXML;
 import javafx.scene.control.MenuBar;
@@ -24,6 +25,7 @@ import java.net.URISyntaxException;
 @Component
 public class TokenEditorController extends BorderPane {
 
+    @Autowired private RestClient restClient;
     @Autowired private TokenEditorView control;
     @Autowired private TokenPropertiesView tokenPropertiesView;
     @Autowired private DetailEditorView detailEditorView;
@@ -59,7 +61,7 @@ public class TokenEditorController extends BorderPane {
     }
 
     @FXML
-    private void onSave(){
-
+    private void onSave() {
+        restClient.saveToken(control.getToken());
     }
 }

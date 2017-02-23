@@ -22,7 +22,7 @@
                 </Menu>
             </MenuBar>
             <ToolBar fx:id="toolBar">
-                <Button>
+                <Button onAction="#onSave">
                     <graphic>
                         <FontAwesomeIconView glyphName="%save.menu_item.icon" size="2em"/>
                     </graphic>
