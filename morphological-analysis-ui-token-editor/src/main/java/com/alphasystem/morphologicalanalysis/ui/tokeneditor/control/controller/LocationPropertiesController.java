@@ -9,6 +9,8 @@ import com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.ProNounPrope
 import com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.VerbPropertiesView;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.WordType;
+import javafx.collections.ObservableList;
+import javafx.scene.Node;
 import javafx.scene.layout.AnchorPane;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -61,7 +63,10 @@ public class LocationPropertiesController extends AnchorPane {
         final Location location = control.getLocation();
         if (location != null) {
             location.setWordType(wordType);
-            getChildren().set(1, refreshPropertiesView(location));
+            final ObservableList<Node> children = getChildren();
+            if (children != null && !children.isEmpty()) {
+                children.set(1, refreshPropertiesView(location));
+            }
         }
     }
 
