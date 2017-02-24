@@ -39,38 +39,15 @@ public class MorphologicalEntryView extends Control {
     private final BooleanProperty skipRuleProcessing = new SimpleBooleanProperty(false, "skipRuleProcessing");
 
     @PostConstruct
-    void postConstruct(){
+    void postConstruct() {
         setSkin(createDefaultSkin());
         morphologicalEntryProperty().addListener((o, ov, nv) -> setValues(nv));
-        rootLettersProperty().addListener((o, ov, nv) -> getMorphologicalEntry().setRootLetters(nv));
-        formProperty().addListener((o, ov, nv) -> getMorphologicalEntry().setForm(nv));
-        shortTranslationProperty().addListener((o, ov, nv) -> getMorphologicalEntry().setShortTranslation(nv));
-        removePassiveLineProperty().addListener((o, ov, nv) -> {
-            ConjugationConfiguration configuration = getMorphologicalEntry().getConfiguration();
-            if (configuration == null) {
-                configuration = new ConjugationConfiguration();
-            }
-            configuration.setRemovePassiveLine(nv);
-            getMorphologicalEntry().setConfiguration(configuration);
-        });
-        skipRuleProcessingProperty().addListener((o, ov, nv) -> {
-            ConjugationConfiguration configuration = getMorphologicalEntry().getConfiguration();
-            if (configuration == null) {
-                configuration = new ConjugationConfiguration();
-            }
-            configuration.setSkipRuleProcessing(nv);
-            getMorphologicalEntry().setConfiguration(configuration);
-        });
-        getVerbalNouns().addListener((SetChangeListener<? super VerbalNoun>) c -> {
-            if (c.wasRemoved()) {
-                VerbalNoun elementRemoved = c.getElementRemoved();
-                getMorphologicalEntry().getVerbalNouns().remove(elementRemoved);
-            }
-            if (c.wasAdded()) {
-                VerbalNoun elementAdded = c.getElementAdded();
-                getMorphologicalEntry().getVerbalNouns().add(elementAdded);
-            }
-        });
+        rootLettersProperty().addListener((o, ov, nv) -> updateMorphologicalEntry(nv));
+        formProperty().addListener((o, ov, nv) -> updateMorphologicalEntry(nv));
+        shortTranslationProperty().addListener((o, ov, nv) -> updateMorphologicalEntry(nv));
+        removePassiveLineProperty().addListener((o, ov, nv) -> updateMorphologicalEntry(nv, getSkipRuleProcessing()));
+        skipRuleProcessingProperty().addListener((o, ov, nv) -> updateMorphologicalEntry(getRemovePassiveLine(), nv));
+        getVerbalNouns().addListener((SetChangeListener<? super VerbalNoun>) c -> updateMorphologicalEntry(c));
     }
 
     private void setValues(MorphologicalEntry morphologicalEntry) {
@@ -85,7 +62,7 @@ public class MorphologicalEntryView extends Control {
             setForm(morphologicalEntry.getForm());
 
             // update verbal nouns and noun of place and time
-           ((MorphologicalEntrySkin) getSkin()).updateVerbalNouns();
+            ((MorphologicalEntrySkin) getSkin()).updateVerbalNouns();
 
             setShortTranslation(morphologicalEntry.getShortTranslation());
             ConjugationConfiguration configuration = morphologicalEntry.getConfiguration();
@@ -97,6 +74,54 @@ public class MorphologicalEntryView extends Control {
             }
             setRemovePassiveLine(removePassiveLine);
             setSkipRuleProcessing(skipRuleProcessing);
+        }
+    }
+
+    private void updateMorphologicalEntry(RootLetters rootLetters) {
+        final MorphologicalEntry morphologicalEntry = getMorphologicalEntry();
+        if (morphologicalEntry != null) {
+            morphologicalEntry.setRootLetters(rootLetters);
+        }
+    }
+
+    private void updateMorphologicalEntry(NamedTemplate namedTemplate) {
+        final MorphologicalEntry morphologicalEntry = getMorphologicalEntry();
+        if (morphologicalEntry != null) {
+            morphologicalEntry.setForm(namedTemplate);
+        }
+    }
+
+    private void updateMorphologicalEntry(String translation) {
+        final MorphologicalEntry morphologicalEntry = getMorphologicalEntry();
+        if (morphologicalEntry != null) {
+            morphologicalEntry.setShortTranslation(translation);
+        }
+    }
+
+    private void updateMorphologicalEntry(Boolean removePassiveLIne, Boolean skipRuleProcessing) {
+        final MorphologicalEntry morphologicalEntry = getMorphologicalEntry();
+        if (morphologicalEntry != null) {
+            ConjugationConfiguration configuration = morphologicalEntry.getConfiguration();
+            if (configuration == null) {
+                configuration = new ConjugationConfiguration();
+            }
+            configuration.setRemovePassiveLine(removePassiveLIne);
+            configuration.setSkipRuleProcessing(skipRuleProcessing);
+            morphologicalEntry.setConfiguration(configuration);
+        }
+    }
+
+    private void updateMorphologicalEntry(SetChangeListener.Change<? extends VerbalNoun> c) {
+        final MorphologicalEntry morphologicalEntry = getMorphologicalEntry();
+        if (morphologicalEntry != null) {
+            if (c.wasRemoved()) {
+                VerbalNoun elementRemoved = c.getElementRemoved();
+                morphologicalEntry.getVerbalNouns().remove(elementRemoved);
+            }
+            if (c.wasAdded()) {
+                VerbalNoun elementAdded = c.getElementAdded();
+                morphologicalEntry.getVerbalNouns().add(elementAdded);
+            }
         }
     }
 
