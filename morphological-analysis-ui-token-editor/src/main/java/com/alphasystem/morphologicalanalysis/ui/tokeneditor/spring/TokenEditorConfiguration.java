@@ -7,7 +7,8 @@ import org.springframework.context.annotation.Configuration;
  * @author sali
  */
 @Configuration
-@ComponentScan({"com.alphasystem.morphologicalanalysis.ui.tokeneditor.control",
+@ComponentScan({"com.alphasystem.morphologicalanalysis.ui.tokeneditor.service",
+        "com.alphasystem.morphologicalanalysis.ui.tokeneditor.control",
         "com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.controller"})
 public class TokenEditorConfiguration {
 }
