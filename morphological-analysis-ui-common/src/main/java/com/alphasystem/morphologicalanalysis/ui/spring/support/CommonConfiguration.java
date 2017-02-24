@@ -14,7 +14,8 @@ import java.util.List;
  * @author sali
  */
 @Configuration
-@ComponentScan({"com.alphasystem.morphologicalanalysis.ui.util", "com.alphasystem.morphologicalanalysis.ui.control"})
+@ComponentScan({"com.alphasystem.morphologicalanalysis.ui.util", "com.alphasystem.morphologicalanalysis.ui.model",
+        "com.alphasystem.morphologicalanalysis.ui.control"})
 public class CommonConfiguration {
 
     @Bean

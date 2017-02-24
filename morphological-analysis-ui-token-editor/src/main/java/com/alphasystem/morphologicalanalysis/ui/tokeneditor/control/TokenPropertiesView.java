@@ -1,5 +1,6 @@
 package com.alphasystem.morphologicalanalysis.ui.tokeneditor.control;
 
+import com.alphasystem.morphologicalanalysis.ui.model.ApplicationState;
 import com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.skin.TokenPropertiesSkin;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
@@ -10,6 +11,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -23,12 +25,17 @@ public class TokenPropertiesView extends Control {
     private final ObjectProperty<Token> token = new SimpleObjectProperty<>(this, "token");
     private final StringProperty translationText = new SimpleStringProperty(this, "translationText");
     private final ObjectProperty<Location> selectedLocation = new SimpleObjectProperty<>(this, "selectedLocation");
+    @Autowired private ApplicationState applicationState;
 
     @PostConstruct
     void postConstruct() {
         setSkin(createDefaultSkin());
         tokenProperty().addListener((observable, oldValue, newValue) -> initValues(newValue));
         translationTextProperty().addListener((observable, oldValue, newValue) -> setTokenTextInternal(newValue));
+        selectedLocationProperty().addListener((observable, oldValue, newValue) -> {
+            applicationState.setToken(getToken());
+            applicationState.setLocation(newValue);
+        });
         getStyleClass().add("border");
     }
 

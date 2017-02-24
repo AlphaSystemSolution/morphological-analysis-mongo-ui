@@ -2,6 +2,7 @@ package com.alphasystem.morphologicalanalysis.ui.tokeneditor.control;
 
 import com.alphasystem.morphologicalanalysis.common.model.VerseTokenPairGroup;
 import com.alphasystem.morphologicalanalysis.common.model.VerseTokensPair;
+import com.alphasystem.morphologicalanalysis.ui.model.ApplicationState;
 import com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.skin.TokenListViewSkin;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
 import com.alphasystem.util.AppUtil;
@@ -11,6 +12,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -33,6 +35,7 @@ public class TokenListView extends Control {
         initialGroup.getPairs().add(new VerseTokensPair(4, 1));
     }
 
+    @Autowired private ApplicationState applicationState;
     private final ObjectProperty<VerseTokenPairGroup> verseTokenPairGroup = new SimpleObjectProperty<>(this, "verseTokenPairGroup", initialGroup);
     private final BooleanProperty refresh = new SimpleBooleanProperty(this, "refresh", true);
     private final ObjectProperty<Token> selectedToken = new SimpleObjectProperty<>(this, "selectedToken");
@@ -40,6 +43,11 @@ public class TokenListView extends Control {
     @PostConstruct
     public void postConstruct() {
         setSkin(createDefaultSkin());
+        selectedTokenProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                applicationState.setToken(newValue);
+            }
+        });
     }
 
     @Override

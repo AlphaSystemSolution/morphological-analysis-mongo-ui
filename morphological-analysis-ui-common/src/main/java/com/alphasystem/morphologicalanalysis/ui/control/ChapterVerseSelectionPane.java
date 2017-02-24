@@ -2,6 +2,7 @@ package com.alphasystem.morphologicalanalysis.ui.control;
 
 
 import com.alphasystem.morphologicalanalysis.common.model.VerseTokenPairGroup;
+import com.alphasystem.morphologicalanalysis.ui.model.ApplicationState;
 import com.alphasystem.morphologicalanalysis.ui.util.RestClient;
 import com.alphasystem.morphologicalanalysis.ui.util.VerseTokensPairsReader;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Chapter;
@@ -35,6 +36,7 @@ public class ChapterVerseSelectionPane extends BorderPane {
     private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(ChapterVerseSelectionPane.class.getSimpleName());
 
     @Autowired private RestClient restClient;
+    @Autowired private ApplicationState applicationState;
     private ObjectProperty<LayoutPolicy> layoutPolicy = new SimpleObjectProperty<>(this, "", LayoutPolicy.HORIZONTAL);
     private Map<Integer, List<VerseTokenPairGroup>> groupMap;
     private Label chapterNameLabel;
@@ -64,6 +66,8 @@ public class ChapterVerseSelectionPane extends BorderPane {
         verseComboBox = new ComboBox<>();
         verseComboBox.setButtonCell(new VerseTokenPairGroupListCell());
         verseComboBox.setCellFactory(param -> new VerseTokenPairGroupListCell());
+        verseComboBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
+                applicationState.setVerseTokenPairGroup(newValue));
 
         chapterNameLabel = new Label(RESOURCE_BUNDLE.getString("chapterName.label"));
         grid.add(chapterNameLabel, 0, 0);
@@ -107,10 +111,12 @@ public class ChapterVerseSelectionPane extends BorderPane {
             verseNumbers.addAll(groupMap.get(chapter.getChapterNumber()));
 
         }
+        applicationState.setChapter(chapter);
         int size = verseNumbers.size();
         verseComboBox.getItems().addAll(verseNumbers.toArray(new VerseTokenPairGroup[size]));
         if (size > 0) {
             verseComboBox.getSelectionModel().selectFirst();
+            applicationState.setVerseTokenPairGroup(verseNumbers.get(0));
         }
         verseComboBox.requestLayout();
     }
