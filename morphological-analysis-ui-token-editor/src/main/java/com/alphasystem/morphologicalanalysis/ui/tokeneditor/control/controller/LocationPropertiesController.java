@@ -3,6 +3,7 @@ package com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.controller;
 import com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.AbstractPropertiesView;
 import com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.CommonPropertiesView;
 import com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.LocationPropertiesView;
+import com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.MorphologicalEntryView;
 import com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.NounPropertiesView;
 import com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.ParticlePropertiesView;
 import com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.ProNounPropertiesView;
@@ -31,6 +32,7 @@ public class LocationPropertiesController extends AnchorPane {
     @Autowired private ProNounPropertiesView proNounPropertiesView;
     @Autowired private VerbPropertiesView verbPropertiesView;
     @Autowired private ParticlePropertiesView particlePropertiesView;
+    @Autowired private MorphologicalEntryView morphologicalEntryView;
 
     @PostConstruct
     void postConstruct() {
@@ -43,7 +45,7 @@ public class LocationPropertiesController extends AnchorPane {
     private void refresh(Location location) {
         getChildren().clear();
         commonPropertiesView.setLocation(location);
-        getChildren().addAll(commonPropertiesView, refreshPropertiesView(location));
+        getChildren().addAll(commonPropertiesView, refreshPropertiesView(location), morphologicalEntryView);
     }
 
     @SuppressWarnings({"unchecked"})
@@ -52,10 +54,32 @@ public class LocationPropertiesController extends AnchorPane {
         final AbstractPropertiesView propertiesView = getPropertiesView(wordType);
         setLeftAnchor(commonPropertiesView, DEFAULT_OFFSET);
         setTopAnchor(commonPropertiesView, DEFAULT_OFFSET);
-        setLeftAnchor(propertiesView, 470 + DEFAULT_OFFSET);
+
+        double offset = 470 + DEFAULT_OFFSET;
+        setLeftAnchor(propertiesView, offset);
         setTopAnchor(propertiesView, DEFAULT_OFFSET);
         propertiesView.setLocation(null);
         propertiesView.setLocation(location);
+
+        switch (wordType) {
+            case NOUN:
+                offset += 340;
+                break;
+            case PRO_NOUN:
+                offset += 390;
+                break;
+            case VERB:
+                offset += 480;
+                break;
+            case PARTICLE:
+                offset += 330;
+                break;
+        }
+        setLeftAnchor(morphologicalEntryView, offset);
+        setTopAnchor(morphologicalEntryView, DEFAULT_OFFSET);
+        morphologicalEntryView.setMorphologicalEntry(null);
+        morphologicalEntryView.setMorphologicalEntry((location == null) ? null : location.getMorphologicalEntry());
+
         return propertiesView;
     }
 
