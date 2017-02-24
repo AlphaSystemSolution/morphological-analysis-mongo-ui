@@ -47,7 +47,7 @@ public class MorphologicalEntryView extends Control {
         shortTranslationProperty().addListener((o, ov, nv) -> updateMorphologicalEntry(nv));
         removePassiveLineProperty().addListener((o, ov, nv) -> updateMorphologicalEntry(nv, getSkipRuleProcessing()));
         skipRuleProcessingProperty().addListener((o, ov, nv) -> updateMorphologicalEntry(getRemovePassiveLine(), nv));
-        getVerbalNouns().addListener((SetChangeListener<? super VerbalNoun>) c -> updateMorphologicalEntry(c));
+        getVerbalNouns().addListener((SetChangeListener<? super VerbalNoun>) this::updateMorphologicalEntry);
     }
 
     private void setValues(MorphologicalEntry morphologicalEntry) {
