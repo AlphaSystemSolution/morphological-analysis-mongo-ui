@@ -1,6 +1,7 @@
 package com.alphasystem.morphologicalanalysis.ui.util;
 
 import com.alphasystem.morphologicalanalysis.common.model.VerseTokenPairGroup;
+import com.alphasystem.morphologicalanalysis.morphology.model.MorphologicalEntry;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Chapter;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
 import org.apache.commons.lang3.ArrayUtils;
@@ -11,7 +12,9 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.annotation.PostConstruct;
 import java.net.URI;
@@ -28,6 +31,8 @@ public class RestClient {
     private static final String CHAPTERS_PATH_SUFFIX = "/chapters";
     private static final String TOKENS_PATH_SUFFIX = "/tokens";
     private static final String SAVE_TOKEN_PATH_SUFFIX = "/saveToken";
+    private static final String CREATE_MORPHOLOGICAL_ENTRY_PATH_SUFFIX = "/morphologicalEntry/create";
+    private static final String FIND_MORPHOLOGICAL_ENTRY_PATH_SUFFIX = "/morphologicalEntry/find";
 
     @Autowired private RestTemplate restTemplate;
     @Value("${service.url}") private String urlPath;
@@ -74,13 +79,35 @@ public class RestClient {
      * @return Saved token.
      * @throws NullPointerException if given <code>token</code> is null.
      */
-    public Token saveToken(Token token) throws NullPointerException{
+    public Token saveToken(Token token) throws NullPointerException {
         if ((token == null)) {
             throw new NullPointerException("token cannot be null.");
         }
         final URI uri = getServicePath(urlPath, SAVE_TOKEN_PATH_SUFFIX);
         final HttpEntity<Token> entity = new HttpEntity<>(token);
         final ResponseEntity<Token> responseEntity = restTemplate.exchange(uri, HttpMethod.POST, entity, new TokenType());
+        return responseEntity.getBody();
+    }
+
+    public MorphologicalEntry createMorphologicalEntry(MorphologicalEntry morphologicalEntry) throws NullPointerException {
+        if (morphologicalEntry == null) {
+            throw new NullPointerException("morphologicalEntry cannot be null.");
+        }
+        final URI uri = getServicePath(urlPath, CREATE_MORPHOLOGICAL_ENTRY_PATH_SUFFIX);
+        final HttpEntity<MorphologicalEntry> entity = new HttpEntity<>(morphologicalEntry);
+        final ResponseEntity<MorphologicalEntry> responseEntity = restTemplate.exchange(uri, HttpMethod.PUT, entity, new MorphologicalEntryType());
+        return responseEntity.getBody();
+    }
+
+    public MorphologicalEntry findMorphologicalEntry(String displayName) throws NullPointerException {
+        if (displayName == null) {
+            throw new NullPointerException("displayName cannot be null.");
+        }
+        final URI uri = getServicePath(urlPath, FIND_MORPHOLOGICAL_ENTRY_PATH_SUFFIX);
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUri(uri).queryParam("displayName", displayName);
+        final HttpEntity<MorphologicalEntry> entity = new HttpEntity<>(new LinkedMultiValueMap<>());
+        final ResponseEntity<MorphologicalEntry> responseEntity = restTemplate.exchange(builder.buildAndExpand().toUri(),
+                HttpMethod.GET, entity, new MorphologicalEntryType());
         return responseEntity.getBody();
     }
 
@@ -91,5 +118,8 @@ public class RestClient {
     }
 
     private static class TokenType extends ParameterizedTypeReference<Token> {
+    }
+
+    private static class MorphologicalEntryType extends ParameterizedTypeReference<MorphologicalEntry> {
     }
 }
