@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import java.lang.Double?>
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+<?import java.lang.Double?>
 <fx:root xmlns:fx="http://javafx.com/fxml/1" type="javafx.scene.layout.BorderPane"
          fx:controller="com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.controller.TokenEditorController"
          xmlns="http://javafx.com/javafx/8.0.40">
@@ -20,12 +21,14 @@
                         </graphic>
                     </MenuItem>
                     <SeparatorMenuItem/>
-                    <MenuItem text="%next.menu_item.text" accelerator="%next.menu_item.accelerator" onAction="#onNext">
+                    <MenuItem text="%next.menu_item.text" accelerator="%next.menu_item.accelerator" onAction="#onNext"
+                              disable="true">
                         <graphic>
                             <FontAwesomeIconView glyphName="%next.menu_item.icon"/>
                         </graphic>
                     </MenuItem>
-                    <MenuItem text="%previous.menu_item.text" accelerator="%previous.menu_item.accelerator" onAction="#onPrevious">
+                    <MenuItem text="%previous.menu_item.text" accelerator="%previous.menu_item.accelerator"
+                              onAction="#onPrevious" disable="true">
                         <graphic>
                             <FontAwesomeIconView glyphName="%previous.menu_item.icon"/>
                         </graphic>
@@ -39,12 +42,12 @@
                     </graphic>
                 </Button>
                 <Separator/>
-                <Button onAction="#onNext">
+                <Button onAction="#onNext" disable="true">
                     <graphic>
                         <FontAwesomeIconView glyphName="%next.menu_item.icon" size="2em"/>
                     </graphic>
                 </Button>
-                <Button onAction="#onPrevious">
+                <Button onAction="#onPrevious" disable="true">
                     <graphic>
                         <FontAwesomeIconView glyphName="%previous.menu_item.icon" size="2em"/>
                     </graphic>
