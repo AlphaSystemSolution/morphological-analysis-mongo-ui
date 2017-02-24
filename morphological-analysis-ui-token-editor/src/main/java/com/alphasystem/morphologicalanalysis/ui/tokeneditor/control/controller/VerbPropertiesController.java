@@ -54,6 +54,7 @@ public class VerbPropertiesController extends BorderPane {
         incompleteVerbCategoryComboBox.valueProperty().bindBidirectional(control.incompleteVerbCategoryProperty());
         incompleteVerbCategoryComboBox.valueProperty().addListener((observable, oldValue, newValue) ->
                 setIncompleteVerbCategoryComboBoxValue(newValue, null));
+        incompleteVerbTypeComboBox.valueProperty().bindBidirectional(control.incompleteVerbTypeProperty());
     }
 
     private void setIncompleteVerbCategoryComboBoxValue(final IncompleteVerbCategory incompleteVerbCategory,
