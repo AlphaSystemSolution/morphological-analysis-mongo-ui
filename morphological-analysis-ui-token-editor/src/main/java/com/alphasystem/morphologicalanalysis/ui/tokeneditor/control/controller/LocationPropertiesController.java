@@ -1,5 +1,9 @@
 package com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.controller;
 
+import com.alphasystem.arabic.model.NamedTemplate;
+import com.alphasystem.fx.ui.util.UiUtilities;
+import com.alphasystem.morphologicalanalysis.morphology.model.MorphologicalEntry;
+import com.alphasystem.morphologicalanalysis.morphology.model.RootLetters;
 import com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.AbstractPropertiesView;
 import com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.CommonPropertiesView;
 import com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.LocationPropertiesView;
@@ -8,10 +12,13 @@ import com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.NounProperti
 import com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.ParticlePropertiesView;
 import com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.ProNounPropertiesView;
 import com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.VerbPropertiesView;
+import com.alphasystem.morphologicalanalysis.ui.tokeneditor.service.RetrieveMorphologicalEntryService;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.WordType;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Worker;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
 import javafx.scene.layout.AnchorPane;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -39,6 +46,8 @@ public class LocationPropertiesController extends AnchorPane {
         refresh(control.getLocation());
         control.locationProperty().addListener((observable, oldValue, newValue) -> refresh(newValue));
         commonPropertiesView.wordTypeProperty().addListener((observable, oldValue, newValue) -> refreshPropertiesView(newValue));
+        morphologicalEntryView.rootLettersProperty().addListener((observable, oldValue, newValue) -> retrieveEntry(newValue, null));
+        morphologicalEntryView.formProperty().addListener((observable, oldValue, newValue) -> retrieveEntry(null, newValue));
     }
 
     @SuppressWarnings({"unchecked"})
@@ -111,5 +120,51 @@ public class LocationPropertiesController extends AnchorPane {
                 break;
         }
         return node;
+    }
+
+    private void retrieveEntry(RootLetters rootLetters, NamedTemplate form) {
+        final MorphologicalEntry morphologicalEntry = morphologicalEntryView.getMorphologicalEntry();
+        if (morphologicalEntry != null && rootLetters == null) {
+            rootLetters = morphologicalEntry.getRootLetters();
+        }
+        if (rootLetters == null || rootLetters.isEmpty()) {
+            return;
+        }
+
+        if (morphologicalEntry != null && form == null) {
+            form = morphologicalEntry.getForm();
+        }
+        if (form == null) {
+            return;
+        }
+
+        UiUtilities.waitCursor(control);
+        RetrieveMorphologicalEntryService morphologicalEntryService = new RetrieveMorphologicalEntryService(rootLetters, form);
+        morphologicalEntryService.setOnSucceeded(event -> {
+            UiUtilities.defaultCursor(control);
+            Worker source = event.getSource();
+            MorphologicalEntry value = (MorphologicalEntry) source.getValue();
+            if (value == null || (morphologicalEntry != null && morphologicalEntry.equals(value))) {
+                value = morphologicalEntry;
+            } else {
+                final Location location = control.getLocation();
+                if (location != null) {
+                    control.getLocation().setMorphologicalEntry(value);
+                }
+            }
+            morphologicalEntryView.setMorphologicalEntry(value);
+        });
+        morphologicalEntryService.setOnFailed(event -> {
+            UiUtilities.defaultCursor(control);
+            Worker source = event.getSource();
+            try {
+                throw source.getException();
+            } catch (Throwable throwable) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setContentText(String.format("%s:%s", throwable.getClass().getName(), throwable.getMessage()));
+                alert.showAndWait();
+            }
+        });
+        morphologicalEntryService.start();
     }
 }
