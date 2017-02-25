@@ -2,7 +2,9 @@ package com.alphasystem.morphologicalanalysis.ui.tokeneditor.control;
 
 import com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.skin.LocationPropertiesSkin;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
@@ -17,10 +19,12 @@ import javax.annotation.PostConstruct;
 public class LocationPropertiesView extends Control {
 
     private final ObjectProperty<Location> location = new SimpleObjectProperty<>(this, "location");
+    private final BooleanProperty morphologicalEntry = new SimpleBooleanProperty(this, "morphologicalEntry", false);
 
     @PostConstruct
     void postConstruct(){
         setSkin(createDefaultSkin());
+        setMorphologicalEntry(false);
     }
 
     public final Location getLocation() {
@@ -33,6 +37,18 @@ public class LocationPropertiesView extends Control {
 
     public final void setLocation(Location location) {
         this.location.set(location);
+    }
+
+    public final boolean isMorphologicalEntry() {
+        return morphologicalEntry.get();
+    }
+
+    public final BooleanProperty morphologicalEntryProperty() {
+        return morphologicalEntry;
+    }
+
+    public final void setMorphologicalEntry(boolean morphologicalEntry) {
+        this.morphologicalEntry.set(morphologicalEntry);
     }
 
     @Override

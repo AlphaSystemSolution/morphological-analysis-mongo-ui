@@ -123,6 +123,7 @@ public class LocationPropertiesController extends AnchorPane {
     }
 
     private void retrieveEntry(RootLetters rootLetters, NamedTemplate form) {
+        control.setMorphologicalEntry(false);
         final MorphologicalEntry morphologicalEntry = morphologicalEntryView.getMorphologicalEntry();
         if (morphologicalEntry != null && rootLetters == null) {
             rootLetters = morphologicalEntry.getRootLetters();
@@ -152,6 +153,7 @@ public class LocationPropertiesController extends AnchorPane {
                     control.getLocation().setMorphologicalEntry(value);
                 }
             }
+            control.setMorphologicalEntry(true);
             morphologicalEntryView.setMorphologicalEntry(value);
         });
         morphologicalEntryService.setOnFailed(event -> {
