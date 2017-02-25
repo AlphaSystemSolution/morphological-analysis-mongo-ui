@@ -18,6 +18,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.annotation.PostConstruct;
 import java.net.URI;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +32,6 @@ public class RestClient {
     private static final String CHAPTERS_PATH_SUFFIX = "/chapters";
     private static final String TOKENS_PATH_SUFFIX = "/tokens";
     private static final String SAVE_TOKEN_PATH_SUFFIX = "/saveToken";
-    private static final String CREATE_MORPHOLOGICAL_ENTRY_PATH_SUFFIX = "/morphologicalEntry/create";
     private static final String FIND_MORPHOLOGICAL_ENTRY_PATH_SUFFIX = "/morphologicalEntry/find";
 
     @Autowired private RestTemplate restTemplate;
@@ -89,23 +89,15 @@ public class RestClient {
         return responseEntity.getBody();
     }
 
-    public MorphologicalEntry createMorphologicalEntry(MorphologicalEntry morphologicalEntry) throws NullPointerException {
-        if (morphologicalEntry == null) {
-            throw new NullPointerException("morphologicalEntry cannot be null.");
-        }
-        final URI uri = getServicePath(urlPath, CREATE_MORPHOLOGICAL_ENTRY_PATH_SUFFIX);
-        final HttpEntity<MorphologicalEntry> entity = new HttpEntity<>(morphologicalEntry);
-        final ResponseEntity<MorphologicalEntry> responseEntity = restTemplate.exchange(uri, HttpMethod.PUT, entity, new MorphologicalEntryType());
-        return responseEntity.getBody();
-    }
-
     public MorphologicalEntry findMorphologicalEntry(String displayName) throws NullPointerException {
         if (displayName == null) {
             throw new NullPointerException("displayName cannot be null.");
         }
         final URI uri = getServicePath(urlPath, FIND_MORPHOLOGICAL_ENTRY_PATH_SUFFIX);
         UriComponentsBuilder builder = UriComponentsBuilder.fromUri(uri).queryParam("displayName", displayName);
-        final HttpEntity<MorphologicalEntry> entity = new HttpEntity<>(new LinkedMultiValueMap<>());
+        final LinkedMultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
+        headers.put("Content-Type", Collections.singletonList("application/json;charset=UTF-8"));
+        final HttpEntity<MorphologicalEntry> entity = new HttpEntity<>(headers);
         final ResponseEntity<MorphologicalEntry> responseEntity = restTemplate.exchange(builder.buildAndExpand().toUri(),
                 HttpMethod.GET, entity, new MorphologicalEntryType());
         return responseEntity.getBody();
