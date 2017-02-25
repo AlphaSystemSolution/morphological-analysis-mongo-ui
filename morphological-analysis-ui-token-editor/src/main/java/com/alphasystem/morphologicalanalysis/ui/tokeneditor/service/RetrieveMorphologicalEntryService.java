@@ -1,22 +1,26 @@
 package com.alphasystem.morphologicalanalysis.ui.tokeneditor.service;
 
+import com.alphasystem.arabic.model.NamedTemplate;
 import com.alphasystem.morphologicalanalysis.morphology.model.MorphologicalEntry;
+import com.alphasystem.morphologicalanalysis.morphology.model.RootLetters;
+import com.alphasystem.morphologicalanalysis.ui.util.ApplicationContextProvider;
 import com.alphasystem.morphologicalanalysis.ui.util.RestClient;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author sali
  */
-@org.springframework.stereotype.Service
 public class RetrieveMorphologicalEntryService extends Service<MorphologicalEntry> {
 
-    @Autowired private RestClient restClient;
-    private final MorphologicalEntry source;
+    private final RestClient restClient;
+    private final RootLetters rootLetters;
+    private final NamedTemplate namedTemplate;
 
-    public RetrieveMorphologicalEntryService(MorphologicalEntry source) {
-        this.source = source;
+    public RetrieveMorphologicalEntryService(RootLetters rootLetters, NamedTemplate namedTemplate) {
+        this.rootLetters = rootLetters;
+        this.namedTemplate = namedTemplate;
+        this.restClient = ApplicationContextProvider.getBean(RestClient.class);
     }
 
     @Override
@@ -24,9 +28,12 @@ public class RetrieveMorphologicalEntryService extends Service<MorphologicalEntr
         return new Task<MorphologicalEntry>() {
             @Override
             protected MorphologicalEntry call() throws Exception {
-                MorphologicalEntry savedEntry = restClient.findMorphologicalEntry(source.getDisplayName());
-                // if current entry is same as the one just retrieved from DB, then we will not update the UI
-                return (savedEntry == null || savedEntry.equals(source)) ? null : savedEntry;
+                MorphologicalEntry source = new MorphologicalEntry();
+                source.setRootLetters(rootLetters);
+                source.setForm(namedTemplate);
+                source.initDisplayName();
+
+                return restClient.findMorphologicalEntry(source.getDisplayName());
             }
         };
     }
