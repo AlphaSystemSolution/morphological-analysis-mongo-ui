@@ -132,13 +132,21 @@ public class ParticlePropertiesController extends BorderPane {
                 if (c.wasRemoved()) {
                     final List<? extends ParticlePartOfSpeechCellModel> removed = c.getRemoved();
                     if (removed != null) {
-                        removed.forEach(o -> o.setChecked(false));
+                        removed.forEach(o -> {
+                            if (o != null) {
+                                o.setChecked(false);
+                            }
+                        });
                     }
                 }
                 if (c.wasAdded()) {
                     final List<? extends ParticlePartOfSpeechCellModel> addedSubList = c.getAddedSubList();
                     if (addedSubList != null) {
-                        addedSubList.forEach(o -> o.setChecked(true));
+                        addedSubList.forEach(o -> {
+                            if (o != null) {
+                                o.setChecked(true);
+                            }
+                        });
                     }
                 }
             }
