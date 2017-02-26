@@ -5,21 +5,28 @@ import com.alphasystem.app.morphologicalengine.conjugation.builder.ConjugationRo
 import com.alphasystem.app.morphologicalengine.conjugation.model.MorphologicalChart;
 import com.alphasystem.app.morphologicalengine.guice.GuiceSupport;
 import com.alphasystem.app.morphologicalengine.ui.MorphologicalChartView;
+import com.alphasystem.fx.ui.Browser;
 import com.alphasystem.fx.ui.util.UiUtilities;
 import com.alphasystem.morphologicalanalysis.morphology.model.MorphologicalEntry;
 import com.alphasystem.morphologicalanalysis.morphology.model.RootLetters;
 import com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.DetailEditorView;
 import com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.LocationPropertiesView;
+import com.alphasystem.morphologicalanalysis.ui.util.ApplicationHelper;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
+import javafx.application.Platform;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
+import javafx.concurrent.Worker;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.web.WebEngine;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 /**
@@ -32,7 +39,22 @@ public class DetailEditorController extends BorderPane {
     @Autowired private DetailEditorView control;
     @Autowired private LocationPropertiesView locationPropertiesView;
     @Autowired private MorphologicalChartView morphologicalChartView;
+    private Browser browser;
     private final TabPane tabPane = new TabPane();
+
+    public DetailEditorController() {
+        Platform.runLater(() -> {
+            browser = new Browser();
+            final WebEngine webEngine = browser.getWebEngine();
+            webEngine.setPromptHandler(param -> {
+                TextInputDialog dialog = new TextInputDialog(param.getDefaultValue());
+                dialog.setHeaderText(param.getMessage());
+                final Optional<String> result = dialog.showAndWait();
+                return result.isPresent() ? result.get() : param.getDefaultValue();
+            });
+            browser.loadUrl(ApplicationHelper.getMawridReaderUrl("a"));
+        });
+    }
 
     @PostConstruct
     void postConstruct() {
@@ -46,11 +68,13 @@ public class DetailEditorController extends BorderPane {
     private void initializeSkin() {
         locationPropertiesView.setLocation(control.getLocation());
         Tab locationPropertiesViewTab = new Tab(RESOURCE_BUNDLE.getString("locationPropertiesView.label"), locationPropertiesView);
+        Tab dictionaryTab = new Tab(RESOURCE_BUNDLE.getString("dictionaryTab.label"), browser);
+        dictionaryTab.selectedProperty().addListener((observable, oldValue, newValue) -> loadDictionary());
         Tab morphologicalChartViewTab = new Tab(RESOURCE_BUNDLE.getString("morphologicalChartView.label"),
                 UiUtilities.wrapInScrollPane(morphologicalChartView));
         morphologicalChartViewTab.setDisable(true);
         morphologicalChartViewTab.disableProperty().bind(locationPropertiesView.morphologicalEntryProperty().not());
-        tabPane.getTabs().addAll(locationPropertiesViewTab, morphologicalChartViewTab);
+        tabPane.getTabs().addAll(locationPropertiesViewTab, dictionaryTab, morphologicalChartViewTab);
     }
 
     private void refresh(Location location) {
@@ -58,6 +82,26 @@ public class DetailEditorController extends BorderPane {
         if (location != null) {
             loadConjugation(location.getMorphologicalEntry());
         }
+    }
+
+    private void loadDictionary() {
+        RootLetters rootLetters = null;
+        final Location location = control.getLocation();
+        if (location != null) {
+            rootLetters = location.getMorphologicalEntry().getRootLetters();
+        }
+        if (rootLetters == null || rootLetters.isEmpty()) {
+            return;
+        }
+        // not sure whether display is initialized or not
+        rootLetters.initDisplayName();
+        UiUtilities.waitCursor(control);
+        browser.getWebEngine().getLoadWorker().stateProperty().addListener((observable, oldValue, newValue) -> {
+            if (Worker.State.READY.equals(newValue) || Worker.State.SUCCEEDED.equals(newValue) || Worker.State.FAILED.equals(newValue)) {
+                UiUtilities.defaultCursor(control);
+            }
+        });
+        browser.loadUrl(ApplicationHelper.getMawridReaderUrl(rootLetters.toMawridSearchString()));
     }
 
     private void loadConjugation(final MorphologicalEntry entry) {

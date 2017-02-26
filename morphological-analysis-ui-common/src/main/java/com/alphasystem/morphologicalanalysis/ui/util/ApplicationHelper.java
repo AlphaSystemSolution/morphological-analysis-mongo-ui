@@ -11,7 +11,9 @@ import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -23,8 +25,24 @@ public final class ApplicationHelper {
 
     public static final MorphologicalAnalysisPreferences PREFERENCES = GenericPreferences.getInstance(MorphologicalAnalysisPreferences.class);
     public static final Border BORDER = new Border(new BorderStroke(Color.LIGHTGREY, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderStroke.THIN));
+    private static final String MAWRID_READER_URL = "http://ejtaal.net/";
+    private static final String MAWRID_READER_URL_SUFFIX = "aa/index.html#bwq=";
     public static final String STYLE_SHEET_PATH = AppUtil.getResource("styles/application.css").toExternalForm();
     public static final double ROW_SIZE = 40.0;
+    private static String mawridReaderUrl = "";
+
+    static {
+        String urlPrefix = MAWRID_READER_URL;
+        File file = new File(AppUtil.USER_HOME_DIR, "Mawrid_Reader");
+        if (file.exists()) {
+            try {
+                urlPrefix = file.toURI().toURL().toExternalForm();
+            } catch (MalformedURLException e) {
+                // ignore
+            }
+        }
+        mawridReaderUrl = String.format("%s%s", urlPrefix, MAWRID_READER_URL_SUFFIX);
+    }
 
     public static double calculateTableHeight(int size) {
         return roundTo100(((size + 7) * ROW_SIZE) + ROW_SIZE) + 100;
@@ -38,6 +56,10 @@ public final class ApplicationHelper {
         fxmlLoader.setControllerFactory(ApplicationContextProvider::getBean);
         fxmlLoader.setRoot(pane);
         fxmlLoader.load();
+    }
+
+    public static String getMawridReaderUrl(String query) {
+        return String.format("%s%s", mawridReaderUrl, query);
     }
 
     private static double roundTo100(double srcValue) {

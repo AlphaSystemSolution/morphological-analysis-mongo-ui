@@ -17,4 +17,5 @@ public class TokenEditorConfiguration {
     public MorphologicalChartView morphologicalChartView() {
         return new MorphologicalChartView();
     }
+
 }
