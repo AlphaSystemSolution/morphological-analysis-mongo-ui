@@ -7,7 +7,10 @@ import com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.TokenPropert
 import com.alphasystem.morphologicalanalysis.ui.util.ApplicationHelper;
 import com.alphasystem.morphologicalanalysis.ui.util.RestClient;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
+import javafx.concurrent.Service;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.ToolBar;
@@ -64,22 +67,38 @@ public class TokenEditorController extends BorderPane {
     @FXML
     private void onSave() {
         UiUtilities.waitCursor(control);
-        try {
-            restClient.saveToken(control.getToken());
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
+        Service<Token> service = new Service<Token>() {
+            @Override
+            protected Task<Token> createTask() {
+                return new Task<Token>() {
+                    @Override
+                    protected Token call() throws Exception {
+                        return restClient.saveToken(control.getToken());
+                    }
+                };
+            }
+        };
+        service.setOnSucceeded(event -> UiUtilities.defaultCursor(control));
+        service.setOnFailed(event -> {
             UiUtilities.defaultCursor(control);
-        }
+            try {
+                throw event.getSource().getException();
+            } catch (Throwable throwable) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setContentText(String.format("%s:%s", throwable.getClass().getName(), throwable.getMessage()));
+                alert.showAndWait();
+            }
+        });
+        service.start();
     }
 
     @FXML
-    private void onNext(){
+    private void onNext() {
 
     }
 
     @FXML
-    private void onPrevious(){
+    private void onPrevious() {
 
     }
 }
