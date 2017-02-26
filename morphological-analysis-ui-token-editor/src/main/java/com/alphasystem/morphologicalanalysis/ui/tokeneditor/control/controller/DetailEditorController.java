@@ -79,14 +79,17 @@ public class DetailEditorController extends BorderPane {
                 UiUtilities.wrapInScrollPane(morphologicalChartView));
         morphologicalChartViewTab.setDisable(true);
         morphologicalChartViewTab.disableProperty().bind(locationPropertiesView.morphologicalEntryProperty().not());
+        locationPropertiesView.morphologicalEntryProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue) {
+                loadConjugation(control.getLocation());
+            }
+        });
         tabPane.getTabs().addAll(locationPropertiesViewTab, dictionaryTab, morphologicalChartViewTab);
     }
 
     private void refresh(Location location) {
         locationPropertiesView.setLocation(location);
-        if (location != null) {
-            loadConjugation(location.getMorphologicalEntry());
-        }
+        loadConjugation(location);
     }
 
     private void loadDictionary() {
@@ -122,7 +125,8 @@ public class DetailEditorController extends BorderPane {
         browser.loadUrl(ApplicationHelper.getMawridReaderUrl(rootLetters.toMawridSearchString()));
     }
 
-    private void loadConjugation(final MorphologicalEntry entry) {
+    private void loadConjugation(Location location) {
+        final MorphologicalEntry entry = (location == null) ? null : location.getMorphologicalEntry();
         if (entry != null) {
             Service<MorphologicalChart> service = new Service<MorphologicalChart>() {
                 @Override
