@@ -57,6 +57,7 @@ public class TokenPropertiesController extends BorderPane {
         locationComboBox.setButtonCell(new LocationListCell());
         locationComboBox.setCellFactory(param -> new LocationListCell());
 
+        translationArea.textProperty().bindBidirectional(control.translationTextProperty());
         translationArea.setFont(PREFERENCES.getEnglishFont14());
 
         refresh(control.getToken());
@@ -67,6 +68,7 @@ public class TokenPropertiesController extends BorderPane {
         locationComboBox.getItems().remove(0, locationComboBox.getItems().size());
         locationComboBox.setDisable(true);
         if (token == null) {
+            translationArea.setText(null);
             createLettersPane(null, null);
             return;
         }

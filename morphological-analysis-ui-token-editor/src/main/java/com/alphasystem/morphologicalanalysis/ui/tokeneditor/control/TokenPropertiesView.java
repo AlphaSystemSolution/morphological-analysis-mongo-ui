@@ -31,7 +31,7 @@ public class TokenPropertiesView extends Control {
     void postConstruct() {
         setSkin(createDefaultSkin());
         tokenProperty().addListener((observable, oldValue, newValue) -> initValues(newValue));
-        translationTextProperty().addListener((observable, oldValue, newValue) -> setTokenTextInternal(newValue));
+        translationTextProperty().addListener((observable, oldValue, newValue) -> setTranslationTextInternal(newValue));
         selectedLocationProperty().addListener((observable, oldValue, newValue) -> {
             applicationState.setToken(getToken());
             applicationState.setLocation(newValue);
@@ -60,18 +60,11 @@ public class TokenPropertiesView extends Control {
         this.token.set(token);
     }
 
-    private void setTokenTextInternal(String tokenText) {
-        final Token token = getToken();
-        if (token != null) {
-            token.setToken(tokenText);
-        }
-    }
-
     public final StringProperty translationTextProperty() {
         return translationText;
     }
 
-    public final void setTranslationText(String translationText) {
+    private void setTranslationText(String translationText) {
         this.translationText.set(translationText);
     }
 
@@ -89,7 +82,7 @@ public class TokenPropertiesView extends Control {
 
     private void setTranslationTextInternal(String translationText) {
         final Token token = getToken();
-        if (token != null) {
+        if (token != null && translationText != null) {
             token.setTranslation(translationText);
         }
     }
