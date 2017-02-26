@@ -52,6 +52,11 @@ public class DetailEditorController extends BorderPane {
                 final Optional<String> result = dialog.showAndWait();
                 return result.isPresent() ? result.get() : param.getDefaultValue();
             });
+            browser.getWebEngine().getLoadWorker().stateProperty().addListener((observable, oldValue, newValue) -> {
+                if (Worker.State.READY.equals(newValue) || Worker.State.SUCCEEDED.equals(newValue) || Worker.State.FAILED.equals(newValue)) {
+                    UiUtilities.defaultCursor(control);
+                }
+            });
             browser.loadUrl(ApplicationHelper.getMawridReaderUrl("a"));
         });
     }
@@ -85,6 +90,25 @@ public class DetailEditorController extends BorderPane {
     }
 
     private void loadDictionary() {
+        Service<Void> service = new Service<Void>() {
+            @Override
+            protected Task<Void> createTask() {
+                return new Task<Void>() {
+                    @Override
+                    protected Void call() throws Exception {
+                        UiUtilities.waitCursor(control);
+                        Platform.runLater(DetailEditorController.this::loadUrl);
+                        return null;
+                    }
+                };
+            }
+        };
+        service.setOnSucceeded(event -> UiUtilities.defaultCursor(control));
+        service.setOnFailed(event -> UiUtilities.defaultCursor(control));
+        service.start();
+    }
+
+    private void loadUrl() {
         RootLetters rootLetters = null;
         final Location location = control.getLocation();
         if (location != null) {
@@ -95,12 +119,6 @@ public class DetailEditorController extends BorderPane {
         }
         // not sure whether display is initialized or not
         rootLetters.initDisplayName();
-        UiUtilities.waitCursor(control);
-        browser.getWebEngine().getLoadWorker().stateProperty().addListener((observable, oldValue, newValue) -> {
-            if (Worker.State.READY.equals(newValue) || Worker.State.SUCCEEDED.equals(newValue) || Worker.State.FAILED.equals(newValue)) {
-                UiUtilities.defaultCursor(control);
-            }
-        });
         browser.loadUrl(ApplicationHelper.getMawridReaderUrl(rootLetters.toMawridSearchString()));
     }
 
