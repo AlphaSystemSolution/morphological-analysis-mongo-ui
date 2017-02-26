@@ -11,7 +11,7 @@ public final class TokenResultAdapter {
 
     private final List<Token> tokens;
 
-    public TokenResultAdapter(List<Token> tokens) {
+    TokenResultAdapter(List<Token> tokens) {
         this.tokens = tokens;
     }
 

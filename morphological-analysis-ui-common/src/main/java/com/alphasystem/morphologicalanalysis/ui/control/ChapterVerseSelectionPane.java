@@ -37,7 +37,7 @@ public class ChapterVerseSelectionPane extends BorderPane {
 
     @Autowired private RestClient restClient;
     @Autowired private ApplicationState applicationState;
-    private ObjectProperty<LayoutPolicy> layoutPolicy = new SimpleObjectProperty<>(this, "", LayoutPolicy.HORIZONTAL);
+    private ObjectProperty<LayoutPolicy> layoutPolicy = new SimpleObjectProperty<>(this, "layoutPolicy", LayoutPolicy.HORIZONTAL);
     private Map<Integer, List<VerseTokenPairGroup>> groupMap;
     private Label chapterNameLabel;
     private ComboBox<Chapter> chapterNameComboBox;
