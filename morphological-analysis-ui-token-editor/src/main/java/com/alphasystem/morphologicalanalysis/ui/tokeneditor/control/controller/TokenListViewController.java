@@ -6,14 +6,17 @@ import com.alphasystem.morphologicalanalysis.common.model.VerseTokenPairGroup;
 import com.alphasystem.morphologicalanalysis.ui.control.TextTableCell;
 import com.alphasystem.morphologicalanalysis.ui.model.TokenCellModel;
 import com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.TokenListView;
+import com.alphasystem.morphologicalanalysis.ui.tokeneditor.service.TokenLoaderService;
+import com.alphasystem.morphologicalanalysis.ui.tokeneditor.service.TokenResultAdapter;
 import com.alphasystem.morphologicalanalysis.ui.util.ApplicationHelper;
-import com.alphasystem.morphologicalanalysis.ui.util.RestClient;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.WorkerStateEvent;
 import javafx.geometry.NodeOrientation;
+import javafx.scene.control.Alert;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -39,7 +42,6 @@ public class TokenListViewController extends BorderPane {
     private static final int WIDTH3 = 50;
     private static final int WIDTH = WIDTH1 + WIDTH2 + WIDTH3 + 30;
 
-    @Autowired private RestClient restClient;
     @Autowired private TokenListView control;
     private final TableView<TokenCellModel> tableView = new TableView<>();
 
@@ -104,18 +106,41 @@ public class TokenListViewController extends BorderPane {
         setCenter(UiUtilities.wrapInScrollPane(tableView));
     }
 
-    private void refreshTable(VerseTokenPairGroup group, boolean refresh) {
-        tableView.getItems().clear();
+
+    private void refreshTable(final VerseTokenPairGroup group, final boolean refresh) {
         if (group != null) {
-            final List<Token> tokens = restClient.getTokens(group, refresh);
-            if (tokens != null && !tokens.isEmpty()) {
-                tableView.setItems(FXCollections.observableArrayList(tokens.stream().map(TokenCellModel::new).collect(Collectors.toList())));
-                tableView.getSelectionModel().selectFirst();
-                final double height = ApplicationHelper.calculateTableHeight(tableView.getItems().size());
-                tableView.setMinHeight(height);
-                tableView.setMaxHeight(height);
-                tableView.setPrefHeight(height);
-            }
+            UiUtilities.waitCursor(control);
+            tableView.getItems().clear();
+            final TokenLoaderService service = new TokenLoaderService(group, refresh);
+            service.setOnSucceeded(this::onSucceeded);
+            service.setOnFailed(this::onFailed);
+            service.start();
+        }
+    }
+
+    private void onSucceeded(WorkerStateEvent event) {
+        UiUtilities.defaultCursor(control);
+        final TokenResultAdapter result = (TokenResultAdapter) event.getSource().getValue();
+        final List<Token> tokens = result.getTokens();
+        if (tokens != null && !tokens.isEmpty()) {
+            tableView.setItems(FXCollections.observableArrayList(tokens.stream().map(TokenCellModel::new).collect(Collectors.toList())));
+            tableView.getSelectionModel().selectFirst();
+            final double height = ApplicationHelper.calculateTableHeight(tableView.getItems().size());
+            tableView.setMinHeight(height);
+            tableView.setMaxHeight(height);
+            tableView.setPrefHeight(height);
+        }
+        tableView.refresh();
+    }
+
+    private void onFailed(WorkerStateEvent event) {
+        UiUtilities.defaultCursor(control);
+        try {
+            throw event.getSource().getException();
+        } catch (Throwable throwable) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setContentText(String.format("%s:%s", throwable.getClass().getName(), throwable.getMessage()));
+            alert.showAndWait();
         }
         tableView.refresh();
     }
