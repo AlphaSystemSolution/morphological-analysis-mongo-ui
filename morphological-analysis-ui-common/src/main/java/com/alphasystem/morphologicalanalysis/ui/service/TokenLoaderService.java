@@ -1,4 +1,4 @@
-package com.alphasystem.morphologicalanalysis.ui.tokeneditor.service;
+package com.alphasystem.morphologicalanalysis.ui.service;
 
 import com.alphasystem.morphologicalanalysis.common.model.VerseTokenPairGroup;
 import com.alphasystem.morphologicalanalysis.ui.util.ApplicationContextProvider;
