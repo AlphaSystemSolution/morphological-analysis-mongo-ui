@@ -17,6 +17,7 @@
         <module>morphological-analysis-ui-common</module>
         <module>morphological-analysis-ui-token-editor</module>
         <module>morphological-analysis-ui-word-by-word</module>
+		<module>morphological-analysis-ui-data-export</module>
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+<?import java.lang.Double?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.SeparatorMenuItem?>
+<fx:root xmlns:fx="http://javafx.com/fxml/1" type="javafx.scene.layout.BorderPane"
+         xmlns="http://javafx.com/javafx/8.0.40"
+         fx:controller="com.alphasystem.morphologicalanalysis.ui.access.control.controller.DataExportController">
+    <fx:define>
+        <Double fx:id="GAP" fx:value="10.0"/>
+    </fx:define>
+    <top>
+        <VBox spacing="$GAP">
+            <MenuBar useSystemMenuBar="true">
+                <Menu text="%file.menu.text">
+                    <MenuItem text="%new.menu_item.text" accelerator="%new.menu_item.accelerator" onAction="#onNew"/>
+                    <MenuItem text="%open.menu_item.text" accelerator="%open.menu_item.accelerator" onAction="#onOpen"/>
+                    <MenuItem text="%save.menu_item.text" fx:id="saveMenuItem" accelerator="%save.menu_item.accelerator"
+                              onAction="#onSave"/>
+                    <SeparatorMenuItem/>
+                    <MenuItem text="%export.menu_item.text" fx:id="exportMenuItem" accelerator="%export.menu_item.accelerator"
+                              onAction="#onExport"/>
+                </Menu>
+                <Menu text="%operations.menu.text">
+                    <MenuItem text="%newQuestion.menu_item.text" fx:id="addNewQuestionMenuItem"
+                              accelerator="%newQuestion.menu_item.accelerator" onAction="#onAddNewQuestion"/>
+                    <MenuItem text="%addTokens.menu_item.text" fx:id="addTokensMenuItem"
+                              accelerator="%addTokens.menu_item.accelerator" onAction="#onAddTokens"/>
+                </Menu>
+            </MenuBar>
+        </VBox>
+    </top>
+</fx:root>

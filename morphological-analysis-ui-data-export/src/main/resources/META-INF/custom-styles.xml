@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:styles xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+          xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+          mc:Ignorable="w14 w15">
+    <w:style w:type="paragraph" w:customStyle="1" w:styleId="ArabicNormal">
+        <w:name w:val="ArabicNormal"/>
+        <w:basedOn w:val="Normal"/>
+        <w:link w:val="ArabicNormalChar"/>
+        <w:qFormat/>
+        <w:rsid w:val="00B745A1"/>
+        <w:pPr>
+            <w:bidi/>
+        </w:pPr>
+        <w:rPr>
+            <w:rFonts w:ascii="KFGQPC Uthman Taha Naskh" w:hAnsi="KFGQPC Uthman Taha Naskh"
+                      w:cs="KFGQPC Uthman Taha Naskh"/>
+            <w:sz w:val="28"/>
+            <w:szCs w:val="28"/>
+        </w:rPr>
+    </w:style>
+    <w:style w:type="character" w:customStyle="1" w:styleId="ArabicNormalChar">
+        <w:name w:val="ArabicNormal Char"/>
+        <w:basedOn w:val="DefaultParagraphFont"/>
+        <w:link w:val="ArabicNormal"/>
+        <w:rsid w:val="00B745A1"/>
+        <w:rPr>
+            <w:rFonts w:ascii="KFGQPC Uthman Taha Naskh" w:hAnsi="KFGQPC Uthman Taha Naskh"
+                      w:cs="KFGQPC Uthman Taha Naskh"/>
+            <w:sz w:val="28"/>
+            <w:szCs w:val="28"/>
+        </w:rPr>
+    </w:style>
+    <w:style w:type="paragraph" w:customStyle="1" w:styleId="ArabicListParagraph">
+        <w:name w:val="ArabicListParagraph"/>
+        <w:basedOn w:val="ListParagraph"/>
+        <w:link w:val="ArabicListParagraphChar"/>
+        <w:qFormat/>
+        <w:rsid w:val="00B3714C"/>
+        <w:pPr>
+            <w:numPr>
+                <w:numId w:val="12"/>
+            </w:numPr>
+            <w:ind w:left="720"/>
+            <w:bidi/>
+        </w:pPr>
+        <w:rPr>
+            <w:rFonts w:cs="KFGQPC Uthman Taha Naskh"/>
+            <w:sz w:val="28"/>
+            <w:szCs w:val="28"/>
+        </w:rPr>
+    </w:style>
+    <w:style w:type="character" w:customStyle="1" w:styleId="ArabicListParagraphChar">
+        <w:name w:val="ArabicListParagraph Char"/>
+        <w:basedOn w:val="ListParagraphChar"/>
+        <w:link w:val="ArabicListParagraph"/>
+        <w:rsid w:val="00B3714C"/>
+        <w:rPr>
+            <w:rFonts w:cs="KFGQPC Uthman Taha Naskh"/>
+            <w:sz w:val="28"/>
+            <w:szCs w:val="28"/>
+        </w:rPr>
+    </w:style>
+    <w:style w:type="paragraph" w:customStyle="1" w:styleId="Translation">
+        <w:name w:val="Translation"/>
+        <w:basedOn w:val="Normal"/>
+        <w:link w:val="TranslationChar"/>
+        <w:qFormat/>
+        <w:rsid w:val="00197B49"/>
+        <w:rPr>
+            <w:rFonts w:ascii="Candara" w:hAnsi="Candara"/>
+            <w:sz w:val="20"/>
+            <w:szCs w:val="20"/>
+        </w:rPr>
+    </w:style>
+    <w:style w:type="character" w:customStyle="1" w:styleId="TranslationChar">
+        <w:name w:val="Translation Char"/>
+        <w:basedOn w:val="DefaultParagraphFont"/>
+        <w:link w:val="Translation"/>
+        <w:rsid w:val="00197B49"/>
+        <w:rPr>
+            <w:rFonts w:ascii="Candara" w:hAnsi="Candara"/>
+            <w:sz w:val="20"/>
+            <w:szCs w:val="20"/>
+        </w:rPr>
+    </w:style>
+    <w:style w:type="table" w:styleId="TableGrid1" w:customStyle="true">
+        <w:name w:val="Table Grid With Header"/>
+        <w:basedOn w:val="TableNormal"/>
+        <w:uiPriority w:val="48"/>
+        <w:rsid w:val="60BE864B"/>
+        <w:pPr>
+            <w:spacing w:after="0" w:line="240" w:lineRule="auto"/>
+        </w:pPr>
+        <w:tblPr>
+            <w:tblBorders>
+                <w:top w:val="single" w:color="2C2C2C" w:themeColor="text1" w:sz="4" w:space="0"/>
+                <w:left w:val="single" w:color="2C2C2C" w:themeColor="text1" w:sz="4" w:space="0"/>
+                <w:bottom w:val="single" w:color="2C2C2C" w:themeColor="text1" w:sz="4" w:space="0"/>
+                <w:right w:val="single" w:color="2C2C2C" w:themeColor="text1" w:sz="4" w:space="0"/>
+                <w:insideH w:val="single" w:color="2C2C2C" w:themeColor="text1" w:sz="4" w:space="0"/>
+                <w:insideV w:val="single" w:color="2C2C2C" w:themeColor="text1" w:sz="4" w:space="0"/>
+            </w:tblBorders>
+        </w:tblPr>
+        <w:tblStylePr w:type="firstRow">
+            <w:pPr>
+                <w:jc w:val="center"/>
+            </w:pPr>
+            <w:rPr>
+                <w:rStyle w:val="Strong"/>
+            </w:rPr>
+            <w:tcPr>
+                <w:vAlign w:val="center"/>
+            </w:tcPr>
+        </w:tblStylePr>
+    </w:style>
+    <w:style w:type="table" w:styleId="TableGrid2" w:customStyle="true">
+        <w:name w:val="Table Grid With Footer"/>
+        <w:basedOn w:val="TableNormal"/>
+        <w:uiPriority w:val="49"/>
+        <w:rsid w:val="45094091"/>
+        <w:pPr>
+            <w:spacing w:after="0" w:line="240" w:lineRule="auto"/>
+        </w:pPr>
+        <w:tblPr>
+            <w:tblBorders>
+                <w:top w:val="single" w:color="2C2C2C" w:themeColor="text1" w:sz="4" w:space="0"/>
+                <w:left w:val="single" w:color="2C2C2C" w:themeColor="text1" w:sz="4" w:space="0"/>
+                <w:bottom w:val="single" w:color="2C2C2C" w:themeColor="text1" w:sz="4" w:space="0"/>
+                <w:right w:val="single" w:color="2C2C2C" w:themeColor="text1" w:sz="4" w:space="0"/>
+                <w:insideH w:val="single" w:color="2C2C2C" w:themeColor="text1" w:sz="4" w:space="0"/>
+                <w:insideV w:val="single" w:color="2C2C2C" w:themeColor="text1" w:sz="4" w:space="0"/>
+            </w:tblBorders>
+        </w:tblPr>
+        <w:tblStylePr w:type="lastRow">
+            <w:pPr>
+                <w:jc w:val="center"/>
+            </w:pPr>
+            <w:rPr>
+                <w:rStyle w:val="Strong"/>
+            </w:rPr>
+            <w:tcPr>
+                <w:vAlign w:val="center"/>
+            </w:tcPr>
+        </w:tblStylePr>
+    </w:style>
+    <w:style w:type="table" w:styleId="TableGrid3" w:customStyle="true">
+        <w:name w:val="Table Grid With Header And Footer"/>
+        <w:basedOn w:val="TableNormal"/>
+        <w:uiPriority w:val="49"/>
+        <w:rsid w:val="A289E8AB"/>
+        <w:pPr>
+            <w:spacing w:after="0" w:line="240" w:lineRule="auto"/>
+        </w:pPr>
+        <w:tblPr>
+            <w:tblBorders>
+                <w:top w:val="single" w:color="2C2C2C" w:themeColor="text1" w:sz="4" w:space="0"/>
+                <w:left w:val="single" w:color="2C2C2C" w:themeColor="text1" w:sz="4" w:space="0"/>
+                <w:bottom w:val="single" w:color="2C2C2C" w:themeColor="text1" w:sz="4" w:space="0"/>
+                <w:right w:val="single" w:color="2C2C2C" w:themeColor="text1" w:sz="4" w:space="0"/>
+                <w:insideH w:val="single" w:color="2C2C2C" w:themeColor="text1" w:sz="4" w:space="0"/>
+                <w:insideV w:val="single" w:color="2C2C2C" w:themeColor="text1" w:sz="4" w:space="0"/>
+            </w:tblBorders>
+        </w:tblPr>
+        <w:tblStylePr w:type="firstRow">
+            <w:pPr>
+                <w:jc w:val="center"/>
+            </w:pPr>
+            <w:rPr>
+                <w:rStyle w:val="Strong"/>
+            </w:rPr>
+            <w:tcPr>
+                <w:vAlign w:val="center"/>
+            </w:tcPr>
+        </w:tblStylePr>
+        <w:tblStylePr w:type="lastRow">
+            <w:pPr>
+                <w:jc w:val="center"/>
+            </w:pPr>
+            <w:rPr>
+                <w:rStyle w:val="Strong"/>
+            </w:rPr>
+            <w:tcPr>
+                <w:vAlign w:val="center"/>
+            </w:tcPr>
+        </w:tblStylePr>
+    </w:style>
+</w:styles>
