@@ -6,6 +6,7 @@ import com.alphasystem.morphologicalanalysis.ui.model.ApplicationState;
 import com.alphasystem.morphologicalanalysis.ui.util.RestClient;
 import com.alphasystem.morphologicalanalysis.ui.util.VerseTokensPairsReader;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Chapter;
+import com.sun.javafx.scene.control.skin.ComboBoxListViewSkin;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -13,6 +14,7 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -117,6 +119,13 @@ public class ChapterVerseSelectionPane extends BorderPane {
         if (size > 0) {
             verseComboBox.getSelectionModel().selectFirst();
             applicationState.setVerseTokenPairGroup(verseNumbers.get(0));
+            final ComboBoxListViewSkin<?> skin = (ComboBoxListViewSkin<?>) verseComboBox.getSkin();
+            if (skin != null) {
+                final ListView<?> popupContent = (ListView<?>) skin.getPopupContent();
+                if (popupContent != null) {
+                    popupContent.scrollTo(0);
+                }
+            }
         }
         verseComboBox.requestLayout();
     }
