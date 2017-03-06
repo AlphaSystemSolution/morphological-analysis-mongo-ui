@@ -13,6 +13,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>morphological-analysis-ui-preloader</module>
+		<module>morphological-engine-ui-common</module>
         <module>morphological-analysis-ui-common</module>
         <module>morphological-analysis-ui-token-editor</module>
         <module>morphological-analysis-ui-word-by-word</module>
