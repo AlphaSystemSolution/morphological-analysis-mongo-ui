@@ -52,7 +52,7 @@ public class TokenView extends BorderPane {
 
     public TokenView() {
         tableView.setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
-        tableView.setFixedCellSize(ApplicationHelper.ROW_SIZE);
+        tableView.setFixedCellSize(ApplicationHelper.ROW_SIZE  + 20);
         tableView.setPrefSize(Screen.getPrimary().getVisualBounds().getWidth(), ApplicationHelper.calculateTableHeight(tableView.getItems().size()));
         tableView.setEditable(true);
         setCenter(UiUtilities.wrapInScrollPane(tableView));
@@ -95,7 +95,6 @@ public class TokenView extends BorderPane {
             if (checkedProperty.get()) {
                 System.out.println(">>>>>>>>>>>>>>>>>>>>>>: " + tableModel.getToken());
             }
-            checkedProperty.setValue(false);
             return checkedProperty;
         };
         checkBoxColumn.setCellFactory(param -> new CheckBoxTableCell<>(cb));
