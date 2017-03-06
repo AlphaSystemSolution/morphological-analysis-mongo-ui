@@ -5,6 +5,8 @@ import com.alphasystem.morphologicalanalysis.morphology.model.MorphologicalEntry
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Chapter;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
 import org.apache.commons.lang3.ArrayUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -34,8 +36,13 @@ public class RestClient {
     private static final String SAVE_TOKEN_PATH_SUFFIX = "/saveToken";
     private static final String FIND_MORPHOLOGICAL_ENTRY_PATH_SUFFIX = "/morphologicalEntry/find";
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(RestClient.class);
+
     @Autowired private RestTemplate restTemplate;
     @Value("${service.url}") private String urlPath;
+    @Value("${service.url.scheme:http}") private String scheme;
+    @Value("${service.url.host:localhost}") private String host;
+    @Value("${service.url.port:8080}") private String port;
 
     private Map<String, List<Token>> cache = new LinkedHashMap<>();
     private Chapter[] chapters;
@@ -70,6 +77,21 @@ public class RestClient {
             cache.put(key, tokens);
         }
         return tokens;
+    }
+
+    public Token getNextToken(Integer chapterNumber, Integer verseNumber, Integer tokenNumber) {
+        final URI uri = UriComponentsBuilder.newInstance().scheme(scheme).host(host).port(port)
+                .path("/morphological/chapter/{chapterNumber}/verse/{verseNumber}/token/{tokenNumber}/next")
+                .buildAndExpand(chapterNumber, verseNumber, tokenNumber).toUri();
+        LOGGER.info("Calling URL: {}", uri);
+
+        final LinkedMultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
+        headers.put("Content-Type", Collections.singletonList("application/json;charset=UTF-8"));
+
+        final ResponseEntity<Token> responseEntity = restTemplate.exchange(uri, HttpMethod.GET,
+                new HttpEntity<>(headers), new TokenType());
+
+        return responseEntity.getBody();
     }
 
     /**
