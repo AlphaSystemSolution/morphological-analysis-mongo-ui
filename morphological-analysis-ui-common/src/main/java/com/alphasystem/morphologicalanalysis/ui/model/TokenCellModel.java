@@ -16,20 +16,18 @@ import javafx.beans.property.StringProperty;
 /**
  * @author sali
  */
-public final class TokenCellModel {
+public class TokenCellModel {
 
-    private final BooleanProperty checked;
+    private final BooleanProperty checked = new SimpleBooleanProperty(this, "checked", false);
     private final ReadOnlyObjectWrapper<ArabicWord> displayName = new ReadOnlyObjectWrapper<>(this, "displayName");
     private final ReadOnlyObjectWrapper<ArabicWord> text = new ReadOnlyObjectWrapper<>(this, "text");
-    private final StringProperty morphologicalDescription;
+    private final StringProperty morphologicalDescription = new SimpleStringProperty(this, "morphologicalDescription");
     private Token token;
 
     public TokenCellModel(Token token) {
         this.token = token;
-        checked = new SimpleBooleanProperty(false);
         displayName.set(getTokenNumber(this.token));
         text.set(getText(this.token));
-        morphologicalDescription = new SimpleStringProperty();
     }
 
     private static ArabicWord getTokenNumber(Token token) {
@@ -45,7 +43,7 @@ public final class TokenCellModel {
                 ArabicWord.getWord(ArabicLetterType.SEMI_COLON), tokenNumber);
     }
 
-    private static ArabicWord getText(Token token){
+    private static ArabicWord getText(Token token) {
         if (token == null) {
             return ArabicLetters.WORD_SPACE;
         }
@@ -66,6 +64,10 @@ public final class TokenCellModel {
 
     public final BooleanProperty checkedProperty() {
         return checked;
+    }
+
+    public final void setChecked(boolean checked) {
+        this.checked.set(checked);
     }
 
     public final ArabicWord getDisplayName() {
