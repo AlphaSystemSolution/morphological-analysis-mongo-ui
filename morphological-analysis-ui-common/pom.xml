@@ -9,11 +9,6 @@
     <artifactId>morphological-analysis-ui-common</artifactId>
     <dependencies>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter</artifactId>
-            <version>1.5.1.RELEASE</version>
-        </dependency>
-        <dependency>
             <groupId>com.alphasystem.arabic</groupId>
             <artifactId>morphological-engine-ui-common</artifactId>
             <version>${morphological-engine-ui-common.version}</version>
