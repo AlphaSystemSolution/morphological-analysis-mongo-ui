@@ -1,5 +1,6 @@
 package com.alphasystem.morphologicalanalysis.ui.tokeneditor.application;
 
+import com.alphasystem.app.morphologicalengine.spring.MorphologicalEngineConfiguration;
 import com.alphasystem.morphologicalanalysis.ui.application.AbstractJavaFxApplicationSupport;
 import com.alphasystem.morphologicalanalysis.ui.spring.support.CommonConfiguration;
 import com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.TokenEditorPane;
@@ -18,7 +19,7 @@ import org.springframework.context.annotation.Lazy;
  */
 @Lazy
 @SpringBootApplication
-@Import({CommonConfiguration.class, TokenEditorConfiguration.class})
+@Import({MorphologicalEngineConfiguration.class, CommonConfiguration.class, TokenEditorConfiguration.class})
 public class TokenEditorApp extends AbstractJavaFxApplicationSupport {
 
     @Value("${app.ui.title}") private String windowTitle;

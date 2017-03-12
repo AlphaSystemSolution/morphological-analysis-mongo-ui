@@ -3,7 +3,7 @@ package com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.controller;
 import com.alphasystem.app.morphologicalengine.conjugation.builder.ConjugationHelper;
 import com.alphasystem.app.morphologicalengine.conjugation.builder.ConjugationRoots;
 import com.alphasystem.app.morphologicalengine.conjugation.model.MorphologicalChart;
-import com.alphasystem.app.morphologicalengine.guice.GuiceSupport;
+import com.alphasystem.app.morphologicalengine.spring.MorphologicalEngineFactory;
 import com.alphasystem.app.morphologicalengine.ui.MorphologicalChartView;
 import com.alphasystem.fx.ui.Browser;
 import com.alphasystem.fx.ui.util.UiUtilities;
@@ -138,7 +138,7 @@ public class DetailEditorController extends BorderPane {
                             RootLetters rootLetters = entry.getRootLetters();
                             final ConjugationRoots conjugationRoots = ConjugationHelper.getConjugationRoots(entry)
                                     .conjugationConfiguration(entry.getConfiguration());
-                            return GuiceSupport.getInstance().getConjugationBuilder().doConjugation(conjugationRoots,
+                            return MorphologicalEngineFactory.getConjugationBuilder().doConjugation(conjugationRoots,
                                     rootLetters.getFirstRadical(), rootLetters.getSecondRadical(), rootLetters.getThirdRadical(),
                                     rootLetters.getFourthRadical());
                         }
