@@ -127,12 +127,9 @@ public class DetailEditorController extends BorderPane {
                         @Override
                         protected MorphologicalChart call() throws Exception {
                             UiUtilities.waitCursor(control);
-                            RootLetters rootLetters = entry.getRootLetters();
                             final ConjugationRoots conjugationRoots = ConjugationHelper.getConjugationRoots(entry)
                                     .conjugationConfiguration(entry.getConfiguration());
-                            return MorphologicalEngineFactory.getConjugationBuilder().doConjugation(conjugationRoots,
-                                    rootLetters.getFirstRadical(), rootLetters.getSecondRadical(), rootLetters.getThirdRadical(),
-                                    rootLetters.getFourthRadical());
+                            return MorphologicalEngineFactory.getConjugationBuilder().doConjugation(conjugationRoots);
                         }
                     };
                 }
