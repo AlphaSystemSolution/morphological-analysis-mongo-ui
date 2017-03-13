@@ -43,7 +43,6 @@
         <springframework.version>4.3.6.RELEASE</springframework.version>
         <base.version>3.0.0-SNAPSHOT</base.version>
         <asciidoctor-editor.version>${base.version}</asciidoctor-editor.version>
-        <morphological-analysis-ui-preloader.version>${project.version}</morphological-analysis-ui-preloader.version>
         <morphological-engine-ui-common.version>${project.version}</morphological-engine-ui-common.version>
         <maven.test.skip>true</maven.test.skip>
     </properties>
