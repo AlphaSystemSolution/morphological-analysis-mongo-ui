@@ -19,14 +19,12 @@ import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
-import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.web.WebEngine;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.Optional;
 import java.util.ResourceBundle;
 
 /**
@@ -46,13 +44,7 @@ public class DetailEditorController extends BorderPane {
         Platform.runLater(() -> {
             browser = new Browser();
             final WebEngine webEngine = browser.getWebEngine();
-            webEngine.setPromptHandler(param -> {
-                TextInputDialog dialog = new TextInputDialog(param.getDefaultValue());
-                dialog.setHeaderText(param.getMessage());
-                final Optional<String> result = dialog.showAndWait();
-                return result.isPresent() ? result.get() : param.getDefaultValue();
-            });
-            browser.getWebEngine().getLoadWorker().stateProperty().addListener((observable, oldValue, newValue) -> {
+            webEngine.getLoadWorker().stateProperty().addListener((observable, oldValue, newValue) -> {
                 if (Worker.State.READY.equals(newValue) || Worker.State.SUCCEEDED.equals(newValue) || Worker.State.FAILED.equals(newValue)) {
                     UiUtilities.defaultCursor(control);
                 }
