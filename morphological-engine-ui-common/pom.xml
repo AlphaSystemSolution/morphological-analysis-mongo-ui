@@ -15,6 +15,11 @@
         </dependency>
         <dependency>
             <groupId>com.alphasystem.arabic</groupId>
+            <artifactId>morphological-analysis-ui-preloader</artifactId>
+            <version>${morphological-analysis-ui-preloader.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.alphasystem.arabic</groupId>
             <artifactId>morphological-engine</artifactId>
             <version>${morphological-engine.version}</version>
         </dependency>
@@ -27,6 +32,7 @@
     <properties>
         <arabic-ui-support.version>${project.version}</arabic-ui-support.version>
         <morphological-engine.version>${project.version}</morphological-engine.version>
+        <morphological-analysis-ui-preloader.version>${project.version}</morphological-analysis-ui-preloader.version>
         <maven.test.skip>true</maven.test.skip>
     </properties>
 </project>

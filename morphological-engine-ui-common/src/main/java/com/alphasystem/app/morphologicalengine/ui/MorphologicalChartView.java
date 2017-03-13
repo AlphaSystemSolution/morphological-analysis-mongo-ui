@@ -12,7 +12,7 @@ import javafx.scene.control.Skin;
  */
 public class MorphologicalChartView extends Control {
 
-    private final ObjectProperty<MorphologicalChart> morphologicalChart = new SimpleObjectProperty<>(null, "morphologicalChart");
+    private final ObjectProperty<MorphologicalChart> morphologicalChart = new SimpleObjectProperty<>(this, "morphologicalChart");
 
     public MorphologicalChartView() {
         setSkin(createDefaultSkin());
