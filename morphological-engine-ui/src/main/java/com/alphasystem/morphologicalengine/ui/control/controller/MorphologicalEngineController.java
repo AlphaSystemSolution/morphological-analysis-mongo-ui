@@ -451,7 +451,8 @@ public class MorphologicalEngineController extends BorderPane {
             ConjugationTemplate conjugationTemplate = getConjugationTemplate(currentItems, tabInfo.getChartConfiguration());
 
             if (MorphologicalEngineController.SaveMode.EXPORT_SELECTED_TO_WORD.equals(saveMode)) {
-                conjugationTemplate.getChartConfiguration().setOmitToc(true);
+                ConjugationTemplate conjugationTemplate1 = new ConjugationTemplate(conjugationTemplate);
+                conjugationTemplate1.getChartConfiguration().setOmitToc(true);
                 Path tempPath = null;
                 try {
                     tempPath = Files.createTempFile("", ".docx");
@@ -460,7 +461,7 @@ public class MorphologicalEngineController extends BorderPane {
                     // ignore
                 }
                 if (tempPath != null) {
-                    MorphologicalChartEngine engine = new MorphologicalChartEngine(conjugationTemplate);
+                    MorphologicalChartEngine engine = new MorphologicalChartEngine(conjugationTemplate1);
                     try {
                         engine.createDocument(tempPath);
                         currentItems.forEach(tableModel -> tableModel.setChecked(false));
