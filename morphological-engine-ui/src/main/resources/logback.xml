@@ -45,10 +45,6 @@
         <appender-ref ref="FILE"/>
     </root>
 
-    <logger name="com.alphasystem.morphologicalanalysis.util" level="INFO"/>
-    <logger name="com.alphasystem.persistence.mongo.spring.support" level="INFO"/>
-    <logger name="com.alphasystem.morphologicalanalysis.wordbyword.listener" level="INFO"/>
-    <logger name="org.springframework.data.mongodb.core" level="INFO"/>
     <logger name="org.springframework.beans.factory.support" level="INFO"/>
     <logger name="org.springframework.test.context" level="INFO"/>
     <logger name="org.springframework.context" level="INFO"/>
@@ -68,4 +64,15 @@
     <logger name="com.sun.javafx.webkit.theme" level="INFO"/>
     <logger name="com.google.inject.internal.util" level="INFO"/>
     <logger name="com.google.inject.internal" level="INFO"/>
+    <logger name="com.sun.xml.internal.bind.v2" level="INFO"/>
+    <logger name="com.sun.xml.internal.bind.v2.runtime.reflect.opt" level="INFO"/>
+    <logger name="com.sun.xml.internal.bind.v2.model.impl" level="INFO"/>
+    <logger name="javax.xml.bind" level="INFO"/>
+    <logger name="org.docx4j" level="INFO"/>
+    <logger name="org.docx4j.utils" level="INFO"/>
+    <logger name="org.docx4j.openpackaging.contenttype" level="INFO"/>
+    <logger name="org.docx4j.openpackaging" level="INFO"/>
+    <logger name="org.docx4j.openpackaging.io3" level="INFO"/>
+    <logger name="org.docx4j.openpackaging.parts" level="INFO"/>
+    <logger name="org.docx4j.jaxb" level="INFO"/>
 </configuration>
