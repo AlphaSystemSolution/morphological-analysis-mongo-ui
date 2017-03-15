@@ -1,7 +1,7 @@
 package com.alphasystem.app.morphologicalengine.ui;
 
-import com.alphasystem.app.morphologicalengine.conjugation.model.AbbreviatedConjugation;
-import com.alphasystem.app.morphologicalengine.conjugation.model.ConjugationHeader;
+import com.alphasystem.morphologicalengine.model.AbbreviatedConjugation;
+import com.alphasystem.morphologicalengine.model.ConjugationHeader;
 import com.alphasystem.app.morphologicalengine.ui.skin.AbbreviatedConjugationSkin;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;

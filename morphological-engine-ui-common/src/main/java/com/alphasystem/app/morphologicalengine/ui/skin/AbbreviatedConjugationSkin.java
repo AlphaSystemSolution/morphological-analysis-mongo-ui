@@ -1,11 +1,11 @@
 package com.alphasystem.app.morphologicalengine.ui.skin;
 
-import com.alphasystem.app.morphologicalengine.conjugation.model.AbbreviatedConjugation;
-import com.alphasystem.app.morphologicalengine.conjugation.model.ConjugationHeader;
-import com.alphasystem.app.morphologicalengine.conjugation.model.abbrvconj.ActiveLine;
-import com.alphasystem.app.morphologicalengine.conjugation.model.abbrvconj.AdverbLine;
-import com.alphasystem.app.morphologicalengine.conjugation.model.abbrvconj.ImperativeAndForbiddingLine;
-import com.alphasystem.app.morphologicalengine.conjugation.model.abbrvconj.PassiveLine;
+import com.alphasystem.morphologicalengine.model.AbbreviatedConjugation;
+import com.alphasystem.morphologicalengine.model.ConjugationHeader;
+import com.alphasystem.morphologicalengine.model.abbrvconj.ActiveLine;
+import com.alphasystem.morphologicalengine.model.abbrvconj.AdverbLine;
+import com.alphasystem.morphologicalengine.model.abbrvconj.ImperativeAndForbiddingLine;
+import com.alphasystem.morphologicalengine.model.abbrvconj.PassiveLine;
 import com.alphasystem.app.morphologicalengine.ui.AbbreviatedConjugationView;
 import com.alphasystem.app.morphologicalengine.ui.util.MorphologicalEnginePreferences;
 import com.alphasystem.arabic.model.ArabicSupport;
