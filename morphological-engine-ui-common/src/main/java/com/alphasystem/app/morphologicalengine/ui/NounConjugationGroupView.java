@@ -19,7 +19,7 @@ public class NounConjugationGroupView extends ConjugationGroupView<NounConjugati
     }
 
     private boolean isEmpty(ConjugationTuple tuple) {
-        return (tuple == null) || tuple.isEmpty();
+        return (tuple == null) || tuple.empty();
     }
 
     @Override

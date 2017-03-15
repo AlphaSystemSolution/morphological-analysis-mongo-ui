@@ -20,7 +20,7 @@ public class VerbConjugationGroupView extends ConjugationGroupView<VerbConjugati
     }
 
     private boolean isEmpty(ConjugationTuple tuple) {
-        return (tuple == null) || tuple.isEmpty();
+        return (tuple == null) || tuple.empty();
     }
 
     @Override
