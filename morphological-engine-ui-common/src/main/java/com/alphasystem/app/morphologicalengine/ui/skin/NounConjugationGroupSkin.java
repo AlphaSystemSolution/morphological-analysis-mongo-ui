@@ -1,6 +1,6 @@
 package com.alphasystem.app.morphologicalengine.ui.skin;
 
-import com.alphasystem.app.morphologicalengine.conjugation.model.NounConjugationGroup;
+import com.alphasystem.morphologicalengine.model.NounConjugationGroup;
 import com.alphasystem.app.morphologicalengine.ui.NounConjugationGroupView;
 import com.alphasystem.arabic.ui.ArabicLabelView;
 import javafx.fxml.FXML;
