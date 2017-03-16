@@ -1,6 +1,6 @@
 package com.alphasystem.app.morphologicalengine.ui;
 
-import com.alphasystem.app.morphologicalengine.conjugation.model.DetailedConjugation;
+import com.alphasystem.morphologicalengine.model.DetailedConjugation;
 import com.alphasystem.app.morphologicalengine.ui.skin.DetailedConjugationSkin;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;

@@ -2,7 +2,7 @@ package com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.controller;
 
 import com.alphasystem.app.morphologicalengine.conjugation.builder.ConjugationHelper;
 import com.alphasystem.app.morphologicalengine.conjugation.builder.ConjugationRoots;
-import com.alphasystem.app.morphologicalengine.conjugation.model.MorphologicalChart;
+import com.alphasystem.morphologicalengine.model.MorphologicalChart;
 import com.alphasystem.app.morphologicalengine.spring.MorphologicalEngineFactory;
 import com.alphasystem.app.morphologicalengine.ui.MorphologicalChartView;
 import com.alphasystem.fx.ui.Browser;

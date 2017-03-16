@@ -1,8 +1,8 @@
 package com.alphasystem.app.morphologicalengine.ui.skin;
 
 import com.alphasystem.morphologicalengine.model.AbbreviatedConjugation;
-import com.alphasystem.app.morphologicalengine.conjugation.model.DetailedConjugation;
-import com.alphasystem.app.morphologicalengine.conjugation.model.MorphologicalChart;
+import com.alphasystem.morphologicalengine.model.DetailedConjugation;
+import com.alphasystem.morphologicalengine.model.MorphologicalChart;
 import com.alphasystem.app.morphologicalengine.ui.AbbreviatedConjugationView;
 import com.alphasystem.app.morphologicalengine.ui.DetailedConjugationView;
 import com.alphasystem.app.morphologicalengine.ui.MorphologicalChartView;

@@ -1,6 +1,6 @@
 package com.alphasystem.morphologicalengine.ui.control.controller;
 
-import com.alphasystem.app.morphologicalengine.conjugation.model.MorphologicalChart;
+import com.alphasystem.morphologicalengine.model.MorphologicalChart;
 import com.alphasystem.app.morphologicalengine.ui.MorphologicalChartView;
 import com.alphasystem.fx.ui.Browser;
 import com.alphasystem.fx.ui.util.UiUtilities;

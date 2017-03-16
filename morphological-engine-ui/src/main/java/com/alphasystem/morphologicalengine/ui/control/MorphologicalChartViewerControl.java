@@ -1,6 +1,6 @@
 package com.alphasystem.morphologicalengine.ui.control;
 
-import com.alphasystem.app.morphologicalengine.conjugation.model.MorphologicalChart;
+import com.alphasystem.morphologicalengine.model.MorphologicalChart;
 import com.alphasystem.morphologicalengine.ui.control.skin.MorphologicalChartViewerSkin;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;

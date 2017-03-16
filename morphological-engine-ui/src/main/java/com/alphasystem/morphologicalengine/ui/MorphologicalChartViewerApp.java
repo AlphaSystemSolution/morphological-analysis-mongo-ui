@@ -1,6 +1,6 @@
 package com.alphasystem.morphologicalengine.ui;
 
-import com.alphasystem.app.morphologicalengine.conjugation.model.MorphologicalChart;
+import com.alphasystem.morphologicalengine.model.MorphologicalChart;
 import com.alphasystem.app.morphologicalengine.docx.MorphologicalChartEngine;
 import com.alphasystem.morphologicalengine.ui.control.MorphologicalChartViewerControl;
 import com.alphasystem.arabic.model.ArabicLetterType;
