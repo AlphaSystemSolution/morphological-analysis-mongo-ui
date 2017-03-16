@@ -1,6 +1,6 @@
 package com.alphasystem.app.morphologicalengine.ui;
 
-import com.alphasystem.app.morphologicalengine.conjugation.model.ConjugationGroup;
+import com.alphasystem.morphologicalengine.model.ConjugationGroup;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.control.Control;

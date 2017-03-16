@@ -1,6 +1,6 @@
 package com.alphasystem.app.morphologicalengine.ui.skin;
 
-import com.alphasystem.app.morphologicalengine.conjugation.model.ConjugationGroup;
+import com.alphasystem.morphologicalengine.model.ConjugationGroup;
 import com.alphasystem.morphologicalengine.model.ConjugationTuple;
 import com.alphasystem.app.morphologicalengine.ui.ConjugationGroupView;
 import com.alphasystem.app.morphologicalengine.ui.util.MorphologicalEnginePreferences;
