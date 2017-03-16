@@ -1,6 +1,6 @@
 package com.alphasystem.app.morphologicalengine.ui;
 
-import com.alphasystem.app.morphologicalengine.conjugation.model.VerbConjugationGroup;
+import com.alphasystem.morphologicalengine.model.VerbConjugationGroup;
 import com.alphasystem.app.morphologicalengine.conjugation.model.VerbDetailedConjugationPair;
 import com.alphasystem.app.morphologicalengine.ui.skin.VerbDetailedConjugationPairSkin;
 import javafx.scene.control.Skin;

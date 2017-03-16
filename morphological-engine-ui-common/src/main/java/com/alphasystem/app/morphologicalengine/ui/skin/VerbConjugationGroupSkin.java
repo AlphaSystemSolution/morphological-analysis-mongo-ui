@@ -1,7 +1,7 @@
 package com.alphasystem.app.morphologicalengine.ui.skin;
 
 import com.alphasystem.morphologicalengine.model.ConjugationTuple;
-import com.alphasystem.app.morphologicalengine.conjugation.model.VerbConjugationGroup;
+import com.alphasystem.morphologicalengine.model.VerbConjugationGroup;
 import com.alphasystem.app.morphologicalengine.ui.VerbConjugationGroupView;
 import com.alphasystem.arabic.ui.ArabicLabelView;
 import com.alphasystem.morphologicalanalysis.morphology.model.support.SarfTermType;
