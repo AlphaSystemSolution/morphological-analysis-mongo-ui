@@ -1,7 +1,7 @@
 package com.alphasystem.app.morphologicalengine.ui;
 
 import com.alphasystem.morphologicalengine.model.NounConjugationGroup;
-import com.alphasystem.app.morphologicalengine.conjugation.model.NounDetailedConjugationPair;
+import com.alphasystem.morphologicalengine.model.NounDetailedConjugationPair;
 import com.alphasystem.app.morphologicalengine.ui.skin.NounDetailedConjugationPairSkin;
 import javafx.scene.control.Skin;
 import javafx.scene.control.SkinBase;

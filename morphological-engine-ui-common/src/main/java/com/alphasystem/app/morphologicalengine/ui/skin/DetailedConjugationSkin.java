@@ -1,8 +1,8 @@
 package com.alphasystem.app.morphologicalengine.ui.skin;
 
 import com.alphasystem.app.morphologicalengine.conjugation.model.DetailedConjugation;
-import com.alphasystem.app.morphologicalengine.conjugation.model.NounDetailedConjugationPair;
-import com.alphasystem.app.morphologicalengine.conjugation.model.VerbDetailedConjugationPair;
+import com.alphasystem.morphologicalengine.model.NounDetailedConjugationPair;
+import com.alphasystem.morphologicalengine.model.VerbDetailedConjugationPair;
 import com.alphasystem.app.morphologicalengine.ui.DetailedConjugationView;
 import com.alphasystem.app.morphologicalengine.ui.NounDetailedConjugationPairView;
 import com.alphasystem.app.morphologicalengine.ui.VerbDetailedConjugationPairView;

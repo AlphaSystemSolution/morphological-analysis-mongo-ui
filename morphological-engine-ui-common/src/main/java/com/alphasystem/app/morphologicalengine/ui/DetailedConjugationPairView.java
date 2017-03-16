@@ -1,7 +1,7 @@
 package com.alphasystem.app.morphologicalengine.ui;
 
 import com.alphasystem.morphologicalengine.model.ConjugationGroup;
-import com.alphasystem.app.morphologicalengine.conjugation.model.DetailedConjugationPair;
+import com.alphasystem.morphologicalengine.model.DetailedConjugationPair;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
