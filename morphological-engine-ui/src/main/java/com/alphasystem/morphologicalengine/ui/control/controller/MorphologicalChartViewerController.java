@@ -90,7 +90,7 @@ public class MorphologicalChartViewerController extends BorderPane {
         RootLetters rootLetters = null;
         final MorphologicalChart morphologicalChart = control.getMorphologicalChart();
         if (morphologicalChart != null) {
-            rootLetters = morphologicalChart.getRootLetters();
+            rootLetters = morphologicalChart.rootLetters();
         }
         if (rootLetters == null || rootLetters.isEmpty()) {
             browser.loadUrl(getMawridReaderUrl("a"));

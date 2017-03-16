@@ -51,7 +51,7 @@ public class MorphologicalChartSkin extends SkinBase<MorphologicalChartView> {
                 final AbbreviatedConjugation abbreviatedConjugation = morphologicalChart.getAbbreviatedConjugation();
                 if (abbreviatedConjugation != null) {
                     AbbreviatedConjugationView control = new AbbreviatedConjugationView();
-                    control.setConjugationHeader(morphologicalChart.getHeader());
+                    control.setConjugationHeader(morphologicalChart.header());
                     control.setAbbreviatedConjugation(abbreviatedConjugation);
                     pane.getChildren().add(control);
                 }
