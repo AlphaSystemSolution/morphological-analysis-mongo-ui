@@ -2,7 +2,7 @@ package com.alphasystem.morphologicalengine.ui.control.controller;
 
 import com.alphasystem.ApplicationException;
 import com.alphasystem.BusinessException;
-import com.alphasystem.app.morphologicalengine.conjugation.model.MorphologicalChart;
+import com.alphasystem.morphologicalengine.model.MorphologicalChart;
 import com.alphasystem.app.morphologicalengine.docx.MorphologicalChartEngine;
 import com.alphasystem.app.morphologicalengine.spring.MorphologicalEngineFactory;
 import com.alphasystem.app.morphologicalengine.ui.util.MorphologicalEnginePreferences;
@@ -28,7 +28,9 @@ import com.sun.javafx.scene.control.skin.TabPaneSkin;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.SortedList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
@@ -72,7 +74,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
@@ -245,6 +246,8 @@ public class MorphologicalEngineController extends BorderPane {
 
         tableView.setFixedCellSize(ROW_SIZE);
         tableView.setPrefSize(boundsWidth, calculateTableHeight(tableModels.size()));
+        // updateTableModel(tableModels, tableView);
+
         ScrollPane scrollPane = new ScrollPane(tableView);
         scrollPane.setVbarPolicy(AS_NEEDED);
         scrollPane.setHbarPolicy(AS_NEEDED);
@@ -252,11 +255,19 @@ public class MorphologicalEngineController extends BorderPane {
         return scrollPane;
     }
 
+    private void updateTableModel(ObservableList<TableModel> tableModels, TableView<TableModel> tableView){
+        SortedList<TableModel> sortedList = new SortedList<>(tableModels);
+        sortedList.setComparator(TableModel::compareTo);
+        sortedList.comparatorProperty().bind(tableView.comparatorProperty());
+        tableView.setItems(sortedList);
+    }
+
     void addNewRowAction() {
         TableView<TableModel> tableView = getCurrentTable();
         if (tableView != null) {
-            ObservableList<TableModel> items = tableView.getItems();
+            ObservableList<TableModel> items = FXCollections.observableArrayList(tableView.getItems());
             items.add(new TableModel());
+            // updateTableModel(items, tableView);
             tableView.setPrefHeight(calculateTableHeight(items.size()));
             Platform.runLater(() -> {
                 tableView.requestFocus();
@@ -279,7 +290,7 @@ public class MorphologicalEngineController extends BorderPane {
                         model.setChecked(false);
                     } // end of if "model.isChecked()"
                 } // end of "while"
-            } // end of if "items != null && !items.isEmpty()"
+            } // end of if "items != null && !items.empty()"
         } // end of if "currentTable != null"
     }
 
