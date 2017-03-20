@@ -1,5 +1,6 @@
 package com.alphasystem.morphologicalengine.ui.application;
 
+import com.alphasystem.app.morphologicalengine.docx.MorphologicalChartConfiguration;
 import com.alphasystem.morphologicalanalysis.ui.application.AbstractJavaFxApplicationSupport;
 import com.alphasystem.morphologicalengine.ui.control.MorphologicalEngineView;
 import javafx.application.Preloader;
@@ -25,7 +26,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
  */
 @Lazy
 @SpringBootApplication
-@Import({MorphologicalEngineUIConfiguration.class})
+@Import({MorphologicalEngineUIConfiguration.class, MorphologicalChartConfiguration.class})
 public class MorphologicalEngineApp extends AbstractJavaFxApplicationSupport {
 
     private static final String OPEN_ARG = "open";

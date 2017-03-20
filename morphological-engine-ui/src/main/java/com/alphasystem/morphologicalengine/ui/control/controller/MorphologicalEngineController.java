@@ -2,6 +2,7 @@ package com.alphasystem.morphologicalengine.ui.control.controller;
 
 import com.alphasystem.ApplicationException;
 import com.alphasystem.BusinessException;
+import com.alphasystem.app.morphologicalengine.docx.MorphologicalChartEngineFactory;
 import com.alphasystem.morphologicalengine.model.MorphologicalChart;
 import com.alphasystem.app.morphologicalengine.docx.MorphologicalChartEngine;
 import com.alphasystem.app.morphologicalengine.spring.MorphologicalEngineFactory;
@@ -115,6 +116,7 @@ public class MorphologicalEngineController extends BorderPane {
     private static final Background BACKGROUND = new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY));
     private static int counter = 1;
 
+    @Autowired private MorphologicalChartEngineFactory morphologicalChartEngineFactory;
     @Autowired private MorphologicalEngineView control;
 
     private TabPane tabPane;
@@ -255,7 +257,7 @@ public class MorphologicalEngineController extends BorderPane {
         return scrollPane;
     }
 
-    private void updateTableModel(ObservableList<TableModel> tableModels, TableView<TableModel> tableView){
+    private void updateTableModel(ObservableList<TableModel> tableModels, TableView<TableModel> tableView) {
         SortedList<TableModel> sortedList = new SortedList<>(tableModels);
         sortedList.setComparator(TableModel::compareTo);
         sortedList.comparatorProperty().bind(tableView.comparatorProperty());
@@ -472,7 +474,7 @@ public class MorphologicalEngineController extends BorderPane {
                     // ignore
                 }
                 if (tempPath != null) {
-                    MorphologicalChartEngine engine = new MorphologicalChartEngine(conjugationTemplate1);
+                    MorphologicalChartEngine engine = morphologicalChartEngineFactory.createMorphologicalChartEngine(conjugationTemplate1);
                     try {
                         engine.createDocument(tempPath);
                         currentItems.forEach(tableModel -> tableModel.setChecked(false));
@@ -514,7 +516,7 @@ public class MorphologicalEngineController extends BorderPane {
                     @Override
                     protected Void call() throws Exception {
                         changeToWaitCursor();
-                        MorphologicalChartEngine engine = new MorphologicalChartEngine(conjugationTemplate);
+                        MorphologicalChartEngine engine = morphologicalChartEngineFactory.createMorphologicalChartEngine(conjugationTemplate);
                         engine.createDocument(tabInfo.getDocxFile().toPath());
                         return null;
                     }
@@ -799,7 +801,7 @@ public class MorphologicalEngineController extends BorderPane {
     private void updateViewer(TableModel tableModel) {
         ConjugationTemplate conjugationTemplate = new ConjugationTemplate();
         conjugationTemplate.getData().add(tableModel.getConjugationData());
-        MorphologicalChartEngine engine = new MorphologicalChartEngine(conjugationTemplate);
+        MorphologicalChartEngine engine = morphologicalChartEngineFactory.createMorphologicalChartEngine(conjugationTemplate);
         final MorphologicalChart morphologicalChart = engine.createMorphologicalCharts().get(0);
 
         MorphologicalChartViewerControl morphologicalChartViewer;
