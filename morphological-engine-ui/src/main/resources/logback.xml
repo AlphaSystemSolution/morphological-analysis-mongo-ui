@@ -45,6 +45,7 @@
         <appender-ref ref="FILE"/>
     </root>
 
+    <logger name="com.alphasystem.app.morphologicalengine.conjugation.builder" level="INFO"/>
     <logger name="org.springframework.beans.factory.support" level="INFO"/>
     <logger name="org.springframework.test.context" level="INFO"/>
     <logger name="org.springframework.context" level="INFO"/>
