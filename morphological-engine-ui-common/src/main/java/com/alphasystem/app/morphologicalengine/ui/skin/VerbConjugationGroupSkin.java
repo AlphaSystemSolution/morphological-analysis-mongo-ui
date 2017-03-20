@@ -1,5 +1,6 @@
 package com.alphasystem.app.morphologicalengine.ui.skin;
 
+import com.alphasystem.arabic.model.ArabicWord;
 import com.alphasystem.morphologicalengine.model.ConjugationTuple;
 import com.alphasystem.morphologicalengine.model.VerbConjugationGroup;
 import com.alphasystem.app.morphologicalengine.ui.VerbConjugationGroupView;
@@ -49,8 +50,8 @@ public class VerbConjugationGroupSkin extends ConjugationGroupSkin<VerbConjugati
     }
 
     private void setupRow5(ConjugationTuple tuple) {
-        row51.setLabel((tuple == null) ? null : tuple.getSingular());
-        row52.setLabel((tuple == null) ? null : tuple.getPlural());
+        row51.setLabel((tuple == null) ? null : ArabicWord.fromUnicode(tuple.getSingular()));
+        row52.setLabel((tuple == null) ? null : ArabicWord.fromUnicode(tuple.getPlural()));
     }
 
     @Override

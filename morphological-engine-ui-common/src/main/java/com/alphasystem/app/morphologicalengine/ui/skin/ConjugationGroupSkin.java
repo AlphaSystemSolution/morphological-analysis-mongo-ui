@@ -1,12 +1,12 @@
 package com.alphasystem.app.morphologicalengine.ui.skin;
 
-import com.alphasystem.morphologicalengine.model.ConjugationGroup;
-import com.alphasystem.morphologicalengine.model.ConjugationTuple;
 import com.alphasystem.app.morphologicalengine.ui.ConjugationGroupView;
 import com.alphasystem.app.morphologicalengine.ui.util.MorphologicalEnginePreferences;
+import com.alphasystem.arabic.model.ArabicWord;
 import com.alphasystem.arabic.ui.ArabicLabelView;
 import com.alphasystem.fx.ui.util.UiUtilities;
-import com.alphasystem.morphologicalanalysis.morphology.model.RootWord;
+import com.alphasystem.morphologicalengine.model.ConjugationGroup;
+import com.alphasystem.morphologicalengine.model.ConjugationTuple;
 import com.alphasystem.util.AppUtil;
 import com.alphasystem.util.GenericPreferences;
 import javafx.fxml.FXML;
@@ -14,6 +14,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -65,17 +66,33 @@ abstract class ConjugationGroupSkin<G extends ConjugationGroup, C extends Conjug
     protected abstract void setupRows(G group);
 
     void setupRow(ConjugationTuple tuple, ArabicLabelView... labels) {
-        RootWord[] data = getData(tuple);
+        ArabicWord[] data = getData(tuple);
         if (data == null) {
-            data = new RootWord[labels.length];
+            data = new ArabicWord[labels.length];
         }
         for (int i = 0; i < labels.length; i++) {
             labels[i].setLabel(data[i]);
         }
     }
 
-    private RootWord[] getData(ConjugationTuple tuple) {
-        return (tuple == null) ? null : new RootWord[]{tuple.getSingular(), tuple.getDual(), tuple.getPlural()};
+    private ArabicWord[] getData(ConjugationTuple tuple) {
+        if (tuple == null) {
+            return null;
+        }
+        ArabicWord[] words = new ArabicWord[3];
+        String value = tuple.getSingular();
+        if (!StringUtils.isBlank(value)) {
+            words[0] = ArabicWord.fromUnicode(value);
+        }
+        value = tuple.getDual();
+        if (!StringUtils.isBlank(value)) {
+            words[1] = ArabicWord.fromUnicode(value);
+        }
+        value = tuple.getPlural();
+        if (!StringUtils.isBlank(value)) {
+            words[2] = ArabicWord.fromUnicode(value);
+        }
+        return words;
     }
 
     protected void setDisableStroke(Paint disableStroke) {

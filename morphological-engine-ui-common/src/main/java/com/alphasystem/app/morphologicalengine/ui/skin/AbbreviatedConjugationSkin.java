@@ -1,17 +1,16 @@
 package com.alphasystem.app.morphologicalengine.ui.skin;
 
+import com.alphasystem.app.morphologicalengine.ui.AbbreviatedConjugationView;
+import com.alphasystem.app.morphologicalengine.ui.util.MorphologicalEnginePreferences;
+import com.alphasystem.arabic.model.ArabicSupport;
+import com.alphasystem.arabic.model.ArabicWord;
+import com.alphasystem.arabic.ui.ArabicLabelView;
 import com.alphasystem.morphologicalengine.model.AbbreviatedConjugation;
 import com.alphasystem.morphologicalengine.model.ConjugationHeader;
 import com.alphasystem.morphologicalengine.model.abbrvconj.ActiveLine;
 import com.alphasystem.morphologicalengine.model.abbrvconj.AdverbLine;
 import com.alphasystem.morphologicalengine.model.abbrvconj.ImperativeAndForbiddingLine;
 import com.alphasystem.morphologicalengine.model.abbrvconj.PassiveLine;
-import com.alphasystem.app.morphologicalengine.ui.AbbreviatedConjugationView;
-import com.alphasystem.app.morphologicalengine.ui.util.MorphologicalEnginePreferences;
-import com.alphasystem.arabic.model.ArabicSupport;
-import com.alphasystem.arabic.model.ArabicWord;
-import com.alphasystem.arabic.ui.ArabicLabelView;
-import com.alphasystem.morphologicalanalysis.morphology.model.RootWord;
 import com.alphasystem.util.GenericPreferences;
 import javafx.geometry.NodeOrientation;
 import javafx.geometry.Pos;
@@ -19,13 +18,14 @@ import javafx.scene.control.SkinBase;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 
-import static com.alphasystem.arabic.model.ArabicLetterType.*;
+import static com.alphasystem.arabic.model.ArabicLetterType.NEW_LINE;
 import static com.alphasystem.arabic.model.ArabicLetters.WORD_SPACE;
-import static com.alphasystem.arabic.model.ArabicWord.*;
+import static com.alphasystem.arabic.model.ArabicWord.concatenate;
+import static com.alphasystem.arabic.model.ArabicWord.fromUnicode;
+import static com.alphasystem.arabic.model.ArabicWord.getWord;
 import static javafx.geometry.Pos.CENTER_LEFT;
 import static javafx.scene.paint.Color.DODGERBLUE;
 import static javafx.scene.paint.Color.TRANSPARENT;
-import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 /**
@@ -33,10 +33,6 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
  */
 public class AbbreviatedConjugationSkin extends SkinBase<AbbreviatedConjugationView> {
 
-    private static final ArabicWord PARTICIPLE_PREFIX = getWord(FA, HA, WAW);
-    private static final ArabicWord COMMAND_PREFIX = getWord(ALIF, LAM, ALIF_HAMZA_ABOVE, MEEM, RA, SPACE, MEEM, NOON, HA);
-    private static final ArabicWord FORBIDDING_PREFIX = getWord(WAW, NOON, HA, YA, SPACE, AIN, NOON, HA);
-    private static final ArabicWord ADVERB_PREFIX = getWord(WAW, ALIF, LAM, DTHA, RA, FA, SPACE, MEEM, NOON, HA);
     private static final int NUM_OF_COLUMNS_IN_DETAIL_MODE = 6;
     private static final int WIDTH_IN_DETAIL_MODE = 128;
     private static final int SPACING = 12;
@@ -116,7 +112,7 @@ public class AbbreviatedConjugationSkin extends SkinBase<AbbreviatedConjugationV
 
         private ArabicLabelView createTitle(ConjugationHeader conjugationHeader) {
             ArabicLabelView labelView = new ArabicLabelView();
-            labelView.setLabel(conjugationHeader.getTitle());
+            labelView.setLabel(fromUnicode(conjugationHeader.getTitle()));
             labelView.setDisabledStroke(TRANSPARENT);
             labelView.setFont(preferences.getArabicHeadingFont());
             labelView.setDisable(true);
@@ -142,9 +138,9 @@ public class AbbreviatedConjugationSkin extends SkinBase<AbbreviatedConjugationV
         private ArabicLabelView createConjugationTypeDetails(ConjugationHeader conjugationHeader) {
             ArabicLabelView labelView = new ArabicLabelView();
             labelView.setFont(preferences.getArabicFont());
-            ArabicWord label = concatenate(WORD_SPACE, conjugationHeader.getTypeLabel1(),
-                    getWord(NEW_LINE), WORD_SPACE, conjugationHeader.getTypeLabel2(), getWord(NEW_LINE), WORD_SPACE,
-                    conjugationHeader.getTypeLabel3());
+            ArabicWord label = concatenate(WORD_SPACE, fromUnicode(conjugationHeader.getTypeLabel1()),
+                    getWord(NEW_LINE), WORD_SPACE, fromUnicode(conjugationHeader.getTypeLabel2()),
+                    getWord(NEW_LINE), WORD_SPACE, fromUnicode(conjugationHeader.getTypeLabel3()));
             labelView.setLabel(label);
             labelView.setAlignment(CENTER_LEFT);
             labelView.setWidth(WIDTH * 2);
@@ -154,31 +150,26 @@ public class AbbreviatedConjugationSkin extends SkinBase<AbbreviatedConjugationV
         }
 
         private void addActiveLine(ActiveLine activeLine, int row) {
-            pane.add(createLabel(activeLine.getPastTense()), 0, row);
-            pane.add(createLabel(activeLine.getPresentTense()), 1, row);
-            pane.add(createLabel(concatenateWithAnd(activeLine.getVerbalNouns())), 3, row);
-            ArabicWord arabicWord = concatenateWithSpace(PARTICIPLE_PREFIX, activeLine.getActiveParticipleMasculine().getRootWord());
-            pane.add(createLabel(arabicWord), 4, row);
+            pane.add(createLabel(fromUnicode(activeLine.getPastTense())), 0, row);
+            pane.add(createLabel(fromUnicode(activeLine.getPresentTense())), 1, row);
+            pane.add(createLabel(fromUnicode(activeLine.getVerbalNoun())), 3, row);
+            pane.add(createLabel(fromUnicode(activeLine.getActiveParticipleValue())), 4, row);
         }
 
         private void addPassiveLine(PassiveLine passiveLine, int row) {
-            pane.add(createLabel(passiveLine.getPastPassiveTense()), 0, row);
-            pane.add(createLabel(passiveLine.getPresentPassiveTense()), 1, row);
-            pane.add(createLabel(concatenateWithAnd(passiveLine.getVerbalNouns())), 3, row);
-            ArabicWord arabicWord = concatenateWithSpace(PARTICIPLE_PREFIX, passiveLine.getPassiveParticipleMasculine().getRootWord());
-            pane.add(createLabel(arabicWord), 4, row);
+            pane.add(createLabel(fromUnicode(passiveLine.getPastPassiveTense())), 0, row);
+            pane.add(createLabel(fromUnicode(passiveLine.getPresentPassiveTense())), 1, row);
+            pane.add(createLabel(fromUnicode(passiveLine.getVerbalNoun())), 3, row);
+            pane.add(createLabel(fromUnicode(passiveLine.getPassiveParticipleValue())), 4, row);
         }
 
         private void addImperativeAndForbiddenLine(ImperativeAndForbiddingLine imperativeAndForbiddingLine, int row) {
-            ArabicWord arabicWord = concatenateWithSpace(COMMAND_PREFIX, imperativeAndForbiddingLine.getImperative().getRootWord());
-            pane.add(createLabel(arabicWord, WIDTH * 2), 0, row, 2, 1);
-            arabicWord = concatenateWithSpace(FORBIDDING_PREFIX, imperativeAndForbiddingLine.getForbidding().getRootWord());
-            pane.add(createLabel(arabicWord, WIDTH * 2), 3, row, 2, 1);
+            pane.add(createLabel(fromUnicode(imperativeAndForbiddingLine.getImperativeWithPrefix()), WIDTH * 2), 0, row, 2, 1);
+            pane.add(createLabel(fromUnicode(imperativeAndForbiddingLine.getForbiddingWithPrefix()), WIDTH * 2), 3, row, 2, 1);
         }
 
         private void addAdverbLine(AdverbLine adverbLine, int row) {
-            ArabicWord arabicWord = concatenateWithSpace(ADVERB_PREFIX, concatenateWithAnd(adverbLine.getAdverbs()));
-            pane.add(createLabel(arabicWord, TOTAL_WIDTH), 0, row, NUM_OF_COLUMNS_IN_DETAIL_MODE, 1);
+            pane.add(createLabel(fromUnicode(adverbLine.getAdverb()), TOTAL_WIDTH), 0, row, NUM_OF_COLUMNS_IN_DETAIL_MODE, 1);
         }
 
         private ArabicLabelView createLabel(ArabicSupport word) {
@@ -195,19 +186,5 @@ public class AbbreviatedConjugationSkin extends SkinBase<AbbreviatedConjugationV
             return label;
         }
 
-        private ArabicWord concatenateWithAnd(RootWord[] rootWords) {
-            ArabicWord arabicWord = null;
-            if (!isEmpty(rootWords)) {
-                arabicWord = concatenate(rootWords[0].toLabel());
-                for (int i = 1; i < rootWords.length; i++) {
-                    RootWord rootWord = rootWords[i];
-                    if (rootWord == null) {
-                        continue;
-                    }
-                    arabicWord = ArabicWord.concatenateWithAnd(arabicWord, rootWord.toLabel());
-                }
-            }
-            return arabicWord;
-        }
     }
 }
