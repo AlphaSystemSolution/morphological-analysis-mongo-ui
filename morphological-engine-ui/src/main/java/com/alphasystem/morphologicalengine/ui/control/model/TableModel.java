@@ -18,7 +18,7 @@ import static javafx.collections.FXCollections.observableArrayList;
 /**
  * @author sali
  */
-``public final class TableModel implements Comparable<TableModel> {
+public final class TableModel implements Comparable<TableModel> {
 
     private final BooleanProperty checked = new SimpleBooleanProperty(FALSE, "checked");
     private final ObjectProperty<RootLetters> rootLetters = new SimpleObjectProperty<>(null, "rootLetters");
