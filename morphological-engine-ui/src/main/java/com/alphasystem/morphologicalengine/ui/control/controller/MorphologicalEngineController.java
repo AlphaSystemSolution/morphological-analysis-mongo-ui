@@ -1,10 +1,23 @@
 package com.alphasystem.morphologicalengine.ui.control.controller;
 
+import javax.annotation.PostConstruct;
+import java.awt.Desktop;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Optional;
+
+import org.docx4j.openpackaging.exceptions.Docx4JException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import com.alphasystem.ApplicationException;
 import com.alphasystem.BusinessException;
-import com.alphasystem.app.morphologicalengine.docx.MorphologicalChartEngineFactory;
-import com.alphasystem.morphologicalengine.model.MorphologicalChart;
 import com.alphasystem.app.morphologicalengine.docx.MorphologicalChartEngine;
+import com.alphasystem.app.morphologicalengine.docx.MorphologicalChartEngineFactory;
 import com.alphasystem.app.morphologicalengine.spring.MorphologicalEngineFactory;
 import com.alphasystem.app.morphologicalengine.ui.util.MorphologicalEnginePreferences;
 import com.alphasystem.app.morphologicalengine.util.TemplateReader;
@@ -14,6 +27,7 @@ import com.alphasystem.morphologicalanalysis.morphology.model.ConjugationData;
 import com.alphasystem.morphologicalanalysis.morphology.model.ConjugationTemplate;
 import com.alphasystem.morphologicalanalysis.morphology.model.RootLetters;
 import com.alphasystem.morphologicalanalysis.morphology.model.support.VerbalNoun;
+import com.alphasystem.morphologicalengine.model.MorphologicalChart;
 import com.alphasystem.morphologicalengine.ui.control.ChartConfigurationDialog;
 import com.alphasystem.morphologicalengine.ui.control.FileSelectionDialog;
 import com.alphasystem.morphologicalengine.ui.control.MorphologicalChartViewerControl;
@@ -26,6 +40,7 @@ import com.alphasystem.util.AppUtil;
 import com.alphasystem.util.GenericPreferences;
 import com.sun.javafx.scene.control.behavior.TabPaneBehavior;
 import com.sun.javafx.scene.control.skin.TabPaneSkin;
+
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.value.ObservableValue;
@@ -70,20 +85,6 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.util.Callback;
-import org.docx4j.openpackaging.exceptions.Docx4JException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import javax.annotation.PostConstruct;
-import java.awt.Desktop;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Optional;
-
 import static com.alphasystem.arabic.ui.ComboBoxHelper.createComboBox;
 import static com.alphasystem.morphologicalengine.ui.Global.FILE_CHOOSER;
 import static com.alphasystem.morphologicalengine.ui.Global.createSpaceLabel;
@@ -269,7 +270,7 @@ public class MorphologicalEngineController extends BorderPane {
         if (tableView != null) {
             ObservableList<TableModel> items = FXCollections.observableArrayList(tableView.getItems());
             items.add(new TableModel());
-            // updateTableModel(items, tableView);
+            updateTableModel(items, tableView);
             tableView.setPrefHeight(calculateTableHeight(items.size()));
             Platform.runLater(() -> {
                 tableView.requestFocus();
@@ -301,13 +302,7 @@ public class MorphologicalEngineController extends BorderPane {
         if (currentTable != null) {
             ObservableList<TableModel> items = currentTable.getItems();
             if (items != null && !items.isEmpty()) {
-                ListIterator<TableModel> listIterator = items.listIterator();
-                while (listIterator.hasNext()) {
-                    TableModel model = listIterator.next();
-                    if (model.isChecked()) {
-                        listIterator.remove();
-                    }
-                }
+                items.removeIf(TableModel::isChecked);
             }
         }
     }
@@ -394,7 +389,7 @@ public class MorphologicalEngineController extends BorderPane {
             }
             changeToDefaultCursor();
         });
-        service.setOnFailed(event -> showErrorServiceFailed(event, "Error occurred while opening document."));
+        service.setOnFailed(this::showErrorServiceFailed);
         service.start();
     }
 
@@ -540,19 +535,17 @@ public class MorphologicalEngineController extends BorderPane {
             });
 
         });
-        service.setOnFailed(event -> {
-            showError(event.getSource().getException());
-            //showErrorServiceFailed(event, "Error occurred while publishing document.");
-        });
+        service.setOnFailed(event -> showError(event.getSource().getException()));
         service.start();
     }
 
-    private void showErrorServiceFailed(@SuppressWarnings({"unused"}) WorkerStateEvent event, String message) {
+    private void showErrorServiceFailed(@SuppressWarnings({"unused"}) WorkerStateEvent event) {
         changeToDefaultCursor();
         Alert alert = new Alert(ERROR);
-        alert.setContentText(message);
+        alert.setContentText("Error occurred while opening document.");
         alert.showAndWait();
     }
+
 
     private void showError(Throwable ex) {
         ex.printStackTrace();
@@ -839,7 +832,8 @@ public class MorphologicalEngineController extends BorderPane {
         chartStage.setMaximized(true);
     }
 
-    public void initDependencies(Stage primaryStage) {
+    @SuppressWarnings("unused")
+    private void initDependencies(Stage primaryStage) {
         setDialogOwner(primaryStage);
     }
 
