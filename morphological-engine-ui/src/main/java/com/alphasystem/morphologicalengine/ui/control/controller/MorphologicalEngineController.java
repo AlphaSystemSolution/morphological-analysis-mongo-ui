@@ -46,7 +46,6 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.transformation.SortedList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
@@ -249,7 +248,7 @@ public class MorphologicalEngineController extends BorderPane {
 
         tableView.setFixedCellSize(ROW_SIZE);
         tableView.setPrefSize(boundsWidth, calculateTableHeight(tableModels.size()));
-        // updateTableModel(tableModels, tableView);
+        updateTableModel(tableModels, tableView);
 
         ScrollPane scrollPane = new ScrollPane(tableView);
         scrollPane.setVbarPolicy(AS_NEEDED);
@@ -259,10 +258,7 @@ public class MorphologicalEngineController extends BorderPane {
     }
 
     private void updateTableModel(ObservableList<TableModel> tableModels, TableView<TableModel> tableView) {
-        SortedList<TableModel> sortedList = new SortedList<>(tableModels);
-        sortedList.setComparator(TableModel::compareTo);
-        sortedList.comparatorProperty().bind(tableView.comparatorProperty());
-        tableView.setItems(sortedList);
+        tableView.setItems(tableModels);
     }
 
     void addNewRowAction() {
