@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.*?>
 <?import java.lang.Double?>
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.TableView?>
+<?import com.alphasystem.morphologicalanalysis.ui.control.ParticlesPicker?>
+<?import javafx.scene.layout.BorderPane?>
 <fx:root xmlns:fx="http://javafx.com/fxml/1" type="javafx.scene.layout.BorderPane"
          xmlns="http://javafx.com/javafx/8.0.40" minWidth="$WIDTH" maxWidth="$WIDTH" prefWidth="$WIDTH"
          fx:controller="com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.controller.ParticlePropertiesController">
@@ -11,15 +10,7 @@
         <Double fx:id="GAP" fx:value="10.0"/>
         <Double fx:id="WIDTH" fx:value="325.0"/>
     </fx:define>
-    <styleClass>border</styleClass>
     <center>
-        <GridPane vgap="$GAP" hgap="$GAP">
-            <GridPane vgap="$GAP" hgap="$GAP" fx:id="selectedPartOfSpeechPane" nodeOrientation="RIGHT_TO_LEFT"
-                      GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.columnSpan="2" GridPane.rowSpan="2"/>
-            <ScrollPane fitToWidth="true" fitToHeight="true" GridPane.columnIndex="0"
-                        GridPane.rowIndex="2" GridPane.columnSpan="2" GridPane.rowSpan="2">
-                <TableView fx:id="tableView" nodeOrientation="RIGHT_TO_LEFT"/>
-            </ScrollPane>
-        </GridPane>
+        <ParticlesPicker fx:id="particlesPicker"/>
     </center>
 </fx:root>
