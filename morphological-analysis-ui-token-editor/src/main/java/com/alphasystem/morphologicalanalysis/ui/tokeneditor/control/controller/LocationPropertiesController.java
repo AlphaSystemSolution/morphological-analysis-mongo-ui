@@ -1,5 +1,10 @@
 package com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.controller;
 
+import javax.annotation.PostConstruct;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import com.alphasystem.arabic.model.NamedTemplate;
 import com.alphasystem.fx.ui.util.UiUtilities;
 import com.alphasystem.morphologicalanalysis.morphology.model.MorphologicalEntry;
@@ -15,15 +20,12 @@ import com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.VerbProperti
 import com.alphasystem.morphologicalanalysis.ui.tokeneditor.service.RetrieveMorphologicalEntryService;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.WordType;
+
 import javafx.collections.ObservableList;
 import javafx.concurrent.Worker;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.layout.AnchorPane;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import javax.annotation.PostConstruct;
 
 /**
  * @author sali
@@ -64,7 +66,13 @@ public class LocationPropertiesController extends AnchorPane {
         setLeftAnchor(commonPropertiesView, DEFAULT_OFFSET);
         setTopAnchor(commonPropertiesView, DEFAULT_OFFSET);
 
+
         double offset = 470 + DEFAULT_OFFSET;
+        switch (wordType) {
+            case PARTICLE:
+                offset += 60;
+                break;
+        }
         setLeftAnchor(propertiesView, offset);
         setTopAnchor(propertiesView, DEFAULT_OFFSET);
         propertiesView.setLocation(null);
@@ -81,7 +89,7 @@ public class LocationPropertiesController extends AnchorPane {
                 offset += 480;
                 break;
             case PARTICLE:
-                offset += 330;
+                offset += 390;
                 break;
         }
         setLeftAnchor(morphologicalEntryView, offset);
