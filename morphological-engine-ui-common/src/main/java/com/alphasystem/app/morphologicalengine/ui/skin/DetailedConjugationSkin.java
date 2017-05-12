@@ -1,16 +1,20 @@
 package com.alphasystem.app.morphologicalengine.ui.skin;
 
-import com.alphasystem.morphologicalengine.model.DetailedConjugation;
-import com.alphasystem.morphologicalengine.model.NounDetailedConjugationPair;
-import com.alphasystem.morphologicalengine.model.VerbDetailedConjugationPair;
+import org.apache.commons.lang3.ArrayUtils;
+
 import com.alphasystem.app.morphologicalengine.ui.DetailedConjugationView;
 import com.alphasystem.app.morphologicalengine.ui.NounDetailedConjugationPairView;
 import com.alphasystem.app.morphologicalengine.ui.VerbDetailedConjugationPairView;
+import com.alphasystem.morphologicalengine.model.DetailedConjugation;
+import com.alphasystem.morphologicalengine.model.NounConjugationGroup;
+import com.alphasystem.morphologicalengine.model.NounDetailedConjugationPair;
+import com.alphasystem.morphologicalengine.model.VerbConjugationGroup;
+import com.alphasystem.morphologicalengine.model.VerbDetailedConjugationPair;
+
 import javafx.geometry.Pos;
 import javafx.scene.control.SkinBase;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
-import org.apache.commons.lang3.ArrayUtils;
 
 /**
  * @author sali
@@ -49,38 +53,41 @@ public class DetailedConjugationSkin extends SkinBase<DetailedConjugationView> {
         private void setup(DetailedConjugation detailedConjugation) {
             pane.getChildren().remove(0, pane.getChildren().size());
             if (detailedConjugation != null) {
-                addVerbPair(detailedConjugation.getActiveTensePair());
-                addNounPair(detailedConjugation.getActiveParticiplePair());
-                addNounPairs(detailedConjugation.getVerbalNounPairs());
-                addVerbPair(detailedConjugation.getPassiveTensePair());
-                addNounPair(detailedConjugation.getPassiveParticiplePair());
-                addVerbPair(detailedConjugation.getImperativeAndForbiddingPair());
-                addNounPairs(detailedConjugation.getAdverbPairs());
+                addVerbPairs(detailedConjugation.getPresentTense(), detailedConjugation.getPastTense());
+                addNounPairs(detailedConjugation.getActiveParticipleFeminine(), detailedConjugation.getActiveParticipleMasculine());
+                addNounPairs(detailedConjugation.getVerbalNouns());
+                addVerbPairs(detailedConjugation.getPresentPassiveTense(), detailedConjugation.getPastPassiveTense());
+                addNounPairs(detailedConjugation.getPassiveParticipleFeminine(), detailedConjugation.getPassiveParticipleFeminine());
+                addVerbPairs(detailedConjugation.getForbidding(), detailedConjugation.getImperative());
+                addNounPairs(detailedConjugation.getAdverbs());
             }
         }
 
-        private void addVerbPair(VerbDetailedConjugationPair pair) {
-            if (pair == null) {
+        private void addVerbPairs(VerbConjugationGroup leftPair, VerbConjugationGroup rightPair) {
+            if (rightPair == null && leftPair == null) {
                 return;
             }
             VerbDetailedConjugationPairView verbPairControl = new VerbDetailedConjugationPairView();
-            verbPairControl.setPair(pair);
+            verbPairControl.setPair(new VerbDetailedConjugationPair(leftPair, rightPair));
             pane.getChildren().add(verbPairControl);
         }
 
-        private void addNounPair(NounDetailedConjugationPair pair) {
-            if (pair == null) {
+        private void addNounPairs(NounConjugationGroup leftPair, NounConjugationGroup rightPair) {
+            if (rightPair == null && leftPair == null) {
                 return;
             }
             NounDetailedConjugationPairView nounPairControl = new NounDetailedConjugationPairView();
-            nounPairControl.setPair(pair);
+            nounPairControl.setPair(new NounDetailedConjugationPair(leftPair, rightPair));
             pane.getChildren().add(nounPairControl);
         }
 
-        private void addNounPairs(NounDetailedConjugationPair[] pairs) {
+        private void addNounPairs(NounConjugationGroup[] pairs) {
             if (!ArrayUtils.isEmpty(pairs)) {
-                for (NounDetailedConjugationPair pair : pairs) {
-                    addNounPair(pair);
+                int index = 0;
+                while (index < pairs.length) {
+                    final NounConjugationGroup rightPair = pairs[index++];
+                    final NounConjugationGroup leftPair = (index >= pairs.length) ? null : pairs[index];
+                    addNounPairs(leftPair, rightPair);
                 }
             }
         }

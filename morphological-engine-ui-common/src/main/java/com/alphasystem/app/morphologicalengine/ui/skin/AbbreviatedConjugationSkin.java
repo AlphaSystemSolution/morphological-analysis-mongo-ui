@@ -1,24 +1,41 @@
 package com.alphasystem.app.morphologicalengine.ui.skin;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import org.apache.commons.lang3.ArrayUtils;
+
 import com.alphasystem.app.morphologicalengine.ui.AbbreviatedConjugationView;
 import com.alphasystem.app.morphologicalengine.ui.util.MorphologicalEnginePreferences;
+import com.alphasystem.arabic.model.ArabicLetters;
 import com.alphasystem.arabic.model.ArabicSupport;
 import com.alphasystem.arabic.model.ArabicWord;
 import com.alphasystem.arabic.ui.ArabicLabelView;
 import com.alphasystem.morphologicalengine.model.AbbreviatedConjugation;
+import com.alphasystem.morphologicalengine.model.AbbreviatedRecord;
 import com.alphasystem.morphologicalengine.model.ConjugationHeader;
-import com.alphasystem.morphologicalengine.model.abbrvconj.ActiveLine;
-import com.alphasystem.morphologicalengine.model.abbrvconj.AdverbLine;
-import com.alphasystem.morphologicalengine.model.abbrvconj.ImperativeAndForbiddingLine;
-import com.alphasystem.morphologicalengine.model.abbrvconj.PassiveLine;
 import com.alphasystem.util.GenericPreferences;
+
 import javafx.geometry.NodeOrientation;
 import javafx.geometry.Pos;
 import javafx.scene.control.SkinBase;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
-
+import static com.alphasystem.arabic.model.ArabicLetterType.AIN;
+import static com.alphasystem.arabic.model.ArabicLetterType.ALIF;
+import static com.alphasystem.arabic.model.ArabicLetterType.ALIF_HAMZA_ABOVE;
+import static com.alphasystem.arabic.model.ArabicLetterType.DTHA;
+import static com.alphasystem.arabic.model.ArabicLetterType.FA;
+import static com.alphasystem.arabic.model.ArabicLetterType.HA;
+import static com.alphasystem.arabic.model.ArabicLetterType.LAM;
+import static com.alphasystem.arabic.model.ArabicLetterType.MEEM;
 import static com.alphasystem.arabic.model.ArabicLetterType.NEW_LINE;
+import static com.alphasystem.arabic.model.ArabicLetterType.NOON;
+import static com.alphasystem.arabic.model.ArabicLetterType.RA;
+import static com.alphasystem.arabic.model.ArabicLetterType.SPACE;
+import static com.alphasystem.arabic.model.ArabicLetterType.WAW;
+import static com.alphasystem.arabic.model.ArabicLetterType.YA;
 import static com.alphasystem.arabic.model.ArabicLetters.WORD_SPACE;
 import static com.alphasystem.arabic.model.ArabicWord.concatenate;
 import static com.alphasystem.arabic.model.ArabicWord.fromUnicode;
@@ -40,6 +57,10 @@ public class AbbreviatedConjugationSkin extends SkinBase<AbbreviatedConjugationV
     private static final int TOTAL_WIDTH = (WIDTH_IN_DETAIL_MODE * NUM_OF_COLUMNS_IN_DETAIL_MODE) + SPACING;
     private static final int WIDTH = TOTAL_WIDTH / NUM_OF_COLUMNS;
     private static final int HEIGHT = 64;
+    private static final ArabicWord PARTICIPLE_PREFIX = getWord(FA, HA, WAW);
+    private static final ArabicWord IMPERATIVE_PREFIX = getWord(ALIF, LAM, ALIF_HAMZA_ABOVE, MEEM, RA, SPACE, MEEM, NOON, HA);
+    private static final ArabicWord FORBIDDING_PREFIX = getWord(WAW, NOON, HA, YA, SPACE, AIN, NOON, HA);
+    private static final ArabicWord ADVERB_PREFIX = getWord(WAW, ALIF, LAM, DTHA, RA, FA, SPACE, MEEM, NOON, HA);
 
     private final MorphologicalEnginePreferences preferences;
 
@@ -88,24 +109,19 @@ public class AbbreviatedConjugationSkin extends SkinBase<AbbreviatedConjugationV
             }
 
             if (abbreviatedConjugation != null) {
-                final ActiveLine activeLine = abbreviatedConjugation.getActiveLine();
-                if (activeLine != null) {
-                    addActiveLine(activeLine, row);
+                addActiveOrPassiveLine(abbreviatedConjugation.getPastTense(), abbreviatedConjugation.getPresentTense(),
+                        abbreviatedConjugation.getVerbalNouns(), abbreviatedConjugation.getActiveParticipleMasculine(), row);
+                row++;
+                if (abbreviatedConjugation.hasPassiveLine()) {
+                    addActiveOrPassiveLine(abbreviatedConjugation.getPastPassiveTense(), abbreviatedConjugation.getPresentPassiveTense(),
+                            abbreviatedConjugation.getVerbalNouns(), abbreviatedConjugation.getPassiveParticipleMasculine(), row);
                     row++;
                 }
-                final PassiveLine passiveLine = abbreviatedConjugation.getPassiveLine();
-                if (passiveLine != null) {
-                    addPassiveLine(passiveLine, row);
-                    row++;
-                }
-                final ImperativeAndForbiddingLine imperativeAndForbiddingLine = abbreviatedConjugation.getImperativeAndForbiddingLine();
-                if (imperativeAndForbiddingLine != null) {
-                    addImperativeAndForbiddenLine(imperativeAndForbiddingLine, row);
-                    row++;
-                }
-                final AdverbLine adverbLine = abbreviatedConjugation.getAdverbLine();
-                if (adverbLine != null) {
-                    addAdverbLine(adverbLine, row);
+                addImperativeAndForbiddenLine(abbreviatedConjugation.getImperative(), abbreviatedConjugation.getForbidding(), row);
+                row++;
+                final AbbreviatedRecord[] adverbs = abbreviatedConjugation.getAdverbs();
+                if(!ArrayUtils.isEmpty(adverbs)){
+                    addAdverbLine(adverbs, row);
                 }
             }
         }
@@ -149,27 +165,49 @@ public class AbbreviatedConjugationSkin extends SkinBase<AbbreviatedConjugationV
             return labelView;
         }
 
-        private void addActiveLine(ActiveLine activeLine, int row) {
-            pane.add(createLabel(fromUnicode(activeLine.getPastTense())), 0, row);
-            pane.add(createLabel(fromUnicode(activeLine.getPresentTense())), 1, row);
-            pane.add(createLabel(fromUnicode(activeLine.getVerbalNoun())), 3, row);
-            pane.add(createLabel(fromUnicode(activeLine.getActiveParticipleValue())), 4, row);
+        private void addActiveOrPassiveLine(AbbreviatedRecord pastTense, AbbreviatedRecord presentTense,
+                                            AbbreviatedRecord[] verbalNouns, AbbreviatedRecord participleMasculine, int row) {
+            pane.add(createLabel(toArabicWord(pastTense)), 0, row);
+            pane.add(createLabel(toArabicWord(presentTense)), 1, row);
+            pane.add(createLabel(toArabicWord(verbalNouns, null)), 3, row);
+            pane.add(createLabel(toArabicWord(participleMasculine, PARTICIPLE_PREFIX)), 4, row);
         }
 
-        private void addPassiveLine(PassiveLine passiveLine, int row) {
-            pane.add(createLabel(fromUnicode(passiveLine.getPastPassiveTense())), 0, row);
-            pane.add(createLabel(fromUnicode(passiveLine.getPresentPassiveTense())), 1, row);
-            pane.add(createLabel(fromUnicode(passiveLine.getVerbalNoun())), 3, row);
-            pane.add(createLabel(fromUnicode(passiveLine.getPassiveParticipleValue())), 4, row);
+        private void addImperativeAndForbiddenLine(AbbreviatedRecord imperative, AbbreviatedRecord forbidding, int row) {
+            pane.add(createLabel(toArabicWord(imperative, IMPERATIVE_PREFIX), WIDTH * 2), 0, row, 2, 1);
+            pane.add(createLabel(toArabicWord(forbidding, FORBIDDING_PREFIX), WIDTH * 2), 3, row, 2, 1);
         }
 
-        private void addImperativeAndForbiddenLine(ImperativeAndForbiddingLine imperativeAndForbiddingLine, int row) {
-            pane.add(createLabel(fromUnicode(imperativeAndForbiddingLine.getImperativeWithPrefix()), WIDTH * 2), 0, row, 2, 1);
-            pane.add(createLabel(fromUnicode(imperativeAndForbiddingLine.getForbiddingWithPrefix()), WIDTH * 2), 3, row, 2, 1);
+        private void addAdverbLine(AbbreviatedRecord[] adverbs, int row) {
+            pane.add(createLabel(toArabicWord(adverbs, ADVERB_PREFIX), TOTAL_WIDTH), 0, row, NUM_OF_COLUMNS_IN_DETAIL_MODE, 1);
         }
 
-        private void addAdverbLine(AdverbLine adverbLine, int row) {
-            pane.add(createLabel(fromUnicode(adverbLine.getAdverb()), TOTAL_WIDTH), 0, row, NUM_OF_COLUMNS_IN_DETAIL_MODE, 1);
+        private ArabicWord toArabicWord(AbbreviatedRecord record, ArabicWord prefix) {
+            if (record == null) {
+                return ArabicLetters.WORD_SPACE;
+            }
+            ArabicWord arabicWord = ArabicWord.fromUnicode(record.getLabel());
+            if (prefix != null) {
+                arabicWord = ArabicWord.concatenateWithSpace(prefix, arabicWord);
+            }
+            return arabicWord;
+        }
+
+        private ArabicWord toArabicWord(AbbreviatedRecord record) {
+            return toArabicWord(record, null);
+        }
+
+        private ArabicWord toArabicWord(AbbreviatedRecord[] values, ArabicWord prefix) {
+            if (ArrayUtils.isEmpty(values)) {
+                return ArabicLetters.WORD_SPACE;
+            }
+            List<ArabicWord> arabicWords = new ArrayList<>();
+            Arrays.stream(values).forEach(record -> arabicWords.add(toArabicWord(record)));
+            ArabicWord arabicWord = ArabicWord.concatenateWithAnd(arabicWords.toArray(new ArabicWord[arabicWords.size()]));
+            if (prefix != null) {
+                arabicWord = ArabicWord.concatenateWithSpace(prefix, arabicWord);
+            }
+            return arabicWord;
         }
 
         private ArabicLabelView createLabel(ArabicSupport word) {
