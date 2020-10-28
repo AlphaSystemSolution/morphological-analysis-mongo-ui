@@ -84,6 +84,7 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.util.Callback;
+
 import static com.alphasystem.arabic.ui.ComboBoxHelper.createComboBox;
 import static com.alphasystem.morphologicalengine.ui.Global.FILE_CHOOSER;
 import static com.alphasystem.morphologicalengine.ui.Global.createSpaceLabel;
@@ -116,8 +117,10 @@ public class MorphologicalEngineController extends BorderPane {
     private static final Background BACKGROUND = new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY));
     private static int counter = 1;
 
-    @Autowired private MorphologicalChartEngineFactory morphologicalChartEngineFactory;
-    @Autowired private MorphologicalEngineView control;
+    @Autowired
+    private MorphologicalChartEngineFactory morphologicalChartEngineFactory;
+    @Autowired
+    private MorphologicalEngineView control;
 
     private TabPane tabPane;
     private FileSelectionDialog fileSelectionDialog;
@@ -469,8 +472,15 @@ public class MorphologicalEngineController extends BorderPane {
                     try {
                         engine.createDocument(tempPath);
                         currentItems.forEach(tableModel -> tableModel.setChecked(false));
-                        Desktop.getDesktop().open(tempPath.toFile());
-                    } catch (Docx4JException | IOException e) {
+                        final File file = tempPath.toFile();
+                        runLater(() -> {
+                            try {
+                                Desktop.getDesktop().open(file);
+                            } catch (Throwable ex) {
+                                // ignore
+                            }
+                        });
+                    } catch (Docx4JException e) {
                         // ignore
                     }
                 }
@@ -525,8 +535,8 @@ public class MorphologicalEngineController extends BorderPane {
             result.ifPresent(buttonType -> {
                 try {
                     Desktop.getDesktop().open(tabInfo.getDocxFile());
-                } catch (IOException e) {
-                    e.printStackTrace();
+                } catch (Throwable e) {
+                    // ignore
                 }
             });
 
