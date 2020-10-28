@@ -1,24 +1,42 @@
 package com.alphasystem.morphologicalengine.ui;
 
+import com.alphasystem.app.morphologicalengine.docx.MorphologicalChartEngine;
+import com.alphasystem.app.morphologicalengine.docx.MorphologicalChartEngineFactory;
 import com.alphasystem.arabic.model.ArabicLetterType;
 import com.alphasystem.arabic.model.NamedTemplate;
 import com.alphasystem.morphologicalanalysis.morphology.model.ConjugationData;
 import com.alphasystem.morphologicalanalysis.morphology.model.ConjugationTemplate;
 import com.alphasystem.morphologicalanalysis.morphology.model.RootLetters;
-import javafx.application.Application;
+import com.alphasystem.morphologicalanalysis.ui.application.AbstractJavaFxApplicationSupport;
+import com.alphasystem.morphologicalengine.model.MorphologicalChart;
+import com.alphasystem.morphologicalengine.ui.application.MorphologicalEngineUIConfiguration;
+import com.alphasystem.morphologicalengine.ui.control.MorphologicalChartViewerControl;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Lazy;
 
 /**
  * @author sali
  */
-public class MorphologicalChartViewerApp extends Application {
+@Lazy
+@SpringBootApplication
+@Import({MorphologicalEngineUIConfiguration.class})
+public class MorphologicalChartViewerApp extends AbstractJavaFxApplicationSupport {
+
+    @Autowired
+    private MorphologicalChartViewerControl morphologicalChartViewer;
+
+    @Autowired
+    private MorphologicalChartEngineFactory morphologicalChartEngineFactory;
 
     public static void main(String[] args) {
-        launch(args);
+        launchApp(MorphologicalChartViewerApp.class, args);
     }
 
     public void start(Stage primaryStage) throws Exception {
@@ -41,11 +59,10 @@ public class MorphologicalChartViewerApp extends Application {
         conjugationData.setRootLetters(new RootLetters(ArabicLetterType.GHAIN, ArabicLetterType.FA, ArabicLetterType.RA));
         conjugationTemplate.getData().add(conjugationData);
 
-        /*MorphologicalChartEngine engine = new MorphologicalChartEngine(conjugationTemplate);
+        MorphologicalChartEngine engine = morphologicalChartEngineFactory.createMorphologicalChartEngine(conjugationTemplate);
         final MorphologicalChart morphologicalChart = engine.createMorphologicalCharts().get(0);
 
-        MorphologicalChartViewerControl morphologicalChartViewer = new MorphologicalChartViewerControl();
-        morphologicalChartViewer.setMorphologicalChart(morphologicalChart);*/
+        morphologicalChartViewer.setMorphologicalChart(morphologicalChart);
 
         Scene scene = new Scene(new Pane());
         primaryStage.setMaximized(true);
