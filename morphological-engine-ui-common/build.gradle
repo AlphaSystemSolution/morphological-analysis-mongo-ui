@@ -1,0 +1,6 @@
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter:2.3.4.RELEASE'
+    compile project(':morphological-analysis-ui-preloader')
+    compile 'com.alphasystem.arabic:morphological-engine:4.0.0-SNAPSHOT'
+    compile 'com.alphasystem.arabic:arabic-ui-support:4.0.0-SNAPSHOT'
+}

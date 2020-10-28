@@ -1,6 +1,7 @@
 target/
-build/
+**/build/
 saved/
+.gradle/
 *.iml
 pom.xml.tag
 pom.xml.releaseBackup

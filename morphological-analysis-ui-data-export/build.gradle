@@ -1,0 +1,6 @@
+apply plugin: 'org.springframework.boot'
+
+dependencies {
+    compile project(':morphological-analysis-ui-common')
+    compile 'org.springframework.boot:spring-boot-starter'
+}
