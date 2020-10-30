@@ -74,9 +74,9 @@ public class MorphologicalEngineApp extends AbstractJavaFxApplicationSupport {
         morphologicalEngineView.setFileProperty(file);
         Scene scene = new Scene(morphologicalEngineView);
         scene.getStylesheets().addAll("/styles/glyphs_custom.css");
-        primaryStage.setMaximized(true);
         primaryStage.setScene(scene);
         primaryStage.show();
+        primaryStage.setMaximized(true);
 
         // primaryStage.setOnShowing(event -> morphologicalEngineView.initDependencies(primaryStage));
     }

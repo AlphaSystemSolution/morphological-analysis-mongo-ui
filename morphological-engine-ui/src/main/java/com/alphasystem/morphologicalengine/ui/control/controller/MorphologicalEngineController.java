@@ -819,6 +819,7 @@ public class MorphologicalEngineController extends BorderPane {
             chartStage.toFront();
         } else {
             chartStage.show();
+            chartStage.setMaximized(true);
         }
     }
 
@@ -834,8 +835,6 @@ public class MorphologicalEngineController extends BorderPane {
 
         chartStage.setWidth(bounds.getWidth() / 4);
         chartStage.setHeight(bounds.getHeight() / 4);
-
-        chartStage.setMaximized(true);
     }
 
     @SuppressWarnings("unused")
