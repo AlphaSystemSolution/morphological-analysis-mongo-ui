@@ -1,10 +1,10 @@
 package com.alphasystem.morphologicalengine.ui.control.controller;
 
-import com.alphasystem.morphologicalengine.model.MorphologicalChart;
 import com.alphasystem.app.morphologicalengine.ui.MorphologicalChartView;
 import com.alphasystem.fx.ui.Browser;
 import com.alphasystem.fx.ui.util.UiUtilities;
 import com.alphasystem.morphologicalanalysis.morphology.model.RootLetters;
+import com.alphasystem.morphologicalengine.model.MorphologicalChart;
 import com.alphasystem.morphologicalengine.ui.control.MorphologicalChartViewerControl;
 import com.alphasystem.util.AppUtil;
 import javafx.application.Platform;
@@ -30,7 +30,7 @@ public class MorphologicalChartViewerController extends BorderPane {
     private static final String MAWRID_READER_URL = "http://ejtaal.net/";
     private static final String MAWRID_READER_URL_SUFFIX = "aa/index.html#bwq=";
 
-    private static String mawridReaderUrl = "";
+    private static final String mawridReaderUrl;
 
     static {
         String urlPrefix = MAWRID_READER_URL;
@@ -45,12 +45,15 @@ public class MorphologicalChartViewerController extends BorderPane {
         mawridReaderUrl = String.format("%s%s", urlPrefix, MAWRID_READER_URL_SUFFIX);
     }
 
-    @Autowired private MorphologicalChartViewerControl control;
-    @Autowired private MorphologicalChartView morphologicalChartControl;
+    private final MorphologicalChartViewerControl control;
+    private final MorphologicalChartView morphologicalChartControl;
     private Browser browser;
-    private TabPane tabPane;
+    private final TabPane tabPane;
 
-    public MorphologicalChartViewerController() {
+    public MorphologicalChartViewerController(@Autowired MorphologicalChartViewerControl control,
+                                              @Autowired MorphologicalChartView morphologicalChartControl) {
+        tabPane = new TabPane();
+        tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
         Platform.runLater(() -> {
             browser = new Browser();
             browser.getWebEngine().getLoadWorker().stateProperty().addListener((observable, oldValue, newValue) -> {
@@ -58,25 +61,21 @@ public class MorphologicalChartViewerController extends BorderPane {
                     UiUtilities.defaultCursor(control);
                 }
             });
+
+            BorderPane borderPane = new BorderPane();
+            borderPane.setCenter(UiUtilities.wrapInScrollPane(morphologicalChartControl));
+            tabPane.getTabs().addAll(new Tab("Morphological Chart", borderPane), new Tab("Dictionary", browser));
+
+            setCenter(tabPane);
         });
+        this.control = control;
+        this.morphologicalChartControl = morphologicalChartControl;
     }
 
     @PostConstruct
     void postConstruct() {
-        setup();
         initialize(control.getMorphologicalChart());
         this.control.morphologicalChartProperty().addListener((observable, oldValue, newValue) -> initialize(newValue));
-    }
-
-    private void setup() {
-        tabPane = new TabPane();
-        tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
-
-        BorderPane borderPane = new BorderPane();
-        borderPane.setCenter(UiUtilities.wrapInScrollPane(morphologicalChartControl));
-        tabPane.getTabs().addAll(new Tab("Morphological Chart", borderPane), new Tab("Dictionary", browser));
-
-        setCenter(tabPane);
     }
 
     private void initialize(MorphologicalChart morphologicalChart) {
@@ -87,6 +86,9 @@ public class MorphologicalChartViewerController extends BorderPane {
     }
 
     private void loadUrl() {
+        if (browser == null) {
+            return;
+        }
         RootLetters rootLetters = null;
         final MorphologicalChart morphologicalChart = control.getMorphologicalChart();
         if (morphologicalChart != null) {
@@ -107,7 +109,7 @@ public class MorphologicalChartViewerController extends BorderPane {
             protected Task<Void> createTask() {
                 return new Task<Void>() {
                     @Override
-                    protected Void call() throws Exception {
+                    protected Void call() {
                         UiUtilities.waitCursor(control);
                         Platform.runLater(MorphologicalChartViewerController.this::loadUrl);
                         return null;
