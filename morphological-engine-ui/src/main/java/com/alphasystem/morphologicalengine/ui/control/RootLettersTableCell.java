@@ -1,9 +1,9 @@
 package com.alphasystem.morphologicalengine.ui.control;
 
-import com.alphasystem.morphologicalengine.ui.control.model.TableModel;
 import com.alphasystem.arabic.model.ArabicLetterType;
 import com.alphasystem.arabic.ui.RootLettersPickerKeyBoard;
 import com.alphasystem.morphologicalanalysis.morphology.model.RootLetters;
+import com.alphasystem.morphologicalengine.ui.control.model.TableModel;
 import javafx.beans.property.ObjectProperty;
 import javafx.geometry.Bounds;
 import javafx.geometry.Pos;

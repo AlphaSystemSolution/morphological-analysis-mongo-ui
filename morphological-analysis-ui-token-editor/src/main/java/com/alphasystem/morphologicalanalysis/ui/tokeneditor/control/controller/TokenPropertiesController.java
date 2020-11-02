@@ -33,10 +33,14 @@ import static com.alphasystem.morphologicalanalysis.ui.util.ApplicationHelper.PR
 @Component
 public class TokenPropertiesController extends BorderPane {
 
-    @Autowired private TokenPropertiesView control;
-    @FXML private ComboBox<Location> locationComboBox;
-    @FXML private TextArea translationArea;
-    @FXML private HBox lettersBox;
+    @Autowired
+    private TokenPropertiesView control;
+    @FXML
+    private ComboBox<Location> locationComboBox;
+    @FXML
+    private TextArea translationArea;
+    @FXML
+    private HBox lettersBox;
     private final ArabicLabelToggleGroup lettersGroup = new ArabicLabelToggleGroup();
     private final List<LabelSelectionChangeListener> listeners = new ArrayList<>();
 
@@ -74,7 +78,7 @@ public class TokenPropertiesController extends BorderPane {
         }
         final List<Location> locations = token.getLocations();
         if (locations != null && !locations.isEmpty()) {
-            locationComboBox.getItems().addAll(locations.toArray(new Location[locations.size()]));
+            locationComboBox.getItems().addAll(locations.toArray(new Location[0]));
             locationComboBox.getSelectionModel().selectFirst();
             control.setSelectedLocation(locations.get(0));
             locationComboBox.setDisable(false);

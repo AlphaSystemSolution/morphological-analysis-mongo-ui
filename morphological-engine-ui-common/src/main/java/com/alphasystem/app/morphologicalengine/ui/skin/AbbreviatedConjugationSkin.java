@@ -1,11 +1,5 @@
 package com.alphasystem.app.morphologicalengine.ui.skin;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import org.apache.commons.lang3.ArrayUtils;
-
 import com.alphasystem.app.morphologicalengine.ui.AbbreviatedConjugationView;
 import com.alphasystem.app.morphologicalengine.ui.util.MorphologicalEnginePreferences;
 import com.alphasystem.arabic.model.ArabicLetters;
@@ -16,30 +10,20 @@ import com.alphasystem.morphologicalengine.model.AbbreviatedConjugation;
 import com.alphasystem.morphologicalengine.model.AbbreviatedRecord;
 import com.alphasystem.morphologicalengine.model.ConjugationHeader;
 import com.alphasystem.util.GenericPreferences;
-
 import javafx.geometry.NodeOrientation;
 import javafx.geometry.Pos;
 import javafx.scene.control.SkinBase;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
-import static com.alphasystem.arabic.model.ArabicLetterType.AIN;
-import static com.alphasystem.arabic.model.ArabicLetterType.ALIF;
-import static com.alphasystem.arabic.model.ArabicLetterType.ALIF_HAMZA_ABOVE;
-import static com.alphasystem.arabic.model.ArabicLetterType.DTHA;
-import static com.alphasystem.arabic.model.ArabicLetterType.FA;
-import static com.alphasystem.arabic.model.ArabicLetterType.HA;
-import static com.alphasystem.arabic.model.ArabicLetterType.LAM;
-import static com.alphasystem.arabic.model.ArabicLetterType.MEEM;
-import static com.alphasystem.arabic.model.ArabicLetterType.NEW_LINE;
-import static com.alphasystem.arabic.model.ArabicLetterType.NOON;
-import static com.alphasystem.arabic.model.ArabicLetterType.RA;
-import static com.alphasystem.arabic.model.ArabicLetterType.SPACE;
-import static com.alphasystem.arabic.model.ArabicLetterType.WAW;
-import static com.alphasystem.arabic.model.ArabicLetterType.YA;
+import org.apache.commons.lang3.ArrayUtils;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static com.alphasystem.arabic.model.ArabicLetterType.*;
 import static com.alphasystem.arabic.model.ArabicLetters.WORD_SPACE;
-import static com.alphasystem.arabic.model.ArabicWord.concatenate;
-import static com.alphasystem.arabic.model.ArabicWord.fromUnicode;
-import static com.alphasystem.arabic.model.ArabicWord.getWord;
+import static com.alphasystem.arabic.model.ArabicWord.*;
 import static javafx.geometry.Pos.CENTER_LEFT;
 import static javafx.scene.paint.Color.DODGERBLUE;
 import static javafx.scene.paint.Color.TRANSPARENT;
@@ -203,7 +187,7 @@ public class AbbreviatedConjugationSkin extends SkinBase<AbbreviatedConjugationV
             }
             List<ArabicWord> arabicWords = new ArrayList<>();
             Arrays.stream(values).forEach(record -> arabicWords.add(toArabicWord(record)));
-            ArabicWord arabicWord = ArabicWord.concatenateWithAnd(arabicWords.toArray(new ArabicWord[arabicWords.size()]));
+            ArabicWord arabicWord = ArabicWord.concatenateWithAnd(arabicWords.toArray(new ArabicWord[0]));
             if (prefix != null) {
                 arabicWord = ArabicWord.concatenateWithSpace(prefix, arabicWord);
             }

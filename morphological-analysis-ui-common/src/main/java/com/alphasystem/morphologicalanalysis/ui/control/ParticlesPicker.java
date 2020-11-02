@@ -2,7 +2,6 @@ package com.alphasystem.morphologicalanalysis.ui.control;
 
 import com.alphasystem.arabic.ui.MultiValuedLabelPicker;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.ParticlePartOfSpeechType;
-
 import javafx.scene.control.Skin;
 
 /**

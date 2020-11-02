@@ -1,8 +1,8 @@
 package com.alphasystem.morphologicalengine.ui.control;
 
-import com.alphasystem.morphologicalengine.ui.control.model.TableModel;
 import com.alphasystem.arabic.ui.VerbalNounPane;
 import com.alphasystem.morphologicalanalysis.morphology.model.support.VerbalNoun;
+import com.alphasystem.morphologicalengine.ui.control.model.TableModel;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TableColumn;
 
