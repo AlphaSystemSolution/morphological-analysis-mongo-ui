@@ -31,7 +31,7 @@ public class DetailedConjugationSkin extends SkinBase<DetailedConjugationView> {
         getChildren().setAll(new SkinView(control));
     }
 
-    private class SkinView extends BorderPane {
+    private static class SkinView extends BorderPane {
 
         private final DetailedConjugationView control;
         private final VBox pane = new VBox();
@@ -57,7 +57,7 @@ public class DetailedConjugationSkin extends SkinBase<DetailedConjugationView> {
                 addNounPairs(detailedConjugation.getActiveParticipleFeminine(), detailedConjugation.getActiveParticipleMasculine());
                 addNounPairs(detailedConjugation.getVerbalNouns());
                 addVerbPairs(detailedConjugation.getPresentPassiveTense(), detailedConjugation.getPastPassiveTense());
-                addNounPairs(detailedConjugation.getPassiveParticipleFeminine(), detailedConjugation.getPassiveParticipleFeminine());
+                addNounPairs(detailedConjugation.getPassiveParticipleFeminine(), detailedConjugation.getPassiveParticipleMasculine());
                 addVerbPairs(detailedConjugation.getForbidding(), detailedConjugation.getImperative());
                 addNounPairs(detailedConjugation.getAdverbs());
             }
