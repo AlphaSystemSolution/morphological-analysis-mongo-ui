@@ -126,7 +126,7 @@ public class MorphologicalEngineController extends BorderPane {
     private FileSelectionDialog fileSelectionDialog;
     private ChartConfigurationDialog chartConfigurationDialog;
     private Stage chartStage;
-    private TemplateReader templateReader = TemplateReader.getInstance();
+    private final TemplateReader templateReader = TemplateReader.getInstance();
     private final MorphologicalEnginePreferences preferences;
 
     public MorphologicalEngineController() {
@@ -442,7 +442,8 @@ public class MorphologicalEngineController extends BorderPane {
             TableView<TableModel> tableView = getCurrentTable();
             ObservableList<TableModel> items = tableView.getItems();
             final ObservableList<TableModel> currentItems = observableArrayList();
-            if (MorphologicalEngineController.SaveMode.SAVE_SELECTED.equals(saveMode) || MorphologicalEngineController.SaveMode.EXPORT_SELECTED_TO_WORD.equals(saveMode)) {
+            if (MorphologicalEngineController.SaveMode.SAVE_SELECTED.equals(saveMode) ||
+                    MorphologicalEngineController.SaveMode.EXPORT_SELECTED_TO_WORD.equals(saveMode)) {
                 items.forEach(tableModel -> {
                     if (tableModel.isChecked()) {
                         currentItems.add(tableModel);
@@ -539,7 +540,6 @@ public class MorphologicalEngineController extends BorderPane {
                     // ignore
                 }
             });
-
         });
         service.setOnFailed(event -> showError(event.getSource().getException()));
         service.start();
@@ -611,9 +611,7 @@ public class MorphologicalEngineController extends BorderPane {
             // clear the currently selected verbal nouns first then add new values, if there is no verbal noun mapped
             // then our list should be empty
             selectedItem.getVerbalNouns().clear();
-            if (verbalNouns != null) {
-                selectedItem.getVerbalNouns().addAll(verbalNouns);
-            }
+            selectedItem.getVerbalNouns().addAll(verbalNouns);
         });
 
         TableColumn<TableModel, Boolean> removePassiveLineColumn = createRemovePassiveLineColumn(mediumColumnWidth);
@@ -785,11 +783,10 @@ public class MorphologicalEngineController extends BorderPane {
                     Alert alert = new Alert(Alert.AlertType.INFORMATION);
                     alert.setContentText("Both RootLetters and Form has to be populated.");
                     alert.show();
-                    viewConjugationProperty.setValue(false);
                 } else {
                     runLater(() -> updateViewer(tableModel));
-                    viewConjugationProperty.setValue(false);
                 }
+                viewConjugationProperty.setValue(false);
             }
             return viewConjugationProperty;
         };
