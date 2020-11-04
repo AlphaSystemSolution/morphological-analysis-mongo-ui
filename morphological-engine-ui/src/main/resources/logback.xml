@@ -28,6 +28,7 @@
     <logger name="org.springframework.beans.factory.support" level="INFO"/>
     <logger name="org.springframework.test.context" level="INFO"/>
     <logger name="org.springframework.context" level="INFO"/>
+    <logger name="org.springframework.jmx" level="INFO"/>
     <logger name="org.springframework.core" level="INFO"/>
     <logger name="org.springframework.web.client" level="INFO"/>
     <logger name="org.springframework.data.repository.config" level="INFO"/>
@@ -35,7 +36,10 @@
     <logger name="org.springframework.test.context.support" level="INFO"/>
     <logger name="org.springframework.boot.autoconfigure.logging" level="INFO"/>
     <logger name="org.springframework.aop.framework" level="INFO"/>
-    <logger name="javafx.scene.focus" level="INFO"/>
+    <logger name="org.springframework.boot.context" level="INFO"/>
+    <logger name="org.springframework.boot.admin" level="INFO"/>
+    <logger name="jdk.event" level="INFO"/>
+    <logger name="javafx.scene" level="INFO"/>
     <logger name="sun.net.www.protocol.http" level="INFO"/>
     <logger name="com.sun.javafx.webkit.prism" level="INFO"/>
     <logger name="com.sun.javafx.webkit.prism.WCImageDecoderImpl" level="INFO"/>
