@@ -130,17 +130,17 @@ final class MenuController {
     }
 
     private MenuItem createExportSelectedToWordMenuItem() {
-        return createMenuItem("Export Selected to Word", FontAwesomeIcon.FILE_WORD_ALT, "1.5em", null,
+        return createMenuItem("Export Selected to Word ...", FontAwesomeIcon.FILE_WORD_ALT, "1.5em", null,
                 event -> pane.exportSelectedToWordAction());
     }
 
     private MenuItem createExportAbbreviatedConjugationsToWord() {
-        return createMenuItem("Export Abbreviated Conjugations to Word", FontAwesomeIcon.FILE_WORD_ALT, "1.5em", null,
+        return createMenuItem("Export Abbreviated Conjugations to Word ...", FontAwesomeIcon.FILE_WORD_ALT, "1.5em", null,
                 event -> pane.exportAbbreviatedConjugationsToWordAction());
     }
 
     private MenuItem createExportDetailConjugationsToWord() {
-        return createMenuItem("Export Detail Conjugations to Word", FontAwesomeIcon.FILE_WORD_ALT, "1.5em", null,
+        return createMenuItem("Export Detail Conjugations to Word ...", FontAwesomeIcon.FILE_WORD_ALT, "1.5em", null,
                 event -> pane.exportDetailedConjugationsToWordAction());
     }
 
