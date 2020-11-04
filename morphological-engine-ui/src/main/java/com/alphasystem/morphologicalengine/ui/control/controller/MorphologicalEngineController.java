@@ -410,11 +410,11 @@ public class MorphologicalEngineController extends BorderPane {
     }
 
     void exportAbbreviatedConjugationsToWordAction() {
-        //TODO:
+        saveAction(SaveMode.EXPORT_ABBREVIATED_CONJUGATION_TO_WORD);
     }
 
     void exportDetailedConjugationsToWordAction() {
-        //TODO:
+        saveAction(SaveMode.EXPORT_DETAILED_CONJUGATION_TO_WORD);
     }
 
     void closeAction() {
@@ -471,12 +471,36 @@ public class MorphologicalEngineController extends BorderPane {
             ConjugationTemplate conjugationTemplate = getConjugationTemplate(currentItems, tabInfo.getChartConfiguration());
 
             if (MorphologicalEngineController.SaveMode.EXPORT_SELECTED_TO_WORD.equals(saveMode)) {
-                final TextInputDialog dialog = new TextInputDialog(getTempFileName(tabInfo.getSarfxFile()));
+                final TextInputDialog dialog = new TextInputDialog(getTempFileName(tabInfo.getSarfxFile(), "temp"));
                 dialog.setHeaderText("Enter the name of the file");
                 final Optional<String> optionalResult = dialog.showAndWait();
                 if (optionalResult.isPresent()) {
                     final Path path = Paths.get(tabInfo.getParentPath().toString(), optionalResult.get());
                     saveAsDocx(conjugationTemplate, path, currentItems);
+                }
+            } else if (SaveMode.EXPORT_ABBREVIATED_CONJUGATION_TO_WORD.equals(saveMode)) {
+                final TextInputDialog dialog = new TextInputDialog(getTempFileName(tabInfo.getSarfxFile(), "Abbreviated"));
+                dialog.setHeaderText("Enter the name of the file");
+                final Optional<String> optionalResult = dialog.showAndWait();
+                if(optionalResult.isPresent()) {
+                    final Path path = Paths.get(tabInfo.getParentPath().toString(), optionalResult.get());
+                    final ChartConfiguration cc = new ChartConfiguration(tabInfo.getChartConfiguration())
+                            .omitToc(true)
+                            .omitDetailedConjugation(true);
+                    final ConjugationTemplate ct = new ConjugationTemplate(conjugationTemplate).withChartConfiguration(cc);
+                    saveAsDocx(ct, path, currentItems);
+                }
+            } else if (SaveMode.EXPORT_DETAILED_CONJUGATION_TO_WORD.equals(saveMode)) {
+                final TextInputDialog dialog = new TextInputDialog(getTempFileName(tabInfo.getSarfxFile(), "Detailed"));
+                dialog.setHeaderText("Enter the name of the file");
+                final Optional<String> optionalResult = dialog.showAndWait();
+                if(optionalResult.isPresent()) {
+                    final Path path = Paths.get(tabInfo.getParentPath().toString(), optionalResult.get());
+                    final ChartConfiguration cc = new ChartConfiguration(tabInfo.getChartConfiguration())
+                            .omitToc(true)
+                            .omitAbbreviatedConjugation(true);
+                    final ConjugationTemplate ct = new ConjugationTemplate(conjugationTemplate).withChartConfiguration(cc);
+                    saveAsDocx(ct, path, currentItems);
                 }
             } else {
                 try {
@@ -498,8 +522,6 @@ public class MorphologicalEngineController extends BorderPane {
                     showError(e);
                 }
             }
-
-            changeToDefaultCursor();
         };
     }
 
@@ -539,6 +561,7 @@ public class MorphologicalEngineController extends BorderPane {
         });
         service.setOnFailed(event -> {
             currentItems.forEach(tableModel -> tableModel.setChecked(false));
+            changeToDefaultCursor();
             showError(event.getSource().getException());
         });
         service.start();
@@ -899,8 +922,8 @@ public class MorphologicalEngineController extends BorderPane {
     } // end of class "FileOpenService"
 
 
-    private String getTempFileName(final File file) {
-        return String.format("%s-temp.docx", getBaseName(file.getName()));
+    private String getTempFileName(final File file, final String suffix) {
+        return String.format("%s-%s.docx", getBaseName(file.getName()), suffix);
     }
 
 }
