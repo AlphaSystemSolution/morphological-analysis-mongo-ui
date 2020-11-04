@@ -2,13 +2,16 @@ package com.alphasystem.morphologicalengine.ui.control.model;
 
 import com.alphasystem.app.morphologicalengine.ui.util.MorphologicalEnginePreferences;
 import com.alphasystem.morphologicalanalysis.morphology.model.ChartConfiguration;
+import com.alphasystem.util.AppUtil;
 import com.alphasystem.util.GenericPreferences;
+import com.alphasystem.util.nio.NIOFileUtils;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
@@ -42,6 +45,11 @@ public final class TabInfo {
 
     public final void setSarfxFile(File sarfxFile) {
         this.sarfxFile.set(sarfxFile);
+    }
+
+    public final Path getParentPath() {
+        final File sarfxFile = getSarfxFile();
+        return sarfxFile == null ? NIOFileUtils.USER_HOME_DIR : sarfxFile.toPath().getParent();
     }
 
     public ChartConfiguration getChartConfiguration() {

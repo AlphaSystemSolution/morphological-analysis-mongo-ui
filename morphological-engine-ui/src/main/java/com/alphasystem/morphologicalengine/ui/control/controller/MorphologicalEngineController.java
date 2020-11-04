@@ -6,10 +6,15 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+import javafx.scene.control.*;
+import org.apache.commons.io.FilenameUtils;
 import org.docx4j.openpackaging.exceptions.Docx4JException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -56,15 +61,6 @@ import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -413,6 +409,14 @@ public class MorphologicalEngineController extends BorderPane {
         saveAction(MorphologicalEngineController.SaveMode.EXPORT_SELECTED_TO_WORD);
     }
 
+    void exportAbbreviatedConjugationsToWordAction() {
+        //TODO:
+    }
+
+    void exportDetailedConjugationsToWordAction() {
+        //TODO:
+    }
+
     void closeAction() {
         final Tab currentTab = getCurrentTab();
         if (currentTab != null) {
@@ -438,21 +442,28 @@ public class MorphologicalEngineController extends BorderPane {
         } // end of if "tabInfo != null"
     }
 
+    private ObservableList<TableModel> getSelectedItems() {
+        final TableView<TableModel> tableView = getCurrentTable();
+        final ObservableList<TableModel> items = tableView.getItems();
+        final ObservableList<TableModel> currentItems = observableArrayList();
+
+        items.forEach(tableModel -> {
+            if (tableModel.isChecked()) {
+                currentItems.add(tableModel);
+            }
+        });
+
+        if (currentItems.isEmpty()) {
+            currentItems.addAll(items);
+        }
+
+        return currentItems;
+    }
+
     private Runnable saveData(final MorphologicalEngineController.SaveMode saveMode, final TabInfo tabInfo) {
         return () -> {
             TableView<TableModel> tableView = getCurrentTable();
-            ObservableList<TableModel> items = tableView.getItems();
-            final ObservableList<TableModel> currentItems = observableArrayList();
-            if (MorphologicalEngineController.SaveMode.SAVE_SELECTED.equals(saveMode) ||
-                    MorphologicalEngineController.SaveMode.EXPORT_SELECTED_TO_WORD.equals(saveMode)) {
-                items.forEach(tableModel -> {
-                    if (tableModel.isChecked()) {
-                        currentItems.add(tableModel);
-                    }
-                });
-            } else {
-                currentItems.addAll(items);
-            }
+            final ObservableList<TableModel> currentItems = getSelectedItems();
             if (currentItems.isEmpty()) {
                 changeToDefaultCursor();
                 return;
@@ -460,38 +471,19 @@ public class MorphologicalEngineController extends BorderPane {
             ConjugationTemplate conjugationTemplate = getConjugationTemplate(currentItems, tabInfo.getChartConfiguration());
 
             if (MorphologicalEngineController.SaveMode.EXPORT_SELECTED_TO_WORD.equals(saveMode)) {
-                ConjugationTemplate conjugationTemplate1 = new ConjugationTemplate(conjugationTemplate);
-                conjugationTemplate1.getChartConfiguration().setOmitToc(true);
-                Path tempPath = null;
-                try {
-                    tempPath = Files.createTempFile("", ".docx");
-                    tempPath.toFile().deleteOnExit();
-                } catch (IOException e) {
-                    // ignore
-                }
-                if (tempPath != null) {
-                    MorphologicalChartEngine engine = morphologicalChartEngineFactory.createMorphologicalChartEngine(conjugationTemplate1);
-                    try {
-                        engine.createDocument(tempPath);
-                        currentItems.forEach(tableModel -> tableModel.setChecked(false));
-                        final File file = tempPath.toFile();
-                        runLater(() -> {
-                            try {
-                                Desktop.getDesktop().open(file);
-                            } catch (Throwable ex) {
-                                // ignore
-                            }
-                        });
-                    } catch (Docx4JException e) {
-                        // ignore
-                    }
+                final TextInputDialog dialog = new TextInputDialog(getTempFileName(tabInfo.getSarfxFile()));
+                dialog.setHeaderText("Enter the name of the file");
+                final Optional<String> optionalResult = dialog.showAndWait();
+                if (optionalResult.isPresent()) {
+                    final Path path = Paths.get(tabInfo.getParentPath().toString(), optionalResult.get());
+                    saveAsDocx(conjugationTemplate, path, currentItems);
                 }
             } else {
                 try {
                     File sarfxFile = tabInfo.getSarfxFile();
                     templateReader.saveFile(sarfxFile, conjugationTemplate);
                     if (MorphologicalEngineController.SaveMode.EXPORT_TO_WORD.equals(saveMode)) {
-                        saveAsDocx(tabInfo, conjugationTemplate);
+                        saveAsDocx(conjugationTemplate, tabInfo.getDocxFile().toPath(), currentItems);
                     }
 
                     Tab currentTab = getCurrentTab();
@@ -511,7 +503,9 @@ public class MorphologicalEngineController extends BorderPane {
         };
     }
 
-    private void saveAsDocx(final TabInfo tabInfo, final ConjugationTemplate conjugationTemplate) {
+    private void saveAsDocx(final ConjugationTemplate conjugationTemplate,
+                            final Path path,
+                            final ObservableList<TableModel> currentItems) {
         Service<Void> service = new Service<Void>() {
             @Override
             protected Task<Void> createTask() {
@@ -520,7 +514,7 @@ public class MorphologicalEngineController extends BorderPane {
                     protected Void call() throws Exception {
                         changeToWaitCursor();
                         MorphologicalChartEngine engine = morphologicalChartEngineFactory.createMorphologicalChartEngine(conjugationTemplate);
-                        engine.createDocument(tabInfo.getDocxFile().toPath());
+                        engine.createDocument(path);
                         return null;
                     }
                 };
@@ -528,21 +522,25 @@ public class MorphologicalEngineController extends BorderPane {
         };
         service.setOnSucceeded(event -> {
             makeDirty(false);
+            currentItems.forEach(tableModel -> tableModel.setChecked(false));
             changeToDefaultCursor();
-            Alert alert = new Alert(CONFIRMATION);
-            final String message = format("Document \"%s\" has been published.%s Would like to open it?",
-                    tabInfo.getDocxFile().getName(), System.lineSeparator());
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            final String message = format("Document \"%s\" has been published.%s", path.toString(), System.lineSeparator());
             alert.setContentText(message);
             Optional<ButtonType> result = alert.showAndWait();
             result.ifPresent(buttonType -> {
-                try {
+                //TODO: show file name
+                /*try {
                     Desktop.getDesktop().open(tabInfo.getDocxFile());
                 } catch (Throwable e) {
                     // ignore
-                }
+                }*/
             });
         });
-        service.setOnFailed(event -> showError(event.getSource().getException()));
+        service.setOnFailed(event -> {
+            currentItems.forEach(tableModel -> tableModel.setChecked(false));
+            showError(event.getSource().getException());
+        });
         service.start();
     }
 
@@ -563,10 +561,8 @@ public class MorphologicalEngineController extends BorderPane {
 
     private ConjugationTemplate getConjugationTemplate(ObservableList<TableModel> items,
                                                        ChartConfiguration chartConfiguration) {
-        ConjugationTemplate template = new ConjugationTemplate();
-        items.forEach(tableModel -> template.getData().add(tableModel.getConjugationData()));
-        template.setChartConfiguration(chartConfiguration);
-        return template;
+        final List<ConjugationData> data = items.stream().map(TableModel::getConjugationData).collect(Collectors.toList());
+        return new ConjugationTemplate().withChartConfiguration(chartConfiguration).withData(data);
     }
 
     private boolean showDialogIfApplicable(MorphologicalEngineController.SaveMode saveMode, TabInfo tabInfo) {
@@ -867,7 +863,8 @@ public class MorphologicalEngineController extends BorderPane {
     }
 
     private enum SaveMode {
-        SAVE, SAVE_AS, SAVE_SELECTED, EXPORT_TO_WORD, EXPORT_SELECTED_TO_WORD
+        SAVE, SAVE_AS, SAVE_SELECTED, EXPORT_TO_WORD, EXPORT_SELECTED_TO_WORD, EXPORT_ABBREVIATED_CONJUGATION_TO_WORD,
+        EXPORT_DETAILED_CONJUGATION_TO_WORD
     }
 
     private class FileOpenService extends Service<Tab> {
@@ -900,4 +897,10 @@ public class MorphologicalEngineController extends BorderPane {
             }; // end of anonymous class "Task"
         } // end of method "createTask"
     } // end of class "FileOpenService"
+
+
+    private String getTempFileName(final File file) {
+        return String.format("%s-temp.docx", getBaseName(file.getName()));
+    }
+
 }
