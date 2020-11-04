@@ -770,7 +770,7 @@ public class MorphologicalEngineController extends BorderPane {
 
     private TableColumn<TableModel, Boolean> createViewConjugationColumn(double width) {
         final TableColumn<TableModel, Boolean> column = new TableColumn<>();
-        column.setText("View\nConjugation\nDictionary");
+        column.setText("View\n Conjugation\n        &\n Dictionary");
         column.setPrefWidth(width);
         column.setEditable(true);
         column.setCellValueFactory(new PropertyValueFactory<>("viewConjugation"));
