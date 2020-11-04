@@ -117,10 +117,8 @@ public class MorphologicalEngineController extends BorderPane {
     private static final Background BACKGROUND = new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY));
     private static int counter = 1;
 
-    @Autowired
-    private MorphologicalChartEngineFactory morphologicalChartEngineFactory;
-    @Autowired
-    private MorphologicalEngineView control;
+    private final MorphologicalChartEngineFactory morphologicalChartEngineFactory;
+    private final MorphologicalEngineView control;
 
     private TabPane tabPane;
     private FileSelectionDialog fileSelectionDialog;
@@ -129,7 +127,8 @@ public class MorphologicalEngineController extends BorderPane {
     private final TemplateReader templateReader = TemplateReader.getInstance();
     private final MorphologicalEnginePreferences preferences;
 
-    public MorphologicalEngineController() {
+    public MorphologicalEngineController(@Autowired MorphologicalChartEngineFactory morphologicalChartEngineFactory,
+                                         @Autowired MorphologicalEngineView control) {
         preferences = GenericPreferences.getInstance(MorphologicalEnginePreferences.class);
         Platform.runLater(() -> {
             chartStage = new Stage();
@@ -138,6 +137,8 @@ public class MorphologicalEngineController extends BorderPane {
             fileSelectionDialog = new FileSelectionDialog(new TabInfo());
             FILE_CHOOSER.setInitialDirectory(preferences.getInitialDirectory());
         });
+        this.morphologicalChartEngineFactory = morphologicalChartEngineFactory;
+        this.control = control;
     }
 
     @PostConstruct
@@ -769,7 +770,7 @@ public class MorphologicalEngineController extends BorderPane {
 
     private TableColumn<TableModel, Boolean> createViewConjugationColumn(double width) {
         final TableColumn<TableModel, Boolean> column = new TableColumn<>();
-        column.setText("View\nConjugation");
+        column.setText("View\nConjugation\nDictionary");
         column.setPrefWidth(width);
         column.setEditable(true);
         column.setCellValueFactory(new PropertyValueFactory<>("viewConjugation"));
