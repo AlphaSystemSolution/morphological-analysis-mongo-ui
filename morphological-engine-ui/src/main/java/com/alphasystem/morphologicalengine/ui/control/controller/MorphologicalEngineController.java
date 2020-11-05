@@ -527,7 +527,7 @@ public class MorphologicalEngineController extends BorderPane {
             currentItems.forEach(tableModel -> tableModel.setChecked(false));
             changeToDefaultCursor();
             Alert alert = new Alert(CONFIRMATION);
-            final String message = format("Document \"%s\" has been published.%sWould you like to open it",
+            final String message = format("Document \"%s\" has been published.%sWould you like to open it?",
                     path.toString(), System.lineSeparator());
             alert.setContentText(message);
             Optional<ButtonType> result = alert.showAndWait();
