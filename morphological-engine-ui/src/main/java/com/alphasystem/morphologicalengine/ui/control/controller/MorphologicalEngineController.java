@@ -1,24 +1,5 @@
 package com.alphasystem.morphologicalengine.ui.control.controller;
 
-import javax.annotation.PostConstruct;
-import java.awt.Desktop;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import javafx.scene.control.*;
-import org.apache.commons.io.FilenameUtils;
-import org.docx4j.openpackaging.exceptions.Docx4JException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import com.alphasystem.ApplicationException;
 import com.alphasystem.BusinessException;
 import com.alphasystem.app.morphologicalengine.docx.MorphologicalChartEngine;
@@ -33,19 +14,13 @@ import com.alphasystem.morphologicalanalysis.morphology.model.ConjugationTemplat
 import com.alphasystem.morphologicalanalysis.morphology.model.RootLetters;
 import com.alphasystem.morphologicalanalysis.morphology.model.support.VerbalNoun;
 import com.alphasystem.morphologicalengine.model.MorphologicalChart;
-import com.alphasystem.morphologicalengine.ui.control.ChartConfigurationDialog;
-import com.alphasystem.morphologicalengine.ui.control.FileSelectionDialog;
-import com.alphasystem.morphologicalengine.ui.control.MorphologicalChartViewerControl;
-import com.alphasystem.morphologicalengine.ui.control.MorphologicalEngineView;
-import com.alphasystem.morphologicalengine.ui.control.RootLettersTableCell;
-import com.alphasystem.morphologicalengine.ui.control.VerbalNounTableCell;
+import com.alphasystem.morphologicalengine.ui.control.*;
 import com.alphasystem.morphologicalengine.ui.control.model.TabInfo;
 import com.alphasystem.morphologicalengine.ui.control.model.TableModel;
 import com.alphasystem.util.AppUtil;
 import com.alphasystem.util.GenericPreferences;
 import com.sun.javafx.scene.control.behavior.TabPaneBehavior;
 import com.sun.javafx.scene.control.skin.TabPaneSkin;
-
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.value.ObservableValue;
@@ -61,30 +36,35 @@ import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.CornerRadii;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-import javafx.scene.text.FontPosture;
-import javafx.scene.text.FontWeight;
-import javafx.scene.text.Text;
-import javafx.scene.text.TextFlow;
+import javafx.scene.text.*;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.util.Callback;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
+import java.awt.*;
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.alphasystem.arabic.ui.ComboBoxHelper.createComboBox;
-import static com.alphasystem.morphologicalengine.ui.Global.FILE_CHOOSER;
-import static com.alphasystem.morphologicalengine.ui.Global.createSpaceLabel;
-import static com.alphasystem.morphologicalengine.ui.Global.roundTo100;
+import static com.alphasystem.morphologicalengine.ui.Global.*;
 import static java.lang.Math.max;
 import static java.lang.String.format;
 import static javafx.application.Platform.runLater;
@@ -92,9 +72,7 @@ import static javafx.collections.FXCollections.observableArrayList;
 import static javafx.geometry.NodeOrientation.RIGHT_TO_LEFT;
 import static javafx.scene.control.Alert.AlertType.CONFIRMATION;
 import static javafx.scene.control.Alert.AlertType.ERROR;
-import static javafx.scene.control.ButtonType.CANCEL;
-import static javafx.scene.control.ButtonType.NO;
-import static javafx.scene.control.ButtonType.YES;
+import static javafx.scene.control.ButtonType.*;
 import static javafx.scene.control.ContentDisplay.GRAPHIC_ONLY;
 import static javafx.scene.control.ScrollPane.ScrollBarPolicy.AS_NEEDED;
 import static javafx.scene.control.SelectionMode.SINGLE;
@@ -216,13 +194,15 @@ public class MorphologicalEngineController extends BorderPane {
                 alert.setContentText("Do you want to save data before closing?");
                 alert.getButtonTypes().setAll(YES, NO, CANCEL);
                 Optional<ButtonType> result = alert.showAndWait();
-                ButtonType buttonType = result.get();
-                ButtonBar.ButtonData buttonData = buttonType.getButtonData();
-                String text = buttonType.getText();
-                if (buttonData.isDefaultButton()) {
-                    saveAction(MorphologicalEngineController.SaveMode.SAVE);
-                } else if (text.equals("Cancel")) {
-                    event.consume();
+                if (result.isPresent()) {
+                    ButtonType buttonType = result.get();
+                    ButtonBar.ButtonData buttonData = buttonType.getButtonData();
+                    String text = buttonType.getText();
+                    if (buttonData.isDefaultButton()) {
+                        saveAction(MorphologicalEngineController.SaveMode.SAVE);
+                    } else if (text.equals("Cancel")) {
+                        event.consume();
+                    }
                 }
             }
 
@@ -482,7 +462,7 @@ public class MorphologicalEngineController extends BorderPane {
                 final TextInputDialog dialog = new TextInputDialog(getTempFileName(tabInfo.getSarfxFile(), "Abbreviated"));
                 dialog.setHeaderText("Enter the name of the file");
                 final Optional<String> optionalResult = dialog.showAndWait();
-                if(optionalResult.isPresent()) {
+                if (optionalResult.isPresent()) {
                     final Path path = Paths.get(tabInfo.getParentPath().toString(), optionalResult.get());
                     final ChartConfiguration cc = new ChartConfiguration(tabInfo.getChartConfiguration())
                             .omitToc(true)
@@ -494,7 +474,7 @@ public class MorphologicalEngineController extends BorderPane {
                 final TextInputDialog dialog = new TextInputDialog(getTempFileName(tabInfo.getSarfxFile(), "Detailed"));
                 dialog.setHeaderText("Enter the name of the file");
                 final Optional<String> optionalResult = dialog.showAndWait();
-                if(optionalResult.isPresent()) {
+                if (optionalResult.isPresent()) {
                     final Path path = Paths.get(tabInfo.getParentPath().toString(), optionalResult.get());
                     final ChartConfiguration cc = new ChartConfiguration(tabInfo.getChartConfiguration())
                             .omitToc(true)
@@ -546,18 +526,20 @@ public class MorphologicalEngineController extends BorderPane {
             makeDirty(false);
             currentItems.forEach(tableModel -> tableModel.setChecked(false));
             changeToDefaultCursor();
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            final String message = format("Document \"%s\" has been published.%s", path.toString(), System.lineSeparator());
+            Alert alert = new Alert(CONFIRMATION);
+            final String message = format("Document \"%s\" has been published.%sWould you like to open it",
+                    path.toString(), System.lineSeparator());
             alert.setContentText(message);
             Optional<ButtonType> result = alert.showAndWait();
-            result.ifPresent(buttonType -> {
-                //TODO: show file name
-                /*try {
-                    Desktop.getDesktop().open(tabInfo.getDocxFile());
+            if (result.filter(buttonType -> OK == buttonType).isPresent()) {
+                // start application with -Djava.awt.headless=false, if Headless exception was thrown
+                try {
+                    Desktop.getDesktop().open(path.toFile());
                 } catch (Throwable e) {
                     // ignore
-                }*/
-            });
+                    showError(e);
+                }
+            }
         });
         service.setOnFailed(event -> {
             currentItems.forEach(tableModel -> tableModel.setChecked(false));
