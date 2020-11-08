@@ -22,7 +22,6 @@ import com.alphasystem.util.GenericPreferences;
 import com.sun.javafx.scene.control.behavior.TabPaneBehavior;
 import com.sun.javafx.scene.control.skin.TabPaneSkin;
 import javafx.application.Platform;
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -397,6 +396,23 @@ public class MorphologicalEngineController extends BorderPane {
         saveAction(SaveMode.EXPORT_DETAILED_CONJUGATION_TO_WORD);
     }
 
+    void viewConjugations() {
+        viewConjugationsOrDictionary(0);
+    }
+
+    void viewDictionary() {
+        viewConjugationsOrDictionary(1);
+    }
+
+    private void viewConjugationsOrDictionary(int index) {
+        final TableView<TableModel> currentTable = getCurrentTable();
+        if (currentTable != null) {
+            final Optional<TableModel> optionalFirst = currentTable.getItems().stream().filter(TableModel::isChecked).findFirst();
+            optionalFirst.ifPresent(tableModel -> runLater(() -> updateViewer(tableModel, index)));
+            currentTable.getItems().forEach(tableModel -> tableModel.setChecked(false));
+        }
+    }
+
     void closeAction() {
         final Tab currentTab = getCurrentTab();
         if (currentTab != null) {
@@ -618,10 +634,9 @@ public class MorphologicalEngineController extends BorderPane {
 
         TableColumn<TableModel, Boolean> removePassiveLineColumn = createRemovePassiveLineColumn(mediumColumnWidth);
         TableColumn<TableModel, Boolean> skipRuleProcessingColumn = createSkipRuleProcessingColumn(mediumColumnWidth);
-        final TableColumn<TableModel, Boolean> viewConjugationColumn = createViewConjugationColumn(mediumColumnWidth);
 
         tableView.getColumns().addAll(checkedColumn, rootLettersColumn, templateColumn, translationColumn,
-                verbalNounsColumn, removePassiveLineColumn, skipRuleProcessingColumn, viewConjugationColumn);
+                verbalNounsColumn, removePassiveLineColumn, skipRuleProcessingColumn);
     }
 
     private TableColumn<TableModel, Boolean> createCheckedColumn(double smallColumnWidth) {
@@ -769,34 +784,7 @@ public class MorphologicalEngineController extends BorderPane {
         return skipRuleProcessingColumn;
     }
 
-    private TableColumn<TableModel, Boolean> createViewConjugationColumn(double width) {
-        final TableColumn<TableModel, Boolean> column = new TableColumn<>();
-        column.setText("View\n Conjugation\n        &\n Dictionary");
-        column.setPrefWidth(width);
-        column.setEditable(true);
-        column.setCellValueFactory(new PropertyValueFactory<>("viewConjugation"));
-        final Callback<Integer, ObservableValue<Boolean>> cb = index -> {
-            final TableModel tableModel = column.getTableView().getItems().get(index);
-            final BooleanProperty viewConjugationProperty = tableModel.viewConjugationProperty();
-            if (viewConjugationProperty.get()) {
-                final RootLetters rootLetters = tableModel.getRootLetters();
-                final NamedTemplate template = tableModel.getTemplate();
-                if (rootLetters == null || template == null) {
-                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                    alert.setContentText("Both RootLetters and Form has to be populated.");
-                    alert.show();
-                } else {
-                    runLater(() -> updateViewer(tableModel));
-                }
-                viewConjugationProperty.setValue(false);
-            }
-            return viewConjugationProperty;
-        };
-        column.setCellFactory(param -> new CheckBoxTableCell<>(cb));
-        return column;
-    }
-
-    private void updateViewer(TableModel tableModel) {
+    private void updateViewer(TableModel tableModel, int selectedIndex) {
         ConjugationTemplate conjugationTemplate = new ConjugationTemplate();
         conjugationTemplate.getData().add(tableModel.getConjugationData());
         MorphologicalChartEngine engine = morphologicalChartEngineFactory.createMorphologicalChartEngine(conjugationTemplate);
@@ -813,6 +801,7 @@ public class MorphologicalEngineController extends BorderPane {
         }
         morphologicalChartViewer.setMorphologicalChart(null);
         morphologicalChartViewer.setMorphologicalChart(morphologicalChart);
+        morphologicalChartViewer.setSelectTab(selectedIndex);
 
         if (chartStage.isShowing()) {
             chartStage.toFront();

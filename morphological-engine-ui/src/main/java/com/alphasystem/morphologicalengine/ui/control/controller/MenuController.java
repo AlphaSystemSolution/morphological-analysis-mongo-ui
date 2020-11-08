@@ -5,15 +5,7 @@ import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.control.Button;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuButton;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.Separator;
-import javafx.scene.control.SeparatorMenuItem;
-import javafx.scene.control.ToolBar;
-import javafx.scene.control.Tooltip;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
@@ -23,14 +15,8 @@ import static de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon.CLONE;
 import static de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon.REMOVE;
 import static de.jensd.fx.glyphs.materialicons.MaterialIcon.ADD_BOX;
 import static de.jensd.fx.glyphs.materialicons.MaterialIcon.SETTINGS_APPLICATIONS;
-import static javafx.scene.input.KeyCode.A;
-import static javafx.scene.input.KeyCode.C;
-import static javafx.scene.input.KeyCode.Q;
-import static javafx.scene.input.KeyCode.R;
-import static javafx.scene.input.KeyCode.S;
-import static javafx.scene.input.KeyCode.W;
-import static javafx.scene.input.KeyCombination.ALT_DOWN;
-import static javafx.scene.input.KeyCombination.SHORTCUT_DOWN;
+import static javafx.scene.input.KeyCode.*;
+import static javafx.scene.input.KeyCombination.*;
 
 /**
  * @author sali
@@ -223,7 +209,8 @@ final class MenuController {
     private MenuItem createRemoveRowsMenuItem() {
         return createMenuItem(
                 "Remove Selected Row",
-                REMOVE, "1.5em",
+                REMOVE,
+                "1.5em",
                 new KeyCodeCombination(R, SHORTCUT_DOWN, ALT_DOWN),
                 event -> pane.removeRowAction());
     }
@@ -239,9 +226,28 @@ final class MenuController {
 
     private MenuItem createExitMenuItem() {
         return createMenuItem(
-                "Exit", null,
+                "Exit",
+                null,
                 new KeyCodeCombination(Q, SHORTCUT_DOWN),
                 event -> pane.exitAction());
+    }
+
+    private MenuItem createViewConjugationMenuItem() {
+        return createMenuItem(
+                "View Conjugation",
+                FontAwesomeIcon.TABLE,
+                new KeyCodeCombination(C, SHIFT_DOWN, SHORTCUT_DOWN),
+                event -> pane.viewConjugations()
+        );
+    }
+
+    private MenuItem createViewDictionaryMenuItem() {
+        return createMenuItem(
+                "View Dictionary",
+                FontAwesomeIcon.BOOK,
+                new KeyCodeCombination(D, SHIFT_DOWN, SHORTCUT_DOWN),
+                event -> pane.viewDictionary()
+        );
     }
 
     private MenuButton createSaveMenu() {
@@ -270,6 +276,19 @@ final class MenuController {
         return menuButton;
     }
 
+    private MenuButton createViewButton() {
+        final MenuButton menuButton = new MenuButton();
+        setIcon(menuButton, FontAwesomeIcon.EYE, "2em");
+        menuButton.setTooltip(new Tooltip("View Conjugation / Dictionary"));
+        menuButton
+                .getItems()
+                .addAll(
+                        createViewConjugationMenuItem(),
+                        createViewDictionaryMenuItem()
+                );
+        return menuButton;
+    }
+
     MenuBar createMenuBar() {
         MenuBar menuBar = new MenuBar();
         menuBar.setUseSystemMenuBar(true);
@@ -283,6 +302,9 @@ final class MenuController {
                         createSaveMenuItem(),
                         createSaveAsMenuItem(),
                         createSaveSelectedMenuItem(),
+                        new SeparatorMenuItem(),
+                        createViewConjugationMenuItem(),
+                        createViewDictionaryMenuItem(),
                         new SeparatorMenuItem(),
                         createCloseMenuItem(),
                         createExitMenuItem()
@@ -305,6 +327,7 @@ final class MenuController {
                         createOpenButton(),
                         createSaveMenu(),
                         createExportMenu(),
+                        createViewButton(),
                         new Separator(),
                         createAddRowButton(),
                         createCloneRowsButton(),

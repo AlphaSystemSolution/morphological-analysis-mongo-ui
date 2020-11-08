@@ -76,6 +76,9 @@ public class MorphologicalChartViewerController extends BorderPane {
     void postConstruct() {
         initialize(control.getMorphologicalChart());
         this.control.morphologicalChartProperty().addListener((observable, oldValue, newValue) -> initialize(newValue));
+        this.control.selectProperty().addListener((observable, oldValue, newValue) -> {
+            tabPane.getSelectionModel().select((Integer) newValue);
+        });
     }
 
     private void initialize(MorphologicalChart morphologicalChart) {
