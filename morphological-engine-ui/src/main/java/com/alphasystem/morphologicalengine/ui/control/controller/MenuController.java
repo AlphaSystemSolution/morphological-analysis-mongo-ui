@@ -64,7 +64,11 @@ final class MenuController {
         return button;
     }
 
-    private MenuItem createMenuItem(String text, GlyphIcons icon, String iconSize, KeyCombination accelerator, EventHandler<ActionEvent> action) {
+    private MenuItem createMenuItem(String text,
+                                    GlyphIcons icon,
+                                    String iconSize,
+                                    KeyCombination accelerator,
+                                    EventHandler<ActionEvent> action) {
         MenuItem menuItem = new MenuItem(text);
         if (icon != null) {
             setIcon(menuItem, icon, iconSize);
@@ -76,7 +80,10 @@ final class MenuController {
         return menuItem;
     }
 
-    private MenuItem createMenuItem(String text, GlyphIcons icon, KeyCombination accelerator, EventHandler<ActionEvent> action) {
+    private MenuItem createMenuItem(String text,
+                                    GlyphIcons icon,
+                                    KeyCombination accelerator,
+                                    EventHandler<ActionEvent> action) {
         return createMenuItem(text, icon, "1em", accelerator, action);
     }
 
@@ -101,73 +108,151 @@ final class MenuController {
     }
 
     private Button createSettingsButton() {
-        return createButton("View / Edit Chart Configuration", SETTINGS_APPLICATIONS, event -> pane.updateChartConfiguration());
+        return createButton(
+                "View / Edit Chart Configuration",
+                SETTINGS_APPLICATIONS,
+                event -> pane.updateChartConfiguration()
+        );
     }
 
     private MenuItem createNewMenuItem() {
-        return createMenuItem("New", FontAwesomeIcon.FILE_ALT, "1.5em", new KeyCodeCombination(KeyCode.N, SHORTCUT_DOWN), event -> pane.newAction());
+        return createMenuItem(
+                "New",
+                FontAwesomeIcon.FILE_ALT,
+                "1.5em",
+                new KeyCodeCombination(KeyCode.N, SHORTCUT_DOWN),
+                event -> pane.newAction()
+        );
     }
 
     private MenuItem createOpenMenuItem() {
-        return createMenuItem("Open", FontAwesomeIcon.FOLDER_OPEN_ALT, "1.5em", new KeyCodeCombination(KeyCode.O, SHORTCUT_DOWN), event -> pane.openAction());
+        return createMenuItem(
+                "Open",
+                FontAwesomeIcon.FOLDER_OPEN_ALT,
+                "1.5em",
+                new KeyCodeCombination(KeyCode.O, SHORTCUT_DOWN),
+                event -> pane.openAction()
+        );
     }
 
     private MenuItem createSaveMenuItem() {
-        return createMenuItem("Save ...", FontAwesomeIcon.SAVE, "1.5em", new KeyCodeCombination(S, SHORTCUT_DOWN), event -> pane.saveAction());
+        return createMenuItem(
+                "Save ...",
+                FontAwesomeIcon.SAVE,
+                "1.5em",
+                new KeyCodeCombination(S, SHORTCUT_DOWN),
+                event -> pane.saveAction()
+        );
     }
 
     private MenuItem createSaveAsMenuItem() {
-        return createMenuItem("Save As ...", null, new KeyCodeCombination(S, SHORTCUT_DOWN, ALT_DOWN), event -> pane.saveAsAction());
+        return createMenuItem(
+                "Save As ...",
+                null,
+                new KeyCodeCombination(S, SHORTCUT_DOWN, ALT_DOWN),
+                event -> pane.saveAsAction()
+        );
     }
 
     private MenuItem createSaveSelectedMenuItem() {
-        return createMenuItem("Save Selected ...", null, null, event -> pane.saveSelectedAction());
+        return createMenuItem(
+                "Save Selected ...",
+                null,
+                null,
+                event -> pane.saveSelectedAction()
+        );
     }
 
     private MenuItem createExportToWordMenuItem() {
-        return createMenuItem("Export to Word", FontAwesomeIcon.FILE_WORD_ALT, "1.5em",
-                new KeyCodeCombination(KeyCode.W, SHORTCUT_DOWN, ALT_DOWN), event -> pane.exportToWordAction());
+        return createMenuItem(
+                "Export to Word",
+                FontAwesomeIcon.FILE_WORD_ALT,
+                "1.5em",
+                new KeyCodeCombination(KeyCode.W, SHORTCUT_DOWN, ALT_DOWN),
+                event -> pane.exportToWordAction()
+        );
     }
 
     private MenuItem createExportSelectedToWordMenuItem() {
-        return createMenuItem("Export Selected to Word ...", FontAwesomeIcon.FILE_WORD_ALT, "1.5em", null,
-                event -> pane.exportSelectedToWordAction());
+        return createMenuItem(
+                "Export Selected to Word ...",
+                FontAwesomeIcon.FILE_WORD_ALT,
+                "1.5em",
+                null,
+                event -> pane.exportSelectedToWordAction()
+        );
     }
 
     private MenuItem createExportAbbreviatedConjugationsToWord() {
-        return createMenuItem("Export Abbreviated Conjugations to Word ...", FontAwesomeIcon.FILE_WORD_ALT, "1.5em", null,
-                event -> pane.exportAbbreviatedConjugationsToWordAction());
+        return createMenuItem(
+                "Export Abbreviated Conjugations to Word ...",
+                FontAwesomeIcon.FILE_WORD_ALT,
+                "1.5em",
+                null,
+                event -> pane.exportAbbreviatedConjugationsToWordAction()
+        );
     }
 
     private MenuItem createExportDetailConjugationsToWord() {
-        return createMenuItem("Export Detail Conjugations to Word ...", FontAwesomeIcon.FILE_WORD_ALT, "1.5em", null,
+        return createMenuItem(
+                "Export Detail Conjugations to Word ...",
+                FontAwesomeIcon.FILE_WORD_ALT,
+                "1.5em",
+                null,
                 event -> pane.exportDetailedConjugationsToWordAction());
     }
 
     private MenuItem createAddRowMenuItem() {
-        return createMenuItem("Add new Row", ADD_BOX, "1.5em", new KeyCodeCombination(A, SHORTCUT_DOWN, ALT_DOWN), event -> pane.addNewRowAction());
+        return createMenuItem(
+                "Add new Row", ADD_BOX,
+                "1.5em",
+                new KeyCodeCombination(A, SHORTCUT_DOWN, ALT_DOWN),
+                event -> pane.addNewRowAction());
     }
 
     private MenuItem createCloneRowsMenuItem() {
-        return createMenuItem("Duplicate Selected Row(s)", CLONE, "1.5em", new KeyCodeCombination(C, SHORTCUT_DOWN, ALT_DOWN), event -> pane.duplicateRowAction());
+        return createMenuItem(
+                "Duplicate Selected Row(s)",
+                CLONE,
+                "1.5em",
+                new KeyCodeCombination(C, SHORTCUT_DOWN, ALT_DOWN),
+                event -> pane.duplicateRowAction()
+        );
     }
 
     private MenuItem createRemoveRowsMenuItem() {
-        return createMenuItem("Remove Selected Row", REMOVE, "1.5em", new KeyCodeCombination(R, SHORTCUT_DOWN, ALT_DOWN), event -> pane.removeRowAction());
+        return createMenuItem(
+                "Remove Selected Row",
+                REMOVE, "1.5em",
+                new KeyCodeCombination(R, SHORTCUT_DOWN, ALT_DOWN),
+                event -> pane.removeRowAction());
     }
 
     private MenuItem createCloseMenuItem() {
-        return createMenuItem("Close", null, new KeyCodeCombination(W, SHORTCUT_DOWN), event -> pane.closeAction());
+        return createMenuItem(
+                "Close",
+                null,
+                new KeyCodeCombination(W, SHORTCUT_DOWN),
+                event -> pane.closeAction()
+        );
     }
 
     private MenuItem createExitMenuItem() {
-        return createMenuItem("Exit", null, new KeyCodeCombination(Q, SHORTCUT_DOWN), event -> pane.exitAction());
+        return createMenuItem(
+                "Exit", null,
+                new KeyCodeCombination(Q, SHORTCUT_DOWN),
+                event -> pane.exitAction());
     }
 
     private MenuButton createSaveMenu() {
         MenuButton menuButton = new MenuButton("Save");
         setIcon(menuButton, FontAwesomeIcon.SAVE, "2em");
-        menuButton.getItems().addAll(createSaveMenuItem(), createSaveAsMenuItem(), createSaveSelectedMenuItem());
+        menuButton
+                .getItems()
+                .addAll(createSaveMenuItem(),
+                        createSaveAsMenuItem(),
+                        createSaveSelectedMenuItem()
+                );
         return menuButton;
     }
 
@@ -175,8 +260,13 @@ final class MenuController {
         MenuButton menuButton = new MenuButton();
         setIcon(menuButton, MaterialDesignIcon.EXPORT, "2em");
         menuButton.setTooltip(new Tooltip("Export Conjugation to external format"));
-        menuButton.getItems().addAll(createExportToWordMenuItem(), createExportSelectedToWordMenuItem(),
-                createExportAbbreviatedConjugationsToWord(), createExportDetailConjugationsToWord());
+        menuButton
+                .getItems()
+                .addAll(createExportToWordMenuItem(),
+                        createExportSelectedToWordMenuItem(),
+                        createExportAbbreviatedConjugationsToWord(),
+                        createExportDetailConjugationsToWord()
+                );
         return menuButton;
     }
 
@@ -185,8 +275,18 @@ final class MenuController {
         menuBar.setUseSystemMenuBar(true);
 
         Menu fileMenu = new Menu("File");
-        fileMenu.getItems().addAll(createNewMenuItem(), createOpenMenuItem(), new SeparatorMenuItem(), createSaveMenuItem(),
-                createSaveAsMenuItem(), createSaveSelectedMenuItem(), new SeparatorMenuItem(), createCloseMenuItem(), createExitMenuItem());
+        fileMenu
+                .getItems()
+                .addAll(createNewMenuItem(),
+                        createOpenMenuItem(),
+                        new SeparatorMenuItem(),
+                        createSaveMenuItem(),
+                        createSaveAsMenuItem(),
+                        createSaveSelectedMenuItem(),
+                        new SeparatorMenuItem(),
+                        createCloseMenuItem(),
+                        createExitMenuItem()
+                );
 
         Menu tableMenu = new Menu("Table");
         tableMenu.getItems().addAll(createAddRowMenuItem(), createCloneRowsMenuItem(), createRemoveRowsMenuItem());
@@ -198,8 +298,20 @@ final class MenuController {
 
     ToolBar createToolBar() {
         ToolBar toolBar = new ToolBar();
-        toolBar.getItems().addAll(createNewButton(), createOpenButton(), createSaveMenu(), createExportMenu(), new Separator(),
-                createAddRowButton(), createCloneRowsButton(), createRemoveRowsButton(), new Separator(), createSettingsButton());
+        toolBar
+                .getItems()
+                .addAll(
+                        createNewButton(),
+                        createOpenButton(),
+                        createSaveMenu(),
+                        createExportMenu(),
+                        new Separator(),
+                        createAddRowButton(),
+                        createCloneRowsButton(),
+                        createRemoveRowsButton(),
+                        new Separator(),
+                        createSettingsButton()
+                );
         return toolBar;
     }
 
