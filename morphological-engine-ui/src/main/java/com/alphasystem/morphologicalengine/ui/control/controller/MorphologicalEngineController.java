@@ -69,8 +69,7 @@ import static java.lang.String.format;
 import static javafx.application.Platform.runLater;
 import static javafx.collections.FXCollections.observableArrayList;
 import static javafx.geometry.NodeOrientation.RIGHT_TO_LEFT;
-import static javafx.scene.control.Alert.AlertType.CONFIRMATION;
-import static javafx.scene.control.Alert.AlertType.ERROR;
+import static javafx.scene.control.Alert.AlertType.*;
 import static javafx.scene.control.ButtonType.*;
 import static javafx.scene.control.ContentDisplay.GRAPHIC_ONLY;
 import static javafx.scene.control.ScrollPane.ScrollBarPolicy.AS_NEEDED;
@@ -542,12 +541,12 @@ public class MorphologicalEngineController extends BorderPane {
             makeDirty(false);
             currentItems.forEach(tableModel -> tableModel.setChecked(false));
             changeToDefaultCursor();
-            Alert alert = new Alert(CONFIRMATION);
-            final String message = format("Document \"%s\" has been published.%sWould you like to open it?",
-                    path.toString(), System.lineSeparator());
-            alert.setContentText(message);
-            Optional<ButtonType> result = alert.showAndWait();
-            if (result.filter(buttonType -> OK == buttonType).isPresent()) {
+            final Alert alert = new Alert(INFORMATION);
+            alert.setTitle("View File");
+            alert.setHeaderText("Click the link to open the file.");
+            final Hyperlink hyperlink = new Hyperlink(path.toString());
+            hyperlink.setOnAction(hyperlinkEvent -> {
+                alert.hide();
                 // start application with -Djava.awt.headless=false, if Headless exception was thrown
                 try {
                     Desktop.getDesktop().open(path.toFile());
@@ -555,7 +554,9 @@ public class MorphologicalEngineController extends BorderPane {
                     // ignore
                     showError(e);
                 }
-            }
+            });
+            alert.getDialogPane().setContent(hyperlink);
+            alert.show();
         });
         service.setOnFailed(event -> {
             currentItems.forEach(tableModel -> tableModel.setChecked(false));
