@@ -1,11 +1,17 @@
 import * as React from 'react';
-import './App.css';
-import AppToolbar from './AppToolbar';
 
 import 'primereact/resources/themes/saga-green/theme.css';
 import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
 import 'primeflex/primeflex.css';
+
+import './assets/font.css';
+import './assets/App.css';
+
+import AppToolbar from './AppToolbar';
+
+// Temp imports
+import AppTest from './components/app-test';
 
 export default class App extends React.Component {
 
@@ -13,6 +19,8 @@ export default class App extends React.Component {
     return (
       <div className="App">
         <AppToolbar />
+        <div>&nbsp;</div>
+        <AppTest/>
       </div>
     );
   }

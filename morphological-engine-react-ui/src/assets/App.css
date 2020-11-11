@@ -1,0 +1,127 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.ui-button {
+  width: 72px;
+  display: inline-block; 
+  margin-bottom: 5px;
+  vertical-align: top;
+}
+
+/* You can add global styles to this file, and also import other style files */
+.arabicTitle, .arabicNormal, .arabicNormalBig, .arabicCaption, .arabicToggleButton, .arabicButton, .arabicDropdown,
+.verbalNounToggleButton, .verbalNounToggleSelector, .abbreviatedConjugationSelector {
+	font-family: 'KFGQPC Uthman Taha Naskh';
+	direction: rtl;
+}
+
+.arabicTitle {
+  font-size: 36px;
+  font-weight: bolder;
+  color: #2E74B5;
+}
+
+.arabicNormal {
+	font-size: 24px;
+}
+
+.arabicCaption {
+ font-size: 30px;
+ font-weight: bolder;
+ color: #2E74B5;
+}
+
+.arabicToggleButton {
+  font-size: 30px;
+}
+
+.verbalNounToggleSelector {
+  font-size: 24px;
+  width: 128px;
+}
+
+.arabicNormalBig {
+  font-size: 30px;
+}
+
+.arabicButton {
+  font-size: 24px;
+}
+
+.arabicDropdown {
+	font-size: 22px;
+}
+
+.code {
+  font-family: Georgia;
+  font-size:12pt
+}
+
+.translation {
+  font-family: Candara;
+  font-size:14pt
+}
+
+table.morphological-chart {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+table.morphological-chart tr td {
+  text-align: center;
+}
+
+td.morphological-chart {
+  border: 1px solid black;
+}
+
+td.morphological-chart-no-border {
+  border: 0;
+}
+
+.btn {
+    display: inline-block;
+   /* background-color: #f44336;
+   color: #FFFFFF;*/
+    padding: 14px 25px;
+    text-align: center;
+    text-decoration: none;
+    margin-left: 20px;
+    opacity: 0.9;
+}
