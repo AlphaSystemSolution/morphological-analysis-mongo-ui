@@ -1,5 +1,5 @@
 {
-  "name": "morphological-engine-react-ui",
+  "name": "my-app",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -10,14 +10,9 @@
     "@types/node": "^12.19.4",
     "@types/react": "^16.9.56",
     "@types/react-dom": "^16.9.9",
-    "classnames": "^2.2.6",
-    "primeflex": "^2.0.0",
-    "primeicons": "^4.0.0",
-    "primereact": "^5.0.1",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-scripts": "4.0.0",
-    "react-transition-group": "^4.4.1",
     "typescript": "^4.0.5",
     "web-vitals": "^0.2.4"
   },
