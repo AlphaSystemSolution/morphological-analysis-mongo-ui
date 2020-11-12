@@ -27,10 +27,9 @@ export default class ToggleSelecter extends React.Component<ToggleSelecterProps,
     }
 
     handleOnChange = (event: any) => {
-        this.setState((previousState, props) => ({
-            selected: event.value
-        }));
-        Emitter.emit('toggle-state-changed', { 'selected': event.value, 'value': this.props.value });
+        this.setState({ selected: event.value }, () => {
+            Emitter.emit('toggle-state-changed', { 'selected': this.state.selected, 'value': this.props.value });
+        });
     }
 
     render() {
