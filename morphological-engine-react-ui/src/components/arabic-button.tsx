@@ -15,7 +15,7 @@ export default class ArabicButton extends React.Component<ArabicButtonProps, any
 
     render() {
         return (
-            <Button label={this.props.letter.label} className="arabicButton ui-button p-button-raised" onClick={this.handleClick} />
+            <Button label={this.props.letter.label} className="arabicButton ui-button p-button-text p-button-raised" onClick={this.handleClick} />
         );
     }
 }

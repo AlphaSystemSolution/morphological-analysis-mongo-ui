@@ -208,7 +208,7 @@ export default class ArabicKeyboard extends React.Component<Props, State> {
                     <ArabicButton letter={this.letters[25]} />&nbsp;
                     <ArabicButton letter={this.letters[26]} />&nbsp;
                     <ArabicButton letter={this.letters[27]} />&nbsp;
-                    <Button label="Reset" className="arabicButton ui-button p-button-raised" onClick={(e) => this.resetSelection()} />
+                    <Button label="Reset" className="arabicButton ui-button p-button-text p-button-raised" onClick={(e) => this.resetSelection()} />
                 </div>
             </OverlayPanel>
         );
