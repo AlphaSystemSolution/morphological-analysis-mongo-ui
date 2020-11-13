@@ -3,8 +3,8 @@ import ArabicButton from './arabic-button';
 import ToggleSelecter from './toggle-selecter';
 import ArabicKeyboard from './arabic-keyboard';
 import { ArabicLetter } from './model/arabic-letter';
-import { ArabicLabel } from './model/models';
-import Emitter from '../services/event-emitter';
+//import { ArabicLabel } from './model/models';
+//import Emitter from '../services/event-emitter';
 import { Button } from 'primereact/button';
 
 export default class AppTest extends React.Component {
