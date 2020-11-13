@@ -5,6 +5,7 @@ import Emitter from '../services/event-emitter';
 
 interface ToggleSelecterProps {
     value: ArabicLabel
+    index: number
     className: string
     selected?: boolean
 }
@@ -16,19 +17,18 @@ interface ToggleSelecterState {
 export default class ToggleSelecter extends React.Component<ToggleSelecterProps, ToggleSelecterState> {
 
     state: ToggleSelecterState = {
-        selected: false
+        selected: this.props.selected ? true : false
     }
 
-    constructor(props: ToggleSelecterProps) {
-        super(props);
-        this.state = {
-            selected: this.props.selected ? true : false
-        }
+    select(b: boolean) {
+        this.setState({
+            selected: b
+        })
     }
 
     handleOnChange = (event: any) => {
         this.setState({ selected: event.value }, () => {
-            Emitter.emit('toggle-state-changed', { 'selected': this.state.selected, 'value': this.props.value });
+            Emitter.emit('toggle-state-changed', { 'selected': this.state.selected, 'value': this.props.value, 'index': this.props.index });
         });
     }
 
