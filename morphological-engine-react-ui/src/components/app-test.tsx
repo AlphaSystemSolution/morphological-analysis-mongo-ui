@@ -4,7 +4,7 @@ import ToggleSelecter from './toggle-selecter';
 import ArabicKeyboard from './arabic-keyboard';
 import { ArabicLetter } from './model/arabic-letter';
 //import { ArabicLabel } from './model/models';
-//import Emitter from '../services/event-emitter';
+import Emitter from '../services/event-emitter';
 import { Button } from 'primereact/button';
 
 export default class AppTest extends React.Component {
@@ -13,12 +13,12 @@ export default class AppTest extends React.Component {
 
     componentDidMount() {
         //Emitter.on('button-clicked', (value: ArabicLabel) => console.log(`Button clicked: ${value.name}`));
-        //Emitter.on('toggle-state-changed', (newValue) => console.log(newValue));
+        Emitter.on('letters-selected', (newValue) => console.log(JSON.stringify(newValue)));
     }
 
     componentWillUnmount() {
         //Emitter.off('button-clicked')
-        //Emitter.off('toggle-state-changed');
+        Emitter.off('letters-selected');
     }
 
     render() {

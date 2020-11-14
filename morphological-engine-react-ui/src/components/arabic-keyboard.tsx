@@ -26,6 +26,7 @@ export default class ArabicKeyboard extends React.Component<Props, State> {
     constructor(props: any) {
         super(props);
 
+        this.lettersSelected = this.lettersSelected.bind(this);
         this.state = {
             rootLetters: new RootLetters(),
             currentIndex: 0
@@ -155,13 +156,17 @@ export default class ArabicKeyboard extends React.Component<Props, State> {
         }
     }
 
+    private lettersSelected() {
+        Emitter.emit('letters-selected', this.state.rootLetters)
+    }
+
     render() {
         const divStyle: any = {
             'direction': 'rtl'
         };
 
         return (
-            <OverlayPanel ref={(el) => this.op = el} id="overlay_panel" showCloseIcon dismissable={false}>
+            <OverlayPanel ref={(el) => this.op = el} id="overlay_panel" showCloseIcon={false} dismissable onHide={this.lettersSelected}>
                 <div style={divStyle}>
                     <ToggleSelecter ref={(el) => this.toggle1 = el} value={this.state.rootLetters.firstRadical} index={0}
                         className="arabicToggleButton ui-button p-button-raised" selected={true} />&nbsp;
