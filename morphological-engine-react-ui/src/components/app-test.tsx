@@ -6,6 +6,7 @@ import { ArabicLetter } from './model/arabic-letter';
 //import { ArabicLabel } from './model/models';
 import Emitter from '../services/event-emitter';
 import { Button } from 'primereact/button';
+import { RootLetters } from './model/root-letters';
 
 export default class AppTest extends React.Component {
 
@@ -22,6 +23,7 @@ export default class AppTest extends React.Component {
     }
 
     render() {
+        const rootLetters: RootLetters = new RootLetters(ArabicLetter.SEEN, ArabicLetter.LAM, ArabicLetter.MEEM)
         return (
             <div>
                 <div>
@@ -31,13 +33,13 @@ export default class AppTest extends React.Component {
                 <div>&nbsp;</div>
                 <div>
                     <span className="arabicTitle">Toggle selecter</span>
-                    <div><ToggleSelecter value={ArabicLetter.MEEM} index={0} className="arabicButton ui-button p-button-raised"/></div>
+                    <div><ToggleSelecter value={ArabicLetter.MEEM} index={0} className="arabicButton ui-button p-button-raised" /></div>
                 </div>
                 <div>&nbsp;</div>
                 <div>
-                    <ArabicKeyboard ref={(el) => this.keyboardRef = el}/>
+                    <ArabicKeyboard ref={(el) => this.keyboardRef = el} initialLetters={rootLetters} />
                     <span className="arabicTitle">Keyboard</span>
-                    <div><Button label="Show keyboard" onClick={(e) => this.keyboardRef.show(e)} aria-haspopup aria-controls="overlay_panel"/></div>
+                    <div><Button label="Show keyboard" onClick={(e) => this.keyboardRef.show(e)} aria-haspopup aria-controls="overlay_panel" /></div>
                 </div>
             </div>
         );

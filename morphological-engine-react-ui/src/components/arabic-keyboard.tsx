@@ -8,6 +8,7 @@ import { Button } from 'primereact/button';
 import Emitter from '../services/event-emitter';
 
 interface Props {
+    initialLetters?: RootLetters
 }
 
 interface State {
@@ -28,7 +29,7 @@ export default class ArabicKeyboard extends React.Component<Props, State> {
 
         this.lettersSelected = this.lettersSelected.bind(this);
         this.state = {
-            rootLetters: new RootLetters(),
+            rootLetters: this.props.initialLetters ? this.props.initialLetters : new RootLetters(),
             currentIndex: 0
         }
     }
