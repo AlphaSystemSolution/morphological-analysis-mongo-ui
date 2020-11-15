@@ -76,6 +76,10 @@ export class ArabicLetter extends ArabicLabel {
     super(name, label, code);
   }
 
+  public equals(other: ArabicLabel): boolean {
+    return this.label == other.label;
+  }
+
   public compareTo(other: ArabicLabel): number {
     return this.label.localeCompare(other.label);
   }

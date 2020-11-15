@@ -1,4 +1,7 @@
 import { IdGenerator } from '../../utils/id-generator';
+import { NamedTemplate } from './named-template';
+import { RootLetters } from './root-letters';
+import { VerbalNoun } from './verbal-noun';
 
 export class Document {
   private _id: string;
@@ -84,3 +87,13 @@ export class Project {
   constructor(public projectName: string, public fileName: string) { }
 }
 
+export class InputData {
+  constructor(
+    public rootLetters: RootLetters = new RootLetters(),
+    public family: NamedTemplate = NamedTemplate.FORM_I_CATEGORY_A_GROUP_U_TEMPLATE,
+    public translation: string = "",
+    public removePassiveLine: boolean = false,
+    public skipRuleProcessing: boolean = false,
+    public verbalNouns: VerbalNoun[] = []
+  ) { }
+}
