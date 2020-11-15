@@ -9,20 +9,21 @@ import Emitter from '../services/event-emitter';
 
 interface Props {
     initialLetters?: RootLetters
+    onHide?(rootLetters: RootLetters): void
 }
 
 interface State {
     rootLetters: RootLetters
-    currentIndex: number;
+    currentIndex: number
+    select1: boolean
+    select2: boolean
+    select3: boolean
+    select4: boolean
 }
 
 export default class ArabicKeyboard extends React.Component<Props, State> {
 
     op: any = React.createRef();
-    toggle1: any = React.createRef();
-    toggle2: any = React.createRef();
-    toggle3: any = React.createRef();
-    toggle4: any = React.createRef();
 
     constructor(props: any) {
         super(props);
@@ -30,7 +31,11 @@ export default class ArabicKeyboard extends React.Component<Props, State> {
         this.lettersSelected = this.lettersSelected.bind(this);
         this.state = {
             rootLetters: this.props.initialLetters ? this.props.initialLetters : new RootLetters(),
-            currentIndex: 0
+            currentIndex: 0,
+            select1: true,
+            select2: false,
+            select3: false,
+            select4: false
         }
     }
 
@@ -53,12 +58,13 @@ export default class ArabicKeyboard extends React.Component<Props, State> {
     }
 
     private resetSelection(): void {
-        this.unselectCurrent();
         this.setState({
             rootLetters: new RootLetters(),
-            currentIndex: 0
-        }, () => {
-            this.toggle1.select(true);
+            currentIndex: 0,
+            select1: true,
+            select2: false,
+            select3: false,
+            select4: false
         })
     }
 
@@ -68,37 +74,33 @@ export default class ArabicKeyboard extends React.Component<Props, State> {
             case 0:
                 this.setState({
                     rootLetters: new RootLetters(letter, rl.secondRadical, rl.thirdRadical, rl.fourthRadical),
-                    currentIndex: 1
-                }, () => {
-                    this.toggle1.select(false);
-                    this.toggle2.select(true);
+                    currentIndex: 1,
+                    select1: false,
+                    select2: true
                 });
                 break;
             case 1:
                 this.setState({
                     rootLetters: new RootLetters(rl.firstRadical, letter, rl.thirdRadical, rl.fourthRadical),
-                    currentIndex: 2
-                }, () => {
-                    this.toggle2.select(false);
-                    this.toggle3.select(true);
+                    currentIndex: 2,
+                    select2: false,
+                    select3: true
                 });
                 break;
             case 2:
                 this.setState({
                     rootLetters: new RootLetters(rl.firstRadical, rl.secondRadical, letter, rl.fourthRadical),
-                    currentIndex: 3
-                }, () => {
-                    this.toggle3.select(false);
-                    this.toggle4.select(true);
+                    currentIndex: 3,
+                    select3: false,
+                    select4: true
                 });
                 break;
             case 3:
                 this.setState({
                     rootLetters: new RootLetters(rl.firstRadical, rl.secondRadical, rl.thirdRadical, letter),
-                    currentIndex: 0
-                }, () => {
-                    this.toggle4.select(false);
-                    this.toggle1.select(true);
+                    currentIndex: 0,
+                    select4: false,
+                    select1: true
                 });
                 break;
         }
@@ -108,57 +110,59 @@ export default class ArabicKeyboard extends React.Component<Props, State> {
         const selected: boolean = payload.selected;
         const index: number = payload.index;
         if (selected) {
-            this.unselectCurrent();
             switch (index) {
                 case 0:
                     this.setState({
-                        currentIndex: 0
+                        currentIndex: 0,
+                        select1: true,
+                        select2: false,
+                        select3: false,
+                        select4: false
                     })
                     break;
                 case 1:
                     this.setState({
-                        currentIndex: 1
+                        currentIndex: 1,
+                        select1: false,
+                        select2: true,
+                        select3: false,
+                        select4: false
                     })
                     break;
                 case 2:
                     this.setState({
-                        currentIndex: 2
+                        currentIndex: 2,
+                        select1: false,
+                        select2: false,
+                        select3: true,
+                        select4: false
                     })
                     break;
                 case 3:
                     this.setState({
-                        currentIndex: 3
+                        currentIndex: 3,
+                        select1: false,
+                        select2: false,
+                        select3: false,
+                        select4: true
                     })
                     break;
             }
         } else {
             this.setState({
-                currentIndex: 0
-            }, () => {
-                this.toggle1.select(true);
+                currentIndex: 0,
+                select1: true,
+                select2: false,
+                select3: false,
+                select4: false
             });
         }
     }
 
-    private unselectCurrent() {
-        switch (this.state.currentIndex) {
-            case 0:
-                this.toggle1.select(false);
-                break;
-            case 1:
-                this.toggle2.select(false);
-                break;
-            case 2:
-                this.toggle3.select(false);
-                break;
-            case 3:
-                this.toggle4.select(false);
-                break;
-        }
-    }
-
     private lettersSelected() {
-        Emitter.emit('letters-selected', this.state.rootLetters)
+        if (this.props.onHide) {
+            this.props.onHide(this.state.rootLetters);
+        }
     }
 
     render() {
@@ -169,14 +173,14 @@ export default class ArabicKeyboard extends React.Component<Props, State> {
         return (
             <OverlayPanel ref={(el) => this.op = el} id="overlay_panel" showCloseIcon={false} dismissable onHide={this.lettersSelected}>
                 <div style={divStyle}>
-                    <ToggleSelecter ref={(el) => this.toggle1 = el} value={this.state.rootLetters.firstRadical} index={0}
-                        className="arabicToggleButton ui-button p-button-raised" selected={true} />&nbsp;
-                    <ToggleSelecter ref={(el) => this.toggle2 = el} value={this.state.rootLetters.secondRadical} index={1}
-                        className="arabicToggleButton ui-button p-button-raised" />&nbsp;
-                    <ToggleSelecter ref={(el) => this.toggle3 = el} value={this.state.rootLetters.thirdRadical} index={2}
-                        className="arabicToggleButton ui-button p-button-raised" />&nbsp;
-                    <ToggleSelecter ref={(el) => this.toggle4 = el} value={this.state.rootLetters.fourthRadical} index={3}
-                        className="arabicToggleButton ui-button p-button-raised" />
+                    <ToggleSelecter value={this.state.rootLetters.firstRadical} index={0}
+                        className="arabicToggleButton ui-button p-button-raised" selected={this.state.select1} />&nbsp;
+                    <ToggleSelecter value={this.state.rootLetters.secondRadical} index={1}
+                        className="arabicToggleButton ui-button p-button-raised" selected={this.state.select2} />&nbsp;
+                    <ToggleSelecter value={this.state.rootLetters.thirdRadical} index={2}
+                        className="arabicToggleButton ui-button p-button-raised" selected={this.state.select3} />&nbsp;
+                    <ToggleSelecter value={this.state.rootLetters.fourthRadical} index={3}
+                        className="arabicToggleButton ui-button p-button-raised" selected={this.state.select4} />
                 </div>
                 <div>&nbsp;</div>
                 <div style={divStyle}>

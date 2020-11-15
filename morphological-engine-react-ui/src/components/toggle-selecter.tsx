@@ -3,27 +3,21 @@ import { ToggleButton } from 'primereact/togglebutton';
 import { ArabicLabel } from './model/models';
 import Emitter from '../services/event-emitter';
 
-interface ToggleSelecterProps {
+interface Props {
     value: ArabicLabel
     index: number
     className: string
-    selected?: boolean
-}
-
-interface ToggleSelecterState {
     selected: boolean
 }
 
-export default class ToggleSelecter extends React.Component<ToggleSelecterProps, ToggleSelecterState> {
+interface State {
+    selected: boolean
+}
 
-    state: ToggleSelecterState = {
+export default class ToggleSelecter extends React.Component<Props, State> {
+
+    state: State = {
         selected: this.props.selected ? true : false
-    }
-
-    select(b: boolean) {
-        this.setState({
-            selected: b
-        })
     }
 
     handleOnChange = (event: any) => {
@@ -35,7 +29,7 @@ export default class ToggleSelecter extends React.Component<ToggleSelecterProps,
     render() {
         return (
             <ToggleButton onLabel={this.props.value.label} offLabel={this.props.value.label} onChange={this.handleOnChange}
-                className={this.props.className} checked={this.state.selected} />
+                className={this.props.className} checked={this.props.selected} />
         );
     }
 }
