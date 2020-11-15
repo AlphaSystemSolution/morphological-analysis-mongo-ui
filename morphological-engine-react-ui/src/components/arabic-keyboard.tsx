@@ -1,10 +1,10 @@
 import * as React from 'react';
-import { OverlayPanel } from 'primereact/overlaypanel';
-import { ArabicLetter } from './model/arabic-letter';
+import { Dialog } from 'primereact/dialog';
 import ToggleSelecter from './toggle-selecter';
+import { Button } from 'primereact/button';
+import { ArabicLetter } from './model/arabic-letter';
 import { RootLetters } from './model/root-letters';
 import ArabicButton from './arabic-button';
-import { Button } from 'primereact/button';
 import Emitter from '../services/event-emitter';
 
 interface Props {
@@ -14,7 +14,9 @@ interface Props {
 
 interface State {
     rootLetters: RootLetters
+    prevLetters: RootLetters
     currentIndex: number
+    visible: boolean
     select1: boolean
     select2: boolean
     select3: boolean
@@ -23,15 +25,14 @@ interface State {
 
 export default class ArabicKeyboard extends React.Component<Props, State> {
 
-    op: any = React.createRef();
-
     constructor(props: any) {
         super(props);
 
-        this.lettersSelected = this.lettersSelected.bind(this);
         this.state = {
             rootLetters: this.props.initialLetters ? this.props.initialLetters : new RootLetters(),
+            prevLetters: this.props.initialLetters ? this.props.initialLetters : new RootLetters(),
             currentIndex: 0,
+            visible: false,
             select1: true,
             select2: false,
             select3: false,
@@ -53,13 +54,21 @@ export default class ArabicKeyboard extends React.Component<Props, State> {
         return ArabicLetter.arabicLetters;
     }
 
-    show(e: any) {
-        this.op.toggle(e);
+    public show(): void {
+        this.setState({
+            prevLetters: this.state.rootLetters,
+            visible: true,
+            currentIndex: 0,
+            select1: true,
+            select2: false,
+            select3: false,
+            select4: false
+        })
     }
 
     private resetSelection(): void {
         this.setState({
-            rootLetters: new RootLetters(),
+            rootLetters: this.state.prevLetters,
             currentIndex: 0,
             select1: true,
             select2: false,
@@ -159,10 +168,25 @@ export default class ArabicKeyboard extends React.Component<Props, State> {
         }
     }
 
-    private lettersSelected() {
-        if (this.props.onHide) {
-            this.props.onHide(this.state.rootLetters);
+    private restore(restore: boolean = true) {
+        if (restore) {
+            this.setState({
+                rootLetters: this.state.prevLetters,
+                visible: false
+            });
+        } else {
+            this.setState({
+                visible: false
+            });
         }
+    }
+
+    private hide() {
+        this.setState({}, () => {
+            if (this.props.onHide) {
+                this.props.onHide(this.state.rootLetters);
+            }
+        });
     }
 
     render() {
@@ -170,8 +194,20 @@ export default class ArabicKeyboard extends React.Component<Props, State> {
             'direction': 'rtl'
         };
 
+        const header = (
+            <div style={divStyle}>&nbsp;</div>
+        );
+
+        const footer = (
+            <div>
+                <Button label="Reset" onClick={(e) => this.resetSelection()} />
+                <Button label="Cancel" onClick={(e) => this.restore()} className="p-button-text" />
+                <Button label="OK" onClick={(e) => this.restore(false)} autoFocus />
+            </div>
+        );
+
         return (
-            <OverlayPanel ref={(el) => this.op = el} id="overlay_panel" showCloseIcon={false} dismissable onHide={this.lettersSelected}>
+            <Dialog header={header} footer={footer} onHide={() => this.hide()} visible={this.state.visible} closeOnEscape={false} closable={false}>
                 <div style={divStyle}>
                     <ToggleSelecter value={this.state.rootLetters.firstRadical} index={0}
                         className="arabicToggleButton ui-button p-button-raised" selected={this.state.select1} />&nbsp;
@@ -217,10 +253,9 @@ export default class ArabicKeyboard extends React.Component<Props, State> {
                     <ArabicButton letter={this.letters[24]} />&nbsp;
                     <ArabicButton letter={this.letters[25]} />&nbsp;
                     <ArabicButton letter={this.letters[26]} />&nbsp;
-                    <ArabicButton letter={this.letters[27]} />&nbsp;
-                    <Button label="Reset" className="arabicButton ui-button p-button-text p-button-raised" onClick={(e) => this.resetSelection()} />
+                    <ArabicButton letter={this.letters[27]} />
                 </div>
-            </OverlayPanel>
+            </Dialog>
         );
     }
 }
