@@ -9,6 +9,7 @@ import Emitter from '../services/event-emitter';
 
 interface Props {
     initialLetters?: RootLetters
+    visible?: boolean
     onHide?(rootLetters: RootLetters): void
 }
 
@@ -32,7 +33,7 @@ export default class ArabicKeyboard extends React.Component<Props, State> {
             rootLetters: this.props.initialLetters ? this.props.initialLetters : new RootLetters(),
             prevLetters: this.props.initialLetters ? this.props.initialLetters : new RootLetters(),
             currentIndex: 0,
-            visible: false,
+            visible: this.props.visible ? this.props.visible : false,
             select1: true,
             select2: false,
             select3: false,
@@ -54,8 +55,9 @@ export default class ArabicKeyboard extends React.Component<Props, State> {
         return ArabicLetter.arabicLetters;
     }
 
-    public show(): void {
+    public show(rootLetters?: RootLetters): void {
         this.setState({
+            rootLetters: rootLetters ? rootLetters : this.state.rootLetters,
             prevLetters: this.state.rootLetters,
             visible: true,
             currentIndex: 0,
@@ -177,17 +179,15 @@ export default class ArabicKeyboard extends React.Component<Props, State> {
         } else {
             this.setState({
                 visible: false
+            }, () => {
+                if (this.props.onHide) {
+                    this.props.onHide(this.state.rootLetters);
+                }
             });
         }
     }
 
-    private hide() {
-        this.setState({}, () => {
-            if (this.props.onHide) {
-                this.props.onHide(this.state.rootLetters);
-            }
-        });
-    }
+    private noop() { }
 
     render() {
         const divStyle: any = {
@@ -200,14 +200,14 @@ export default class ArabicKeyboard extends React.Component<Props, State> {
 
         const footer = (
             <div>
-                <Button label="Reset" onClick={(e) => this.resetSelection()} />
+                <Button label="Reset" onClick={(e) => this.resetSelection()} className="p-button-text" />
                 <Button label="Cancel" onClick={(e) => this.restore()} className="p-button-text" />
                 <Button label="OK" onClick={(e) => this.restore(false)} autoFocus />
             </div>
         );
 
         return (
-            <Dialog header={header} footer={footer} onHide={() => this.hide()} visible={this.state.visible} closeOnEscape={false} closable={false}>
+            <Dialog header={header} footer={footer} onHide={() => this.noop()} visible={this.state.visible} closeOnEscape={false} closable={false}>
                 <div style={divStyle}>
                     <ToggleSelecter value={this.state.rootLetters.firstRadical} index={0}
                         className="arabicToggleButton ui-button p-button-raised" selected={this.state.select1} />&nbsp;
