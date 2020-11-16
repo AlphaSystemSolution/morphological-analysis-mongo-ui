@@ -5,7 +5,6 @@ import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
 import { InputData } from './model/models';
 import MorphologicalInputForm from './morphological-input-form'
-import { InputText } from 'primereact/inputtext';
 
 interface Props {
     initialData?: InputData[]
@@ -44,11 +43,6 @@ export default class InputTable extends React.Component<Props, State> {
         return <span className="arabicNormal">{rowData.rootLetters.label}</span>
     }
 
-    /* rootLettersEditor(props: any) {
-         console.log(`${JSON.stringify(props)}`)
-         return (<InputText type="text" value={this.state.data[props.rowIndex].rootLetters.label} onChange={(e) => console.log("||||||||")} />);
-     }*/
-
     familyTemplate(rowData: InputData) {
         return (
             <span style={{ 'direction': 'rtl' }}>
@@ -59,11 +53,11 @@ export default class InputTable extends React.Component<Props, State> {
     }
 
     removePassiveLineTemplate(rowData: InputData) {
-        return <Checkbox value={rowData.removePassiveLine} />
+        return <Checkbox value={rowData.removePassiveLine} checked={rowData.removePassiveLine} />
     }
 
     skipRuleProcessingTemplate(rowData: InputData) {
-        return <Checkbox value={rowData.skipRuleProcessing} />
+        return <Checkbox value={rowData.skipRuleProcessing} checked={rowData.skipRuleProcessing} />
     }
 
     actionBodyTemplate(rowData: InputData) {
@@ -116,7 +110,7 @@ export default class InputTable extends React.Component<Props, State> {
                 <MorphologicalInputForm ref={(el) => this.dialogRef = el} inputData={this.state.currentRow} visible={false}
                     onHide={(newData) => this.updateRow(newData)} />
                 <DataTable value={this.state.data} className="p-datatable-gridlines" style={{ 'paddingTop': '0', 'paddingBottom': '0' }} selection={this.state.selectedRows}
-                    onSelectionChange={(e) => this.setState({ selectedRows: e.value })} editMode="cell">
+                            onSelectionChange={(e) => this.setState({ selectedRows: e.value })} editMode="cell">
                     <Column selectionMode="multiple" headerStyle={{ width: '3rem' }}></Column>
                     <Column field="rootLetters" body={this.rootLettersTemplate} header="Root Letters" />
                     <Column field="family" body={this.familyTemplate} header="Family" />
