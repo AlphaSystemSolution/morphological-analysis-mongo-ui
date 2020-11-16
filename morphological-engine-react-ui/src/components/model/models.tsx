@@ -94,6 +94,7 @@ export class InputData {
     public translation: string = "",
     public removePassiveLine: boolean = false,
     public skipRuleProcessing: boolean = false,
-    public verbalNouns: VerbalNoun[] = []
+    public verbalNouns: VerbalNoun[] = [],
+    public id: string = IdGenerator.nextId()
   ) { }
 }
