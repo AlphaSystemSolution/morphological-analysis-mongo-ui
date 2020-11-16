@@ -7,6 +7,7 @@ import ArabicKeyboard from './arabic-keyboard';
 import { InputData } from './model/models';
 import { RootLetters } from './model/root-letters';
 import { NamedTemplate } from './model/named-template';
+import { Checkbox } from 'primereact/checkbox';
 
 interface Props {
     inputData: InputData
@@ -29,6 +30,10 @@ export default class MorphologicalInputForm extends React.Component<Props, State
 
         this.familyTemplate = this.familyTemplate.bind(this);
         this.updateFamily = this.updateFamily.bind(this);
+        this.updateTranslation = this.updateTranslation.bind(this);
+        this.updateRemovePassiveLine = this.updateRemovePassiveLine.bind(this);
+        this.updateSkipRuleProcessing = this.updateSkipRuleProcessing.bind(this);
+
         this.state = {
             inputData: this.props.inputData,
             prevData: this.props.inputData,
@@ -86,6 +91,31 @@ export default class MorphologicalInputForm extends React.Component<Props, State
         });
     }
 
+    private updateTranslation(event: any) {
+        const data = this.state.inputData;
+        data.translation = event.target.value;
+        this.setState({
+            inputData: data
+        });
+    }
+
+    private updateRemovePassiveLine(event: any) {
+        console.log(`${event.checked}`)
+        const data = this.state.inputData;
+        data.removePassiveLine = event.checked;
+        this.setState({
+            inputData: data
+        });
+    }
+
+    private updateSkipRuleProcessing(event: any) {
+        const data = this.state.inputData;
+        data.skipRuleProcessing = event.checked;
+        this.setState({
+            inputData: data
+        });
+    }
+
     render() {
         const footer = (
             <div>
@@ -105,14 +135,38 @@ export default class MorphologicalInputForm extends React.Component<Props, State
                                 onClick={(e) => this.keyboardRef.show(this.state.inputData.rootLetters)} />
                         </div>
                     </div>
+                    <div className="p-fluid p-formgrid p-grid">&nbsp;</div>
                     <div className="p-fluid p-formgrid p-grid">
                         <div className="p-field p-col">
-                            <label htmlFor="family">Family</label>
+                            <label htmlFor="family">Family:</label>
                             <Dropdown id="family" value={this.state.inputData.family} options={NamedTemplate.namedTemplates} onChange={(e) => this.updateFamily(e.value)}
                                 valueTemplate={this.familyTemplate} itemTemplate={this.familyTemplate} scrollHeight="600px" />
                         </div>
                     </div>
-                    <div>&nbsp;</div>
+                    <div className="p-fluid p-formgrid p-grid">&nbsp;</div>
+                    <div className="p-fluid p-formgrid p-grid">
+                        <div className="p-field p-col">
+                            <label htmlFor="translation">Transalation:</label>
+                            <InputText id="translation" type="text" value={this.state.inputData.translation} className="translation"
+                                onChange={this.updateTranslation} />
+                        </div>
+                    </div>
+                    <div className="p-fluid p-formgrid p-grid">&nbsp;</div>
+                    <div className="p-fluid p-formgrid p-grid">
+                        <div className="p-field-checkbox p-col">
+                            <Checkbox inputId="removePassiveLine" value={this.state.inputData.removePassiveLine} checked={this.state.inputData.removePassiveLine}
+                                onChange={this.updateRemovePassiveLine} />
+                            <label htmlFor="removePassiveLine" className="p-checkbox-label">Remove Passive Line</label>
+                        </div>
+                    </div>
+                    <div className="p-fluid p-formgrid p-grid">&nbsp;</div>
+                    <div className="p-fluid p-formgrid p-grid">
+                        <div className="p-field-checkbox p-col">
+                            <Checkbox inputId="skipRuleProcessing" value={this.state.inputData.skipRuleProcessing} checked={this.state.inputData.skipRuleProcessing}
+                                onChange={this.updateSkipRuleProcessing} />
+                            <label htmlFor="skipRuleProcessing" className="p-checkbox-label">Skip Rule Processing</label>
+                        </div>
+                    </div>
                     <div>&nbsp;</div>
                     <div>&nbsp;</div>
                     <div>&nbsp;</div>
