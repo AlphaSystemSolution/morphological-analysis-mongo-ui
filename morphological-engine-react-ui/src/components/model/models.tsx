@@ -1,4 +1,5 @@
 import { IdGenerator } from '../../utils/id-generator';
+import { ArabicLabel } from './arabic-label';
 import { NamedTemplate } from './named-template';
 import { RootLetters } from './root-letters';
 import { VerbalNoun } from './verbal-noun';
@@ -16,14 +17,6 @@ export class Document {
 
   set id(id: string) {
     this._id = id ? id : IdGenerator.nextId();
-  }
-}
-
-export class ArabicLabel {
-  constructor(public name: string, public label: string, public code: string) { }
-
-  equals(other: ArabicLabel): boolean {
-    return (other !== null) && (other.name === this.name);
   }
 }
 

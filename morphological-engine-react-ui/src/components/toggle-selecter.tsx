@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { ToggleButton } from 'primereact/togglebutton';
-import { ArabicLabel } from './model/models';
+import { ArabicLabel } from './model/arabic-label';
 import Emitter from '../services/event-emitter';
 
 interface Props {

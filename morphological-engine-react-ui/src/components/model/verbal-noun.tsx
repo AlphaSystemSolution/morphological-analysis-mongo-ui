@@ -1,4 +1,4 @@
-import { ArabicLabel } from './models';
+import { ArabicLabel } from './arabic-label';
 
 export class VerbalNoun extends ArabicLabel {
     static VERBAL_NOUN_V1 = new VerbalNoun('VERBAL_NOUN_V1', 'فَعْلٌ', 'VERBAL_NOUN_V1');

@@ -1,5 +1,5 @@
 import { ConjugationHeader } from './conjugation-header';
-import { ArabicLabel } from './models';
+import { ArabicLabel } from './arabic-label';
 import { SarfTermType } from './sarf-term-type';
 import { RootLetters } from './root-letters';
 import { NamedTemplate } from './named-template';

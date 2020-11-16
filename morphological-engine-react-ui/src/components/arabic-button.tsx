@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ArabicLabel } from './model/models';
+import { ArabicLabel } from './model/arabic-label';
 import { Button } from 'primereact/button';
 import Emitter from '../services/event-emitter';
 

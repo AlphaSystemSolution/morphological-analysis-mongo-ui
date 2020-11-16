@@ -1,4 +1,4 @@
-import { ArabicLabel } from './models';
+import { ArabicLabel } from './arabic-label';
 
 export class SarfTermType extends ArabicLabel {
 
