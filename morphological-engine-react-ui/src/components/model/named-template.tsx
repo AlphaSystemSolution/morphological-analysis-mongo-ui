@@ -1,6 +1,6 @@
-import { ArabicLabel } from './models';
+//import { ArabicLabel } from './models';
 
-export class NamedTemplate extends ArabicLabel {
+export class NamedTemplate /*extends ArabicLabel*/ {
   static FORM_I_CATEGORY_A_GROUP_U_TEMPLATE = new NamedTemplate('FORM_I_CATEGORY_A_GROUP_U_TEMPLATE', 'فَعَلَ يَفْعُلُ', 'Family I', 1, 1);
   static FORM_I_CATEGORY_A_GROUP_I_TEMPLATE = new NamedTemplate('FORM_I_CATEGORY_A_GROUP_I_TEMPLATE', 'فَعَلَ يَفْعِلُ', 'Family I', 1, 2);
   static FORM_I_CATEGORY_A_GROUP_A_TEMPLATE = new NamedTemplate('FORM_I_CATEGORY_A_GROUP_A_TEMPLATE', 'فَعَلَ يَفْعَلُ', 'Family I', 1, 3);
@@ -44,7 +44,7 @@ export class NamedTemplate extends ArabicLabel {
   }
 
   constructor(public name: string, public label: string, public code: string, private index: number, private subIndex: number) {
-    super(name, label, code);
+    //super(name, label, code);
   }
 
   public compareTo(other: NamedTemplate): number {
