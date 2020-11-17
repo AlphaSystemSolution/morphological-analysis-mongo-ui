@@ -14,14 +14,13 @@ import VerbalNounPicker from './verbal-noun-picker';
 
 interface Props {
     inputData: InputData
-    visible?: boolean
-    onHide?(result: InputData): void
+    visible: boolean
+    onHide?(result?: InputData): void
 }
 
 interface State {
     inputData: InputData
     prevData: InputData
-    visible: boolean
     showVerbalNounPicker: boolean
 }
 
@@ -40,19 +39,18 @@ export default class MorphologicalInputForm extends React.Component<Props, State
         this.updateVernalNouns = this.updateVernalNouns.bind(this);
         this.updateRemovePassiveLine = this.updateRemovePassiveLine.bind(this);
         this.updateSkipRuleProcessing = this.updateSkipRuleProcessing.bind(this);
+        this.show = this.show.bind(this);
 
         this.state = {
             inputData: this.props.inputData,
             prevData: this.props.inputData,
-            visible: this.props.visible ? this.props.visible : false,
             showVerbalNounPicker: false
         }
     }
 
-    public show(newData?: InputData) {
+    private show() {
         this.setState({
-            inputData: newData ? newData : this.state.inputData,
-            visible: true
+            inputData: this.props.inputData
         });
     }
 
@@ -76,11 +74,13 @@ export default class MorphologicalInputForm extends React.Component<Props, State
         if (restore) {
             this.setState({
                 inputData: this.state.prevData,
-                visible: false
+            }, () => {
+                if (this.props.onHide) {
+                    this.props.onHide();
+                }
             });
         } else {
             this.setState({
-                visible: false
             }, () => {
                 if (this.props.onHide) {
                     this.props.onHide(this.state.inputData);
@@ -154,12 +154,12 @@ export default class MorphologicalInputForm extends React.Component<Props, State
                 <ArabicKeyboard ref={(el) => this.keyboardRef = el} onHide={(rootLetters) => this.updateRootLetters(rootLetters)} />
                 <VerbalNounPicker initalValues={this.state.inputData.verbalNouns} showDialog={this.state.showVerbalNounPicker} onHide={this.updateVernalNouns} />
                 <Dialog header="Add / Update Morphological Chart Input" footer={footer} onHide={() => this.noop()} closeOnEscape={false} closable={false}
-                    visible={this.state.visible}>
+                    visible={this.props.visible} onShow={this.show}>
                     <div className="p-fluid p-formgrid p-grid">
                         <div className="p-field p-col-12">
                             <label htmlFor="rootLetters" style={{ 'fontWeight': 'bold' }}>Root Letters:</label>
                             <InputText id="rootLetters" type="text" value={this.state.inputData.rootLetters.label} className="arabicNormal"
-                                onClick={(e) => this.keyboardRef.show(this.state.inputData.rootLetters)} />
+                                onClick={() => this.keyboardRef.show(this.state.inputData.rootLetters)} />
                         </div>
                     </div>
                     <div className="p-fluid p-formgrid p-grid">

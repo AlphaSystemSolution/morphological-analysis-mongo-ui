@@ -14,12 +14,10 @@ interface State {
     data: InputData[],
     selectedRows: InputData[]
     currentRow: InputData
-    showEditDialog: boolean
+    showRowEditDialog: boolean
 }
 
 export default class InputTable extends React.Component<Props, State> {
-
-    dialogRef: any = React.createRef();
 
     constructor(props: Props) {
         super(props);
@@ -35,7 +33,7 @@ export default class InputTable extends React.Component<Props, State> {
             data: this.props.initialData ? this.props.initialData : [],
             selectedRows: [],
             currentRow: new InputData(),
-            showEditDialog: false
+            showRowEditDialog: false
         }
     }
 
@@ -72,25 +70,30 @@ export default class InputTable extends React.Component<Props, State> {
     private editRow(rowData: InputData) {
         this.setState({
             currentRow: rowData,
-            showEditDialog: true
-        }, () => {
-            this.dialogRef.show(rowData);
+            showRowEditDialog: true
         });
     }
 
-    private updateRow(newData: InputData) {
-        const index: number = this.findIndexById(newData.id);
-        let data = this.state.data;
-        if (index > -1) {
-            data[index] = newData;
+    private updateRow(newData?: InputData) {
+        if (!newData) {
+            this.setState({
+                showRowEditDialog: false
+            });
         } else {
-            // add new row
-            data.push(newData);
+            const index: number = this.findIndexById(newData.id);
+            let data = this.state.data;
+            if (index > -1) {
+                data[index] = newData;
+            } else {
+                // add new row
+                data.push(newData);
+            }
+            this.setState({
+                showRowEditDialog: false,
+                data: data
+            });
         }
-        this.setState({
-            showEditDialog: false,
-            data: data
-        });
+
     }
 
     private findIndexById(id: string): number {
@@ -107,10 +110,9 @@ export default class InputTable extends React.Component<Props, State> {
     render() {
         return (
             <React.Fragment>
-                <MorphologicalInputForm ref={(el) => this.dialogRef = el} inputData={this.state.currentRow} visible={false}
-                    onHide={(newData) => this.updateRow(newData)} />
+                <MorphologicalInputForm inputData={this.state.currentRow} visible={this.state.showRowEditDialog} onHide={(newData) => this.updateRow(newData)} />
                 <DataTable value={this.state.data} className="p-datatable-gridlines" style={{ 'paddingTop': '0', 'paddingBottom': '0' }} selection={this.state.selectedRows}
-                            onSelectionChange={(e) => this.setState({ selectedRows: e.value })} editMode="cell">
+                    onSelectionChange={(e) => this.setState({ selectedRows: e.value })} editMode="cell">
                     <Column selectionMode="multiple" headerStyle={{ width: '3rem' }}></Column>
                     <Column field="rootLetters" body={this.rootLettersTemplate} header="Root Letters" />
                     <Column field="family" body={this.familyTemplate} header="Family" />
