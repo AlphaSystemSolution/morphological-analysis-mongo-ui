@@ -1,4 +1,5 @@
 import { ArabicLabel } from './arabic-label';
+import { NamedTemplate } from './named-template';
 
 export class VerbalNoun extends ArabicLabel {
     static VERBAL_NOUN_V1 = new VerbalNoun('VERBAL_NOUN_V1', 'فَعْلٌ', 'VERBAL_NOUN_V1');
@@ -130,6 +131,29 @@ export class VerbalNoun extends ArabicLabel {
     static formXTemplates: VerbalNoun[][] = [
         [VerbalNoun.VERBAL_NOUN_FORM_X]
     ];
+
+    static getByTemplate(template: NamedTemplate): VerbalNoun[] {
+        if (NamedTemplate.FORM_II_TEMPLATE.equals(template)) {
+            return [VerbalNoun.VERBAL_NOUN_FORM_II]
+        } else if (NamedTemplate.FORM_III_TEMPLATE.equals(template)) {
+            return [VerbalNoun.VERBAL_NOUN_FORM_III_V1, VerbalNoun.VERBAL_NOUN_FORM_III_V2]
+        } else if (NamedTemplate.FORM_IV_TEMPLATE.equals(template)) {
+            return [VerbalNoun.VERBAL_NOUN_FORM_IV]
+        } else if (NamedTemplate.FORM_V_TEMPLATE.equals(template)) {
+            return [VerbalNoun.VERBAL_NOUN_FORM_V]
+        } else if (NamedTemplate.FORM_VI_TEMPLATE.equals(template)) {
+            return [VerbalNoun.VERBAL_NOUN_FORM_VI]
+        } else if (NamedTemplate.FORM_VII_TEMPLATE.equals(template)) {
+            return [VerbalNoun.VERBAL_NOUN_FORM_VII]
+        } else if (NamedTemplate.FORM_VIII_TEMPLATE.equals(template)) {
+            return [VerbalNoun.VERBAL_NOUN_FORM_VIII]
+        } else if (NamedTemplate.FORM_IX_TEMPLATE.equals(template)) {
+            return [VerbalNoun.VERBAL_NOUN_FORM_IX]
+        } else if (NamedTemplate.FORM_X_TEMPLATE.equals(template)) {
+            return [VerbalNoun.VERBAL_NOUN_FORM_X]
+        }
+        return [];
+    }
 
     static getByName(name: string): VerbalNoun {
         const results = VerbalNoun.verbalNounPatterns.filter(al => (al.name === name));
