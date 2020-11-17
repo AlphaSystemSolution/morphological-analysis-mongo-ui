@@ -8,7 +8,7 @@ import Emitter from '../services/event-emitter';
 interface Props {
     initalValues: VerbalNoun[]
     showDialog: boolean
-    onHide?(verbalNouns: VerbalNoun[]): void
+    onHide(verbalNouns: VerbalNoun[]): void
 }
 
 interface State {
@@ -77,19 +77,11 @@ export default class VerbalNounPicker extends React.Component<Props, State> {
         if (cancelled) {
             this.setState({
                 currentlySelectedValues: this.copyArray(this.state.selectedValues)
-            }, () => {
-                if (this.props.onHide) {
-                    this.props.onHide(this.state.selectedValues);
-                }
-            });
+            }, () => this.props.onHide(this.state.selectedValues));
         } else {
             this.setState({
                 selectedValues: this.copyArray(this.state.currentlySelectedValues)
-            }, () => {
-                if (this.props.onHide) {
-                    this.props.onHide(this.state.selectedValues);
-                }
-            });
+            }, () => this.props.onHide(this.state.selectedValues));
         }
     }
 

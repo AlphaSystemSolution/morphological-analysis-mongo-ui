@@ -15,7 +15,7 @@ import VerbalNounPicker from './verbal-noun-picker';
 interface Props {
     inputData: InputData
     visible: boolean
-    onHide?(result?: InputData): void
+    onHide(result?: InputData): void
 }
 
 interface State {
@@ -74,18 +74,10 @@ export default class MorphologicalInputForm extends React.Component<Props, State
         if (restore) {
             this.setState({
                 inputData: this.state.prevData,
-            }, () => {
-                if (this.props.onHide) {
-                    this.props.onHide();
-                }
-            });
+            }, () => this.props.onHide());
         } else {
             this.setState({
-            }, () => {
-                if (this.props.onHide) {
-                    this.props.onHide(this.state.inputData);
-                }
-            });
+            }, () => this.props.onHide(this.state.inputData));
         }
     }
 
