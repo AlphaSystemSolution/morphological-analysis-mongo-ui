@@ -3,11 +3,14 @@ import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
 import { Dropdown } from 'primereact/dropdown';
+import { Chips } from 'primereact/chips';
 import ArabicKeyboard from './arabic-keyboard';
 import { InputData } from './model/models';
 import { RootLetters } from './model/root-letters';
 import { NamedTemplate } from './model/named-template';
 import { Checkbox } from 'primereact/checkbox';
+import { VerbalNoun } from './model/verbal-noun';
+import VerbalNounPicker from './verbal-noun-picker';
 
 interface Props {
     inputData: InputData
@@ -19,25 +22,30 @@ interface State {
     inputData: InputData
     prevData: InputData
     visible: boolean
+    showVerbalNounPicker: boolean
 }
 
 export default class MorphologicalInputForm extends React.Component<Props, State> {
 
     keyboardRef: any = React.createRef();
+    verbalNounPickerRef: any = React.createRef();
 
     constructor(props: Props) {
         super(props);
 
         this.familyTemplate = this.familyTemplate.bind(this);
+        this.verbalNounTemplate = this.verbalNounTemplate.bind(this);
         this.updateFamily = this.updateFamily.bind(this);
         this.updateTranslation = this.updateTranslation.bind(this);
+        this.updateVernalNouns = this.updateVernalNouns.bind(this);
         this.updateRemovePassiveLine = this.updateRemovePassiveLine.bind(this);
         this.updateSkipRuleProcessing = this.updateSkipRuleProcessing.bind(this);
 
         this.state = {
             inputData: this.props.inputData,
             prevData: this.props.inputData,
-            visible: this.props.visible ? this.props.visible : false
+            visible: this.props.visible ? this.props.visible : false,
+            showVerbalNounPicker: false
         }
     }
 
@@ -52,6 +60,14 @@ export default class MorphologicalInputForm extends React.Component<Props, State
         return (
             <span style={{ 'direction': 'rtl' }}>
                 <span style={{ 'textAlign': 'center' }}>{family.code}&nbsp;&mdash;&nbsp;<span className="arabicNormal">{family.label}</span></span>
+            </span>
+        );
+    }
+
+    private verbalNounTemplate(verbalNoun: VerbalNoun) {
+        return (
+            <span style={{ 'direction': 'rtl' }}>
+                <span className="arabicNormal">{verbalNoun.label}</span>
             </span>
         );
     }
@@ -86,6 +102,7 @@ export default class MorphologicalInputForm extends React.Component<Props, State
     private updateFamily(family: NamedTemplate) {
         const data = this.state.inputData;
         data.family = family;
+        data.verbalNouns = VerbalNoun.getByTemplate(family);
         this.setState({
             inputData: data
         });
@@ -96,6 +113,15 @@ export default class MorphologicalInputForm extends React.Component<Props, State
         data.translation = event.target.value;
         this.setState({
             inputData: data
+        });
+    }
+
+    private updateVernalNouns(selectedValues: VerbalNoun[]) {
+        const data = this.state.inputData;
+        data.verbalNouns = selectedValues;
+        this.setState({
+            inputData: data,
+            showVerbalNounPicker: false
         });
     }
 
@@ -126,50 +152,50 @@ export default class MorphologicalInputForm extends React.Component<Props, State
         return (
             <React.Fragment>
                 <ArabicKeyboard ref={(el) => this.keyboardRef = el} onHide={(rootLetters) => this.updateRootLetters(rootLetters)} />
+                <VerbalNounPicker initalValues={this.state.inputData.verbalNouns} showDialog={this.state.showVerbalNounPicker} onHide={this.updateVernalNouns} />
                 <Dialog header="Add / Update Morphological Chart Input" footer={footer} onHide={() => this.noop()} closeOnEscape={false} closable={false}
                     visible={this.state.visible}>
                     <div className="p-fluid p-formgrid p-grid">
-                        <div className="p-field p-col">
-                            <label htmlFor="rootLetters">Root Letters:</label>
+                        <div className="p-field p-col-12">
+                            <label htmlFor="rootLetters" style={{ 'fontWeight': 'bold' }}>Root Letters:</label>
                             <InputText id="rootLetters" type="text" value={this.state.inputData.rootLetters.label} className="arabicNormal"
                                 onClick={(e) => this.keyboardRef.show(this.state.inputData.rootLetters)} />
                         </div>
                     </div>
-                    <div className="p-fluid p-formgrid p-grid">&nbsp;</div>
                     <div className="p-fluid p-formgrid p-grid">
-                        <div className="p-field p-col">
-                            <label htmlFor="family">Family:</label>
+                        <div className="p-field p-col-12">
+                            <label htmlFor="family" style={{ 'fontWeight': 'bold' }}>Family:</label>
                             <Dropdown id="family" value={this.state.inputData.family} options={NamedTemplate.namedTemplates} onChange={(e) => this.updateFamily(e.value)}
-                                valueTemplate={this.familyTemplate} itemTemplate={this.familyTemplate} scrollHeight="600px" />
+                                valueTemplate={this.familyTemplate} itemTemplate={this.familyTemplate} scrollHeight="600px" className="multiselect" />
                         </div>
                     </div>
-                    <div className="p-fluid p-formgrid p-grid">&nbsp;</div>
                     <div className="p-fluid p-formgrid p-grid">
-                        <div className="p-field p-col">
-                            <label htmlFor="translation">Transalation:</label>
+                        <div className="p-field p-col-12">
+                            <label htmlFor="translation" style={{ 'fontWeight': 'bold' }}>Transalation:</label>
                             <InputText id="translation" type="text" value={this.state.inputData.translation} className="translation"
                                 onChange={this.updateTranslation} />
                         </div>
                     </div>
-                    <div className="p-fluid p-formgrid p-grid">&nbsp;</div>
                     <div className="p-fluid p-formgrid p-grid">
-                        <div className="p-field-checkbox p-col">
+                        <div className="p-field p-col-12">
+                            <label htmlFor="verbalNouns" style={{ 'fontWeight': 'bold' }}>Verbal Nouns:</label>
+                            <Chips id="verbalNouns" value={this.state.inputData.verbalNouns} itemTemplate={this.verbalNounTemplate} disabled={true} max={3}
+                                style={{ 'direction': 'rtl' }} /><span>&nbsp;</span>
+                            <Button type="button" icon="pi pi-pencil" tooltip="Add / Remove Verbal Nouns" onClick={() => this.setState({ showVerbalNounPicker: true })} />
+                        </div>
+                    </div>
+                    <div className="p-formgroup-inline">
+                        <div className="p-field-checkbox">
                             <Checkbox inputId="removePassiveLine" value={this.state.inputData.removePassiveLine} checked={this.state.inputData.removePassiveLine}
                                 onChange={this.updateRemovePassiveLine} />
-                            <label htmlFor="removePassiveLine" className="p-checkbox-label">Remove Passive Line</label>
+                            <label htmlFor="removePassiveLine" className="p-checkbox-label" style={{ 'fontWeight': 'bold' }}>Remove Passive Line</label>
                         </div>
-                    </div>
-                    <div className="p-fluid p-formgrid p-grid">&nbsp;</div>
-                    <div className="p-fluid p-formgrid p-grid">
-                        <div className="p-field-checkbox p-col">
+                        <div className="p-field-checkbox">
                             <Checkbox inputId="skipRuleProcessing" value={this.state.inputData.skipRuleProcessing} checked={this.state.inputData.skipRuleProcessing}
                                 onChange={this.updateSkipRuleProcessing} />
-                            <label htmlFor="skipRuleProcessing" className="p-checkbox-label">Skip Rule Processing</label>
+                            <label htmlFor="skipRuleProcessing" className="p-checkbox-label" style={{ 'fontWeight': 'bold' }}>Skip Rule Processing</label>
                         </div>
                     </div>
-                    <div>&nbsp;</div>
-                    <div>&nbsp;</div>
-                    <div>&nbsp;</div>
                 </Dialog>
             </React.Fragment>
         );

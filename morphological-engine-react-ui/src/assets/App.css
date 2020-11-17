@@ -125,3 +125,12 @@ td.morphological-chart-no-border {
     margin-left: 20px;
     opacity: 0.9;
 }
+
+.multiselect {
+  padding: .25rem .5rem;
+  padding-top: .25rem;
+  padding-bottom: .25rem;
+  border-radius: 3px;
+  display: inline-flex;
+  margin-right: .5rem;
+}
