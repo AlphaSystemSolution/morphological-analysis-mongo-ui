@@ -8,6 +8,7 @@ interface Props {
     index: number
     className: string
     selected: boolean
+    editable?: boolean
 }
 
 interface State {
@@ -27,9 +28,10 @@ export default class ToggleSelecter extends React.Component<Props, State> {
     }
 
     render() {
+        const checked = this.props.editable ? this.state.selected : this.props.selected;
         return (
             <ToggleButton onLabel={this.props.value.label} offLabel={this.props.value.label} onChange={this.handleOnChange}
-                className={this.props.className} checked={this.props.selected} />
+                className={this.props.className} checked={checked} />
         );
     }
 }
