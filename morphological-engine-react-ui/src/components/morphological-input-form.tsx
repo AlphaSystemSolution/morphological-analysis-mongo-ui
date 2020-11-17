@@ -27,7 +27,6 @@ interface State {
 export default class MorphologicalInputForm extends React.Component<Props, State> {
 
     keyboardRef: any = React.createRef();
-    verbalNounPickerRef: any = React.createRef();
 
     constructor(props: Props) {
         super(props);
