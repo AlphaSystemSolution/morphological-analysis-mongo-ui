@@ -4,6 +4,7 @@ import { Dialog } from 'primereact/dialog';
 import { VerbalNoun } from './model/verbal-noun';
 import ToggleSelecter from './toggle-selecter';
 import Emitter from '../services/event-emitter';
+import { Utils } from '../utils/utils';
 
 interface Props {
     initalValues: VerbalNoun[]
@@ -35,8 +36,8 @@ export default class VerbalNounPicker extends React.Component<Props, State> {
         this.show = this.show.bind(this);
 
         this.state = {
-            selectedValues: this.copyArray(this.props.initalValues),
-            currentlySelectedValues: this.copyArray(this.props.initalValues)
+            selectedValues: Utils.copyArray(this.props.initalValues),
+            currentlySelectedValues: Utils.copyArray(this.props.initalValues)
         };
     }
 
@@ -48,21 +49,17 @@ export default class VerbalNounPicker extends React.Component<Props, State> {
         Emitter.off('toggle-state-changed');
     }
 
-    private copyArray(array: VerbalNoun[]) {
-        return array.map(x => Object.assign({}, x));
-    }
-
     private show() {
         this.setState({
-            selectedValues: this.copyArray(this.props.initalValues),
-            currentlySelectedValues: this.copyArray(this.props.initalValues)
+            selectedValues: Utils.copyArray(this.props.initalValues),
+            currentlySelectedValues: Utils.copyArray(this.props.initalValues)
         });
     }
 
     private valueSelected(payload: any) {
         const verbalNoun = payload.value;
         const selected = payload.selected;
-        let updatedValues: VerbalNoun[] = this.copyArray(this.state.currentlySelectedValues);
+        let updatedValues: VerbalNoun[] = Utils.copyArray(this.state.currentlySelectedValues);
         if (selected) {
             updatedValues.push(verbalNoun);
         } else {
@@ -76,11 +73,11 @@ export default class VerbalNounPicker extends React.Component<Props, State> {
     private dialogSubmitted(cancelled: boolean = true) {
         if (cancelled) {
             this.setState({
-                currentlySelectedValues: this.copyArray(this.state.selectedValues)
+                currentlySelectedValues: Utils.copyArray(this.state.selectedValues)
             }, () => this.props.onHide(this.state.selectedValues));
         } else {
             this.setState({
-                selectedValues: this.copyArray(this.state.currentlySelectedValues)
+                selectedValues: Utils.copyArray(this.state.currentlySelectedValues)
             }, () => this.props.onHide(this.state.selectedValues));
         }
     }
