@@ -110,7 +110,9 @@ export default class InputTable extends React.Component<Props, State> {
         newData.id = IdGenerator.nextId();
         this.state.data.push(newData);
         this.setState({
-            data: this.state.data
+            currentRow: newData,
+            data: this.state.data,
+            showRowEditDialog: true
         });
     }
 
