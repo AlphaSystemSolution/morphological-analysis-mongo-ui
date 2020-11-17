@@ -3,7 +3,7 @@ import { DataTable } from 'primereact/datatable';
 import { Checkbox } from 'primereact/checkbox';
 import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
-import { InputData } from './model/models';
+import { ArabicConstants, InputData } from './model/models';
 import MorphologicalInputForm from './morphological-input-form'
 import { IdGenerator } from '../utils/id-generator';
 
@@ -27,6 +27,7 @@ export default class InputTable extends React.Component<Props, State> {
         this.familyTemplate = this.familyTemplate.bind(this);
         this.removePassiveLineTemplate = this.removePassiveLineTemplate.bind(this);
         this.skipRuleProcessingTemplate = this.skipRuleProcessingTemplate.bind(this);
+        this.verbalNounsTemplate = this.verbalNounsTemplate.bind(this);
         this.actionBodyTemplate = this.actionBodyTemplate.bind(this);
         this.editRow = this.editRow.bind(this);
         this.duplicateRow = this.duplicateRow.bind(this);
@@ -39,17 +40,38 @@ export default class InputTable extends React.Component<Props, State> {
         }
     }
 
-    rootLettersTemplate(rowData: InputData) {
+    private rootLettersTemplate(rowData: InputData) {
         return <span className="arabicNormal">{rowData.rootLetters.label}</span>
     }
 
-    familyTemplate(rowData: InputData) {
+    private familyTemplate(rowData: InputData) {
         return (
             <span style={{ 'direction': 'rtl' }}>
                 <div style={{ 'textAlign': 'center' }}>{rowData.family.code}</div>
                 <div className="arabicNormal" style={{ 'textAlign': 'center' }}>{rowData.family.label}</div>
             </span>
         );
+    }
+
+    private verbalNounsTemplate(rowData: InputData) {
+        const verbalNouns = rowData.verbalNouns;
+        if (verbalNouns.length <= 0) {
+            return <span>&nbsp;</span>
+        } else {
+            const array = [<span className="arabicNormal" key="vn-1">{verbalNouns[0].label}</span>];
+            if (verbalNouns.length >= 2) {
+                array.push(<span className="arabicDisabled" key="vn-2">{ArabicConstants.AND_SPACE.label}</span>);
+                array.push(<span className="arabicNormal" key="vn-3">{verbalNouns[1].label}</span>);
+            }
+            if (array.length >= 3) {
+                array.unshift(<span className="arabicDisabled" key="vn-4"> ... </span>)
+            }
+            return (
+                <span className="arabicNormal" style={{ direction: 'rtl', textAlign: 'right' }}>
+                    {array}
+                </span>
+            );
+        }
     }
 
     removePassiveLineTemplate(rowData: InputData) {
@@ -128,6 +150,7 @@ export default class InputTable extends React.Component<Props, State> {
                     <Column field="rootLetters" body={this.rootLettersTemplate} header="Root Letters" />
                     <Column field="family" body={this.familyTemplate} header="Family" />
                     <Column field="translation" header="Translation" />
+                    <Column field="verbalNouns" header="Verbal Nouns" body={this.verbalNounsTemplate} />
                     <Column field="removePassiveLine" body={this.removePassiveLineTemplate} header="Remove Passive Line" style={{ width: '10%' }} />
                     <Column field="skipRuleProcessing" body={this.skipRuleProcessingTemplate} header="Skip Rule Processing" style={{ width: '10%' }} />
                     <Column body={this.actionBodyTemplate} headerStyle={{ width: '8em', textAlign: 'center' }} bodyStyle={{ textAlign: 'center', overflow: 'visible' }} />

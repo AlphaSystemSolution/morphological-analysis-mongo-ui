@@ -46,7 +46,7 @@
 
 /* You can add global styles to this file, and also import other style files */
 .arabicTitle, .arabicNormal, .arabicNormalBig, .arabicCaption, .arabicToggleButton, .arabicButton, .arabicDropdown,
-.verbalNounToggleButton, .verbalNounToggleSelector, .abbreviatedConjugationSelector {
+.verbalNounToggleButton, .verbalNounToggleSelector, .abbreviatedConjugationSelector, arabicDisabled {
 	font-family: 'KFGQPC Uthman Taha Naskh';
 	direction: rtl;
 }
@@ -59,6 +59,11 @@
 
 .arabicNormal {
 	font-size: 24px;
+}
+
+.arabicDisabled {
+  font-size: 20px;
+  color: darkgray;
 }
 
 .arabicCaption {
