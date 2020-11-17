@@ -6,6 +6,7 @@ import { Button } from 'primereact/button';
 import { ArabicConstants, InputData } from './model/models';
 import MorphologicalInputForm from './morphological-input-form'
 import { IdGenerator } from '../utils/id-generator';
+import { Dialog } from 'primereact/dialog';
 
 interface Props {
     initialData?: InputData[]
@@ -15,7 +16,8 @@ interface State {
     data: InputData[],
     selectedRows: InputData[]
     currentRow: InputData
-    showRowEditDialog: boolean
+    showRowEditDialog: boolean,
+    showDeleteRowDialog: boolean
 }
 
 export default class InputTable extends React.Component<Props, State> {
@@ -31,12 +33,16 @@ export default class InputTable extends React.Component<Props, State> {
         this.actionBodyTemplate = this.actionBodyTemplate.bind(this);
         this.editRow = this.editRow.bind(this);
         this.duplicateRow = this.duplicateRow.bind(this);
+        this.deleteRow = this.deleteRow.bind(this);
+        this.confirmDeleteRow = this.confirmDeleteRow.bind(this);
+        this.hideDeleteRowDialog = this.hideDeleteRowDialog.bind(this);
 
         this.state = {
             data: this.props.initialData ? this.props.initialData : [],
             selectedRows: [],
             currentRow: new InputData(),
-            showRowEditDialog: false
+            showRowEditDialog: false,
+            showDeleteRowDialog: false
         }
     }
 
@@ -74,19 +80,20 @@ export default class InputTable extends React.Component<Props, State> {
         }
     }
 
-    removePassiveLineTemplate(rowData: InputData) {
+    private removePassiveLineTemplate(rowData: InputData) {
         return <Checkbox value={rowData.removePassiveLine} checked={rowData.removePassiveLine} />
     }
 
-    skipRuleProcessingTemplate(rowData: InputData) {
+    private skipRuleProcessingTemplate(rowData: InputData) {
         return <Checkbox value={rowData.skipRuleProcessing} checked={rowData.skipRuleProcessing} />
     }
 
-    actionBodyTemplate(rowData: InputData) {
+    private actionBodyTemplate(rowData: InputData) {
         return (
             <React.Fragment>
-                <Button type="button" icon="pi pi-pencil" className="p-button-secondary" tooltip="Edit" onClick={() => this.editRow(rowData)} />&nbsp;
-                <Button type="button" icon="pi pi-copy" className="p-button-secondary" tooltip="Duplicate" onClick={() => this.duplicateRow(rowData)} />
+                <Button type="button" icon="pi pi-pencil" className="p-button-rounded p-button-success" tooltip="Edit" onClick={() => this.editRow(rowData)} />&nbsp;
+                <Button type="button" icon="pi pi-copy" className="p-button-rounded p-button-success" tooltip="Duplicate" onClick={() => this.duplicateRow(rowData)} />&nbsp;
+                <Button type="button" icon="pi pi-trash" className="p-button-rounded p-button-warning" tooltip="Duplicate" onClick={() => this.confirmDeleteRow(rowData)} />
             </React.Fragment>
         );
     }
@@ -126,8 +133,29 @@ export default class InputTable extends React.Component<Props, State> {
                 data: data
             });
         }
-
     }
+
+    private confirmDeleteRow(rowData: InputData){
+        this.setState({
+            currentRow: rowData,
+            showDeleteRowDialog: true
+        });
+    }
+
+    private deleteRow(){
+        const data = this.state.data.filter((current) => this.state.currentRow.id !== current.id);
+        this.setState({
+            data: data,
+            showDeleteRowDialog: false
+        });
+    }
+
+    private hideDeleteRowDialog() {
+        this.setState({
+            showDeleteRowDialog: false
+        });
+    }
+
 
     private findIndexById(id: string): number {
         let index: number = -1;
@@ -141,6 +169,13 @@ export default class InputTable extends React.Component<Props, State> {
     }
 
     render() {
+        const deleteRowDialogFooter = (
+            <React.Fragment>
+                <Button label="No" icon="pi pi-times" className="p-button-text" onClick={this.hideDeleteRowDialog} />
+                <Button label="Yes" icon="pi pi-check" className="p-button-text" onClick={this.deleteRow} />
+            </React.Fragment>
+        );
+
         return (
             <React.Fragment>
                 <MorphologicalInputForm inputData={this.state.currentRow} visible={this.state.showRowEditDialog} onHide={(newData) => this.updateRow(newData)} />
@@ -153,8 +188,14 @@ export default class InputTable extends React.Component<Props, State> {
                     <Column field="verbalNouns" header="Verbal Nouns" body={this.verbalNounsTemplate} />
                     <Column field="removePassiveLine" body={this.removePassiveLineTemplate} header="Remove Passive Line" style={{ width: '10%' }} />
                     <Column field="skipRuleProcessing" body={this.skipRuleProcessingTemplate} header="Skip Rule Processing" style={{ width: '10%' }} />
-                    <Column body={this.actionBodyTemplate} headerStyle={{ width: '8em', textAlign: 'center' }} bodyStyle={{ textAlign: 'center', overflow: 'visible' }} />
+                    <Column body={this.actionBodyTemplate} headerStyle={{ width: '10em', textAlign: 'center' }} bodyStyle={{ textAlign: 'center', overflow: 'visible' }} />
                 </DataTable>
+                <Dialog visible={this.state.showDeleteRowDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteRowDialogFooter} onHide={this.hideDeleteRowDialog}>
+                    <div className="confirmation-content">
+                        <i className="pi pi-exclamation-triangle p-mr-3" style={{ fontSize: '2rem'}} />
+                        {<span>Are you sure you want to delete current row?</span>}
+                    </div>
+                </Dialog>
             </React.Fragment>
         );
     }
