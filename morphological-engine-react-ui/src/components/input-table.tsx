@@ -93,7 +93,7 @@ export default class InputTable extends React.Component<Props, State> {
             <React.Fragment>
                 <Button type="button" icon="pi pi-pencil" className="p-button-rounded p-button-success" tooltip="Edit" onClick={() => this.editRow(rowData)} />&nbsp;
                 <Button type="button" icon="pi pi-copy" className="p-button-rounded p-button-success" tooltip="Duplicate" onClick={() => this.duplicateRow(rowData)} />&nbsp;
-                <Button type="button" icon="pi pi-trash" className="p-button-rounded p-button-warning" tooltip="Duplicate" onClick={() => this.confirmDeleteRow(rowData)} />
+                <Button type="button" icon="pi pi-trash" className="p-button-rounded p-button-warning" tooltip="Delete" onClick={() => this.confirmDeleteRow(rowData)} />
             </React.Fragment>
         );
     }
