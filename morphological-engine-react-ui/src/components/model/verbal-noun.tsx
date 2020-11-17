@@ -163,4 +163,8 @@ export class VerbalNoun extends ArabicLabel {
     constructor(public name: string, public label: string, public code: string) {
         super(name, label, code);
     }
+
+    public copy(): VerbalNoun {
+        return new VerbalNoun(this.name, this.label, this.code);
+    }
 }

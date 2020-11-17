@@ -1,4 +1,6 @@
+import { copyFile } from 'fs';
 import { IdGenerator } from '../../utils/id-generator';
+import { Utils } from '../../utils/utils';
 import { ArabicLabel } from './arabic-label';
 import { NamedTemplate } from './named-template';
 import { RootLetters } from './root-letters';
@@ -90,4 +92,8 @@ export class InputData {
     public verbalNouns: VerbalNoun[] = [],
     public id: string = IdGenerator.nextId()
   ) { }
+
+  copy(): InputData {
+    return new InputData(this.rootLetters.copy(), this.family.copy(), this.translation, this.removePassiveLine, this.skipRuleProcessing, Utils.copyArray(this.verbalNouns), this.id);
+  }
 }

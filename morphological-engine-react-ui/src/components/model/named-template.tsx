@@ -43,7 +43,7 @@ export class NamedTemplate extends ArabicLabel {
     return (results && results.length > 0) ? results[0] : NamedTemplate.FORM_I_CATEGORY_A_GROUP_U_TEMPLATE;
   }
 
-  constructor(public name: string, public label: string, public code: string, private index: number, private subIndex: number) {
+  constructor(public name: string, public label: string, public code: string, protected index: number, protected subIndex: number) {
     super(name, label, code);
   }
 
@@ -53,5 +53,9 @@ export class NamedTemplate extends ArabicLabel {
       result = this.subIndex - other.subIndex;
     }
     return result;
+  }
+
+  public copy(): NamedTemplate {
+    return new NamedTemplate(this.name, this.label, this.code, this.index, this.subIndex);
   }
 }
