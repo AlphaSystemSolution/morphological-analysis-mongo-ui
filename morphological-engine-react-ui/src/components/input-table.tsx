@@ -5,6 +5,7 @@ import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
 import { InputData } from './model/models';
 import MorphologicalInputForm from './morphological-input-form'
+import { IdGenerator } from '../utils/id-generator';
 
 interface Props {
     initialData?: InputData[]
@@ -28,6 +29,7 @@ export default class InputTable extends React.Component<Props, State> {
         this.skipRuleProcessingTemplate = this.skipRuleProcessingTemplate.bind(this);
         this.actionBodyTemplate = this.actionBodyTemplate.bind(this);
         this.editRow = this.editRow.bind(this);
+        this.duplicateRow = this.duplicateRow.bind(this);
 
         this.state = {
             data: this.props.initialData ? this.props.initialData : [],
@@ -62,7 +64,7 @@ export default class InputTable extends React.Component<Props, State> {
         return (
             <React.Fragment>
                 <Button type="button" icon="pi pi-pencil" className="p-button-secondary" tooltip="Edit" onClick={() => this.editRow(rowData)} />&nbsp;
-                <Button type="button" icon="pi pi-copy" className="p-button-secondary" tooltip="Duplicate" />
+                <Button type="button" icon="pi pi-copy" className="p-button-secondary" tooltip="Duplicate" onClick={() => this.duplicateRow(rowData)} />
             </React.Fragment>
         );
     }
@@ -71,6 +73,15 @@ export default class InputTable extends React.Component<Props, State> {
         this.setState({
             currentRow: rowData,
             showRowEditDialog: true
+        });
+    }
+
+    private duplicateRow(rowData: InputData) {
+        const newData = rowData.copy();
+        newData.id = IdGenerator.nextId();
+        this.state.data.push(newData);
+        this.setState({
+            data: this.state.data
         });
     }
 
