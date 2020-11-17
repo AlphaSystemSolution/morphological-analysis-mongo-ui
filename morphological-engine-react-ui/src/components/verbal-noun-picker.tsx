@@ -97,14 +97,15 @@ export default class VerbalNounPicker extends React.Component<Props, State> {
         const values =
             verbalNouns.map((verbalNoun, index) => {
                 const i = (10 * parentIndex) + index;
+                const key = "ts-" + i;
                 return (
-                    <span>
-                        <ToggleSelecter key={i} value={verbalNoun} className="verbalNounToggleSelector ui-button p-button-raised"
+                    <span key={"sp-" + i}>
+                        <ToggleSelecter key={key} value={verbalNoun} className="verbalNounToggleSelector ui-button p-button-raised"
                             selected={this.isSelected(verbalNoun)} editable={true} index={i} />&nbsp;
                     </span>
                 );
             });
-        return <div>{values}</div>;
+        return <div key={"div-" + parentIndex}>{values}</div>;
     }
 
     render() {
