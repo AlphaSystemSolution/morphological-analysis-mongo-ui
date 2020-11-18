@@ -3,7 +3,6 @@ import { ArabicLabel } from './arabic-label';
 import { SarfTermType } from './sarf-term-type';
 import { RootLetters } from './root-letters';
 import { NamedTemplate } from './named-template';
-import { ArabicLetter } from './arabic-letter';
 import { IdGenerator } from '../../utils/id-generator';
 
 export class ConjugationLabel extends ArabicLabel {
@@ -71,9 +70,7 @@ export class AbbreviatedConjugation {
     }
 
     private static getRootLetters(conjugationHeader: ConjugationHeader): RootLetters {
-        const rl = conjugationHeader.rootLetters;
-        return new RootLetters(ArabicLetter.getByName(rl.firstRadical), ArabicLetter.getByName(rl.secondRadical),
-            ArabicLetter.getByName(rl.thirdRadical), ArabicLetter.getByName(rl.fourthRadical));
+        return conjugationHeader.rootLetters.toRootLetters();
     }
 
     private static getNamedTemplate(conjugationHeader: ConjugationHeader): NamedTemplate {

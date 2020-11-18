@@ -1,4 +1,5 @@
-import { ConjugationConfiguration, Document } from './models';
+import { Document } from './document';
+import { ConjugationConfiguration } from './models';
 import { ArabicLetter } from './arabic-letter';
 import { RootLetters } from './root-letters';
 import { NamedTemplate } from './named-template';
@@ -39,13 +40,7 @@ export class MorphologicalInput extends Document {
         result.template = NamedTemplate.getByName(src.template);
         const rl = src.rootLetters;
         if (rl) {
-            const rootLetters = new RootLetters(
-                ArabicLetter.getByName(rl.firstRadical),
-                ArabicLetter.getByName(rl.secondRadical),
-                ArabicLetter.getByName(rl.thirdRadical),
-                ArabicLetter.getByName(rl.fourthRadical)
-            );
-            result.rootLetters = rootLetters;
+            result.rootLetters = src.rootLetters.toRootLetters();
         }
         result.translation = src.translation;
         result.configuration = src.configuration;

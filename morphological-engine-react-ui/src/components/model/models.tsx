@@ -1,26 +1,10 @@
-import { copyFile } from 'fs';
 import { IdGenerator } from '../../utils/id-generator';
 import { Utils } from '../../utils/utils';
 import { ArabicLabel } from './arabic-label';
+import { ChartConfiguration } from './chart-configuration';
 import { NamedTemplate } from './named-template';
 import { RootLetters } from './root-letters';
 import { VerbalNoun } from './verbal-noun';
-
-export class Document {
-  private _id: string;
-
-  constructor() {
-    this._id = IdGenerator.nextId();
-  }
-
-  get id(): string {
-    return this._id;
-  }
-
-  set id(id: string) {
-    this._id = id ? id : IdGenerator.nextId();
-  }
-}
 
 export class ConjugationConfiguration {
   constructor(public removePassiveLine: boolean = false, public skipRuleProcessing: boolean = false) { }
@@ -79,7 +63,11 @@ export class ArabicConstants {
 }
 
 export class Project {
-  constructor(public projectName: string, public fileName: string, public data: InputData[] = [new InputData()]) { }
+  constructor(
+    public projectName: string,
+    public fileName: string,
+    public data: InputData[] = [new InputData()],
+    public chartConfiguration: ChartConfiguration = new ChartConfiguration()) { }
 }
 
 export class InputData {
@@ -94,6 +82,13 @@ export class InputData {
   ) { }
 
   copy(): InputData {
-    return new InputData(this.rootLetters.copy(), this.family.copy(), this.translation, this.removePassiveLine, this.skipRuleProcessing, Utils.copyArray(this.verbalNouns), this.id);
+    return new InputData(
+      this.rootLetters.copy(),
+      this.family.copy(),
+      this.translation,
+      this.removePassiveLine,
+      this.skipRuleProcessing,
+      Utils.copyArray(this.verbalNouns), this.id
+    );
   }
 }

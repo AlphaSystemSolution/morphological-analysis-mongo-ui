@@ -1,4 +1,4 @@
-import { Document } from './models';
+import { Document } from './document';
 
 export enum PageOrientation {
     PORTRAIT, LANDSCAPE

@@ -1,14 +1,15 @@
 import { IdGenerator } from '../../utils/id-generator'
+import { ArabicLetter } from './arabic-letter';
 import { RootLetters as _RootLetters } from './root-letters';
 
 export class RootLetters {
     constructor(
         public id: string = IdGenerator.nextId(),
+        public name: string,
         public firstRadical: string,
         public secondRadical: string,
         public thirdRadical: string,
-        public fourthRadical: string,
-        public name: string,
+        public fourthRadical?: string,
         public displayName?: string,
         public empty?: string
     ) { }
@@ -17,8 +18,24 @@ export class RootLetters {
         return this.firstRadical + this.secondRadical + this.thirdRadical;
     }
 
+    public toRootLetters(): _RootLetters {
+        return new _RootLetters(
+            ArabicLetter.getByName(this.firstRadical),
+            ArabicLetter.getByName(this.secondRadical),
+            ArabicLetter.getByName(this.thirdRadical),
+            ArabicLetter.getByName(this.fourthRadical ? this.fourthRadical : ArabicLetter.TATWEEL.name)
+        );
+    }
+
     static of(src: _RootLetters): RootLetters {
-       return new RootLetters(IdGenerator.nextId(), src.firstRadical.name, src.secondRadical.name, src.thirdRadical.name, src.fourthRadical.name, src.name);
+        return new RootLetters(
+            IdGenerator.nextId(),
+            src.name,
+            src.firstRadical.name,
+            src.secondRadical.name,
+            src.thirdRadical.name,
+            src.fourthRadical.name
+        );
     }
 }
 
