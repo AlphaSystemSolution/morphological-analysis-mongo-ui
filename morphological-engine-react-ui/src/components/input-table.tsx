@@ -209,7 +209,7 @@ export default class InputTable extends React.Component<Props, State> {
         const toolbarContent: any = (
             <React.Fragment>
                 <Button label="Add Row" icon="pi pi-plus" className="p-button-success p-mr-2" onClick={this.addRow} />
-                <Button label="Delete Row(s)" icon="pi pi-plus" className="p-button-danger p-mr-2" onClick={this.confirmDeleteSelected} disabled={this.state.selectedRows.length <= 0} />
+                <Button label="Delete Row(s)" icon="pi pi-trash" className="p-button-danger p-mr-2" onClick={this.confirmDeleteSelected} disabled={this.state.selectedRows.length <= 0} />
             </React.Fragment>
         );
 

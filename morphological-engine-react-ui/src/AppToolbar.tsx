@@ -2,6 +2,7 @@ import * as React from 'react';
 
 import { Toolbar } from 'primereact/toolbar';
 import { Button } from 'primereact/button';
+import { FileUpload } from 'primereact/fileupload';
 // import { SplitButton } from 'primereact/splitbutton';
 import Emitter from './services/event-emitter';
 
@@ -9,25 +10,36 @@ interface Props { }
 
 interface State { }
 
-export default class AppToolbar extends React.Component<Props, State> {
+export class AppToolbar extends React.Component<Props, State> {
+
+    static NEW_PROJECT_ACTION: string = "create-new-project";
+    static IMPORT_PROJECT_ACTION: string = "import-project"
+
     constructor(props: Props) {
         super(props);
 
-        this.createNewProject = this.createNewProject.bind(this);
+        this.uploadHandler = this.uploadHandler.bind(this);
 
         this.state = {};
     }
 
-    private createNewProject() {
-        Emitter.emit('create-new-project', {})
+    private emitAction(event: string, payload: any = {}) {
+        Emitter.emit(event, payload)
+    }
+
+    private uploadHandler(event: any) {
+        if(event.files) {
+            this.emitAction(AppToolbar.IMPORT_PROJECT_ACTION, event.files[0]);
+        }
     }
 
     render() {
         const leftContents: any = (
             <React.Fragment>
-                <Button label="New" icon="pi pi-plus" className="p-mr-2" onClick={this.createNewProject} />
+                <Button label="New" icon="pi pi-plus" className="p-mr-2" onClick={() => this.emitAction(AppToolbar.NEW_PROJECT_ACTION)} />
                 <span>&nbsp;</span>
-                <Button label="Open" icon="pi pi-file-o" className="p-mr-2" />
+                <FileUpload name="import" accept="*.json" auto mode="basic" chooseLabel="Import" customUpload uploadHandler={this.uploadHandler} />
+                <span>&nbsp;</span>
                 <i className="pi pi-bars p-toolbar-separator p-mr-2" />
             </React.Fragment>
         );

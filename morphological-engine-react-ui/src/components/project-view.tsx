@@ -4,6 +4,7 @@ import { TabView, TabPanel } from 'primereact/tabview';
 import { Project } from './model/models';
 import InputTable from './input-table';
 import Emitter from '../services/event-emitter';
+import { AppToolbar } from '../AppToolbar';
 
 interface Props { }
 
@@ -17,8 +18,6 @@ export class ProjectView extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
 
-        this.createNewProject = this.createNewProject.bind(this);
-
         this.state = {
             activeTabIndex: 0,
             projects: [new Project("Untitled1", "Untitled1.json")]
@@ -26,11 +25,13 @@ export class ProjectView extends React.Component<Props, State> {
     }
 
     componentDidMount() {
-        Emitter.on('create-new-project', () => this.createNewProject());
+        Emitter.on(AppToolbar.NEW_PROJECT_ACTION, () => this.createNewProject());
+        Emitter.on(AppToolbar.IMPORT_PROJECT_ACTION, (file) => this.importProject(file));
     }
 
     componentWillUnmount() {
-        Emitter.off('create-new-project')
+        Emitter.off(AppToolbar.NEW_PROJECT_ACTION);
+        Emitter.off(AppToolbar.IMPORT_PROJECT_ACTION);
     }
 
     private createNewProject() {
@@ -40,6 +41,10 @@ export class ProjectView extends React.Component<Props, State> {
         this.setState({
             projects: this.state.projects
         });
+    }
+
+    private importProject(file: any) {
+        console.log(`>>>>> ${file}`)
     }
 
     render() {
