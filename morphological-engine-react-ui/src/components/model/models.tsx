@@ -79,7 +79,7 @@ export class ArabicConstants {
 }
 
 export class Project {
-  constructor(public projectName: string, public fileName: string) { }
+  constructor(public projectName: string, public fileName: string, public data: InputData[] = [new InputData()]) { }
 }
 
 export class InputData {

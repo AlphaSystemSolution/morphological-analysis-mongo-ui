@@ -9,18 +9,26 @@ import './assets/font.css';
 import './assets/App.css';
 
 import AppToolbar from './AppToolbar';
+import { ProjectView } from './components/project-view';
 
-// Temp imports
-import AppTest from './components/app-test';
+interface Props { }
 
-export default class App extends React.Component {
+interface State { }
+
+export default class App extends React.Component<Props, State> {
+
+  constructor(props: Props) {
+    super(props);
+
+    this.state = {}
+  }
 
   render() {
     return (
       <div className="App">
         <AppToolbar />
         <div>&nbsp;</div>
-        <AppTest/>
+        <ProjectView />
       </div>
     );
   }
