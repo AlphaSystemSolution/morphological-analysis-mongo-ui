@@ -7,6 +7,7 @@ import { ArabicConstants, InputData } from './model/models';
 import MorphologicalInputForm from './morphological-input-form'
 import { IdGenerator } from '../utils/id-generator';
 import { Dialog } from 'primereact/dialog';
+import { Toolbar } from 'primereact/toolbar';
 
 interface Props {
     initialData?: InputData[]
@@ -17,7 +18,8 @@ interface State {
     selectedRows: InputData[]
     currentRow: InputData
     showRowEditDialog: boolean,
-    showDeleteRowDialog: boolean
+    showDeleteRowDialog: boolean,
+    showDeleteRowsDialog: boolean
 }
 
 export default class InputTable extends React.Component<Props, State> {
@@ -31,18 +33,23 @@ export default class InputTable extends React.Component<Props, State> {
         this.skipRuleProcessingTemplate = this.skipRuleProcessingTemplate.bind(this);
         this.verbalNounsTemplate = this.verbalNounsTemplate.bind(this);
         this.actionBodyTemplate = this.actionBodyTemplate.bind(this);
+        this.addRow = this.addRow.bind(this);
         this.editRow = this.editRow.bind(this);
         this.duplicateRow = this.duplicateRow.bind(this);
         this.deleteRow = this.deleteRow.bind(this);
+        this.confirmDeleteSelected = this.confirmDeleteSelected.bind(this);
         this.confirmDeleteRow = this.confirmDeleteRow.bind(this);
         this.hideDeleteRowDialog = this.hideDeleteRowDialog.bind(this);
+        this.deleteSelectedRows = this.deleteSelectedRows.bind(this);
+        this.hideDeleteRowsDialog = this.hideDeleteRowsDialog.bind(this);
 
         this.state = {
             data: this.props.initialData ? this.props.initialData : [],
             selectedRows: [],
             currentRow: new InputData(),
             showRowEditDialog: false,
-            showDeleteRowDialog: false
+            showDeleteRowDialog: false,
+            showDeleteRowsDialog: false
         }
     }
 
@@ -98,6 +105,13 @@ export default class InputTable extends React.Component<Props, State> {
         );
     }
 
+    private addRow() {
+        this.setState({
+            currentRow: new InputData(),
+            showRowEditDialog: true
+        });
+    }
+
     private editRow(rowData: InputData) {
         this.setState({
             currentRow: rowData,
@@ -137,14 +151,20 @@ export default class InputTable extends React.Component<Props, State> {
         }
     }
 
-    private confirmDeleteRow(rowData: InputData){
+    private confirmDeleteSelected() {
+        this.setState({
+            showDeleteRowsDialog: true
+        });
+    }
+
+    private confirmDeleteRow(rowData: InputData) {
         this.setState({
             currentRow: rowData,
             showDeleteRowDialog: true
         });
     }
 
-    private deleteRow(){
+    private deleteRow() {
         const data = this.state.data.filter((current) => this.state.currentRow.id !== current.id);
         this.setState({
             data: data,
@@ -158,6 +178,21 @@ export default class InputTable extends React.Component<Props, State> {
         });
     }
 
+    private deleteSelectedRows() {
+        const selectedRows = this.state.selectedRows.map((row) => row.id);
+        const data = this.state.data.filter((row) => !selectedRows.includes(row.id));
+        this.setState({
+            data: data,
+            selectedRows: [],
+            showDeleteRowsDialog: false
+        })
+    }
+
+    private hideDeleteRowsDialog() {
+        this.setState({
+            showDeleteRowsDialog: false
+        });
+    }
 
     private findIndexById(id: string): number {
         let index: number = -1;
@@ -171,6 +206,13 @@ export default class InputTable extends React.Component<Props, State> {
     }
 
     render() {
+        const toolbarContent: any = (
+            <React.Fragment>
+                <Button label="Add Row" icon="pi pi-plus" className="p-button-success p-mr-2" onClick={this.addRow} />
+                <Button label="Delete Row(s)" icon="pi pi-plus" className="p-button-danger p-mr-2" onClick={this.confirmDeleteSelected} disabled={this.state.selectedRows.length <= 0} />
+            </React.Fragment>
+        );
+
         const deleteRowDialogFooter = (
             <React.Fragment>
                 <Button label="No" icon="pi pi-times" className="p-button-text" onClick={this.hideDeleteRowDialog} />
@@ -178,11 +220,19 @@ export default class InputTable extends React.Component<Props, State> {
             </React.Fragment>
         );
 
+        const deleteRowsDialogFooter = (
+            <React.Fragment>
+                <Button label="No" icon="pi pi-times" className="p-button-text" onClick={this.hideDeleteRowsDialog} />
+                <Button label="Yes" icon="pi pi-check" className="p-button-text" onClick={this.deleteSelectedRows} />
+            </React.Fragment>
+        );
+
         return (
             <React.Fragment>
                 <MorphologicalInputForm inputData={this.state.currentRow} visible={this.state.showRowEditDialog} onHide={(newData) => this.updateRow(newData)} />
+                <Toolbar className="p-mb-4" left={toolbarContent} />
                 <DataTable value={this.state.data} className="p-datatable-gridlines" style={{ 'paddingTop': '0', 'paddingBottom': '0' }} selection={this.state.selectedRows}
-                    onSelectionChange={(e) => this.setState({ selectedRows: e.value })} editMode="cell">
+                    onSelectionChange={(e) => this.setState({ selectedRows: e.value })}>
                     <Column selectionMode="multiple" headerStyle={{ width: '3rem' }}></Column>
                     <Column field="rootLetters" body={this.rootLettersTemplate} header="Root Letters" />
                     <Column field="family" body={this.familyTemplate} header="Family" />
@@ -194,8 +244,14 @@ export default class InputTable extends React.Component<Props, State> {
                 </DataTable>
                 <Dialog visible={this.state.showDeleteRowDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteRowDialogFooter} onHide={this.hideDeleteRowDialog}>
                     <div className="confirmation-content">
-                        <i className="pi pi-exclamation-triangle p-mr-3" style={{ fontSize: '2rem'}} />
+                        <i className="pi pi-exclamation-triangle p-mr-3" style={{ fontSize: '2rem' }} />
                         {<span>Are you sure you want to delete current row?</span>}
+                    </div>
+                </Dialog>
+                <Dialog visible={this.state.showDeleteRowsDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteRowsDialogFooter} onHide={this.hideDeleteRowsDialog}>
+                    <div className="confirmation-content">
+                        <i className="pi pi-exclamation-triangle p-mr-3" style={{ fontSize: '2rem' }} />
+                        {<span>Are you sure you want to delete the selected rows?</span>}
                     </div>
                 </Dialog>
             </React.Fragment>
