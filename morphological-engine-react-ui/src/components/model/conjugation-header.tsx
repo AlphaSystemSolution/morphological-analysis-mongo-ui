@@ -27,14 +27,19 @@ export class RootLetters {
         );
     }
 
-    static of(src: _RootLetters): RootLetters {
+    public static of(src?: any): RootLetters {
+        if (!src) {
+            throw new Error(`Unable to create "RootLetters" from: ${src}`);
+        }
         return new RootLetters(
-            IdGenerator.nextId(),
+            src.id,
             src.name,
-            src.firstRadical.name,
-            src.secondRadical.name,
-            src.thirdRadical.name,
-            src.fourthRadical.name
+            src.firstRadical,
+            src.secondRadical,
+            src.thirdRadical,
+            src.fourthRadical,
+            src.displayName,
+            src.empty
         );
     }
 }

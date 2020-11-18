@@ -8,6 +8,10 @@ import { VerbalNoun } from './verbal-noun';
 
 export class ConjugationConfiguration {
   constructor(public removePassiveLine: boolean = false, public skipRuleProcessing: boolean = false) { }
+
+  public static of(src?: any): ConjugationConfiguration {
+    return src ? new ConjugationConfiguration(src.removePassiveLine, src.skipRuleProcessing) : new ConjugationConfiguration();
+  }
 }
 
 export class NounStatus extends ArabicLabel {

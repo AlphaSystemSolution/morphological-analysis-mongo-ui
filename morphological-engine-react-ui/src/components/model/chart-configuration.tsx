@@ -6,30 +6,54 @@ export enum PageOrientation {
 
 export class PageOption extends Document {
 
-    constructor(public orientation: string) {
+    constructor(public orientation: string = PageOrientation[PageOrientation.PORTRAIT]) {
         super();
+    }
+
+    public static of(src?: any): PageOption {
+        return src ? new PageOption(PageOrientation[src.orientation]) : new PageOption()
     }
 }
 
 export class ChartConfiguration extends Document {
 
-    omitToc = false;
-    omitAbbreviatedConjugation = false;
-    omitDetailedConjugation = false;
-    omitTitle = false;
-    omitHeader = false;
-    omitSarfTermCaption = false;
-    sortDirective = 'NONE';
-    sortDirection = 'ASCENDING';
-    arabicFontFamily = 'KFGQPC Uthman Taha Naskh';
-    translationFontFamily = 'Candara';
-    arabicFontSize = 14;
-    translationFontSize = 12;
-    headingFontSize = 30;
-    pageOption: PageOption;
-
-    constructor() {
+    constructor(
+        public omitToc = false,
+        public omitAbbreviatedConjugation = false,
+        public omitDetailedConjugation = false,
+        public omitTitle = false,
+        public omitHeader = true,
+        public omitSarfTermCaption = false,
+        public sortDirective = 'NONE',
+        public sortDirection = 'ASCENDING',
+        public arabicFontFamily = 'KFGQPC Uthman Taha Naskh',
+        public translationFontFamily = 'Candara',
+        public arabicFontSize = 14,
+        public translationFontSize = 12,
+        public headingFontSize = 30,
+        public pageOption: PageOption = new PageOption()) {
         super();
-        this.pageOption = new PageOption(PageOrientation[PageOrientation.PORTRAIT]);
+    }
+
+    public static of(src?: any): ChartConfiguration {
+        if (src) {
+            return new ChartConfiguration(
+                src.omitToc,
+                src.omitAbbreviatedConjugation,
+                src.omitDetailedConjugation,
+                src.omitTitle,
+                src.omitHeader,
+                src.omitSarfTermCaption,
+                src.sortDirective,
+                src.sortDirection,
+                src.arabicFontFamily,
+                src.translationFontFamily,
+                src.arabicFontSize,
+                src.translationFontSize,
+                src.headingFontSize,
+                PageOption.of(src.pageOption)
+            );
+        }
+        return new ChartConfiguration();
     }
 }

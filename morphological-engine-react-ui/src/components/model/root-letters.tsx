@@ -1,8 +1,24 @@
+import { IdGenerator } from '../../utils/id-generator';
 import { ArabicLetter } from './arabic-letter';
+import { RootLetters as _RootLetters } from './conjugation-header';
 
 export class RootLetters {
+  private _id: string = IdGenerator.nextId();
+
   constructor(public firstRadical: ArabicLetter = ArabicLetter.FA, public secondRadical: ArabicLetter = ArabicLetter.AIN,
     public thirdRadical: ArabicLetter = ArabicLetter.LAM, public fourthRadical: ArabicLetter = ArabicLetter.TATWEEL) { }
+
+  get id(): string {
+    return this._id;
+  }
+
+  set id(value: string) {
+    this._id = value ? value : IdGenerator.nextId();
+  }
+
+  get empty(): boolean {
+    return this.firstRadical !== null || this.secondRadical !== null || this.thirdRadical !== null;
+  }
 
   get label(): string {
     let label = this.firstRadical.label + this.secondRadical.label + this.thirdRadical.label;
@@ -55,5 +71,18 @@ export class RootLetters {
 
   public copy(): RootLetters {
     return new RootLetters(this.firstRadical.copy(), this.secondRadical.copy(), this.thirdRadical, this.fourthRadical.copy());
+  }
+
+  public toRootLetters(): _RootLetters {
+    return new _RootLetters(
+      this.id,
+      this.name,
+      this.firstRadical.code,
+      this.secondRadical.code,
+      this.thirdRadical.code,
+      this.firstRadical.code,
+      this.name,
+      this.name
+    );
   }
 }

@@ -2,16 +2,12 @@ import * as React from 'react';
 
 import * as path from 'path';
 import { TabView, TabPanel } from 'primereact/tabview';
-import { InputData, Project } from './model/models';
+import { Project } from './model/models';
 import InputTable from './input-table';
 import Emitter from '../services/event-emitter';
 import { AppToolbar } from '../AppToolbar';
-import { RootLetters } from './model/root-letters';
 import { ConjugationTemplate } from "../components/model/conjugation-template";
 import { ApplicationController } from '../services/application-controller';
-import { ArabicLetter } from './model/arabic-letter';
-import { NamedTemplate } from './model/named-template';
-import { VerbalNoun } from './model/verbal-noun';
 
 interface Props { }
 
@@ -58,26 +54,9 @@ export class ProjectView extends React.Component<Props, State> {
         fileReader.readAsText(file);
         fileReader.onload = () => {
             const content = fileReader.result as string;
-            const ct: ConjugationTemplate = Object.assign(new ConjugationTemplate(), JSON.parse(content));
-            let data: InputData[] = [];
-            ct.data.forEach((item) => {
-                const rootLetters = item.rootLetters
-                data.push(new InputData(
-                    new RootLetters(
-                        ArabicLetter.getByName(rootLetters.firstRadical),
-                        ArabicLetter.getByName(rootLetters.secondRadical),
-                        ArabicLetter.getByName(rootLetters.thirdRadical),
-                        !rootLetters.fourthRadical ? ArabicLetter.TATWEEL : ArabicLetter.getByName(rootLetters.fourthRadical)
-                    ),
-                    NamedTemplate.getByName(item.template),
-                    item.translation,
-                    item.configuration.removePassiveLine,
-                    item.configuration.skipRuleProcessing,
-                    item.verbalNouns.map((name) => VerbalNoun.getByName(name)),
-                    item.id
-                ));
-            });
-
+            const src = JSON.parse(content);
+            const ct = ConjugationTemplate.of(src);
+            const data = ct.data.map((d) => d.toInputData())
             const project = new Project(path.basename(file.name, ".json"), file.name, data, ct.chartConfiguration)
             const projects = [...this.state.projects];
             projects.push(project);
