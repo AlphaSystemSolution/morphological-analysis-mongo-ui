@@ -64,6 +64,7 @@ export class ProjectView extends React.Component<Props, State> {
                 projects: projects,
                 activeTabIndex: projects.length - 1
             });
+            Emitter.emit('project-created', {})
         };
         fileReader.onerror = () => {
             console.error(`Error reading file: ${file.name}`)
