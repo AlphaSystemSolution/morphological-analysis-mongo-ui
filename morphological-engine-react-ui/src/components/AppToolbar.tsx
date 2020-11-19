@@ -58,7 +58,7 @@ export class AppToolbar extends React.Component<Props, State> {
             <React.Fragment>
                 <Button label="New" icon="pi pi-plus" className="p-mr-2" onClick={() => this.emitAction(AppToolbar.NEW_PROJECT_ACTION)} />
                 <span>&nbsp;</span>
-                <FileUpload ref={(el) => this.fileUploaderRef = el} name="import" accept="*.json" mode="basic" chooseLabel="Import" customUpload uploadHandler={this.uploadHandler}
+                <FileUpload ref={(el) => this.fileUploaderRef = el} name="import" accept="application/json" mode="basic" chooseLabel="Import" customUpload uploadHandler={this.uploadHandler}
                     auto={true} />
                 <span>&nbsp;</span>
                 <i className="pi pi-bars p-toolbar-separator p-mr-2" />
