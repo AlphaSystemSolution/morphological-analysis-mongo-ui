@@ -1,10 +1,13 @@
 import * as React from 'react';
 
+import * as path from 'path';
 import { Toolbar } from 'primereact/toolbar';
 import { Button } from 'primereact/button';
 import { FileUpload } from 'primereact/fileupload';
 // import { SplitButton } from 'primereact/splitbutton';
 import Emitter from '../services/event-emitter';
+import { ConjugationTemplate } from "../components/model/conjugation-template";
+import { Project } from './model/models';
 
 interface Props { }
 
@@ -25,21 +28,28 @@ export class AppToolbar extends React.Component<Props, State> {
         this.state = {};
     }
 
-    componentDidMount() {
-        Emitter.on("project-created", () => this.fileUploaderRef.clear());
-    }
-
-    componentWillUnmount() {
-        Emitter.off("project-created");
-    }
-
     private emitAction(event: string, payload: any = {}) {
         Emitter.emit(event, payload)
     }
 
     private uploadHandler(event: any) {
         if (event.files) {
-            this.emitAction(AppToolbar.IMPORT_PROJECT_ACTION, event.files[0]);
+            const file = event.files[0];
+            const fileReader = new FileReader();
+            fileReader.readAsText(file);
+            fileReader.onload = () => {
+                const content = fileReader.result as string;
+                const src = JSON.parse(content);
+                const ct = ConjugationTemplate.of(src);
+                const data = ct.data.map((d) => d.toInputData())
+                const project = new Project(path.basename(file.name, ".json"), file.name, data, ct.chartConfiguration)                
+                Emitter.emit(AppToolbar.IMPORT_PROJECT_ACTION, project)
+                this.fileUploaderRef.clear();
+            };
+            fileReader.onerror = () => {
+                console.error(`Error reading file: ${file.name}`)
+                throw new Error("Unable to read file");
+            }
         }
     }
 
