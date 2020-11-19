@@ -8,7 +8,7 @@ import 'primeflex/primeflex.css';
 import './assets/font.css';
 import './assets/App.css';
 
-import { AppToolbar } from './AppToolbar';
+import { AppToolbar } from './components/AppToolbar';
 import { ProjectView } from './components/project-view';
 
 interface Props { }

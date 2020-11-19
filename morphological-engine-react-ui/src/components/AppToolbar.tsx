@@ -4,7 +4,7 @@ import { Toolbar } from 'primereact/toolbar';
 import { Button } from 'primereact/button';
 import { FileUpload } from 'primereact/fileupload';
 // import { SplitButton } from 'primereact/splitbutton';
-import Emitter from './services/event-emitter';
+import Emitter from '../services/event-emitter';
 
 interface Props { }
 
