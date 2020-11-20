@@ -2,6 +2,7 @@ import { IdGenerator } from '../../utils/id-generator';
 import { Utils } from '../../utils/utils';
 import { ArabicLabel } from './arabic-label';
 import { ChartConfiguration } from './chart-configuration';
+import { ConjugationData } from './conjugation-data';
 import { NamedTemplate } from './named-template';
 import { RootLetters } from './root-letters';
 import { VerbalNoun } from './verbal-noun';
@@ -57,6 +58,10 @@ export enum DisplayType {
   LABEL_ONLY, CODE_ONLY, LABEL_AND_CODE
 }
 
+export enum OutputFormat {
+  UNICODE, HTML, BUCK_WALTER, STREAM
+}
+
 export class ArabicConstants {
   static PARTICIPLE_PREFIX = new ArabicLabel('PARTICIPLE_PREFIX', 'فهو', 'Participle prefix');
   static IMPERATIVE_PREFIX = new ArabicLabel('IMPERATIVE_PREFIX', 'الأمر منه', 'Imperative prefix');
@@ -85,7 +90,17 @@ export class InputData {
     public id: string = IdGenerator.nextId()
   ) { }
 
-  copy(): InputData {
+  public toConjugationData() {
+    return new ConjugationData(
+      this.rootLetters.toRootLetters(),
+      this.family.name,
+      new ConjugationConfiguration(this.removePassiveLine, this.skipRuleProcessing),
+      this.translation,
+      this.verbalNouns.map((vn) => vn.name)
+    );
+  }
+
+  public copy(): InputData {
     return new InputData(
       this.rootLetters.copy(),
       this.family.copy(),

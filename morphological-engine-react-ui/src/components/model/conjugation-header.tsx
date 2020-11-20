@@ -11,7 +11,7 @@ export class RootLetters {
         public thirdRadical: string,
         public fourthRadical?: string,
         public displayName?: string,
-        public empty?: string
+        public empty?: boolean
     ) { }
 
     get label(): string {
@@ -23,7 +23,7 @@ export class RootLetters {
             ArabicLetter.getByName(this.firstRadical),
             ArabicLetter.getByName(this.secondRadical),
             ArabicLetter.getByName(this.thirdRadical),
-            ArabicLetter.getByName(this.fourthRadical ? this.fourthRadical : ArabicLetter.TATWEEL.name)
+            this.fourthRadical ? ArabicLetter.getByName(this.firstRadical) : ArabicLetter.TATWEEL
         );
     }
 

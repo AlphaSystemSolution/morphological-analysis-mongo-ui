@@ -22,7 +22,7 @@ export class ConjugationData extends Document {
             this.translation,
             this.configuration.removePassiveLine,
             this.configuration.skipRuleProcessing,
-            this.verbalNouns.map((name) => NamedTemplate.getByName(name))
+            this.verbalNouns && this.verbalNouns.length > 0 ? this.verbalNouns.filter((name) => name != null).map((name) => VerbalNoun.getByName(name)) : []
         );
     }
 
@@ -35,7 +35,7 @@ export class ConjugationData extends Document {
             src.template,
             ConjugationConfiguration.of(src.configuration),
             src.translation,
-            src.verbalNouns.map((name: string) => VerbalNoun.getByName(name))
+            src.verbalNouns ? src.verbalNouns : []
         );
     }
 }

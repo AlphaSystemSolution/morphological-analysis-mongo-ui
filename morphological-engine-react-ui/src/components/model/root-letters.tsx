@@ -17,7 +17,7 @@ export class RootLetters {
   }
 
   get empty(): boolean {
-    return this.firstRadical !== null || this.secondRadical !== null || this.thirdRadical !== null;
+    return this.firstRadical === null || this.secondRadical === null || this.thirdRadical === null;
   }
 
   get label(): string {
@@ -77,12 +77,12 @@ export class RootLetters {
     return new _RootLetters(
       this.id,
       this.name,
-      this.firstRadical.code,
-      this.secondRadical.code,
-      this.thirdRadical.code,
-      this.firstRadical.code,
+      this.firstRadical.name,
+      this.secondRadical.name,
+      this.thirdRadical.name,
+      this.fourthRadical.equals(ArabicLetter.TATWEEL) ? undefined : this.fourthRadical.name,
       this.name,
-      this.name
+      this.empty
     );
   }
 }
