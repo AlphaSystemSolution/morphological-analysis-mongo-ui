@@ -3,8 +3,8 @@ import * as React from 'react';
 import { TabView, TabPanel } from 'primereact/tabview';
 import { Project } from './model/models';
 import Emitter from '../services/event-emitter';
-import { AppToolbar } from './app-toolbar';
 import { ProjectView } from './project-view';
+import { EmitterConstants } from './emitter-constants';
 
 interface Props { }
 
@@ -25,13 +25,13 @@ export class HomeView extends React.Component<Props, State> {
     }
 
     componentDidMount() {
-        Emitter.on(AppToolbar.NEW_PROJECT_ACTION, () => this.createNewProject());
-        Emitter.on(AppToolbar.IMPORT_PROJECT_ACTION, (project) => this.importProject(project));
+        Emitter.on(EmitterConstants.NEW_PROJECT_ACTION, () => this.createNewProject());
+        Emitter.on(EmitterConstants.IMPORT_PROJECT_ACTION, (project) => this.importProject(project));
     }
 
     componentWillUnmount() {
-        Emitter.off(AppToolbar.NEW_PROJECT_ACTION);
-        Emitter.off(AppToolbar.IMPORT_PROJECT_ACTION);
+        Emitter.off(EmitterConstants.NEW_PROJECT_ACTION);
+        Emitter.off(EmitterConstants.IMPORT_PROJECT_ACTION);
     }
 
     private createNewProject() {

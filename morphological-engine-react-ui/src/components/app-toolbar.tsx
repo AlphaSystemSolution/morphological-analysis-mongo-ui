@@ -8,15 +8,13 @@ import { FileUpload } from 'primereact/fileupload';
 import Emitter from '../services/event-emitter';
 import { ConjugationTemplate } from "./model/conjugation-template";
 import { Project } from './model/models';
+import { EmitterConstants } from './emitter-constants';
 
 interface Props { }
 
 interface State { }
 
 export class AppToolbar extends React.Component<Props, State> {
-
-    static NEW_PROJECT_ACTION: string = "create-new-project";
-    static IMPORT_PROJECT_ACTION: string = "import-project"
 
     fileUploaderRef: any = React.createRef();
 
@@ -43,7 +41,7 @@ export class AppToolbar extends React.Component<Props, State> {
                 const ct = ConjugationTemplate.of(src);
                 const data = ct.data.map((d) => d.toInputData())
                 const project = new Project(path.basename(file.name, ".json"), file.name, data, ct.chartConfiguration)                
-                Emitter.emit(AppToolbar.IMPORT_PROJECT_ACTION, project)
+                Emitter.emit(EmitterConstants.IMPORT_PROJECT_ACTION, project)
                 this.fileUploaderRef.clear();
             };
             fileReader.onerror = () => {
@@ -56,7 +54,7 @@ export class AppToolbar extends React.Component<Props, State> {
     render() {
         const leftContents: any = (
             <React.Fragment>
-                <Button label="New" icon="pi pi-plus" className="p-mr-2" onClick={() => this.emitAction(AppToolbar.NEW_PROJECT_ACTION)} />
+                <Button label="New" icon="pi pi-plus" className="p-mr-2" onClick={() => this.emitAction(EmitterConstants.NEW_PROJECT_ACTION)} />
                 <span>&nbsp;</span>
                 <FileUpload ref={(el) => this.fileUploaderRef = el} name="import" accept="application/json" mode="basic" chooseLabel="Import" customUpload uploadHandler={this.uploadHandler}
                     auto={true} />
