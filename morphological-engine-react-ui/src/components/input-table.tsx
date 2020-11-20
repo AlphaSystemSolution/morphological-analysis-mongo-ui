@@ -11,6 +11,8 @@ import { Toolbar } from 'primereact/toolbar';
 import { ArabicLetter } from './model/arabic-letter';
 import { ApplicationController } from '../services/application-controller';
 import { ConjugationTemplate } from './model/conjugation-template';
+import Emitter from '../services/event-emitter';
+import { EmitterConstants } from './emitter-constants';
 
 interface Props {
     initialData?: InputData[]
@@ -223,11 +225,8 @@ export default class InputTable extends React.Component<Props, State> {
     private viewConjugation(rowData: InputData) {
         this.applicationController
             .getMorphologicalChart(OutputFormat.UNICODE, new ConjugationTemplate([rowData.toConjugationData()]))
-            .then((r) => {
-                console.log(`HERE: ${JSON.stringify(r)}`);
-            })
-            .finally(() => {
-                console.log("Done")
+            .then((charts) => {
+                Emitter.emit(EmitterConstants.MORPHOLOGICAL_CHART, charts[0]);
             });
     }
 

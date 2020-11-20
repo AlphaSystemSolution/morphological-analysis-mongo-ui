@@ -104,6 +104,7 @@
 }
 
 table.morphological-chart {
+  table-layout: fixed;
   border-collapse: collapse;
   width: 100%;
 }
