@@ -2,10 +2,9 @@ import * as React from 'react';
 
 import { TabView, TabPanel } from 'primereact/tabview';
 import { Project } from './model/models';
-import InputTable from './input-table';
 import Emitter from '../services/event-emitter';
 import { AppToolbar } from './app-toolbar';
-import { ApplicationController } from '../services/application-controller';
+import { ProjectView } from './project-view';
 
 interface Props { }
 
@@ -16,12 +15,9 @@ interface State {
 
 export class HomeView extends React.Component<Props, State> {
 
-    private applicationController: ApplicationController
-
     constructor(props: Props) {
         super(props);
 
-        this.applicationController = new ApplicationController();
         this.state = {
             activeTabIndex: 0,
             projects: [new Project("Untitled1", "Untitled1.json")]
@@ -59,9 +55,10 @@ export class HomeView extends React.Component<Props, State> {
     render() {
         const panels =
             this.state.projects.map((project, index) => {
-                return <TabPanel header={project.projectName} key={"project-" + index}>
-                    <InputTable initialData={project.data} />
-                </TabPanel>;
+                return (
+                    <TabPanel header={project.projectName} key={"project-" + index}>
+                        <ProjectView project={project} />
+                    </TabPanel>);
             });
 
         return (
