@@ -14,7 +14,7 @@ interface State {
     projects: Project[]
 }
 
-export class ProjectView extends React.Component<Props, State> {
+export class HomeView extends React.Component<Props, State> {
 
     private applicationController: ApplicationController
 

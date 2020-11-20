@@ -9,7 +9,7 @@ import './assets/font.css';
 import './assets/App.css';
 
 import { AppToolbar } from './components/app-toolbar';
-import { ProjectView } from './components/project-view';
+import { HomeView } from './components/project-view';
 
 interface Props { }
 
@@ -28,7 +28,7 @@ export default class App extends React.Component<Props, State> {
       <div className="App">
         <AppToolbar />
         <div>&nbsp;</div>
-        <ProjectView />
+        <HomeView />
       </div>
     );
   }
