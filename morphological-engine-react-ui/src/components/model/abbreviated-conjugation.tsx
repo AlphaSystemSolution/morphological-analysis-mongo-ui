@@ -1,17 +1,14 @@
 import { ConjugationHeader } from './conjugation-header';
-import { ArabicLabel } from './arabic-label';
 import { SarfTermType } from './sarf-term-type';
 import { RootLetters } from './root-letters';
 import { NamedTemplate } from './named-template';
 import { IdGenerator } from '../../utils/id-generator';
 
-export class ConjugationLabel extends ArabicLabel {
-    static of(src?: any) {
-        if(src) {
+export class ConjugationLabel {
+    public static of(src?: any): ConjugationLabel | undefined {
+        if (src) {
             return new ConjugationLabel(
-                src.id || IdGenerator.nextId(),
                 (src.type && SarfTermType.getByName(src.type)) || SarfTermType.PAST_TENSE,
-                src.source,
                 src.label,
                 src.source
             );
@@ -20,13 +17,24 @@ export class ConjugationLabel extends ArabicLabel {
         }
     }
 
+    public static toArrayOfLabels(src?: any[]): ConjugationLabel[] {
+        let result: ConjugationLabel[] = [];
+        if (src) {
+            result = src
+                .filter((item: any) => item !== null || item !== undefined)
+                .map((item: any) => ConjugationLabel.of(item)!);
+        }
+        return result;
+    }
+
     constructor(
-        public id: string,
         public type: SarfTermType,
-        public name: string,
         public label: string,
-        public code: string) {
-        super(name, label, code)
+        public code: string) { }
+
+    public equals(other?: ConjugationLabel) {
+        return other ? (this.type.equals(other.type) && this.label === other.label
+            && this.code === other.code) : false;
     }
 }
 
@@ -46,28 +54,14 @@ export class AbbreviatedConjugation {
             ConjugationLabel.of(src.activeParticipleMasculine)!,
             ConjugationLabel.of(src.activeParticipleFeminine)!,
             ConjugationLabel.of(src.imperative)!,
-            ConjugationLabel.of(src.imperative)!,
+            ConjugationLabel.of(src.forbidding)!,
             ConjugationLabel.of(src.pastPassiveTense),
             ConjugationLabel.of(src.presentPassiveTense),
             ConjugationLabel.of(src.passiveParticipleMasculine),
             ConjugationLabel.of(src.passiveParticipleFeminine),
-            AbbreviatedConjugation.getLabels(src.verbalNouns),
-            AbbreviatedConjugation.getLabels(src.advebs)
+            ConjugationLabel.toArrayOfLabels(src.verbalNouns),
+            ConjugationLabel.toArrayOfLabels(src.adverbs)
         );
-    }
-
-    private static getLabels(values: any[]): ConjugationLabel[] {
-        if (!values) {
-            return [];
-        }
-        const labels: ConjugationLabel[] = [];
-        values.forEach(value => {
-            const label = ConjugationLabel.of(value);
-            if (label != null) {
-                labels.push(label);
-            }
-        });
-        return labels;
     }
 
     private static getRootLetters(conjugationHeader: ConjugationHeader): RootLetters {
@@ -97,7 +91,7 @@ export class AbbreviatedConjugation {
         public adverbs: ConjugationLabel[] = []) { }
 
     public hasPassiveLine() {
-        return this.pastPassiveTense && this.presentPassiveTense && this.passiveParticipleMasculine; 
+        return this.pastPassiveTense && this.presentPassiveTense && this.passiveParticipleMasculine;
     }
 
     equals(other: AbbreviatedConjugation) {

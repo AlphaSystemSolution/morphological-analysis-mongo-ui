@@ -118,7 +118,6 @@ export default class MorphologicalInputForm extends React.Component<Props, State
     }
 
     private updateRemovePassiveLine(event: any) {
-        console.log(`${event.checked}`)
         const data = this.state.currentData;
         data.removePassiveLine = event.checked;
         this.setState({

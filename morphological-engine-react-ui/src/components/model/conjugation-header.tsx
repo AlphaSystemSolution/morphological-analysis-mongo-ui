@@ -45,10 +45,15 @@ export class RootLetters {
 }
 
 export class ChartMode {
-    constructor(public template: string, public rootType: string, public verbType: string, public weakVerbType: string) { }
+    constructor(public template: string, public rootType: string, public verbType: string, public weakVerbType?: string) { }
 
     public static of(src: any) {
         return new ChartMode(src.template, src.rootType, src.verbType, src.weakVerbType);
+    }
+
+    public equals(other?: ChartMode): boolean {
+        return other ? this.template === other.template && this.rootType === other.rootType &&
+            this.verbType === other.verbType && this.weakVerbType == other.weakVerbType : false;
     }
 }
 
