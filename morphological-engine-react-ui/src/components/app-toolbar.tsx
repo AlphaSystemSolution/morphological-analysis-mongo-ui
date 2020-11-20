@@ -6,7 +6,7 @@ import { Button } from 'primereact/button';
 import { FileUpload } from 'primereact/fileupload';
 // import { SplitButton } from 'primereact/splitbutton';
 import Emitter from '../services/event-emitter';
-import { ConjugationTemplate } from "../components/model/conjugation-template";
+import { ConjugationTemplate } from "./model/conjugation-template";
 import { Project } from './model/models';
 
 interface Props { }

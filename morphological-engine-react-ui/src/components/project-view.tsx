@@ -4,7 +4,7 @@ import { TabView, TabPanel } from 'primereact/tabview';
 import { Project } from './model/models';
 import InputTable from './input-table';
 import Emitter from '../services/event-emitter';
-import { AppToolbar } from './AppToolbar';
+import { AppToolbar } from './app-toolbar';
 import { ApplicationController } from '../services/application-controller';
 
 interface Props { }
