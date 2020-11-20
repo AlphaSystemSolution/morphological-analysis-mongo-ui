@@ -25,7 +25,7 @@ export class MorphologicalChart {
             chart.abbreviatedConjugation = AbbreviatedConjugation.of(src.abbreviatedConjugation);
             chart.detailedConjugation = DetailedConjugation.of(src.detailedConjugation);
         }
-        
+
         return chart;
 
     }

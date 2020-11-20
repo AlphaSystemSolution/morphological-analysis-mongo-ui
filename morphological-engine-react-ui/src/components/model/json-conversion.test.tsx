@@ -1,8 +1,7 @@
 import { assert } from 'console';
-import React from 'react';
-import { IdGenerator } from '../../utils/id-generator';
 import { ConjugationLabel } from './abbreviated-conjugation';
 import { ChartMode } from './conjugation-header';
+import { ConjugationTuple, NounConjugationGroup } from './detailed-conjugation';
 import { NamedTemplate } from './named-template';
 import { SarfTermType } from './sarf-term-type';
 
@@ -41,6 +40,32 @@ const conjugationLabels = [
     }
 ];
 
+const cojugationTuple = {
+    "singular": "فَعَلَ",
+    "dual": "فَعَلَا",
+    "plural": "فَعَلُوْا"
+};
+
+const conjugationGroup = {
+    "termType": "ACTIVE_PARTICIPLE_MASCULINE",
+    "id": "9EDEB6F9",
+    "nominative": {
+        "singular": "فَاعِلٌ",
+        "dual": "فَاعِلَانِ",
+        "plural": "فَاعِلُوْنَ"
+    },
+    "accusative": {
+        "singular": "فَاعِلًا",
+        "dual": "فَاعِلَيْنِ",
+        "plural": "فَاعِلِيْنَ"
+    },
+    "genitive": {
+        "singular": "فَاعِلٍ",
+        "dual": "فَاعِلَيْنِ",
+        "plural": "فَاعِلِيْنَ"
+    }
+};
+
 test('convert ChartMode', () => {
     const actual = ChartMode.of(chartMode);
     const expected = new ChartMode(
@@ -65,4 +90,14 @@ test('convert ConjugationLabel', () => {
 test('convert multiple ConjugationLabel', () => {
     const actual = ConjugationLabel.toArrayOfLabels(conjugationLabels)!;
     console.log(`${JSON.stringify(actual)}`);
+});
+
+test('convert ConjugationTuple', () => {
+    const actual = ConjugationTuple.of(cojugationTuple);
+    console.log(JSON.stringify(actual));
+});
+
+test('convert ConjugationGroup', () => {
+    const actual = NounConjugationGroup.of(conjugationGroup);
+    console.log(JSON.stringify(actual));
 });

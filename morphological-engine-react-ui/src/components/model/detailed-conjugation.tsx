@@ -10,35 +10,25 @@ export class ConjugationTuple {
         }
         return new ConjugationTuple(src.singular, src.dual, src.plural);
     }
-    private _type: string = "";
 
     constructor(public singular: string, public dual: string, public plural: string) { }
-
-    get type(): string {
-        return this._type;
-    }
-
-    set type(value: string) {
-        this._type = value;
-    }
 }
 
 export class ConjugationGroup {
-    constructor(public id: string, public termType: string) { }
+    constructor(public termType: string) { }
 
     equals(other: ConjugationGroup): boolean {
-        return other && this.id === other.id;
+        return other && this.termType === other.termType;
     }
 }
 
 export class VerbConjugationGroup extends ConjugationGroup {
-    static of(src?: any) {
+    static of(src?: any): VerbConjugationGroup | undefined {
         if (!src || !src.termType || !src.masculineThirdPerson || src.feminineThirdPerson || !src.masculineSecondPerson ||
             !src.masculineSecondPerson || !src.feminineSecondPerson || !src.firstPerson) {
-            throw new Error(`Invalid source: ${src}`);
+            return undefined;
         }
         return new VerbConjugationGroup(
-            src.id || IdGenerator.nextId(),
             src.termType,
             ConjugationTuple.of(src.masculineThirdPerson),
             ConjugationTuple.of(src.feminineThirdPerson),
@@ -49,7 +39,6 @@ export class VerbConjugationGroup extends ConjugationGroup {
     }
 
     constructor(
-        public id: string,
         public termType: string,
         public masculineThirdPerson: ConjugationTuple,
         public feminineThirdPerson: ConjugationTuple,
@@ -57,19 +46,18 @@ export class VerbConjugationGroup extends ConjugationGroup {
         public feminineSecondPerson: ConjugationTuple,
         public firstPerson: ConjugationTuple
     ) {
-        super(id, termType);
+        super(termType);
     }
 
 }
 
 export class NounConjugationGroup extends ConjugationGroup {
 
-    static of(src?: any): NounConjugationGroup {
+    static of(src?: any): NounConjugationGroup | undefined {
         if (!src || !src.nominative || !src.accusative || !src.genitive) {
-            throw new Error(`Invalid source: ${src}`);
+            return undefined;
         }
         return new NounConjugationGroup(
-            src.id || IdGenerator.nextId(),
             src.termType,
             ConjugationTuple.of(src.nominative),
             ConjugationTuple.of(src.accusative),
@@ -78,12 +66,11 @@ export class NounConjugationGroup extends ConjugationGroup {
     }
 
     constructor(
-        public id: string,
         public termType: string,
         public nominative: ConjugationTuple,
         public accusative: ConjugationTuple,
         public genitive: ConjugationTuple) {
-        super(id, termType);
+        super(termType);
     }
 }
 
@@ -93,16 +80,16 @@ export class DetailedConjugation {
             throw new Error(`Invalid source: ${src}`);
         }
         return new DetailedConjugation(
-            VerbConjugationGroup.of(src.pastTense),
-            VerbConjugationGroup.of(src.presentTense),
-            NounConjugationGroup.of(src.activeParticipleMasculine),
-            NounConjugationGroup.of(src.activeParticipleFeminine),
+            VerbConjugationGroup.of(src.pastTense)!,
+            VerbConjugationGroup.of(src.presentTense)!,
+            NounConjugationGroup.of(src.activeParticipleMasculine)!,
+            NounConjugationGroup.of(src.activeParticipleFeminine)!,
+            VerbConjugationGroup.of(src.imperative)!,
+            VerbConjugationGroup.of(src.forbidding)!,
             VerbConjugationGroup.of(src.pastPassiveTense),
             VerbConjugationGroup.of(src.presentPassiveTense),
             NounConjugationGroup.of(src.passiveParticipleMasculine),
-            NounConjugationGroup.of(src.passiveParticipleFeminine),
-            VerbConjugationGroup.of(src.imperative),
-            VerbConjugationGroup.of(src.forbidding)
+            NounConjugationGroup.of(src.passiveParticipleFeminine)
         );
     }
 
@@ -117,14 +104,17 @@ export class DetailedConjugation {
         public presentTense: VerbConjugationGroup,
         public activeParticipleMasculine: NounConjugationGroup,
         public activeParticipleFeminine: NounConjugationGroup,
-        // passive values
-        public pastPassiveTense: VerbConjugationGroup,
-        public presentPassiveTense: VerbConjugationGroup,
-        public passiveParticipleMasculine: NounConjugationGroup,
-        public passiveParticipleFeminine: NounConjugationGroup,
+
         // imperative and forbidden values
         public imperative: VerbConjugationGroup,
         public forbidding: VerbConjugationGroup,
+
+        // passive values
+        public pastPassiveTense?: VerbConjugationGroup,
+        public presentPassiveTense?: VerbConjugationGroup,
+        public passiveParticipleMasculine?: NounConjugationGroup,
+        public passiveParticipleFeminine?: NounConjugationGroup,
+
         // verbal noun values
         public verbalNouns: NounConjugationGroup[] = [],
         // adverb values
@@ -148,8 +138,8 @@ export class DetailedConjugation {
         this.updateId();
     }
 
-    getConjugation(id: string, type: SarfTermType): NounConjugationGroup | VerbConjugationGroup | null {
-        let result: NounConjugationGroup | VerbConjugationGroup | null = null;
+    getConjugation(type: SarfTermType): NounConjugationGroup | VerbConjugationGroup | undefined {
+        let result: NounConjugationGroup | VerbConjugationGroup | undefined = undefined;
         switch (type.name) {
             case SarfTermType.PAST_TENSE.name:
                 result = this.pastTense;
@@ -182,13 +172,13 @@ export class DetailedConjugation {
                 result = this.forbidding;
                 break;
             case SarfTermType.VERBAL_NOUN.name:
-                let values = this.verbalNouns.filter(v => v.id === id);
+                let values = this.verbalNouns;
                 if (values && values.length > 0) {
                     result = values[0];
                 }
                 break;
             case SarfTermType.NOUN_OF_PLACE_AND_TIME.name:
-                values = this.adverbs.filter(v => v.id === id);
+                values = this.adverbs;
                 if (values && values.length > 0) {
                     result = values[0];
                 }
