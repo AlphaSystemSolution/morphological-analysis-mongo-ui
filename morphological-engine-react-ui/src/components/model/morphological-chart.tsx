@@ -19,6 +19,17 @@ export class MorphologicalChart {
         }
     }
 
+    public static of(src?: any) {
+        const chart = new MorphologicalChart();
+        if (src) {
+            chart.abbreviatedConjugation = AbbreviatedConjugation.of(src.abbreviatedConjugation);
+            chart.detailedConjugation = DetailedConjugation.of(src.detailedConjugation);
+        }
+        
+        return chart;
+
+    }
+
     get abbreviatedConjugation(): AbbreviatedConjugation {
         return this._abbreviatedConjugation;
     }

@@ -46,10 +46,38 @@ export class RootLetters {
 
 export class ChartMode {
     constructor(public template: string, public rootType: string, public verbType: string, public weakVerbType: string) { }
+
+    public static of(src: any) {
+        return new ChartMode(src.template, src.rootType, src.verbType, src.weakVerbType);
+    }
 }
 
 export class ConjugationHeader {
-    constructor(public rootLetters: RootLetters, public chartMode: ChartMode, public baseWord: string, public pastTenseRoot: string,
-        public presentTenseRoot: string, public translation: string, public title: string, public typeLabel1: string,
-        public typeLabel2: string, public typeLabel3: string) { }
+    constructor(
+        public rootLetters: RootLetters,
+        public chartMode: ChartMode,
+        public baseWord: string,
+        public pastTenseRoot: string,
+        public presentTenseRoot: string,
+        public translation: string,
+        public title: string,
+        public typeLabel1: string,
+        public typeLabel2: string,
+        public typeLabel3: string
+    ) { }
+
+    public static of(src: any) {
+        return new ConjugationHeader(
+            RootLetters.of(src.rootLetters),
+            ChartMode.of(src.chartMode),
+            src.baseWord,
+            src.pastTenseRoot,
+            src.presentTenseRoot,
+            src.translation,
+            src.title,
+            src.typeLabel1,
+            src.typeLabel2,
+            src.typeLabel3
+        );
+    }
 }

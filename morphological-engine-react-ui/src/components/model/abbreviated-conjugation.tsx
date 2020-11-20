@@ -7,16 +7,17 @@ import { IdGenerator } from '../../utils/id-generator';
 
 export class ConjugationLabel extends ArabicLabel {
     static of(src?: any) {
-        if (!src) {
-            throw new Error(`Invalid source: ${src}`);
+        if(src) {
+            return new ConjugationLabel(
+                src.id || IdGenerator.nextId(),
+                (src.type && SarfTermType.getByName(src.type)) || SarfTermType.PAST_TENSE,
+                src.source,
+                src.label,
+                src.source
+            );
+        } else {
+            return undefined;
         }
-        return new ConjugationLabel(
-            src.id || IdGenerator.nextId(),
-            src.type && SarfTermType.getByName(src.type) || SarfTermType.PAST_TENSE,
-            src.label,
-            src.source,
-            src.source
-        );
     }
 
     constructor(
@@ -34,22 +35,22 @@ export class AbbreviatedConjugation {
         if (!src) {
             throw new Error(`Invalid source: ${src}`);
         }
-        const conjugationHeader = src.conjugationHeader as ConjugationHeader;
+        const conjugationHeader = ConjugationHeader.of(src.conjugationHeader);
         return new AbbreviatedConjugation(
             src.id || IdGenerator.nextId(),
             conjugationHeader,
             AbbreviatedConjugation.getRootLetters(conjugationHeader),
             AbbreviatedConjugation.getNamedTemplate(conjugationHeader),
-            ConjugationLabel.of(src.pastTense),
-            ConjugationLabel.of(src.presentTense),
-            ConjugationLabel.of(src.activeParticipleMasculine),
-            ConjugationLabel.of(src.activeParticipleFeminine),
+            ConjugationLabel.of(src.pastTense)!,
+            ConjugationLabel.of(src.presentTense)!,
+            ConjugationLabel.of(src.activeParticipleMasculine)!,
+            ConjugationLabel.of(src.activeParticipleFeminine)!,
+            ConjugationLabel.of(src.imperative)!,
+            ConjugationLabel.of(src.imperative)!,
             ConjugationLabel.of(src.pastPassiveTense),
             ConjugationLabel.of(src.presentPassiveTense),
             ConjugationLabel.of(src.passiveParticipleMasculine),
             ConjugationLabel.of(src.passiveParticipleFeminine),
-            ConjugationLabel.of(src.imperative),
-            ConjugationLabel.of(src.imperative),
             AbbreviatedConjugation.getLabels(src.verbalNouns),
             AbbreviatedConjugation.getLabels(src.advebs)
         );
@@ -86,14 +87,18 @@ export class AbbreviatedConjugation {
         public presentTense: ConjugationLabel,
         public activeParticipleMasculine: ConjugationLabel,
         public activeParticipleFeminine: ConjugationLabel,
-        public pastPassiveTense: ConjugationLabel,
-        public presentPassiveTense: ConjugationLabel,
-        public passiveParticipleMasculine: ConjugationLabel,
-        public passiveParticipleFeminine: ConjugationLabel,
         public imperative: ConjugationLabel,
         public forbidding: ConjugationLabel,
-        public verbalNouns: ConjugationLabel[],
-        public adverbs: ConjugationLabel[]) { }
+        public pastPassiveTense?: ConjugationLabel,
+        public presentPassiveTense?: ConjugationLabel,
+        public passiveParticipleMasculine?: ConjugationLabel,
+        public passiveParticipleFeminine?: ConjugationLabel,
+        public verbalNouns: ConjugationLabel[] = [],
+        public adverbs: ConjugationLabel[] = []) { }
+
+    public hasPassiveLine() {
+        return this.pastPassiveTense && this.presentPassiveTense && this.passiveParticipleMasculine; 
+    }
 
     equals(other: AbbreviatedConjugation) {
         return other && this.id === other.id;
