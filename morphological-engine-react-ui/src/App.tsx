@@ -9,7 +9,7 @@ import './assets/font.css';
 import './assets/App.css';
 
 import { AppToolbar } from './components/app-toolbar';
-import { HomeView } from './components/project-view';
+import { HomeView } from './components/home-view';
 
 interface Props { }
 
