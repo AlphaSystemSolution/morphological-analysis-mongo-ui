@@ -4,51 +4,21 @@ import { RootLetters } from './root-letters';
 import { NamedTemplate } from './named-template';
 
 export class MorphologicalChart {
-    private _abbreviatedConjugation!: AbbreviatedConjugation;
-    private _detailedConjugation!: DetailedConjugation;
     private _rootLetters: RootLetters = new RootLetters();
     private _namedTemplate: NamedTemplate = NamedTemplate.FORM_I_CATEGORY_A_GROUP_A_TEMPLATE;
     private _id!: string;
 
-    constructor(abbreviatedConjugation?: AbbreviatedConjugation, detailedConjugation?: DetailedConjugation) {
-        if (abbreviatedConjugation) {
-            this.abbreviatedConjugation = abbreviatedConjugation;
-        }
-        if (detailedConjugation) {
-            this.detailedConjugation = detailedConjugation;
-        }
+    constructor(public readonly abbreviatedConjugation: AbbreviatedConjugation, public readonly detailedConjugation: DetailedConjugation) {
+        this._rootLetters = this.abbreviatedConjugation.rootLetters;
+        this._namedTemplate = this.abbreviatedConjugation.namedTemplate;
+        this._id = `${this.rootLetters.name}_${this.namedTemplate.name}`;
     }
 
-    public static of(src?: any) {
-        const chart = new MorphologicalChart();
-        if (src) {
-            chart.abbreviatedConjugation = AbbreviatedConjugation.of(src.abbreviatedConjugation);
-            chart.detailedConjugation = DetailedConjugation.of(src.detailedConjugation);
-        }
-
-        return chart;
-
-    }
-
-    get abbreviatedConjugation(): AbbreviatedConjugation {
-        return this._abbreviatedConjugation;
-    }
-
-    set abbreviatedConjugation(value: AbbreviatedConjugation) {
-        this._abbreviatedConjugation = value;
-        if (this.abbreviatedConjugation) {
-            this._rootLetters = this.abbreviatedConjugation.rootLetters;
-            this._namedTemplate = this.abbreviatedConjugation.namedTemplate;
-            this._id = this.abbreviatedConjugation.id;
-        }
-    }
-
-    get detailedConjugation(): DetailedConjugation {
-        return this._detailedConjugation;
-    }
-
-    set detailedConjugation(value: DetailedConjugation) {
-        this._detailedConjugation = value;
+    public static of(src: any) {
+        return new MorphologicalChart(
+            AbbreviatedConjugation.of(src.abbreviatedConjugation),
+            DetailedConjugation.of(src.detailedConjugation)
+        );
     }
 
     get rootLetters(): RootLetters {
@@ -64,13 +34,10 @@ export class MorphologicalChart {
     }
 
     equals(other: MorphologicalChart) {
-        return this.abbreviatedConjugation && other && this.abbreviatedConjugation.equals(other.abbreviatedConjugation);
+        return this.id === other.id;
     }
 
     compareTo(other: MorphologicalChart): number {
-        if (!this.abbreviatedConjugation && !other) {
-            return 0;
-        }
-        return (other && this.abbreviatedConjugation.compareTo(other.abbreviatedConjugation)) || 1;
+        return this.id.localeCompare(other.id);
     }
 }

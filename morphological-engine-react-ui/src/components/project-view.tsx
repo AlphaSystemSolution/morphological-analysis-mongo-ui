@@ -14,7 +14,7 @@ interface Props {
 interface State {
     activeTabIndex: number
     disableConjugationTab: boolean
-    chart: MorphologicalChart
+    chart?: MorphologicalChart
 }
 
 export class ProjectView extends React.Component<Props, State> {
@@ -26,8 +26,7 @@ export class ProjectView extends React.Component<Props, State> {
 
         this.state = {
             activeTabIndex: 0,
-            disableConjugationTab: true,
-            chart: new MorphologicalChart()
+            disableConjugationTab: true
         };
     }
 
@@ -48,15 +47,24 @@ export class ProjectView extends React.Component<Props, State> {
     }
 
     render() {
+        const chart = this.state.chart;
+        let conjugationContent: JSX.Element;
+        if (chart) {
+            conjugationContent = (
+                <div>
+                    <AbbreviatedConjugationView conjugation={chart.abbreviatedConjugation} />
+                </div>
+            );
+        } else {
+            conjugationContent = <div>&nbsp;</div>
+        }
         return (
             <TabView activeIndex={this.state.activeTabIndex} onTabChange={(e) => this.setState({ activeTabIndex: e.index })}>
                 <TabPanel header="Table">
                     <InputTable initialData={this.props.project!.data} />
                 </TabPanel>
                 <TabPanel header="Conjugation" disabled={this.state.disableConjugationTab}>
-                    <div>
-                        <AbbreviatedConjugationView conjugation={this.state.chart.abbreviatedConjugation} />
-                    </div>
+                    {conjugationContent}
                 </TabPanel>
             </TabView>
         );
