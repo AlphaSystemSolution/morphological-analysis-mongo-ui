@@ -75,7 +75,7 @@ export class Project {
   constructor(
     public projectName: string,
     public fileName: string,
-    public data: InputData[] = [new InputData()],
+    public data: InputData[] = [],
     public chartConfiguration: ChartConfiguration = new ChartConfiguration()) { }
 }
 
