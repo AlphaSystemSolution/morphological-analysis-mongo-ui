@@ -1,11 +1,10 @@
 import * as React from 'react';
 import { Dialog } from 'primereact/dialog';
-import ToggleSelecter from './toggle-selecter';
+import { ToggleSelecter } from './toggle-selecter';
 import { Button } from 'primereact/button';
 import { ArabicLetter } from './model/arabic-letter';
 import { RootLetters } from './model/root-letters';
 import ArabicButton from './arabic-button';
-import Emitter from '../services/event-emitter';
 
 interface Props {
     initialLetters?: RootLetters
@@ -29,6 +28,9 @@ export default class ArabicKeyboard extends React.Component<Props, State> {
     constructor(props: any) {
         super(props);
 
+        this.letterSelected = this.letterSelected.bind(this);
+        this.selectLetter = this.selectLetter.bind(this);
+
         this.state = {
             rootLetters: this.props.initialLetters ? this.props.initialLetters : new RootLetters(),
             prevLetters: this.props.initialLetters ? this.props.initialLetters : new RootLetters(),
@@ -39,16 +41,6 @@ export default class ArabicKeyboard extends React.Component<Props, State> {
             select3: false,
             select4: false
         }
-    }
-
-    componentDidMount() {
-        Emitter.on('button-clicked', (value: ArabicLetter) => this.selectLetter(value));
-        Emitter.on('toggle-state-changed', (newValue) => this.letterSelected(newValue));
-    }
-
-    componentWillUnmount() {
-        Emitter.off('button-clicked')
-        Emitter.off('toggle-state-changed');
     }
 
     get letters(): ArabicLetter[] {
@@ -209,51 +201,51 @@ export default class ArabicKeyboard extends React.Component<Props, State> {
         return (
             <Dialog header={header} footer={footer} onHide={() => this.noop()} visible={this.state.visible} closeOnEscape={false} closable={false}>
                 <div style={divStyle}>
-                    <ToggleSelecter value={this.state.rootLetters.firstRadical} index={0}
-                        className="arabicToggleButton ui-button p-button-raised" selected={this.state.select1} />&nbsp;
-                    <ToggleSelecter value={this.state.rootLetters.secondRadical} index={1}
-                        className="arabicToggleButton ui-button p-button-raised" selected={this.state.select2} />&nbsp;
-                    <ToggleSelecter value={this.state.rootLetters.thirdRadical} index={2}
-                        className="arabicToggleButton ui-button p-button-raised" selected={this.state.select3} />&nbsp;
-                    <ToggleSelecter value={this.state.rootLetters.fourthRadical} index={3}
-                        className="arabicToggleButton ui-button p-button-raised" selected={this.state.select4} />
+                    <ToggleSelecter value={this.state.rootLetters.firstRadical} index={0} checked={this.state.select1}
+                        className="arabicToggleButton ui-button p-button-raised" onChange={this.letterSelected} />&nbsp;
+                    <ToggleSelecter value={this.state.rootLetters.secondRadical} index={1} checked={this.state.select2}
+                        className="arabicToggleButton ui-button p-button-raised" onChange={this.letterSelected} />&nbsp;
+                    <ToggleSelecter value={this.state.rootLetters.thirdRadical} index={2} checked={this.state.select3}
+                        className="arabicToggleButton ui-button p-button-raised" onChange={this.letterSelected} />&nbsp;
+                    <ToggleSelecter value={this.state.rootLetters.fourthRadical} index={3} checked={this.state.select4}
+                        className="arabicToggleButton ui-button p-button-raised" onChange={this.letterSelected} />
                 </div>
                 <div>&nbsp;</div>
                 <div style={divStyle}>
-                    <ArabicButton letter={this.letters[0]} />&nbsp;
-                    <ArabicButton letter={this.letters[1]} />&nbsp;
-                    <ArabicButton letter={this.letters[2]} />&nbsp;
-                    <ArabicButton letter={this.letters[3]} />&nbsp;
-                    <ArabicButton letter={this.letters[4]} />&nbsp;
-                    <ArabicButton letter={this.letters[5]} />&nbsp;
-                    <ArabicButton letter={this.letters[6]} />&nbsp;
-                    <ArabicButton letter={this.letters[7]} />&nbsp;
-                    <ArabicButton letter={this.letters[8]} />&nbsp;
-                    <ArabicButton letter={this.letters[9]} />&nbsp;
-                    <ArabicButton letter={this.letters[10]} />&nbsp;
+                    <ArabicButton letter={this.letters[0]} onClick={this.selectLetter} />&nbsp;
+                    <ArabicButton letter={this.letters[1]} onClick={this.selectLetter} />&nbsp;
+                    <ArabicButton letter={this.letters[2]} onClick={this.selectLetter} />&nbsp;
+                    <ArabicButton letter={this.letters[3]} onClick={this.selectLetter} />&nbsp;
+                    <ArabicButton letter={this.letters[4]} onClick={this.selectLetter} />&nbsp;
+                    <ArabicButton letter={this.letters[5]} onClick={this.selectLetter} />&nbsp;
+                    <ArabicButton letter={this.letters[6]} onClick={this.selectLetter} />&nbsp;
+                    <ArabicButton letter={this.letters[7]} onClick={this.selectLetter} />&nbsp;
+                    <ArabicButton letter={this.letters[8]} onClick={this.selectLetter} />&nbsp;
+                    <ArabicButton letter={this.letters[9]} onClick={this.selectLetter} />&nbsp;
+                    <ArabicButton letter={this.letters[10]} onClick={this.selectLetter} />&nbsp;
                 </div>
                 <div>&nbsp;</div>
                 <div style={divStyle}>
-                    <ArabicButton letter={this.letters[11]} />&nbsp;
-                    <ArabicButton letter={this.letters[12]} />&nbsp;
-                    <ArabicButton letter={this.letters[13]} />&nbsp;
-                    <ArabicButton letter={this.letters[14]} />&nbsp;
-                    <ArabicButton letter={this.letters[15]} />&nbsp;
-                    <ArabicButton letter={this.letters[16]} />&nbsp;
-                    <ArabicButton letter={this.letters[17]} />&nbsp;
-                    <ArabicButton letter={this.letters[18]} />&nbsp;
-                    <ArabicButton letter={this.letters[19]} />&nbsp;
-                    <ArabicButton letter={this.letters[20]} />&nbsp;
+                    <ArabicButton letter={this.letters[11]} onClick={this.selectLetter} />&nbsp;
+                    <ArabicButton letter={this.letters[12]} onClick={this.selectLetter} />&nbsp;
+                    <ArabicButton letter={this.letters[13]} onClick={this.selectLetter} />&nbsp;
+                    <ArabicButton letter={this.letters[14]} onClick={this.selectLetter} />&nbsp;
+                    <ArabicButton letter={this.letters[15]} onClick={this.selectLetter} />&nbsp;
+                    <ArabicButton letter={this.letters[16]} onClick={this.selectLetter} />&nbsp;
+                    <ArabicButton letter={this.letters[17]} onClick={this.selectLetter} />&nbsp;
+                    <ArabicButton letter={this.letters[18]} onClick={this.selectLetter} />&nbsp;
+                    <ArabicButton letter={this.letters[19]} onClick={this.selectLetter} />&nbsp;
+                    <ArabicButton letter={this.letters[20]} onClick={this.selectLetter} />&nbsp;
                 </div>
                 <div>&nbsp;</div>
                 <div style={divStyle}>
-                    <ArabicButton letter={this.letters[21]} />&nbsp;
-                    <ArabicButton letter={this.letters[22]} />&nbsp;
-                    <ArabicButton letter={this.letters[23]} />&nbsp;
-                    <ArabicButton letter={this.letters[24]} />&nbsp;
-                    <ArabicButton letter={this.letters[25]} />&nbsp;
-                    <ArabicButton letter={this.letters[26]} />&nbsp;
-                    <ArabicButton letter={this.letters[27]} />
+                    <ArabicButton letter={this.letters[21]} onClick={this.selectLetter} />&nbsp;
+                    <ArabicButton letter={this.letters[22]} onClick={this.selectLetter} />&nbsp;
+                    <ArabicButton letter={this.letters[23]} onClick={this.selectLetter} />&nbsp;
+                    <ArabicButton letter={this.letters[24]} onClick={this.selectLetter} />&nbsp;
+                    <ArabicButton letter={this.letters[25]} onClick={this.selectLetter} />&nbsp;
+                    <ArabicButton letter={this.letters[26]} onClick={this.selectLetter} />&nbsp;
+                    <ArabicButton letter={this.letters[27]} onClick={this.selectLetter} />
                 </div>
             </Dialog>
         );

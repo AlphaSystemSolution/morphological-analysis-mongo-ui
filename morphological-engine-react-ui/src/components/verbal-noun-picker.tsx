@@ -2,8 +2,7 @@ import * as React from 'react';
 import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
 import { VerbalNoun } from './model/verbal-noun';
-import ToggleSelecter from './toggle-selecter';
-import Emitter from '../services/event-emitter';
+import { ToggleSelecter } from './toggle-selecter';
 import { Utils } from '../utils/utils';
 
 interface Props {
@@ -33,20 +32,13 @@ export default class VerbalNounPicker extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
 
+        this.valueSelected = this.valueSelected.bind(this);
         this.show = this.show.bind(this);
 
         this.state = {
             selectedValues: Utils.copyArray(this.props.initalValues),
             currentlySelectedValues: Utils.copyArray(this.props.initalValues)
         };
-    }
-
-    componentDidMount() {
-        Emitter.on('toggle-state-changed', (newValue) => this.valueSelected(newValue));
-    }
-
-    componentWillUnmount() {
-        Emitter.off('toggle-state-changed');
     }
 
     private show() {
@@ -101,7 +93,7 @@ export default class VerbalNounPicker extends React.Component<Props, State> {
                 return (
                     <span key={"sp-" + i}>
                         <ToggleSelecter key={key} value={verbalNoun} className="verbalNounToggleSelector ui-button p-button-raised"
-                            selected={this.isSelected(verbalNoun)} editable={true} index={i} />&nbsp;
+                            checked={this.isSelected(verbalNoun)} index={i} onChange={this.valueSelected} />&nbsp;
                     </span>
                 );
             });

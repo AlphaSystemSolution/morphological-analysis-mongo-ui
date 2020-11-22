@@ -1,16 +1,16 @@
 import * as React from 'react';
 import { ArabicLabel } from './model/arabic-label';
 import { Button } from 'primereact/button';
-import Emitter from '../services/event-emitter';
 
 interface ArabicButtonProps {
     letter: ArabicLabel
+    onClick(letter: ArabicLabel): void
 }
 
 export default class ArabicButton extends React.Component<ArabicButtonProps, any> {
 
     handleClick = (e: any) => {
-        Emitter.emit('button-clicked', this.props.letter);
+        this.props.onClick(this.props.letter)
     }
 
     render() {
