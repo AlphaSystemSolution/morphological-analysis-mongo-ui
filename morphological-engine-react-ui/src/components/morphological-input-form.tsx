@@ -39,6 +39,7 @@ export default class MorphologicalInputForm extends React.Component<Props, State
         this.updateRemovePassiveLine = this.updateRemovePassiveLine.bind(this);
         this.updateSkipRuleProcessing = this.updateSkipRuleProcessing.bind(this);
         this.show = this.show.bind(this);
+        this.showKeyboard = this.showKeyboard.bind(this);
 
         this.state = {
             currentData: this.props.inputData.copy(),
@@ -137,6 +138,10 @@ export default class MorphologicalInputForm extends React.Component<Props, State
         });
     }
 
+    private showKeyboard() {
+        this.setState({ showKeyboard: true });
+    }
+
     render() {
         const footer = (
             <div>
@@ -154,7 +159,7 @@ export default class MorphologicalInputForm extends React.Component<Props, State
                         <div className="p-field p-col-12">
                             <label htmlFor="rootLetters" style={{ 'fontWeight': 'bold' }}>Root Letters:</label>
                             <InputText id="rootLetters" type="text" value={this.state.currentData.rootLetters.label} className="arabicNormal"
-                                onClick={() => this.setState({ showKeyboard: true })} />
+                                onClick={this.showKeyboard} />
                         </div>
                     </div>
                     <div className="p-fluid p-formgrid p-grid">
