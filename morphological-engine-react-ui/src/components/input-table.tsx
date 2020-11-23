@@ -3,7 +3,7 @@ import { DataTable } from 'primereact/datatable';
 import { Checkbox } from 'primereact/checkbox';
 import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
-import { ArabicConstants, InputData, OutputFormat } from './model/models';
+import { ArabicConstants, InputData } from './model/models';
 import MorphologicalInputForm from './morphological-input-form'
 import { IdGenerator } from '../utils/id-generator';
 import { Dialog } from 'primereact/dialog';
@@ -224,7 +224,7 @@ export default class InputTable extends React.Component<Props, State> {
 
     private viewConjugation(rowData: InputData) {
         this.applicationController
-            .getMorphologicalChart(OutputFormat.UNICODE, new ConjugationTemplate([rowData.toConjugationData()]))
+            .getMorphologicalChart(new ConjugationTemplate([rowData.toConjugationData()]))
             .then((charts) => {
                 Emitter.emit(EmitterConstants.MORPHOLOGICAL_CHART, charts[0]);
             });
