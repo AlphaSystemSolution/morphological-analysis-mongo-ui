@@ -18,8 +18,7 @@ interface State {
     data: InputData[],
     selectedRows: InputData[]
     currentRow: InputData
-    showRowEditDialog: boolean,
-    showDeleteRowDialog: boolean,
+    showRowEditDialog: boolean
     showDeleteRowsDialog: boolean
 }
 
@@ -37,10 +36,7 @@ export default class InputTable extends React.Component<Props, State> {
         this.addRow = this.addRow.bind(this);
         this.editRow = this.editRow.bind(this);
         this.duplicateRow = this.duplicateRow.bind(this);
-        this.deleteRow = this.deleteRow.bind(this);
         this.confirmDeleteSelected = this.confirmDeleteSelected.bind(this);
-        this.confirmDeleteRow = this.confirmDeleteRow.bind(this);
-        this.hideDeleteRowDialog = this.hideDeleteRowDialog.bind(this);
         this.deleteSelectedRows = this.deleteSelectedRows.bind(this);
         this.hideDeleteRowsDialog = this.hideDeleteRowsDialog.bind(this);
         this.viewDictionary = this.viewDictionary.bind(this);
@@ -50,7 +46,6 @@ export default class InputTable extends React.Component<Props, State> {
             selectedRows: [],
             currentRow: new InputData(),
             showRowEditDialog: false,
-            showDeleteRowDialog: false,
             showDeleteRowsDialog: false
         }
     }
@@ -102,8 +97,6 @@ export default class InputTable extends React.Component<Props, State> {
             <React.Fragment>
                 <Button type="button" icon="pi pi-pencil" className="p-button-rounded p-button-success" tooltip="Edit" onClick={() => this.editRow(rowData)} />&nbsp;
                 <Button type="button" icon="pi pi-copy" className="p-button-rounded p-button-success" tooltip="Duplicate" onClick={() => this.duplicateRow(rowData)} />&nbsp;
-                <Button type="button" icon="pi pi-trash" className="p-button-rounded p-button-warning" tooltip="Delete" onClick={() => this.confirmDeleteRow(rowData)} />
-                <br />
                 <Button type="button" icon="pi pi-info" className="p-button-rounded p-button-secondary" tooltip="Dictionary" onClick={() => this.viewDictionary(rowData)} />
             </React.Fragment>
         );
@@ -161,27 +154,6 @@ export default class InputTable extends React.Component<Props, State> {
         });
     }
 
-    private confirmDeleteRow(rowData: InputData) {
-        this.setState({
-            currentRow: rowData,
-            showDeleteRowDialog: true
-        });
-    }
-
-    private deleteRow() {
-        const data = this.state.data.filter((current) => this.state.currentRow.id !== current.id);
-        this.setState({
-            data: data,
-            showDeleteRowDialog: false
-        });
-    }
-
-    private hideDeleteRowDialog() {
-        this.setState({
-            showDeleteRowDialog: false
-        });
-    }
-
     private deleteSelectedRows() {
         const selectedRows = this.state.selectedRows.map((row) => row.id);
         const data = this.state.data.filter((row) => !selectedRows.includes(row.id));
@@ -235,13 +207,6 @@ export default class InputTable extends React.Component<Props, State> {
             </React.Fragment>
         );
 
-        const deleteRowDialogFooter = (
-            <React.Fragment>
-                <Button label="No" icon="pi pi-times" className="p-button-text" onClick={this.hideDeleteRowDialog} />
-                <Button label="Yes" icon="pi pi-check" className="p-button-text" onClick={this.deleteRow} />
-            </React.Fragment>
-        );
-
         const deleteRowsDialogFooter = (
             <React.Fragment>
                 <Button label="No" icon="pi pi-times" className="p-button-text" onClick={this.hideDeleteRowsDialog} />
@@ -264,12 +229,6 @@ export default class InputTable extends React.Component<Props, State> {
                     <Column field="skipRuleProcessing" body={this.skipRuleProcessingTemplate} header="Skip Rule Processing" style={{ width: '10%' }} />
                     <Column body={this.actionBodyTemplate} headerStyle={{ width: '10em', textAlign: 'center' }} bodyStyle={{ textAlign: 'center', overflow: 'visible' }} />
                 </DataTable>
-                <Dialog visible={this.state.showDeleteRowDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteRowDialogFooter} onHide={this.hideDeleteRowDialog}>
-                    <div className="confirmation-content">
-                        <i className="pi pi-exclamation-triangle p-mr-3" style={{ fontSize: '2rem' }} />
-                        {<span>Are you sure you want to delete current row?</span>}
-                    </div>
-                </Dialog>
                 <Dialog visible={this.state.showDeleteRowsDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteRowsDialogFooter} onHide={this.hideDeleteRowsDialog}>
                     <div className="confirmation-content">
                         <i className="pi pi-exclamation-triangle p-mr-3" style={{ fontSize: '2rem' }} />
