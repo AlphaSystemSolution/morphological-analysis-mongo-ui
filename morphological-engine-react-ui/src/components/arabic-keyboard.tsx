@@ -7,16 +7,14 @@ import { RootLetters } from './model/root-letters';
 import ArabicButton from './arabic-button';
 
 interface Props {
-    initialLetters?: RootLetters
-    visible?: boolean
-    onHide?(rootLetters: RootLetters): void
+    rootLetters: RootLetters
+    visible: boolean
+    onHide(rootLetters?: RootLetters): void
 }
 
 interface State {
     rootLetters: RootLetters
-    prevLetters: RootLetters
     currentIndex: number
-    visible: boolean
     select1: boolean
     select2: boolean
     select3: boolean
@@ -28,14 +26,13 @@ export default class ArabicKeyboard extends React.Component<Props, State> {
     constructor(props: any) {
         super(props);
 
+        this.show = this.show.bind(this);
         this.letterSelected = this.letterSelected.bind(this);
         this.selectLetter = this.selectLetter.bind(this);
 
         this.state = {
-            rootLetters: this.props.initialLetters ? this.props.initialLetters : new RootLetters(),
-            prevLetters: this.props.initialLetters ? this.props.initialLetters : new RootLetters(),
+            rootLetters: this.props.rootLetters,
             currentIndex: 0,
-            visible: this.props.visible ? this.props.visible : false,
             select1: true,
             select2: false,
             select3: false,
@@ -47,11 +44,9 @@ export default class ArabicKeyboard extends React.Component<Props, State> {
         return ArabicLetter.arabicLetters;
     }
 
-    public show(rootLetters?: RootLetters): void {
+    private show(): void {
         this.setState({
-            rootLetters: rootLetters ? rootLetters : this.state.rootLetters,
-            prevLetters: this.state.rootLetters,
-            visible: true,
+            rootLetters: this.props.rootLetters,
             currentIndex: 0,
             select1: true,
             select2: false,
@@ -62,7 +57,7 @@ export default class ArabicKeyboard extends React.Component<Props, State> {
 
     private resetSelection(): void {
         this.setState({
-            rootLetters: this.state.prevLetters,
+            rootLetters: this.props.rootLetters,
             currentIndex: 0,
             select1: true,
             select2: false,
@@ -164,14 +159,11 @@ export default class ArabicKeyboard extends React.Component<Props, State> {
 
     private restore(restore: boolean = true) {
         if (restore) {
-            this.setState({
-                rootLetters: this.state.prevLetters,
-                visible: false
+            this.setState({}, () => {
+                this.props.onHide();
             });
         } else {
-            this.setState({
-                visible: false
-            }, () => {
+            this.setState({}, () => {
                 if (this.props.onHide) {
                     this.props.onHide(this.state.rootLetters);
                 }
@@ -199,7 +191,8 @@ export default class ArabicKeyboard extends React.Component<Props, State> {
         );
 
         return (
-            <Dialog header={header} footer={footer} onHide={() => this.noop()} visible={this.state.visible} closeOnEscape={false} closable={false}>
+            <Dialog header={header} footer={footer} onHide={() => this.noop()} visible={this.props.visible} closeOnEscape={false} closable={false}
+                onShow={this.show}>
                 <div style={divStyle}>
                     <ToggleSelecter value={this.state.rootLetters.firstRadical} index={0} checked={this.state.select1}
                         className="arabicToggleButton ui-button p-button-raised" onChange={this.letterSelected} />&nbsp;

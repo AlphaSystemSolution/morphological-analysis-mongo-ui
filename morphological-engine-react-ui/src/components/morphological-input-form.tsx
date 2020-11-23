@@ -21,16 +21,16 @@ interface Props {
 interface State {
     currentData: InputData
     inputData: InputData
+    showKeyboard: boolean
     showVerbalNounPicker: boolean
 }
 
 export default class MorphologicalInputForm extends React.Component<Props, State> {
 
-    keyboardRef: any = React.createRef();
-
     constructor(props: Props) {
         super(props);
 
+        this.updateRootLetters = this.updateRootLetters.bind(this);
         this.familyTemplate = this.familyTemplate.bind(this);
         this.verbalNounTemplate = this.verbalNounTemplate.bind(this);
         this.updateFamily = this.updateFamily.bind(this);
@@ -43,6 +43,7 @@ export default class MorphologicalInputForm extends React.Component<Props, State
         this.state = {
             currentData: this.props.inputData.copy(),
             inputData: this.props.inputData.copy(),
+            showKeyboard: false,
             showVerbalNounPicker: false
         }
     }
@@ -83,11 +84,14 @@ export default class MorphologicalInputForm extends React.Component<Props, State
 
     private noop() { }
 
-    private updateRootLetters(rootLetters: RootLetters) {
+    private updateRootLetters(rootLetters?: RootLetters) {
         const data = this.state.currentData;
-        data.rootLetters = rootLetters;
+        if (rootLetters) {
+            data.rootLetters = rootLetters;
+        }
         this.setState({
-            currentData: data
+            currentData: data,
+            showKeyboard: false
         });
     }
 
@@ -142,7 +146,7 @@ export default class MorphologicalInputForm extends React.Component<Props, State
         );
         return (
             <React.Fragment>
-                <ArabicKeyboard ref={(el) => this.keyboardRef = el} onHide={(rootLetters) => this.updateRootLetters(rootLetters)} />
+                <ArabicKeyboard onHide={this.updateRootLetters} visible={this.state.showKeyboard} rootLetters={this.props.inputData.rootLetters} />
                 <VerbalNounPicker initalValues={this.state.currentData.verbalNouns} showDialog={this.state.showVerbalNounPicker} onHide={this.updateVernalNouns} />
                 <Dialog header="Add / Update Morphological Chart Input" footer={footer} onHide={() => this.noop()} closeOnEscape={false} closable={false}
                     visible={this.props.visible} onShow={this.show}>
@@ -150,7 +154,7 @@ export default class MorphologicalInputForm extends React.Component<Props, State
                         <div className="p-field p-col-12">
                             <label htmlFor="rootLetters" style={{ 'fontWeight': 'bold' }}>Root Letters:</label>
                             <InputText id="rootLetters" type="text" value={this.state.currentData.rootLetters.label} className="arabicNormal"
-                                onClick={() => this.keyboardRef.show(this.state.currentData.rootLetters)} />
+                                onClick={() => this.setState({ showKeyboard: true })} />
                         </div>
                     </div>
                     <div className="p-fluid p-formgrid p-grid">
