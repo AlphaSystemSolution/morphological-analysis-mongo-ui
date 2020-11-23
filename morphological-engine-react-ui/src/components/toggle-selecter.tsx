@@ -7,6 +7,7 @@ interface Props {
     index: number
     className: string
     checked: boolean
+    userKey?: any
     onChange(payload: any): void
 }
 
@@ -17,7 +18,7 @@ export class ToggleSelecter extends React.Component<Props, State> {
     state: State = {}
 
     handleOnChange = (event: any) => {
-        this.props.onChange({ 'selected': event.value, 'value': this.props.value, 'index': this.props.index });
+        this.props.onChange({ 'selected': event.value, 'value': this.props.value, 'index': this.props.index, 'userKey': this.props.userKey });
     }
 
     render() {
