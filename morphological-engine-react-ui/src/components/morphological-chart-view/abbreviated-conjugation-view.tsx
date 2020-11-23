@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { AbbreviatedConjugation, ConjugationLabel } from './model/abbreviated-conjugation';
-import { ArabicConstants } from './model/models';
+import { AbbreviatedConjugation, ConjugationLabel } from '../model/abbreviated-conjugation';
+import { ArabicConstants } from '../model/models';
 
 interface Props {
     conjugation?: AbbreviatedConjugation
