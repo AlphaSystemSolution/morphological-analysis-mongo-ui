@@ -58,9 +58,11 @@ export class MorphologicalChartsView extends React.Component<Props, State> {
                 });
                 return <tr key={"chart-label" + parentIndex}>{labelElements}</tr>;
             });
-        return (<table style={{ 'direction': 'rtl' }}>
-            <tbody>{elements}</tbody>
-        </table>);
+        return (
+            <table style={{ 'direction': 'rtl' }}>
+                <tbody>{elements}</tbody>
+            </table>
+        );
     }
 
     render() {

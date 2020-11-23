@@ -98,6 +98,16 @@ export class AbbreviatedConjugationView extends React.Component<Props, State> {
         );
     }
 
+    private renderAdverbs(labels: ConjugationLabel[]) {
+        return (
+            <span>
+                <span className="arabicDisabled">{ArabicConstants.ADVERBS_PREFIX.label}</span>
+                <span className="arabicDisabled">{ArabicConstants.AND_SPACE.label}</span>
+                {this.renderMultiValues(labels)}
+            </span>
+        );
+    }
+
     render() {
         const abbreviatedConjugation = this.props.conjugation;
         if (abbreviatedConjugation) {
@@ -129,7 +139,12 @@ export class AbbreviatedConjugationView extends React.Component<Props, State> {
                         {secondAndThirdRows}
                         <tr>
                             <td className="morphological-chart" colSpan={4}>
-                                {this.renderMultiValues(abbreviatedConjugation.adverbs)}
+                                {this.renderAdverbs(abbreviatedConjugation.adverbs)}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td className="morphological-chart-no-border" colSpan={4}>
+                                <span>&nbsp;</span>
                             </td>
                         </tr>
                     </tbody>
