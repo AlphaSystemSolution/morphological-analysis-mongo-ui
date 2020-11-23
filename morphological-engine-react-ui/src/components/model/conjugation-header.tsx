@@ -14,6 +14,19 @@ export class RootLetters {
         public empty?: boolean
     ) { }
 
+    public copy(): RootLetters {
+        return new RootLetters(
+            this.id,
+            this.name,
+            this.firstRadical,
+            this.secondRadical,
+            this.thirdRadical,
+            this.fourthRadical,
+            this.displayName,
+            this.empty
+        );
+    }
+
     get label(): string {
         return this.firstRadical + this.secondRadical + this.thirdRadical;
     }
@@ -47,13 +60,22 @@ export class RootLetters {
 export class ChartMode {
     constructor(public template: string, public rootType: string, public verbType: string, public weakVerbType?: string) { }
 
+    public copy(): ChartMode {
+        return new ChartMode(
+            this.template,
+            this.rootType,
+            this.verbType,
+            this.weakVerbType
+        );
+    }
+
     public static of(src: any) {
         return new ChartMode(src.template, src.rootType, src.verbType, src.weakVerbType);
     }
 
     public equals(other?: ChartMode): boolean {
         return other ? this.template === other.template && this.rootType === other.rootType &&
-            this.verbType === other.verbType && this.weakVerbType == other.weakVerbType : false;
+            this.verbType === other.verbType && this.weakVerbType === other.weakVerbType : false;
     }
 }
 
@@ -70,6 +92,21 @@ export class ConjugationHeader {
         public typeLabel2: string,
         public typeLabel3: string
     ) { }
+
+    public copy(): ConjugationHeader {
+        return new ConjugationHeader(
+            this.rootLetters.copy(),
+            this.chartMode.copy(),
+            this.baseWord,
+            this.pastTenseRoot,
+            this.presentTenseRoot,
+            this.translation,
+            this.title,
+            this.typeLabel1,
+            this.typeLabel2,
+            this.typeLabel3
+        );
+    }
 
     public static of(src: any) {
         return new ConjugationHeader(

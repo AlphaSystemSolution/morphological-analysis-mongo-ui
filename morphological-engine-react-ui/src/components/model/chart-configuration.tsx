@@ -22,7 +22,7 @@ export class ChartConfiguration extends Document {
         public omitAbbreviatedConjugation = false,
         public omitDetailedConjugation = false,
         public omitTitle = false,
-        public omitHeader = true,
+        public omitHeader = false,
         public omitSarfTermCaption = false,
         public sortDirective = 'NONE',
         public sortDirection = 'ASCENDING',

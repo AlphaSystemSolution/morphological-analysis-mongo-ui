@@ -32,6 +32,10 @@ export class ConjugationLabel {
         public label: string,
         public code: string) { }
 
+    public copy(): ConjugationLabel {
+        return new ConjugationLabel(this.type.copy(), this.label, this.code);
+    }
+
     public equals(other?: ConjugationLabel) {
         return other ? (this.type.equals(other.type) && this.label === other.label
             && this.code === other.code) : false;
@@ -96,6 +100,27 @@ export class AbbreviatedConjugation {
 
     equals(other: AbbreviatedConjugation) {
         return other && this.id === other.id;
+    }
+
+    public copy(): AbbreviatedConjugation {
+        return new AbbreviatedConjugation(
+            this.id,
+            this.conjugationHeader.copy(),
+            this.rootLetters.copy(),
+            this.namedTemplate.copy(),
+            this.pastTense.copy(),
+            this.presentTense.copy(),
+            this.activeParticipleMasculine.copy(),
+            this.activeParticipleFeminine.copy(),
+            this.imperative.copy(),
+            this.forbidding.copy(),
+            this.pastPassiveTense ? this.pastPassiveTense.copy() : undefined,
+            this.presentPassiveTense ? this.presentPassiveTense.copy() : undefined,
+            this.passiveParticipleMasculine ? this.passiveParticipleMasculine.copy() : undefined,
+            this.passiveParticipleFeminine ? this.passiveParticipleFeminine.copy() : undefined,
+            this.verbalNouns.map((vn) => vn.copy()),
+            this.adverbs.map((ad) => ad.copy())
+        );
     }
 
     compareTo(other: AbbreviatedConjugation): number {

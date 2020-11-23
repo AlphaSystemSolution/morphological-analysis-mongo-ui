@@ -4,14 +4,18 @@ import { NamedTemplate } from './named-template';
 import { SarfTermType } from './sarf-term-type';
 
 export class ConjugationTuple {
-    static of(src?: any): ConjugationTuple {
-        if (!src || !src.singular || !src.dual || !src.plural) {
-            throw new Error(`Invalid source: ${src}`);
+    static of(src?: any): ConjugationTuple | undefined {
+        if (!src) {
+            return undefined;
         }
         return new ConjugationTuple(src.singular, src.dual, src.plural);
     }
 
     constructor(public singular: string, public dual: string, public plural: string) { }
+
+    public copy(): ConjugationTuple {
+        return new ConjugationTuple(this.singular, this.dual, this.plural)
+    }
 }
 
 export class ConjugationGroup {
@@ -24,29 +28,39 @@ export class ConjugationGroup {
 
 export class VerbConjugationGroup extends ConjugationGroup {
     static of(src?: any): VerbConjugationGroup | undefined {
-        if (!src || !src.termType || !src.masculineThirdPerson || src.feminineThirdPerson || !src.masculineSecondPerson ||
-            !src.masculineSecondPerson || !src.feminineSecondPerson || !src.firstPerson) {
+        if (!src) {
             return undefined;
         }
         return new VerbConjugationGroup(
             src.termType,
+            ConjugationTuple.of(src.masculineSecondPerson)!,
+            ConjugationTuple.of(src.feminineSecondPerson)!,
             ConjugationTuple.of(src.masculineThirdPerson),
             ConjugationTuple.of(src.feminineThirdPerson),
-            ConjugationTuple.of(src.masculineSecondPerson),
-            ConjugationTuple.of(src.feminineSecondPerson),
             ConjugationTuple.of(src.firstPerson)
         );
     }
 
     constructor(
         public termType: string,
-        public masculineThirdPerson: ConjugationTuple,
-        public feminineThirdPerson: ConjugationTuple,
         public masculineSecondPerson: ConjugationTuple,
         public feminineSecondPerson: ConjugationTuple,
-        public firstPerson: ConjugationTuple
+        public masculineThirdPerson?: ConjugationTuple,
+        public feminineThirdPerson?: ConjugationTuple,
+        public firstPerson?: ConjugationTuple
     ) {
         super(termType);
+    }
+
+    public copy(): VerbConjugationGroup {
+        return new VerbConjugationGroup(
+            this.termType,
+            this.masculineSecondPerson.copy(),
+            this.feminineSecondPerson.copy(),
+            this.masculineThirdPerson ? this.masculineThirdPerson.copy() : undefined,
+            this.feminineThirdPerson ? this.feminineThirdPerson.copy() : undefined,
+            this.firstPerson ? this.firstPerson.copy() : undefined
+        )
     }
 
 }
@@ -54,14 +68,14 @@ export class VerbConjugationGroup extends ConjugationGroup {
 export class NounConjugationGroup extends ConjugationGroup {
 
     static of(src?: any): NounConjugationGroup | undefined {
-        if (!src || !src.nominative || !src.accusative || !src.genitive) {
+        if (!src) {
             return undefined;
         }
         return new NounConjugationGroup(
             src.termType,
-            ConjugationTuple.of(src.nominative),
-            ConjugationTuple.of(src.accusative),
-            ConjugationTuple.of(src.genitive)
+            ConjugationTuple.of(src.nominative)!,
+            ConjugationTuple.of(src.accusative)!,
+            ConjugationTuple.of(src.genitive)!
         );
     }
 
@@ -72,11 +86,21 @@ export class NounConjugationGroup extends ConjugationGroup {
         public genitive: ConjugationTuple) {
         super(termType);
     }
+
+    public copy(): NounConjugationGroup {
+        return new NounConjugationGroup(
+            this.termType,
+            this.nominative.copy(),
+            this.accusative.copy(),
+            this.genitive.copy()
+        )
+    }
 }
 
 export class DetailedConjugation {
     static of(src?: any) {
-        if (!src) {
+        if (!src || !src.pastTense || !src.presentTense || !src.activeParticipleMasculine
+            || !src.activeParticipleFeminine || !src.imperative || !src.forbidding) {
             throw new Error(`Invalid source: ${src}`);
         }
         return new DetailedConjugation(
@@ -89,7 +113,8 @@ export class DetailedConjugation {
             VerbConjugationGroup.of(src.pastPassiveTense),
             VerbConjugationGroup.of(src.presentPassiveTense),
             NounConjugationGroup.of(src.passiveParticipleMasculine),
-            NounConjugationGroup.of(src.passiveParticipleFeminine)
+            NounConjugationGroup.of(src.passiveParticipleFeminine),
+            [], [] // TODO:
         );
     }
 
@@ -120,6 +145,22 @@ export class DetailedConjugation {
         // adverb values
         public adverbs: NounConjugationGroup[] = []) { }
 
+    public copy(): DetailedConjugation {
+        return new DetailedConjugation(
+            this.pastTense.copy(),
+            this.presentTense.copy(),
+            this.activeParticipleMasculine.copy(),
+            this.activeParticipleFeminine.copy(),
+            this.imperative.copy(),
+            this.forbidding.copy(),
+            this.pastPassiveTense ? this.pastPassiveTense.copy() : undefined,
+            this.presentPassiveTense ? this.presentPassiveTense.copy() : undefined,
+            this.passiveParticipleMasculine ? this.passiveParticipleMasculine.copy() : undefined,
+            this.passiveParticipleFeminine ? this.passiveParticipleFeminine.copy() : undefined,
+            this.verbalNouns ? this.verbalNouns.map((vn) => vn.copy()) : [],
+            this.adverbs ? this.adverbs.map((ad) => ad.copy()) : []
+        );
+    }
     get rootLetters(): RootLetters {
         return this._rootLetters;
     }
@@ -254,6 +295,8 @@ export class DetailedConjugation {
             if (v.equals(value)) {
                 index = i;
                 return true;
+            } else {
+                return false;
             }
         });
         if (index > -1) {

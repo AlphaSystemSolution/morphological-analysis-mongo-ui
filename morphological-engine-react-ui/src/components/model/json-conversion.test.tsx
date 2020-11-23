@@ -1,7 +1,10 @@
 import { assert } from 'console';
+import * as fs from 'fs';
+import { Utils } from '../../utils/utils';
 import { ConjugationLabel } from './abbreviated-conjugation';
 import { ChartMode } from './conjugation-header';
 import { ConjugationTuple, NounConjugationGroup } from './detailed-conjugation';
+import { MorphologicalChart } from './morphological-chart';
 import { NamedTemplate } from './named-template';
 import { SarfTermType } from './sarf-term-type';
 
@@ -100,4 +103,16 @@ test('convert ConjugationTuple', () => {
 test('convert ConjugationGroup', () => {
     const actual = NounConjugationGroup.of(conjugationGroup);
     console.log(JSON.stringify(actual));
+});
+
+test('Convert MorphologicalChart', () => {
+    const mc = MorphologicalChart.of(JSON.parse(fs.readFileSync('mc.json')));
+    console.log(`[[[[[ ${JSON.stringify(mc.detailedConjugation)} ]]]]]`);
+});
+
+test('slice array', () => {
+    const array = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    const result = Utils.chunkArray(array, 3);
+    console.log(result.length)
+    console.log(result);
 });
