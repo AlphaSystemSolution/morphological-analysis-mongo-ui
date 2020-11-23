@@ -35,28 +35,30 @@ export class MorphologicalChartsView extends React.Component<Props, State> {
 
     private renderChartTabs() {
         const charts = this.props.charts.map((c) => c.copy());
-        const labels = Utils.chunkArray(charts.map((chart) => chart.label), 5);
+        const labels = Utils.chunkArray(charts.map((chart) => chart.label), 8);
         const elements =
             labels.map((labelArray, parentIndex) => {
                 const labelElements = labelArray.map((label, index) => {
                     const key = (parentIndex * 10) + index;
                     return (
-                        <span key={"chart-label-row" + key}>
+                        <td key={"chart-label-row" + key}>
                             <ToggleSelecter value={label} index={key} className="chartSelector ui-button p-button-raised"
                                 userKey={label.id} checked={this.state.selectedIndex === key} onChange={this.onChartSelected} />&nbsp;
-                        </span>
+                        </td>
                     );
                 });
-                return <div key={"chart-label" + parentIndex} style={{ 'direction': 'rtl' }}>{labelElements}</div>;
+                return <tr key={"chart-label" + parentIndex}>{labelElements}</tr>;
             });
-        return <AccordionTab header="Contents">{elements}</AccordionTab>;
+        return (<table style={{ 'direction': 'rtl' }}>
+            <tbody>{elements}</tbody>
+        </table>);
     }
 
     render() {
         return (
             <React.Fragment>
                 <Accordion activeIndex={this.state.activeIndex} onTabChange={(e) => this.setState({ activeIndex: e.index })}>
-                    {this.renderChartTabs()}
+                    <AccordionTab header="Contents">{this.renderChartTabs()}</AccordionTab>
                 </Accordion>
             </React.Fragment>
         );
