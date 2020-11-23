@@ -5,8 +5,9 @@ import { MorphologicalChart } from '../components/model/morphological-chart';
 
 export class ApplicationController {
 
-    public async getMorphologicalChart(outputFormat: OutputFormat, body: ConjugationTemplate): Promise<MorphologicalChart[]> {
-        const response = await axios.post<MorphologicalChart[]>(`${process.env.REACT_APP_MORPHOLOGICAL_ENGINE_URL}${OutputFormat[outputFormat]}`, body);
+    public async getMorphologicalChart(body: ConjugationTemplate, outputFormat: OutputFormat = OutputFormat.UNICODE): Promise<MorphologicalChart[]> {
+        const url = `${process.env.REACT_APP_MORPHOLOGICAL_ENGINE_URL}${OutputFormat[outputFormat]}`;
+        const response = await axios.post<MorphologicalChart[]>(url, body);
         if (response.status !== 200) {
             return Promise.reject(`Invalid status: ${response.status}:${response.statusText}`);
         }

@@ -1,11 +1,11 @@
 import { TabPanel, TabView } from 'primereact/tabview';
 import * as React from 'react';
-import Emitter from '../services/event-emitter';
-import { AbbreviatedConjugationView } from './abbreviated-conjugation-view';
-import { EmitterConstants } from './emitter-constants';
+import { ApplicationController } from '../services/application-controller';
 import InputTable from './input-table';
+import { ConjugationTemplate } from './model/conjugation-template';
 import { Project } from './model/models';
 import { MorphologicalChart } from './model/morphological-chart';
+import { MorphologicalChartsView } from './morphological-chart-view/morphological-charts-view';
 
 interface Props {
     project: Project
@@ -14,57 +14,46 @@ interface Props {
 interface State {
     activeTabIndex: number
     disableConjugationTab: boolean
-    chart?: MorphologicalChart
+    charts: MorphologicalChart[]
 }
 
 export class ProjectView extends React.Component<Props, State> {
 
+    private applicationController = new ApplicationController();
+
     constructor(props: Props) {
         super(props);
 
-        this.showMorphologicalChart = this.showMorphologicalChart.bind(this);
-
         this.state = {
             activeTabIndex: 0,
-            disableConjugationTab: true
+            disableConjugationTab: true,
+            charts: []
         };
     }
 
     componentDidMount() {
-        Emitter.on(EmitterConstants.MORPHOLOGICAL_CHART, this.showMorphologicalChart);
-    }
-
-    componentWillUnmount() {
-        Emitter.off(EmitterConstants.MORPHOLOGICAL_CHART);
-    }
-
-    private showMorphologicalChart(chart: MorphologicalChart) {
-        this.setState({
-            chart: chart,
-            disableConjugationTab: false,
-            activeTabIndex: 1
-        });
+        const data = this.props.project.data;
+        if (data.length > 0) {
+            const conjugationData = data.map((inputData) => inputData.toConjugationData());
+            this.applicationController
+                .getMorphologicalChart(new ConjugationTemplate(conjugationData))
+                .then((charts) => {
+                    this.setState({
+                        charts: charts,
+                        disableConjugationTab: false
+                    });
+                });
+        }
     }
 
     render() {
-        const chart = this.state.chart;
-        let conjugationContent: JSX.Element;
-        if (chart) {
-            conjugationContent = (
-                <div>
-                    <AbbreviatedConjugationView conjugation={chart.abbreviatedConjugation} />
-                </div>
-            );
-        } else {
-            conjugationContent = <div>&nbsp;</div>
-        }
         return (
             <TabView activeIndex={this.state.activeTabIndex} onTabChange={(e) => this.setState({ activeTabIndex: e.index })}>
                 <TabPanel header="Table">
                     <InputTable initialData={this.props.project!.data} />
                 </TabPanel>
                 <TabPanel header="Conjugation" disabled={this.state.disableConjugationTab}>
-                    {conjugationContent}
+                    <MorphologicalChartsView charts={this.state.charts} />
                 </TabPanel>
             </TabView>
         );
