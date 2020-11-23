@@ -9,10 +9,6 @@ import { IdGenerator } from '../utils/id-generator';
 import { Dialog } from 'primereact/dialog';
 import { Toolbar } from 'primereact/toolbar';
 import { ArabicLetter } from './model/arabic-letter';
-import { ApplicationController } from '../services/application-controller';
-import { ConjugationTemplate } from './model/conjugation-template';
-import Emitter from '../services/event-emitter';
-import { EmitterConstants } from './emitter-constants';
 
 interface Props {
     initialData?: InputData[]
@@ -29,12 +25,8 @@ interface State {
 
 export default class InputTable extends React.Component<Props, State> {
 
-    private applicationController: ApplicationController;
-
     constructor(props: Props) {
         super(props);
-
-        this.applicationController = new ApplicationController();
 
         this.rootLettersTemplate = this.rootLettersTemplate.bind(this);
         this.familyTemplate = this.familyTemplate.bind(this);
@@ -52,7 +44,6 @@ export default class InputTable extends React.Component<Props, State> {
         this.deleteSelectedRows = this.deleteSelectedRows.bind(this);
         this.hideDeleteRowsDialog = this.hideDeleteRowsDialog.bind(this);
         this.viewDictionary = this.viewDictionary.bind(this);
-        this.viewConjugation = this.viewConjugation.bind(this);
 
         this.state = {
             data: this.props.initialData ? this.props.initialData : [],
@@ -113,7 +104,6 @@ export default class InputTable extends React.Component<Props, State> {
                 <Button type="button" icon="pi pi-copy" className="p-button-rounded p-button-success" tooltip="Duplicate" onClick={() => this.duplicateRow(rowData)} />&nbsp;
                 <Button type="button" icon="pi pi-trash" className="p-button-rounded p-button-warning" tooltip="Delete" onClick={() => this.confirmDeleteRow(rowData)} />
                 <br />
-                <Button type="button" icon="pi pi-eye" className="p-button-rounded p-button-secondary" tooltip="Conjugation" onClick={() => this.viewConjugation(rowData)} />&nbsp;
                 <Button type="button" icon="pi pi-info" className="p-button-rounded p-button-secondary" tooltip="Dictionary" onClick={() => this.viewDictionary(rowData)} />
             </React.Fragment>
         );
@@ -220,14 +210,6 @@ export default class InputTable extends React.Component<Props, State> {
         }
         const url = process.env.REACT_APP_DICTIONARY_URL + searchString;
         window.open(url, '_dictionary');
-    }
-
-    private viewConjugation(rowData: InputData) {
-        this.applicationController
-            .getMorphologicalChart(new ConjugationTemplate([rowData.toConjugationData()]))
-            .then((charts) => {
-                Emitter.emit(EmitterConstants.MORPHOLOGICAL_CHART, charts[0]);
-            });
     }
 
     private getLetterCode(letter: ArabicLetter): string {
