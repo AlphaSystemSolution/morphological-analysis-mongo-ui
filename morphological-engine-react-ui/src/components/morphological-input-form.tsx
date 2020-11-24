@@ -11,6 +11,7 @@ import { NamedTemplate } from './model/named-template';
 import { Checkbox } from 'primereact/checkbox';
 import { VerbalNoun } from './model/verbal-noun';
 import VerbalNounPicker from './verbal-noun-picker';
+import { Utils } from '../utils/utils';
 
 interface Props {
     inputData: InputData
@@ -145,6 +146,7 @@ export class MorphologicalInputForm extends React.Component<Props, State> {
     render() {
         const footer = (
             <div>
+                <Button label="View Dictionary" className="p-button-text" onClick={() => Utils.viewDictionary(this.state.currentData)} />
                 <Button label="Cancel" onClick={() => this.restore()} className="p-button-text" />
                 <Button label="Save" onClick={() => this.restore(false)} autoFocus />
             </div>
