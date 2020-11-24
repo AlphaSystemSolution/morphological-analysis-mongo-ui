@@ -59,8 +59,8 @@ export class MorphologicalInputForm extends React.Component<Props, State> {
 
     private familyTemplate(family: NamedTemplate) {
         return (
-            <span style={{ 'direction': 'rtl' }}>
-                <span style={{ 'textAlign': 'center' }}>{family.code}&nbsp;&mdash;&nbsp;<span className="arabicNormal">{family.label}</span></span>
+            <span style={{ direction: 'rtl', textAlign: 'center' }}>
+                {family.code}&nbsp;&mdash;&nbsp;<span className="arabicNormal">{family.label}</span>
             </span>
         );
     }
@@ -168,7 +168,7 @@ export class MorphologicalInputForm extends React.Component<Props, State> {
                         <div className="p-field p-col-12">
                             <label htmlFor="family" style={{ 'fontWeight': 'bold' }}>Family:</label>
                             <Dropdown id="family" value={this.state.currentData.family} options={NamedTemplate.namedTemplates} onChange={(e) => this.updateFamily(e.value)}
-                                valueTemplate={this.familyTemplate} itemTemplate={this.familyTemplate} scrollHeight="600px" className="multiselect" />
+                                valueTemplate={this.familyTemplate} itemTemplate={this.familyTemplate} className="multiselect" />
                         </div>
                     </div>
                     <div className="p-fluid p-formgrid p-grid">
