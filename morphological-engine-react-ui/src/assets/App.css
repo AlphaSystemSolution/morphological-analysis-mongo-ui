@@ -46,7 +46,7 @@
 
 /* You can add global styles to this file, and also import other style files */
 .arabicTitle, .arabicNormal, .arabicNormalBig, .arabicCaption, .arabicToggleButton, .arabicButton, .arabicDropdown,
-.verbalNounToggleButton, .verbalNounToggleSelector, .abbreviatedConjugationSelector, .arabicDisabled, .chartSelector {
+.verbalNounToggleButton, .verbalNounToggleSelector, .abbreviatedConjugationSelector, .arabicDisabled, .chartSelector, .p-panel-title {
 	font-family: 'KFGQPC Uthman Taha Naskh';
 	direction: rtl;
 }
@@ -71,6 +71,12 @@
  font-weight: bolder;
  color: #2E74B5;
 }
+
+.p-panel-title {
+  font-size: 30px;
+  font-weight: bolder;
+  color: #2E74B5;
+ }
 
 .arabicToggleButton {
   font-size: 30px;
@@ -144,4 +150,13 @@ td.morphological-chart-no-border {
   border-radius: 3px;
   display: inline-flex;
   margin-right: .5rem;
+}
+
+.box {
+  background-color: var(--surface-e);
+  text-align: center;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  border-radius: 4px;
+  box-shadow: 0 2px 1px -1px rgba(0,0,0,.2), 0 1px 1px 0 rgba(0,0,0,.14), 0 1px 3px 0 rgba(0,0,0,.12);
 }

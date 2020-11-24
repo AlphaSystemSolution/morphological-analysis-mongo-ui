@@ -8,18 +8,27 @@ export class ConjugationTuple {
         if (!src) {
             return undefined;
         }
-        return new ConjugationTuple(src.singular, src.dual, src.plural);
+        return new ConjugationTuple(src.singular, src.plural, src.dual);
     }
 
-    constructor(public singular: string, public dual: string, public plural: string) { }
+    constructor(public singular: string, public plural: string, public dual?: string) { }
 
     public copy(): ConjugationTuple {
-        return new ConjugationTuple(this.singular, this.dual, this.plural)
+        return new ConjugationTuple(this.singular, this.plural, this.dual)
     }
 }
 
 export class ConjugationGroup {
-    constructor(public termType: string) { }
+
+    private _termTypeValue: SarfTermType;
+
+    constructor(public termType: string) {
+        this._termTypeValue = SarfTermType.getByName(this.termType);
+    }
+
+    get termTypeValue(): SarfTermType {
+        return this._termTypeValue;
+    }
 
     equals(other: ConjugationGroup): boolean {
         return other && this.termType === other.termType;
@@ -114,7 +123,8 @@ export class DetailedConjugation {
             VerbConjugationGroup.of(src.presentPassiveTense),
             NounConjugationGroup.of(src.passiveParticipleMasculine),
             NounConjugationGroup.of(src.passiveParticipleFeminine),
-            [], [] // TODO:
+            src.verbalNouns.map((item: NounConjugationGroup) => NounConjugationGroup.of(item)),
+            src.adverbs.map((item: NounConjugationGroup) => NounConjugationGroup.of(item))
         );
     }
 
@@ -161,6 +171,11 @@ export class DetailedConjugation {
             this.adverbs ? this.adverbs.map((ad) => ad.copy()) : []
         );
     }
+
+    public hasPassiveLine() {
+        return this.pastPassiveTense && this.presentPassiveTense && this.passiveParticipleMasculine;
+    }
+
     get rootLetters(): RootLetters {
         return this._rootLetters;
     }

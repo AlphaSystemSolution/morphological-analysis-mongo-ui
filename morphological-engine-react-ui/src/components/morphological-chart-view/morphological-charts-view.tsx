@@ -5,6 +5,8 @@ import { ToggleSelecter } from '../toggle-selecter';
 import { Utils } from '../../utils/utils';
 import { AbbreviatedConjugationView } from './abbreviated-conjugation-view';
 import { AbbreviatedConjugation } from '../model/abbreviated-conjugation';
+import { DetailedConjugation } from '../model/detailed-conjugation';
+import { DetailConjugationView } from './detail-conjugation-view';
 
 interface Props {
     charts: MorphologicalChart[]
@@ -14,6 +16,7 @@ interface State {
     activeTabIndex: number
     selectedChartIndex: number
     abbreviatedConjugation?: AbbreviatedConjugation
+    detailConjugation?: DetailedConjugation
 }
 
 export class MorphologicalChartsView extends React.Component<Props, State> {
@@ -37,6 +40,7 @@ export class MorphologicalChartsView extends React.Component<Props, State> {
         this.setState({
             selectedChartIndex: index,
             abbreviatedConjugation: this.props.charts[index].abbreviatedConjugation,
+            detailConjugation: this.props.charts[index].detailedConjugation,
             activeTabIndex: 1
         });
     }
@@ -67,12 +71,14 @@ export class MorphologicalChartsView extends React.Component<Props, State> {
 
     render() {
         const abbreviatedConjugation = this.state.abbreviatedConjugation ? this.state.abbreviatedConjugation : this.props.charts[0].abbreviatedConjugation;
+        const detailConjugation = this.state.detailConjugation ? this.state.detailConjugation : this.props.charts[0].detailedConjugation;
         return (
             <React.Fragment>
                 <Accordion activeIndex={this.state.activeTabIndex} onTabChange={(e) => this.setState({ activeTabIndex: e.index })}>
                     <AccordionTab header="Contents">{this.renderChartTabs()}</AccordionTab>
                     <AccordionTab header="Conjugation">
                         <AbbreviatedConjugationView conjugation={abbreviatedConjugation} />
+                        <DetailConjugationView conjugation={detailConjugation} />
                     </AccordionTab>
                 </Accordion>
             </React.Fragment>
