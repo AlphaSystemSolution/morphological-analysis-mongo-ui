@@ -98,7 +98,8 @@ export class InputData {
       this.family.name,
       new ConjugationConfiguration(this.removePassiveLine, this.skipRuleProcessing),
       this.translation,
-      this.verbalNouns.map((vn) => vn.name)
+      this.verbalNouns.map((vn) => vn.name),
+      this.id
     );
   }
 
@@ -109,7 +110,8 @@ export class InputData {
       this.translation,
       this.removePassiveLine,
       this.skipRuleProcessing,
-      Utils.copyArray(this.verbalNouns), this.id
+      Utils.copyArray(this.verbalNouns),
+      this.id
     );
   }
 }

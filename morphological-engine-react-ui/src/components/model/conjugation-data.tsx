@@ -11,8 +11,12 @@ export class ConjugationData extends Document {
         public template: string = NamedTemplate.FORM_I_CATEGORY_A_GROUP_U_TEMPLATE.name,
         public configuration: ConjugationConfiguration = new ConjugationConfiguration(),
         public translation: string = "",
-        public verbalNouns: string[] = []) {
+        public verbalNouns: string[] = [],
+        id?: string) {
         super();
+        if (id) {
+            this.id = id;
+        }
     }
 
     public toInputData(): InputData {
@@ -22,7 +26,8 @@ export class ConjugationData extends Document {
             this.translation,
             this.configuration.removePassiveLine,
             this.configuration.skipRuleProcessing,
-            this.verbalNouns && this.verbalNouns.length > 0 ? this.verbalNouns.filter((name) => name != null).map((name) => VerbalNoun.getByName(name)) : []
+            this.verbalNouns && this.verbalNouns.length > 0 ? this.verbalNouns.filter((name) => name != null).map((name) => VerbalNoun.getByName(name)) : [],
+            this.id
         );
     }
 
@@ -35,7 +40,8 @@ export class ConjugationData extends Document {
             src.template,
             ConjugationConfiguration.of(src.configuration),
             src.translation,
-            src.verbalNouns ? src.verbalNouns : []
+            src.verbalNouns ? src.verbalNouns : [],
+            src.id ? src.id : undefined
         );
     }
 }
