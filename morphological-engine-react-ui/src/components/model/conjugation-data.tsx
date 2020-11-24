@@ -12,11 +12,8 @@ export class ConjugationData extends Document {
         public configuration: ConjugationConfiguration = new ConjugationConfiguration(),
         public translation: string = "",
         public verbalNouns: string[] = [],
-        id?: string) {
-        super();
-        if (id) {
-            this.id = id;
-        }
+        id: string) {
+        super(id);
     }
 
     public toInputData(): InputData {

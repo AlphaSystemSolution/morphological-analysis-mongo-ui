@@ -1,12 +1,9 @@
-import { Document } from './document';
 import { ConjugationData } from './conjugation-data';
 import { ChartConfiguration } from './chart-configuration';
 
-export class ConjugationTemplate extends Document {
+export class ConjugationTemplate {
 
-    constructor(public data: ConjugationData[] = [], public chartConfiguration: ChartConfiguration = new ChartConfiguration()) {
-        super();
-    }
+    constructor(public data: ConjugationData[] = [], public chartConfiguration: ChartConfiguration = new ChartConfiguration()) { }
 
     public static of(src?: any): ConjugationTemplate {
         if (!src) {

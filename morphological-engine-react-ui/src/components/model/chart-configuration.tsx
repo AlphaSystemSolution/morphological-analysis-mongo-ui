@@ -4,18 +4,16 @@ export enum PageOrientation {
     PORTRAIT, LANDSCAPE
 }
 
-export class PageOption extends Document {
+export class PageOption {
 
-    constructor(public orientation: string = PageOrientation[PageOrientation.PORTRAIT]) {
-        super();
-    }
+    constructor(public orientation: string = PageOrientation[PageOrientation.PORTRAIT]) { }
 
     public static of(src?: any): PageOption {
         return src ? new PageOption(PageOrientation[src.orientation]) : new PageOption()
     }
 }
 
-export class ChartConfiguration extends Document {
+export class ChartConfiguration {
 
     constructor(
         public omitToc = false,
@@ -31,9 +29,7 @@ export class ChartConfiguration extends Document {
         public arabicFontSize = 14,
         public translationFontSize = 12,
         public headingFontSize = 30,
-        public pageOption: PageOption = new PageOption()) {
-        super();
-    }
+        public pageOption: PageOption = new PageOption()) { }
 
     public static of(src?: any): ChartConfiguration {
         if (src) {

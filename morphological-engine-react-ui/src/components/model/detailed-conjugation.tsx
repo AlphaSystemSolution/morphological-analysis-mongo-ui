@@ -123,8 +123,8 @@ export class DetailedConjugation {
             VerbConjugationGroup.of(src.presentPassiveTense),
             NounConjugationGroup.of(src.passiveParticipleMasculine),
             NounConjugationGroup.of(src.passiveParticipleFeminine),
-            src.verbalNouns.map((item: NounConjugationGroup) => NounConjugationGroup.of(item)),
-            src.adverbs.map((item: NounConjugationGroup) => NounConjugationGroup.of(item))
+            src.verbalNouns ? src.verbalNouns.map((item: NounConjugationGroup) => NounConjugationGroup.of(item)) : [],
+            src.adverbs ? src.adverbs.map((item: NounConjugationGroup) => NounConjugationGroup.of(item)) : []
         );
     }
 
