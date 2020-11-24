@@ -9,6 +9,7 @@ import { IdGenerator } from '../utils/id-generator';
 import { Dialog } from 'primereact/dialog';
 import { Toolbar } from 'primereact/toolbar';
 import { ArabicLetter } from './model/arabic-letter';
+import { Utils } from '../utils/utils';
 
 interface Props {
     initialData?: InputData[]
@@ -39,7 +40,7 @@ export default class InputTable extends React.Component<Props, State> {
         this.confirmDeleteSelected = this.confirmDeleteSelected.bind(this);
         this.deleteSelectedRows = this.deleteSelectedRows.bind(this);
         this.hideDeleteRowsDialog = this.hideDeleteRowsDialog.bind(this);
-        this.viewDictionary = this.viewDictionary.bind(this);
+        Utils.viewDictionary = Utils.viewDictionary.bind(this);
 
         this.state = {
             data: this.props.initialData ? this.props.initialData : [],
@@ -97,7 +98,7 @@ export default class InputTable extends React.Component<Props, State> {
             <React.Fragment>
                 <Button type="button" icon="pi pi-pencil" className="p-button-rounded p-button-success" tooltip="Edit" onClick={() => this.editRow(rowData)} />&nbsp;
                 <Button type="button" icon="pi pi-copy" className="p-button-rounded p-button-success" tooltip="Duplicate" onClick={() => this.duplicateRow(rowData)} />&nbsp;
-                <Button type="button" icon="pi pi-info" className="p-button-rounded p-button-secondary" tooltip="Dictionary" onClick={() => this.viewDictionary(rowData)} />
+                <Button type="button" icon="pi pi-info" className="p-button-rounded p-button-secondary" tooltip="Dictionary" onClick={() => Utils.viewDictionary(rowData)} />
             </React.Fragment>
         );
     }
@@ -166,24 +167,6 @@ export default class InputTable extends React.Component<Props, State> {
         this.setState({
             showDeleteRowsDialog: false
         });
-    }
-
-    private viewDictionary(rowData: InputData) {
-        const rootLetters = rowData.rootLetters;
-        let searchString = this.getLetterCode(rootLetters.firstRadical) + this.getLetterCode(rootLetters.secondRadical);
-        if (!rootLetters.secondRadical.equals(rootLetters.thirdRadical)) {
-            searchString += this.getLetterCode(rootLetters.thirdRadical);
-        }
-        const fourthRadical = rootLetters.fourthRadical;
-        if (fourthRadical && !ArabicLetter.TATWEEL.equals(fourthRadical)) {
-            searchString += this.getLetterCode(fourthRadical);
-        }
-        const url = process.env.REACT_APP_DICTIONARY_URL + searchString;
-        window.open(url, '_dictionary');
-    }
-
-    private getLetterCode(letter: ArabicLetter): string {
-        return ArabicLetter.HAMZA.equals(letter) ? ArabicLetter.ALIF.code : letter.code;
     }
 
     private findIndexById(id: string): number {
