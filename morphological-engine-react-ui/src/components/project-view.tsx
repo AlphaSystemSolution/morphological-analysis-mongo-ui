@@ -37,11 +37,13 @@ export class ProjectView extends React.Component<Props, State> {
         this.loadInitialData();
         Emitter.on(EmitterConstants.ROW_ADDED, (data: InputData) => this.loadConjugation(EmitterConstants.ROW_ADDED, data));
         Emitter.on(EmitterConstants.ROW_UPDATED, (data: InputData) => this.loadConjugation(EmitterConstants.ROW_UPDATED, data));
+        Emitter.on(EmitterConstants.ROWS_DELETED, (deletedIds: string[]) => this.removeConjugations(deletedIds));
     }
 
     componentWillUnmount() {
         Emitter.off(EmitterConstants.ROW_ADDED);
         Emitter.off(EmitterConstants.ROW_UPDATED);
+        Emitter.off(EmitterConstants.ROWS_DELETED);
     }
 
     private loadInitialData() {
@@ -66,7 +68,7 @@ export class ProjectView extends React.Component<Props, State> {
             .getMorphologicalChart(new ConjugationTemplate([conjugationData]))
             .then((results) => {
                 const charts = this.state.charts;
-                if(index > -1) {
+                if (index > -1) {
                     charts[index] = results[0];
                 } else {
                     charts.push(results[0]);
@@ -76,6 +78,14 @@ export class ProjectView extends React.Component<Props, State> {
                     disableConjugationTab: false
                 });
             })
+    }
+
+    private removeConjugations(deletedIds: string[]) {
+        const deletedIndices = deletedIds.map((id) => this.findIndexById(id)).filter((index) => index > -1);
+        const charts = this.state.charts.filter((_, index) => deletedIndices.indexOf(index) === -1);
+        this.setState({
+            charts: charts
+        });
     }
 
     private findIndexById(id: string): number {

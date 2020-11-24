@@ -166,7 +166,9 @@ export default class InputTable extends React.Component<Props, State> {
             data: data,
             selectedRows: [],
             showDeleteRowsDialog: false
-        })
+        }, () => {
+            Emitter.emit(EmitterConstants.ROWS_DELETED, selectedRows)
+        });
     }
 
     private hideDeleteRowsDialog() {

@@ -3,5 +3,5 @@ export class EmitterConstants {
     static IMPORT_PROJECT_ACTION: string = "import-project";
     static ROW_ADDED = "row-added";
     static ROW_UPDATED = "row-updated";
-    static ROW_DELETED = "row-deleted";
+    static ROWS_DELETED = "row-deleted";
 }
