@@ -30,6 +30,10 @@ interface State {
     showDeleteRowsDialog: boolean
 }
 
+enum ExportType {
+    ALL, ABBREVIATED_CONJUGATION, DETAILED_CONJUGATION
+}
+
 export default class InputTable extends React.Component<Props, State> {
 
     private applicationController: ApplicationController;
@@ -59,14 +63,14 @@ export default class InputTable extends React.Component<Props, State> {
             exportMenuItems: [
                 {
                     label: 'Abbreviated Conjugation',
-                    command: (e: any) => {
-                        console.log('Export Abbreviated Conjugation to Word');
+                    command: (_: any) => {
+                        this.exportToWord(ExportType.ABBREVIATED_CONJUGATION);
                     }
                 },
                 {
                     label: 'Detailed Conjugation',
-                    command: (e: any) => {
-                        console.log('Export Detailed Conjugation to Word');
+                    command: (_: any) => {
+                        this.exportToWord(ExportType.DETAILED_CONJUGATION);
                     }
                 }
             ],
@@ -202,14 +206,29 @@ export default class InputTable extends React.Component<Props, State> {
         });
     }
 
-    private exportToWord() {
+    private exportToWord(exportType: ExportType = ExportType.ALL) {
+        const configuration = ChartConfiguration.of(this.props.chartConfiguration);
+        switch (exportType) {
+            case ExportType.ABBREVIATED_CONJUGATION:
+                configuration.omitToc = true;
+                configuration.omitHeader = true;
+                configuration.omitDetailedConjugation = true;
+                break;
+            case ExportType.DETAILED_CONJUGATION:
+                configuration.omitToc = true;
+                configuration.omitHeader = true;
+                configuration.omitAbbreviatedConjugation = true;
+                break;
+            default:
+                break;
+        }
         let data = this.state.selectedRows;
         if (data.length <= 0) {
             data = this.state.data;
         }
         const conjugationData = data.map((inputData) => inputData.toConjugationData());
         this.applicationController
-            .exportToWord(new ConjugationTemplate(conjugationData))
+            .exportToWord(new ConjugationTemplate(conjugationData, configuration))
             .then((_) => {
                 this.setState({
                     selectedRows: []
@@ -240,7 +259,7 @@ export default class InputTable extends React.Component<Props, State> {
         const rightToolbarContent: any = (
             <React.Fragment>
                 <SplitButton label="Export to Word" icon="pi pi-download" model={this.state.exportMenuItems} className="p-md-12" disabled={this.state.data.length <= 0}
-                    onClick={this.exportToWord} />
+                    onClick={() => this.exportToWord()} />
             </React.Fragment >
         );
 
