@@ -18,29 +18,35 @@ export class AbbreviatedConjugationView extends React.Component<Props, State> {
 
     private renderActiveLine(abbreviatedConjugation: AbbreviatedConjugation, verbalNouns: any) {
         return (
-            <tr>
-                <td className="morphological-chart">
-                    <span>{abbreviatedConjugation.pastTense.label}</span>
-                </td>
-                <td className="morphological-chart">
-                    <span>{abbreviatedConjugation.presentTense.label}</span>
-                </td>
-                <td className="morphological-chart">
-                    {verbalNouns}
-                </td>
-                <td className="morphological-chart">
-                    <span>
+            <React.Fragment>
+                <div className="p-col-3 p-md-12 p-lg-3">
+                    <div className="box">
+                        {abbreviatedConjugation.pastTense.label}
+                    </div>
+                </div>
+                <div className="p-col-3 p-md-12 p-lg-3">
+                    <div className="box">
+                        {abbreviatedConjugation.presentTense.label}
+                    </div>
+                </div>
+                <div className="p-col-3 p-md-12 p-lg-3">
+                    <div className="box">
+                        {verbalNouns}
+                    </div>
+                </div>
+                <div className="p-col-3 p-md-12 p-lg-3">
+                    <div className="box">
                         <span className="arabicDisabled">{ArabicConstants.PARTICIPLE_PREFIX.label}</span>&nbsp;
                                     <span>{abbreviatedConjugation.activeParticipleMasculine.label}</span>
-                    </span>
-                </td>
-            </tr>
+                    </div>
+                </div>
+            </React.Fragment>
         );
     }
 
     private renderMultiValues(labels: ConjugationLabel[]) {
         if (labels.length <= 0) {
-            return <span>&nbsp;</span>
+            return <div className="box">&nbsp;</div>
         } else {
             const values = [];
             values.push(<span key="item-0">{labels[0].label}</span>);
@@ -50,105 +56,102 @@ export class AbbreviatedConjugationView extends React.Component<Props, State> {
                 values.push(<span key={"item-" + (index + 2)}>{item.label}</span>);
             });
             return (
-                <span>
+                <React.Fragment>
                     {values}
-                </span>
+                </React.Fragment>
             );
         }
     }
 
     private renderPassiveLine(abbreviatedConjugation: AbbreviatedConjugation, verbalNouns: any) {
         return (
-            <tr>
-                <td className="morphological-chart">
-                    <span>{abbreviatedConjugation.pastPassiveTense!.label}</span>
-                </td>
-                <td className="morphological-chart">
-                    <span>{abbreviatedConjugation.presentPassiveTense!.label}</span>
-                </td>
-                <td className="morphological-chart">
-                    {verbalNouns}
-                </td>
-                <td className="morphological-chart">
-                    <span>
+            <React.Fragment>
+                <div className="p-col-3 p-md-12 p-lg-3">
+                    <div className="box">
+                        {abbreviatedConjugation.pastPassiveTense!.label}
+                    </div>
+                </div>
+                <div className="p-col-3 p-md-12 p-lg-3">
+                    <div className="box">
+                        {abbreviatedConjugation.presentPassiveTense!.label}
+                    </div>
+                </div>
+                <div className="p-col-3 p-md-12 p-lg-3">
+                    <div className="box">
+                        {verbalNouns}
+                    </div>
+                </div>
+                <div className="p-col-3 p-md-12 p-lg-3">
+                    <div className="box">
                         <span className="arabicDisabled">{ArabicConstants.PARTICIPLE_PREFIX.label}</span>&nbsp;
-                        <span>{abbreviatedConjugation.passiveParticipleMasculine!.label}</span>
-                    </span>
-                </td>
-            </tr>
+                                    <span>{abbreviatedConjugation.passiveParticipleMasculine!.label}</span>
+                    </div>
+                </div>
+            </React.Fragment>
         );
     }
 
     private renderImperativeAndForbiddenLine(abbreviatedConjugation: AbbreviatedConjugation) {
         return (
-            <tr>
-                <td className="morphological-chart" colSpan={2}>
-                    <span>
-                        <span className="arabicDisabled">{ArabicConstants.IMPERATIVE_PREFIX.label}</span>&nbsp;
-                                    <span>{abbreviatedConjugation.imperative.label}</span>
-                    </span>
-                </td>
-                <td className="morphological-chart" colSpan={2}>
-                    <span>
-                        <span className="arabicDisabled">{ArabicConstants.FORBIDDING_PREFIX.label}</span>&nbsp;
-                                    <span>{abbreviatedConjugation.forbidding.label}</span>
-                    </span>
-                </td>
-            </tr>
+            <React.Fragment>
+                <div className="p-col-6 p-md-12 p-lg-6">
+                    <div className="box">
+                        <span className="arabicDisabled">
+                            {ArabicConstants.IMPERATIVE_PREFIX.label}
+                        </span>&nbsp;
+                        {abbreviatedConjugation.imperative.label}
+                    </div>
+                </div>
+                <div className="p-col-6 p-md-12 p-lg-6">
+                    <div className="box">
+                        <span className="arabicDisabled">
+                            {ArabicConstants.FORBIDDING_PREFIX.label}
+                        </span>&nbsp;
+                        {abbreviatedConjugation.forbidding.label}
+                    </div>
+                </div>
+            </React.Fragment>
         );
     }
 
     private renderAdverbs(labels: ConjugationLabel[]) {
-        return (
-            <span>
-                <span className="arabicDisabled">{ArabicConstants.ADVERBS_PREFIX.label}</span>
-                <span className="arabicDisabled">{ArabicConstants.AND_SPACE.label}</span>
-                {this.renderMultiValues(labels)}
-            </span>
-        );
+        if (labels.length <= 0) {
+            return null;
+        } else {
+            return (
+                <React.Fragment>
+                    <div className="p-col-12 p-md-12 p-lg-12">
+                        <div className="box">
+                            <span className="arabicDisabled">
+                                {ArabicConstants.ADVERBS_PREFIX.label}
+                            </span>&nbsp;
+                            {this.renderMultiValues(labels)}
+                        </div>
+                    </div>
+                </React.Fragment>
+            );
+        }
+
     }
 
     render() {
         const abbreviatedConjugation = this.props.conjugation;
         if (abbreviatedConjugation) {
-            const verbalNouns: any = this.renderMultiValues(abbreviatedConjugation.verbalNouns);
-            let secondAndThirdRows = undefined;
+            const verbalNouns: any = this.renderMultiValues(abbreviatedConjugation.verbalNouns.map((item) => item.copy()));
+            let passiveLine = null;
             if (abbreviatedConjugation.hasPassiveLine()) {
-                secondAndThirdRows = (
-                    <React.Fragment>
-                        {this.renderPassiveLine(abbreviatedConjugation, verbalNouns)}
-                        {this.renderImperativeAndForbiddenLine(abbreviatedConjugation)}
-                    </React.Fragment>
-                );
-            } else {
-                secondAndThirdRows = (
-                    <React.Fragment>
-                        {this.renderImperativeAndForbiddenLine(abbreviatedConjugation)}
-                    </React.Fragment>
-                );
+                passiveLine = this.renderPassiveLine(abbreviatedConjugation, verbalNouns);
             }
             return (
-                <table className="morphological-chart arabicNormal">
-                    <tbody>
-                        <tr>
-                            <td colSpan={4} className="morphological-chart-no-border arabicTitle">
-                                {abbreviatedConjugation.conjugationHeader.title}
-                            </td>
-                        </tr>
+                <React.Fragment>
+                    <div className="p-grid arabicNormal">
                         {this.renderActiveLine(abbreviatedConjugation, verbalNouns)}
-                        {secondAndThirdRows}
-                        <tr>
-                            <td className="morphological-chart" colSpan={4}>
-                                {this.renderAdverbs(abbreviatedConjugation.adverbs)}
-                            </td>
-                        </tr>
-                        <tr>
-                            <td className="morphological-chart-no-border" colSpan={4}>
-                                <span>&nbsp;</span>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                        {passiveLine}
+                        {this.renderImperativeAndForbiddenLine(abbreviatedConjugation)}
+                        {this.renderAdverbs(abbreviatedConjugation.adverbs.map((item) => item.copy()))}
+                    </div>
+                    <div>&nbsp;</div>
+                </React.Fragment>
             );
         } else {
             return <div>&nbsp;</div>
