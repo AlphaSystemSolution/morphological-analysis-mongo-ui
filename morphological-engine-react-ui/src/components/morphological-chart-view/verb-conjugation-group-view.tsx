@@ -14,7 +14,7 @@ export class VerbConjugationGroupView extends React.Component<Props, State> {
     render() {
         const group = this.props.group;
         return (
-            <Panel header={group.termTypeValue.label} style={{ direction: 'rtl' }}>
+            <Panel header={group.termTypeValue.label} style={{ direction: 'rtl' }} toggleable>
                 <div className="p-grid arabicNormal">
                     <ConjugationTupleView tuple={group.masculineThirdPerson} />
                     <ConjugationTupleView tuple={group.feminineThirdPerson} />
