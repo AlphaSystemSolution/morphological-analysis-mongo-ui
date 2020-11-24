@@ -14,9 +14,11 @@ import { EmitterConstants } from './emitter-constants';
 import Emitter from '../services/event-emitter';
 import { ApplicationController } from '../services/application-controller';
 import { ConjugationTemplate } from './model/conjugation-template';
+import { ChartConfiguration } from './model/chart-configuration';
 
 interface Props {
     initialData?: InputData[]
+    chartConfiguration: ChartConfiguration
 }
 
 interface State {

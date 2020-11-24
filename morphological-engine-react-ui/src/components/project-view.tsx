@@ -105,7 +105,7 @@ export class ProjectView extends React.Component<Props, State> {
         return (
             <TabView activeIndex={this.state.activeTabIndex} onTabChange={(e) => this.setState({ activeTabIndex: e.index })}>
                 <TabPanel header="Table">
-                    <InputTable initialData={this.props.project!.data} />
+                    <InputTable initialData={this.props.project!.data} chartConfiguration={this.props.project.chartConfiguration} />
                 </TabPanel>
                 <TabPanel header="Conjugation" disabled={this.state.disableConjugationTab}>
                     <MorphologicalChartsView charts={this.state.charts} />
