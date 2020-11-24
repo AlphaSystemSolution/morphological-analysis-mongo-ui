@@ -3,6 +3,7 @@ import { DataTable } from 'primereact/datatable';
 import { Checkbox } from 'primereact/checkbox';
 import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
+import { SplitButton } from 'primereact/splitbutton';
 import { ArabicConstants, InputData } from './model/models';
 import { MorphologicalInputForm } from './morphological-input-form'
 import { IdGenerator } from '../utils/id-generator';
@@ -11,6 +12,8 @@ import { Toolbar } from 'primereact/toolbar';
 import { Utils } from '../utils/utils';
 import { EmitterConstants } from './emitter-constants';
 import Emitter from '../services/event-emitter';
+import { ApplicationController } from '../services/application-controller';
+import { ConjugationTemplate } from './model/conjugation-template';
 
 interface Props {
     initialData?: InputData[]
@@ -18,6 +21,7 @@ interface Props {
 
 interface State {
     data: InputData[],
+    exportMenuItems: any[],
     selectedRows: InputData[]
     currentRow: InputData
     showRowEditDialog: boolean
@@ -26,8 +30,12 @@ interface State {
 
 export default class InputTable extends React.Component<Props, State> {
 
+    private applicationController: ApplicationController;
+
     constructor(props: Props) {
         super(props);
+
+        this.applicationController = new ApplicationController();
 
         this.rootLettersTemplate = this.rootLettersTemplate.bind(this);
         this.familyTemplate = this.familyTemplate.bind(this);
@@ -41,10 +49,25 @@ export default class InputTable extends React.Component<Props, State> {
         this.confirmDeleteSelected = this.confirmDeleteSelected.bind(this);
         this.deleteSelectedRows = this.deleteSelectedRows.bind(this);
         this.hideDeleteRowsDialog = this.hideDeleteRowsDialog.bind(this);
+        this.exportToWord = this.exportToWord.bind(this);
         Utils.viewDictionary = Utils.viewDictionary.bind(this);
 
         this.state = {
             data: this.props.initialData ? this.props.initialData : [],
+            exportMenuItems: [
+                {
+                    label: 'Abbreviated Conjugation',
+                    command: (e: any) => {
+                        console.log('Export Abbreviated Conjugation to Word');
+                    }
+                },
+                {
+                    label: 'Detailed Conjugation',
+                    command: (e: any) => {
+                        console.log('Export Detailed Conjugation to Word');
+                    }
+                }
+            ],
             selectedRows: [],
             currentRow: new InputData(),
             showRowEditDialog: false,
@@ -177,6 +200,21 @@ export default class InputTable extends React.Component<Props, State> {
         });
     }
 
+    private exportToWord() {
+        let data = this.state.selectedRows;
+        if (data.length <= 0) {
+            data = this.state.data;
+        }
+        const conjugationData = data.map((inputData) => inputData.toConjugationData());
+        this.applicationController
+            .exportToWord(new ConjugationTemplate(conjugationData))
+            .then((_) => {
+                this.setState({
+                    selectedRows: []
+                });
+            })
+    }
+
     private findIndexById(id: string): number {
         let index: number = -1;
         for (let i = 0; i < this.state.data.length; i++) {
@@ -189,11 +227,19 @@ export default class InputTable extends React.Component<Props, State> {
     }
 
     render() {
-        const toolbarContent: any = (
+        const leftToolbarContent: any = (
             <React.Fragment>
                 <Button label="Add Row" icon="pi pi-plus" className="p-button-success p-mr-2" onClick={this.addRow} />
-                <Button label="Delete Row(s)" icon="pi pi-trash" className="p-button-danger p-mr-2" onClick={this.confirmDeleteSelected} disabled={this.state.selectedRows.length <= 0} />
+                <Button label="Delete Row(s)" icon="pi pi-trash" className="p-button-danger p-mr-2" onClick={this.confirmDeleteSelected}
+                    disabled={this.state.selectedRows.length <= 0} />
             </React.Fragment>
+        );
+
+        const rightToolbarContent: any = (
+            <React.Fragment>
+                <SplitButton label="Export to Word" icon="pi pi-download" model={this.state.exportMenuItems} className="p-md-12" disabled={this.state.data.length <= 0}
+                    onClick={this.exportToWord} />
+            </React.Fragment >
         );
 
         const deleteRowsDialogFooter = (
@@ -206,7 +252,7 @@ export default class InputTable extends React.Component<Props, State> {
         return (
             <React.Fragment>
                 <MorphologicalInputForm inputData={this.state.currentRow} visible={this.state.showRowEditDialog} onHide={(newData) => this.updateRow(newData)} />
-                <Toolbar className="p-mb-4" left={toolbarContent} />
+                <Toolbar left={leftToolbarContent} right={rightToolbarContent} />
                 <DataTable value={this.state.data} className="p-datatable-gridlines" style={{ 'paddingTop': '0', 'paddingBottom': '0' }} selection={this.state.selectedRows}
                     onSelectionChange={(e) => this.setState({ selectedRows: e.value })}>
                     <Column selectionMode="multiple" headerStyle={{ width: '3rem' }}></Column>
