@@ -1,6 +1,9 @@
+import { Panel } from 'primereact/panel';
 import * as React from 'react';
+import { IdGenerator } from '../../utils/id-generator';
 import { AbbreviatedConjugation, ConjugationLabel } from '../model/abbreviated-conjugation';
 import { ArabicConstants } from '../model/models';
+import { MorphologicalChartLabel } from '../model/morphological-chart';
 
 interface Props {
     conjugation?: AbbreviatedConjugation
@@ -14,6 +17,27 @@ export class AbbreviatedConjugationView extends React.Component<Props, State> {
         super(props);
 
         this.state = {}
+    }
+
+    private renderTitleLabel(abbreviatedConjugation: AbbreviatedConjugation) {
+        const translation = abbreviatedConjugation.conjugationHeader.translation;
+        let translationLabel = null;
+        if (translation && translation.trim().length > 0) {
+            translationLabel = (
+                <div className="translation">
+                    {translation}
+                </div>
+            );
+        }
+        const chartLabel = new MorphologicalChartLabel(abbreviatedConjugation.rootLetters, abbreviatedConjugation.namedTemplate, IdGenerator.nextId());
+        return (
+            <div className="p-col-12 p-md-12 p-lg-12">
+                <div className="box">
+                    <span className="arabicTitle">{chartLabel.label}</span>
+                    {translationLabel}
+                </div>
+            </div>
+        );
     }
 
     private renderActiveLine(abbreviatedConjugation: AbbreviatedConjugation, verbalNouns: any) {
@@ -42,25 +66,6 @@ export class AbbreviatedConjugationView extends React.Component<Props, State> {
                 </div>
             </React.Fragment>
         );
-    }
-
-    private renderMultiValues(labels: ConjugationLabel[]) {
-        if (labels.length <= 0) {
-            return <div className="box">&nbsp;</div>
-        } else {
-            const values = [];
-            values.push(<span key="item-0">{labels[0].label}</span>);
-            labels.shift();
-            labels.forEach((item, index) => {
-                values.push(<span key={"item-separator-" + (index + 1)} className="arabicDisabled">{ArabicConstants.AND_SPACE.label}</span>);
-                values.push(<span key={"item-" + (index + 2)}>{item.label}</span>);
-            });
-            return (
-                <React.Fragment>
-                    {values}
-                </React.Fragment>
-            );
-        }
     }
 
     private renderPassiveLine(abbreviatedConjugation: AbbreviatedConjugation, verbalNouns: any) {
@@ -119,19 +124,35 @@ export class AbbreviatedConjugationView extends React.Component<Props, State> {
             return null;
         } else {
             return (
-                <React.Fragment>
-                    <div className="p-col-12 p-md-12 p-lg-12">
-                        <div className="box">
-                            <span className="arabicDisabled">
-                                {ArabicConstants.ADVERBS_PREFIX.label}
-                            </span>&nbsp;
+                <div className="p-col-12 p-md-12 p-lg-12">
+                    <div className="box">
+                        <span className="arabicDisabled">
+                            {ArabicConstants.ADVERBS_PREFIX.label}
+                        </span>&nbsp;
                             {this.renderMultiValues(labels)}
-                        </div>
                     </div>
+                </div>
+            );
+        }
+    }
+
+    private renderMultiValues(labels: ConjugationLabel[]) {
+        if (labels.length <= 0) {
+            return <span>&nbsp;</span>
+        } else {
+            const values = [];
+            values.push(<span key="item-0">{labels[0].label}</span>);
+            labels.shift();
+            labels.forEach((item, index) => {
+                values.push(<span key={"item-separator-" + (index + 1)} className="arabicDisabled">{ArabicConstants.AND_SPACE.label}</span>);
+                values.push(<span key={"item-" + (index + 2)}>{item.label}</span>);
+            });
+            return (
+                <React.Fragment>
+                    {values}
                 </React.Fragment>
             );
         }
-
     }
 
     render() {
@@ -144,12 +165,15 @@ export class AbbreviatedConjugationView extends React.Component<Props, State> {
             }
             return (
                 <React.Fragment>
-                    <div className="p-grid arabicNormal">
-                        {this.renderActiveLine(abbreviatedConjugation, verbalNouns)}
-                        {passiveLine}
-                        {this.renderImperativeAndForbiddenLine(abbreviatedConjugation)}
-                        {this.renderAdverbs(abbreviatedConjugation.adverbs.map((item) => item.copy()))}
-                    </div>
+                    <Panel header={ArabicConstants.ABBREVIATED_CONJUGATION_LABEL.label} style={{ direction: 'rtl' }} toggleable>
+                        <div className="p-grid arabicNormal">
+                            {this.renderTitleLabel(abbreviatedConjugation)}
+                            {this.renderActiveLine(abbreviatedConjugation, verbalNouns)}
+                            {passiveLine}
+                            {this.renderImperativeAndForbiddenLine(abbreviatedConjugation)}
+                            {this.renderAdverbs(abbreviatedConjugation.adverbs.map((item) => item.copy()))}
+                        </div>
+                    </Panel>
                     <div>&nbsp;</div>
                 </React.Fragment>
             );
