@@ -1,9 +1,11 @@
 import { TabPanel, TabView } from 'primereact/tabview';
 import * as React from 'react';
 import { ApplicationController } from '../services/application-controller';
+import Emitter from '../services/event-emitter';
+import { EmitterConstants } from './emitter-constants';
 import InputTable from './input-table';
 import { ConjugationTemplate } from './model/conjugation-template';
-import { Project } from './model/models';
+import { InputData, Project } from './model/models';
 import { MorphologicalChart } from './model/morphological-chart';
 import { MorphologicalChartsView } from './morphological-chart-view/morphological-charts-view';
 
@@ -32,6 +34,17 @@ export class ProjectView extends React.Component<Props, State> {
     }
 
     componentDidMount() {
+        this.loadInitialData();
+        Emitter.on(EmitterConstants.ROW_ADDED, (data: InputData) => this.loadConjugation(EmitterConstants.ROW_ADDED, data));
+        Emitter.on(EmitterConstants.ROW_UPDATED, (data: InputData) => this.loadConjugation(EmitterConstants.ROW_UPDATED, data));
+    }
+
+    componentWillUnmount() {
+        Emitter.off(EmitterConstants.ROW_ADDED);
+        Emitter.off(EmitterConstants.ROW_UPDATED);
+    }
+
+    private loadInitialData() {
         const data = this.props.project.data;
         if (data.length > 0) {
             const conjugationData = data.map((inputData) => inputData.toConjugationData());
@@ -44,6 +57,38 @@ export class ProjectView extends React.Component<Props, State> {
                     });
                 });
         }
+    }
+
+    private loadConjugation(action: string, data: InputData) {
+        const conjugationData = data.toConjugationData();
+        const index = EmitterConstants.ROW_UPDATED === action ? this.findIndexById(data.id) : -1;
+        this.applicationController
+            .getMorphologicalChart(new ConjugationTemplate([conjugationData]))
+            .then((results) => {
+                const charts = this.state.charts;
+                if(index > -1) {
+                    charts[index] = results[0];
+                } else {
+                    charts.push(results[0]);
+                }
+                this.setState({
+                    charts: charts,
+                    disableConjugationTab: false
+                });
+            })
+    }
+
+    private findIndexById(id: string): number {
+        let result = -1;
+        const charts = this.state.charts;
+        for (let index = 0; index < charts.length; index++) {
+            const chart = charts[index];
+            if (chart.id === id) {
+                result = index;
+                break;
+            }
+        }
+        return result;
     }
 
     render() {

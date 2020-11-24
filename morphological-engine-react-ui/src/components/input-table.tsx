@@ -8,8 +8,9 @@ import { MorphologicalInputForm } from './morphological-input-form'
 import { IdGenerator } from '../utils/id-generator';
 import { Dialog } from 'primereact/dialog';
 import { Toolbar } from 'primereact/toolbar';
-import { ArabicLetter } from './model/arabic-letter';
 import { Utils } from '../utils/utils';
+import { EmitterConstants } from './emitter-constants';
+import Emitter from '../services/event-emitter';
 
 interface Props {
     initialData?: InputData[]
@@ -134,15 +135,20 @@ export default class InputTable extends React.Component<Props, State> {
         } else {
             const index: number = this.findIndexById(newData.id);
             let data = this.state.data;
+            let action: string
             if (index > -1) {
                 data[index] = newData;
+                action = EmitterConstants.ROW_UPDATED;
             } else {
                 // add new row
                 data.push(newData);
+                action = EmitterConstants.ROW_UPDATED;
             }
             this.setState({
                 showRowEditDialog: false,
                 data: data
+            }, () => {
+                Emitter.emit(action, newData); // emit new data
             });
         }
     }
