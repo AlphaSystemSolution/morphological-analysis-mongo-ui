@@ -24,10 +24,10 @@ export class DetailConjugationView extends React.Component<Props, State> {
                 return (
                     <React.Fragment>
                         <div className="p-col-12 p-md-6 p-lg-6">
-                            <NounConjugationGroupView group={group[1]} />
+                            <NounConjugationGroupView group={group[0]} />
                         </div>
                         <div className="p-col-12 p-md-6 p-lg-6">
-                            <NounConjugationGroupView group={group[0]} />
+                            <NounConjugationGroupView group={group[1]} />
                         </div>
                     </React.Fragment>
                 );
@@ -35,10 +35,10 @@ export class DetailConjugationView extends React.Component<Props, State> {
                 return (
                     <React.Fragment>
                         <div className="p-col-12 p-md-6 p-lg-6">
-                            <div>&nbsp;</div>
+                            <NounConjugationGroupView group={group[0]} />
                         </div>
                         <div className="p-col-12 p-md-6 p-lg-6">
-                            <NounConjugationGroupView group={group[0]} />
+                            <div>&nbsp;</div>
                         </div>
                     </React.Fragment>
                 );
@@ -54,20 +54,20 @@ export class DetailConjugationView extends React.Component<Props, State> {
             passiveTenseLine = (
                 <React.Fragment>
                     <div className="p-col-12 p-md-6 p-lg-6">
-                        <VerbConjugationGroupView group={conjugation.presentPassiveTense!} />
+                        <VerbConjugationGroupView group={conjugation.pastPassiveTense!} />
                     </div>
                     <div className="p-col-12 p-md-6 p-lg-6">
-                        <VerbConjugationGroupView group={conjugation.pastPassiveTense!} />
+                        <VerbConjugationGroupView group={conjugation.presentPassiveTense!} />
                     </div>
                 </React.Fragment>
             );
             passiveParticipleLine = (
                 <React.Fragment>
                     <div className="p-col-12 p-md-6 p-lg-6">
-                        <NounConjugationGroupView group={conjugation.passiveParticipleFeminine!} />
+                        <NounConjugationGroupView group={conjugation.passiveParticipleMasculine!} />
                     </div>
                     <div className="p-col-12 p-md-6 p-lg-6">
-                        <NounConjugationGroupView group={conjugation.passiveParticipleMasculine!} />
+                        <NounConjugationGroupView group={conjugation.passiveParticipleFeminine!} />
                     </div>
                 </React.Fragment>
             );
@@ -77,25 +77,25 @@ export class DetailConjugationView extends React.Component<Props, State> {
             <Panel header={ArabicConstants.DETAIL_CONJUGATION_LABEL.label} style={{ direction: 'rtl' }} toggleable>
                 <div className="p-grid">
                     <div className="p-col-12 p-md-6 p-lg-6">
-                        <VerbConjugationGroupView group={conjugation.presentTense} />
+                        <VerbConjugationGroupView group={conjugation.pastTense} />
                     </div>
                     <div className="p-col-12 p-md-6 p-lg-6">
-                        <VerbConjugationGroupView group={conjugation.pastTense} />
+                        <VerbConjugationGroupView group={conjugation.presentTense} />
+                    </div>
+                    {this.renderArrayValues(conjugation.verbalNouns)}
+                    <div className="p-col-12 p-md-6 p-lg-6">
+                        <NounConjugationGroupView group={conjugation.activeParticipleMasculine} />
                     </div>
                     <div className="p-col-12 p-md-6 p-lg-6">
                         <NounConjugationGroupView group={conjugation.activeParticipleFeminine} />
                     </div>
-                    <div className="p-col-12 p-md-6 p-lg-6">
-                        <NounConjugationGroupView group={conjugation.activeParticipleMasculine} />
-                    </div>
-                    {this.renderArrayValues(conjugation.verbalNouns)}
                     {passiveTenseLine}
                     {passiveParticipleLine}
                     <div className="p-col-12 p-md-6 p-lg-6">
-                        <VerbConjugationGroupView group={conjugation.forbidding} />
+                        <VerbConjugationGroupView group={conjugation.imperative} />
                     </div>
                     <div className="p-col-12 p-md-6 p-lg-6">
-                        <VerbConjugationGroupView group={conjugation.imperative} />
+                        <VerbConjugationGroupView group={conjugation.forbidding} />
                     </div>
                     {this.renderArrayValues(conjugation.adverbs)}
                 </div>
