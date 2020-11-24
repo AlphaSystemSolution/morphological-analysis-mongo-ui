@@ -19,14 +19,16 @@ export class DetailConjugationView extends React.Component<Props, State> {
             return null;
         }
         const groupsChunked = Utils.chunkArray(groups.map((item) => item.copy()), 2);
-        return groupsChunked.map((group) => {
+        return groupsChunked.map((group, index) => {
+            const group0 = group[0];
+            const termType = group0.termType;
             if (group.length > 1) {
                 return (
                     <React.Fragment>
-                        <div className="p-col-12 p-md-6 p-lg-6">
-                            <NounConjugationGroupView group={group[0]} />
+                        <div className="p-col-12 p-md-6 p-lg-6" key={termType + "-0-" + index}>
+                            <NounConjugationGroupView group={group0} />
                         </div>
-                        <div className="p-col-12 p-md-6 p-lg-6">
+                        <div className="p-col-12 p-md-6 p-lg-6" key={termType + "-1-" + index}>
                             <NounConjugationGroupView group={group[1]} />
                         </div>
                     </React.Fragment>
@@ -34,10 +36,10 @@ export class DetailConjugationView extends React.Component<Props, State> {
             } else {
                 return (
                     <React.Fragment>
-                        <div className="p-col-12 p-md-6 p-lg-6">
-                            <NounConjugationGroupView group={group[0]} />
+                        <div className="p-col-12 p-md-6 p-lg-6" key={termType + "-0-" + index}>
+                            <NounConjugationGroupView group={group0} />
                         </div>
-                        <div className="p-col-12 p-md-6 p-lg-6">
+                        <div className="p-col-12 p-md-6 p-lg-6" key={termType + "-1-" + index}>
                             <div>&nbsp;</div>
                         </div>
                     </React.Fragment>

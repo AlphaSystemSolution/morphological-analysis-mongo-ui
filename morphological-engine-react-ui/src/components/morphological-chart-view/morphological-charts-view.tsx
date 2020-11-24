@@ -54,16 +54,14 @@ export class MorphologicalChartsView extends React.Component<Props, State> {
                 const labelElements = labelArray.map((label, index) => {
                     const key = (parentIndex * MorphologicalChartsView.NUM_OF_COLUMNS) + index;
                     return (
-                        <div className="p-col-12 p-md-6 p-lg-2" key={"chart-label-row" + key}>
-                            <div>
-                                <ToggleSelecter value={label} index={key} className="chartSelector ui-button p-button-raised"
-                                    userKey={label.id} checked={this.state.selectedChartIndex === key} onChange={this.onChartSelected} />
-                            </div>
+                        <div className="p-col-12 p-md-6 p-lg-2" key={"chart-label-row-" + key}>
+                            <ToggleSelecter value={label} index={key} className="chartSelector ui-button p-button-raised"
+                                userKey={label.id} checked={this.state.selectedChartIndex === key} onChange={this.onChartSelected} />
                         </div>
                     );
                 });
                 return (
-                    <React.Fragment>
+                    <React.Fragment key={"chart-label-" + parentIndex}>
                         {labelElements}
                     </React.Fragment>
                 );
