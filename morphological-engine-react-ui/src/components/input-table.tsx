@@ -4,7 +4,7 @@ import { Checkbox } from 'primereact/checkbox';
 import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
 import { ArabicConstants, InputData } from './model/models';
-import MorphologicalInputForm from './morphological-input-form'
+import { MorphologicalInputForm } from './morphological-input-form'
 import { IdGenerator } from '../utils/id-generator';
 import { Dialog } from 'primereact/dialog';
 import { Toolbar } from 'primereact/toolbar';
@@ -119,10 +119,8 @@ export default class InputTable extends React.Component<Props, State> {
     private duplicateRow(rowData: InputData) {
         const newData = rowData.copy();
         newData.id = IdGenerator.nextId();
-        this.state.data.push(newData);
         this.setState({
             currentRow: newData,
-            data: this.state.data,
             showRowEditDialog: true
         });
     }

@@ -25,7 +25,7 @@ interface State {
     showVerbalNounPicker: boolean
 }
 
-export default class MorphologicalInputForm extends React.Component<Props, State> {
+export class MorphologicalInputForm extends React.Component<Props, State> {
 
     constructor(props: Props) {
         super(props);
