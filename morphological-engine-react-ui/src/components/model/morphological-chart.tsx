@@ -40,7 +40,8 @@ export class MorphologicalChart {
     public static of(src: any) {
         return new MorphologicalChart(
             AbbreviatedConjugation.of(src.abbreviatedConjugation),
-            DetailedConjugation.of(src.detailedConjugation)
+            DetailedConjugation.of(src.detailedConjugation),
+            src.id
         );
     }
 
