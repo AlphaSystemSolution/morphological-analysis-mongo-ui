@@ -153,7 +153,7 @@ export class MorphologicalInputForm extends React.Component<Props, State> {
         );
         return (
             <React.Fragment>
-                <ArabicKeyboard onHide={this.updateRootLetters} visible={this.state.showKeyboard} rootLetters={this.props.inputData.rootLetters} />
+                <ArabicKeyboard onHide={this.updateRootLetters} visible={this.state.showKeyboard} rootLetters={this.state.currentData.rootLetters} />
                 <VerbalNounPicker initalValues={this.state.currentData.verbalNouns} showDialog={this.state.showVerbalNounPicker} onHide={this.updateVernalNouns} />
                 <Dialog header="Add / Update Morphological Chart Input" footer={footer} onHide={() => this.noop()} closeOnEscape={false} closable={false}
                     visible={this.props.visible} onShow={this.show}>
