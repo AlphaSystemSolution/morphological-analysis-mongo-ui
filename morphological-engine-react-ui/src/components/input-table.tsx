@@ -55,7 +55,7 @@ export default class InputTable extends React.Component<Props, State> {
         this.confirmDeleteSelected = this.confirmDeleteSelected.bind(this);
         this.deleteSelectedRows = this.deleteSelectedRows.bind(this);
         this.hideDeleteRowsDialog = this.hideDeleteRowsDialog.bind(this);
-        this.exportToWord = this.exportToWord.bind(this);
+        this.saveProject = this.saveProject.bind(this);
         Utils.viewDictionary = Utils.viewDictionary.bind(this);
 
         this.state = {
@@ -206,6 +206,10 @@ export default class InputTable extends React.Component<Props, State> {
         });
     }
 
+    private saveProject() {
+        Emitter.emit(EmitterConstants.SAVE_PROJECT, { data: this.state.data, configuration: this.props.chartConfiguration })
+    }
+
     private exportToWord(exportType: ExportType = ExportType.ALL) {
         const configuration = ChartConfiguration.of(this.props.chartConfiguration);
         switch (exportType) {
@@ -253,6 +257,7 @@ export default class InputTable extends React.Component<Props, State> {
                 <Button label="Add Row" icon="pi pi-plus" className="p-button-success p-mr-2" onClick={this.addRow} />
                 <Button label="Delete Row(s)" icon="pi pi-trash" className="p-button-danger p-mr-2" onClick={this.confirmDeleteSelected}
                     disabled={this.state.selectedRows.length <= 0} />
+                <Button label="Save" icon="pi pi-save" onClick={this.saveProject} disabled={this.state.data.length <= 0} />
             </React.Fragment>
         );
 

@@ -4,6 +4,7 @@ import { ApplicationController } from '../services/application-controller';
 import Emitter from '../services/event-emitter';
 import { EmitterConstants } from './emitter-constants';
 import InputTable from './input-table';
+import { ChartConfiguration } from './model/chart-configuration';
 import { ConjugationTemplate } from './model/conjugation-template';
 import { InputData, Project } from './model/models';
 import { MorphologicalChart } from './model/morphological-chart';
@@ -38,12 +39,14 @@ export class ProjectView extends React.Component<Props, State> {
         Emitter.on(EmitterConstants.ROW_ADDED, (data: InputData) => this.loadConjugation(EmitterConstants.ROW_ADDED, data));
         Emitter.on(EmitterConstants.ROW_UPDATED, (data: InputData) => this.loadConjugation(EmitterConstants.ROW_UPDATED, data));
         Emitter.on(EmitterConstants.ROWS_DELETED, (deletedIds: string[]) => this.removeConjugations(deletedIds));
+        Emitter.on(EmitterConstants.SAVE_PROJECT, (payload: any) => this.saveProject(payload.data, payload.configuration))
     }
 
     componentWillUnmount() {
         Emitter.off(EmitterConstants.ROW_ADDED);
         Emitter.off(EmitterConstants.ROW_UPDATED);
         Emitter.off(EmitterConstants.ROWS_DELETED);
+        Emitter.off(EmitterConstants.SAVE_PROJECT);
     }
 
     private loadInitialData() {
@@ -86,6 +89,10 @@ export class ProjectView extends React.Component<Props, State> {
         this.setState({
             charts: charts
         });
+    }
+
+    private saveProject(data: InputData[], configuration: ChartConfiguration){
+        this.applicationController.saveFile(this.props.project.fileName, data, configuration)
     }
 
     private findIndexById(id: string): number {

@@ -4,4 +4,5 @@ export class EmitterConstants {
     static ROW_ADDED = "row-added";
     static ROW_UPDATED = "row-updated";
     static ROWS_DELETED = "row-deleted";
+    static SAVE_PROJECT = "save-project";
 }
