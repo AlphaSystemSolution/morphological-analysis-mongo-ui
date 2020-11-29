@@ -1,23 +1,12 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext } from 'react';
 import { observer } from 'mobx-react-lite';
 import { TabView, TabPanel } from 'primereact/tabview';
 import ProjectView from './project-view';
 import { ProjectContext } from '../store/project-store';
-import Emitter from '../services/event-emitter';
-import { EmitterConstants } from './emitter-constants';
 
 const HomeView = () => {
-    const [activeTabIndex, setActiveTabIndex] = useState(0);
     const context = useContext(ProjectContext);
-    const { projects } = context;
-
-    useEffect(() => {
-        Emitter.on(EmitterConstants.PROJECT_CREATED, (index: number) => setActiveTabIndex(index));
-
-        return () => {
-            Emitter.off(EmitterConstants.PROJECT_CREATED);
-        }
-    }, []);
+    const { projects, activeProjectIndex, setActiveProjectIndex: selectProject } = context;
 
     const panels = projects.map((project) => {
         return (
@@ -28,7 +17,7 @@ const HomeView = () => {
     });
 
     return (
-        <TabView activeIndex={activeTabIndex} onTabChange={(e) => setActiveTabIndex(e.index)}>
+        <TabView activeIndex={activeProjectIndex} onTabChange={(e) => selectProject(e.index)}>
             {panels}
         </TabView>
     );
