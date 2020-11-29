@@ -12,23 +12,24 @@ import { MorphologicalInputForm } from './morphological-input-form';
 import { Dialog } from 'primereact/dialog';
 import { SplitButton } from 'primereact/splitbutton';
 import { Toolbar } from 'primereact/toolbar';
+import Project from '../store/project';
 
 enum ExportType {
     ALL, ABBREVIATED_CONJUGATION, DETAILED_CONJUGATION
 }
 
 interface Props {
-    projectId: string
+    project: Project
 }
 
-const InputTable: FC<Props> = ({ projectId }) => {
+const InputTable: FC<Props> = ({ project }) => {
     const [selectedRows, setSelectedRows] = useState([] as InputData[]);
     const [currentRow, setCurrentRow] = useState(new InputData());
     const [showRowEditDialog, setShowRowEditDialog] = useState(false);
     const [showDeleteRowsDialog, setShowDeleteRowsDialog] = useState(false);
     const context = useContext(ProjectContext);
-    const { addData, removeData } = context;
-    const data: InputData[] = context.getProjectData(projectId).toArray();
+    //const { addData, removeData } = context;
+    const data: InputData[] = project.data.toArray();
 
     const rowsSelected = (e: any) => setSelectedRows(e.value)
 
@@ -94,7 +95,7 @@ const InputTable: FC<Props> = ({ projectId }) => {
         setShowRowEditDialog(false);
         if (newData) {
             const index: number = findIndexById(newData.id);
-            addData(projectId, index, newData);
+            project.addData(index, newData);
         }
     };
 
@@ -105,7 +106,7 @@ const InputTable: FC<Props> = ({ projectId }) => {
     const deleteSelectedRows = () => {
         setShowDeleteRowsDialog(false);
         const rowsToDelete = selectedRows.map((row) => row.id);
-        removeData(projectId, rowsToDelete)
+        project.removeData(rowsToDelete)
         setSelectedRows([]);
     };
 

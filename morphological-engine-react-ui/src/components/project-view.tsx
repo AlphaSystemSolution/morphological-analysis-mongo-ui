@@ -14,12 +14,12 @@ const ProjectView: React.FC<Props> = ({ projectId }) => {
 
     const context = useContext(ProjectContext);
     const project = context.getProject(projectId);
-    
+
     return (
         <>
             <TabView activeIndex={activeTabIndex} onTabChange={(e) => setActiveTabIndex(e.index)}>
                 <TabPanel header="Table">
-                    <InputTable projectId={project.id} />
+                    <InputTable project={project} />
                 </TabPanel>
                 <TabPanel header="Conjugation" disabled={disableConjugationTab}>
                     <p>MorphologicalChartsView</p>
