@@ -18,7 +18,8 @@ const HomeView = () => {
         return () => {
             Emitter.off(EmitterConstants.PROJECT_SAVED);
         }
-    }, [])
+    }, [refreshTab]);
+
     return (
         <TabView activeIndex={activeProjectIndex} onTabChange={(e) => selectProject(e.index)}>
             {
