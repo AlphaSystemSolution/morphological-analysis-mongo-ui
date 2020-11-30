@@ -1,97 +1,11 @@
 import React, { FC, useState } from 'react';
 import { Accordion, AccordionTab } from 'primereact/accordion'
-import { MorphologicalChart } from '../model/morphological-chart';
 import { ToggleSelecter } from '../toggle-selecter';
 import { Utils } from '../../utils/utils';
 import { AbbreviatedConjugationView } from './abbreviated-conjugation-view';
-import { AbbreviatedConjugation } from '../model/abbreviated-conjugation';
-import { DetailedConjugation } from '../model/detailed-conjugation';
 import { DetailConjugationView } from './detail-conjugation-view';
-import { List } from 'immutable';
 import Project from '../../store/project';
 import { observer } from 'mobx-react-lite';
-
-interface Props2 {
-    charts: List<MorphologicalChart>
-}
-
-interface State {
-    activeTabIndex: number
-    selectedChartIndex: number
-    abbreviatedConjugation?: AbbreviatedConjugation
-    detailConjugation?: DetailedConjugation
-}
-
-export class MorphologicalChartsView2 extends React.Component<Props2, State> {
-
-    private static NUM_OF_COLUMNS = 8;
-
-    constructor(props: Props2) {
-        super(props);
-
-        this.onChartSelected = this.onChartSelected.bind(this);
-
-        this.state = {
-            activeTabIndex: 0,
-            selectedChartIndex: 0
-        };
-    }
-
-    private onChartSelected(payload: any) {
-        const index = payload.index;
-        console.log(`CurrentIndex: ${index}`)
-        this.setState({
-            selectedChartIndex: index,
-            abbreviatedConjugation: this.props.charts.get(index)!.abbreviatedConjugation,
-            detailConjugation: this.props.charts.get(index)!.detailedConjugation,
-            activeTabIndex: 1
-        });
-    }
-
-
-    private renderChartTabs() {
-        const charts = this.props.charts.map((c) => c.copy());
-        const labels = Utils.chunkList(charts.map((chart) => chart.label), MorphologicalChartsView2.NUM_OF_COLUMNS);
-        const elements =
-            labels.map((labelArray, parentIndex) => {
-                const labelElements = labelArray.map((label, index) => {
-                    const key = (parentIndex * MorphologicalChartsView2.NUM_OF_COLUMNS) + index;
-                    return (
-                        <div className="p-col-12 p-md-6 p-lg-2" key={"chart-label-row-" + key}>
-                            <ToggleSelecter value={label} index={key} className="chartSelector ui-button p-button-raised"
-                                userKey={label.id} checked={this.state.selectedChartIndex === key} onChange={this.onChartSelected} />
-                        </div>
-                    );
-                });
-                return (
-                    <React.Fragment key={"chart-label-" + parentIndex}>
-                        {labelElements}
-                    </React.Fragment>
-                );
-            });
-        return (
-            <div className="p-grid" style={{ direction: 'rtl' }}>
-                {elements}
-            </div>
-        );
-    }
-
-    render() {
-        const abbreviatedConjugation = this.state.abbreviatedConjugation ? this.state.abbreviatedConjugation : this.props.charts.get(0)!.abbreviatedConjugation;
-        const detailConjugation = this.state.detailConjugation ? this.state.detailConjugation : this.props.charts.get(0)!.detailedConjugation;
-        return (
-            <React.Fragment>
-                <Accordion activeIndex={this.state.activeTabIndex} onTabChange={(e) => this.setState({ activeTabIndex: e.index })}>
-                    <AccordionTab header="Contents">{this.renderChartTabs()}</AccordionTab>
-                    <AccordionTab header="Conjugation">
-                        <AbbreviatedConjugationView conjugation={abbreviatedConjugation} />
-                        <DetailConjugationView conjugation={detailConjugation} />
-                    </AccordionTab>
-                </Accordion>
-            </React.Fragment>
-        );
-    }
-}
 
 interface Props {
     project: Project
