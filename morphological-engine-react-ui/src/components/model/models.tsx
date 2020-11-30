@@ -1,7 +1,6 @@
 import {v4 as uuid} from 'uuid';
 import { Utils } from '../../utils/utils';
 import { ArabicLabel } from './arabic-label';
-import { ChartConfiguration } from './chart-configuration';
 import { ConjugationData } from './conjugation-data';
 import { NamedTemplate } from './named-template';
 import { RootLetters } from './root-letters';
