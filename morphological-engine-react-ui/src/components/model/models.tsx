@@ -74,6 +74,19 @@ export class ArabicConstants {
 }
 
 export class InputData {
+
+  public static of(src: any): InputData {
+    return new InputData(
+      RootLetters.of(src.rootLetters),
+      NamedTemplate.getByName(src.family.name),
+      src.translation ? src.translation : "",
+      src.removePassiveLine,
+      src.skipRuleProcessing,
+      src.verbalNouns ? src.verbalNouns.map((vn: any) => vn.name).map((name: string) => VerbalNoun.getByName(name)) : [],
+      src.id
+    );
+  }
+
   constructor(
     public rootLetters: RootLetters = new RootLetters(),
     public family: NamedTemplate = NamedTemplate.FORM_I_CATEGORY_A_GROUP_U_TEMPLATE,

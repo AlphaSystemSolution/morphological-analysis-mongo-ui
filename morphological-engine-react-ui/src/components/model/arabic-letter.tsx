@@ -1,6 +1,15 @@
 import { ArabicLabel } from './arabic-label';
 
 export class ArabicLetter extends ArabicLabel {
+
+  public static of(src: any): ArabicLetter {
+    return new ArabicLetter(
+      src.name,
+      src.label,
+      src.code
+    );
+  }
+
   static HAMZA = new ArabicLetter('HAMZA', 'ء', '\'');
   static ALIF = new ArabicLetter('ALIF', 'ا', 'A');
   static BA = new ArabicLetter('BA', 'ب', 'b');

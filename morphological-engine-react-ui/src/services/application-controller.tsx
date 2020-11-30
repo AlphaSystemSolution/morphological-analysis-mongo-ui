@@ -30,8 +30,6 @@ export class ApplicationController {
 
     public saveFile(projectName: string, inputDatas: List<InputData>, configuration: ChartConfiguration) {
         const fileName = `${projectName}.json`;
-        const data = inputDatas.map((item) => item.toConjugationData());
-        const template = new ConjugationTemplate(data.toArray(), configuration);
-        FileSaver.saveAs(new Blob([JSON.stringify({projectName: projectName, conjugationTemplate: template})]), fileName);
+        FileSaver.saveAs(new Blob([JSON.stringify({projectName: projectName, data: inputDatas, configuration: configuration})]), fileName);
     }
 }

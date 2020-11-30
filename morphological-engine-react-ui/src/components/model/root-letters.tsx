@@ -3,18 +3,20 @@ import { ArabicLetter } from './arabic-letter';
 import { RootLetters as _RootLetters } from './conjugation-header';
 
 export class RootLetters {
-  private _id: string = uuid();
+
+  public static of(src: any): RootLetters {
+    return new RootLetters (
+      ArabicLetter.of(src.firstRadical),
+      ArabicLetter.of(src.secondRadical),
+      ArabicLetter.of(src.thirdRadical),
+      src.fourthRadical ? ArabicLetter.of(src.fourthRadical) : ArabicLetter.TATWEEL
+    );
+  }
+
+  public id: string = uuid();
 
   constructor(public firstRadical: ArabicLetter = ArabicLetter.FA, public secondRadical: ArabicLetter = ArabicLetter.AIN,
     public thirdRadical: ArabicLetter = ArabicLetter.LAM, public fourthRadical: ArabicLetter = ArabicLetter.TATWEEL) { }
-
-  get id(): string {
-    return this._id;
-  }
-
-  set id(value: string) {
-    this._id = value ? value : uuid();
-  }
 
   get empty(): boolean {
     return this.firstRadical === null || this.secondRadical === null || this.thirdRadical === null;
