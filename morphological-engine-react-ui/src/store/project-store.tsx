@@ -1,10 +1,11 @@
 import { createContext } from 'react';
 import { List } from 'immutable';
 import { action, computed, makeAutoObservable, observable } from "mobx";
-import { ConjugationTemplate } from '../components/model/conjugation-template';
 import Emitter from '../services/event-emitter';
 import { EmitterConstants } from '../components/emitter-constants';
 import Project from './project';
+import { InputData } from '../components/model/models';
+import { ChartConfiguration } from '../components/model/chart-configuration';
 
 export class ProjectStore {
 
@@ -38,9 +39,8 @@ export class ProjectStore {
         fileReader.readAsText(file);
         fileReader.onload = () => {
             const content = JSON.parse(fileReader.result as string);
-            const conjugationTemplate = ConjugationTemplate.of(content.conjugationTemplate);
-            const data = conjugationTemplate.data.map((data) => data.toInputData());
-            const project = new Project(content.projectName, false, conjugationTemplate.chartConfiguration, List(data));
+            const data = content.data.map((src: any)=> InputData.of(src));
+            const project = new Project(content.projectName, false, ChartConfiguration.of(content.configuration), List(data));
             this.projects = this.projects.push(project);
             this.activeProjectIndex = this.projects.size - 1;
             Emitter.emit(EmitterConstants.PROJECT_IMPORTED, this.size - 1);
