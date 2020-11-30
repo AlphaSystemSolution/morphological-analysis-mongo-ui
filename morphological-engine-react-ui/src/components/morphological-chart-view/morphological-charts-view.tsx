@@ -14,7 +14,7 @@ interface Props {
 const MorphologicalChartsView: FC<Props> = ({ project }) => {
 
     const numOfColumns = 8;
-    const [activeTabIndex, setActiveTabIndex] = useState(0);
+    const [activeTabIndex, setActiveTabIndex] = useState(1);
     const [selectedChartIndex, setSelectedChartIndex] = useState(0);
 
     const charts = project.charts;
