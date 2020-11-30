@@ -8,8 +8,10 @@ import { List } from 'immutable';
 
 export class ApplicationController {
 
+    private static MORPHOLOGICAL_ENGINE_URL = `${process.env.REACT_APP_MORPHOLOGICAL_ENGINE_HOST}/morphologicalEngine/morphologicalChart/format/`;
+
     public async getMorphologicalChart(body: ConjugationTemplate, outputFormat: OutputFormat = OutputFormat.UNICODE): Promise<MorphologicalChart[]> {
-        const url = `${process.env.REACT_APP_MORPHOLOGICAL_ENGINE_URL}${OutputFormat[outputFormat]}`;
+        const url = `${ApplicationController.MORPHOLOGICAL_ENGINE_URL}${OutputFormat[outputFormat]}`;
         const response = await axios.post<MorphologicalChart[]>(url, body);
         if (response.status !== 200) {
             return Promise.reject(`Invalid status: ${response.status}:${response.statusText}`);
@@ -18,7 +20,7 @@ export class ApplicationController {
     }
 
     public async exportToWord(body: ConjugationTemplate) {
-        const url = `${process.env.REACT_APP_MORPHOLOGICAL_ENGINE_URL}${OutputFormat[OutputFormat.STREAM]}`;
+        const url = `${ApplicationController.MORPHOLOGICAL_ENGINE_URL}${OutputFormat[OutputFormat.STREAM]}`;
         const response = await axios.post(url, body, { responseType: 'blob' });
         if (response.status !== 200) {
             return Promise.reject(`Invalid status: ${response.status}:${response.statusText}`);
