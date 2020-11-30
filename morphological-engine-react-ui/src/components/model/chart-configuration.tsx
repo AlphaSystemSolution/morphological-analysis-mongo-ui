@@ -1,5 +1,3 @@
-import { Document } from './document';
-
 export enum PageOrientation {
     PORTRAIT, LANDSCAPE
 }

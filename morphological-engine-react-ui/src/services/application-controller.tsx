@@ -4,6 +4,7 @@ import { InputData, OutputFormat } from '../components/model/models';
 import { MorphologicalChart } from '../components/model/morphological-chart';
 import FileSaver from 'file-saver';
 import { ChartConfiguration } from '../components/model/chart-configuration';
+import { List } from 'immutable';
 
 export class ApplicationController {
 
@@ -27,9 +28,10 @@ export class ApplicationController {
         return null;
     }
 
-    public saveFile(fileName: string, inputDatas: InputData[], configuration: ChartConfiguration) {
+    public saveFile(projectName: string, inputDatas: List<InputData>, configuration: ChartConfiguration) {
+        const fileName = `${projectName}.json`;
         const data = inputDatas.map((item) => item.toConjugationData());
-        const template = new ConjugationTemplate(data, configuration);
-        FileSaver.saveAs(new Blob([JSON.stringify(template)]), fileName);
+        const template = new ConjugationTemplate(data.toArray(), configuration);
+        FileSaver.saveAs(new Blob([JSON.stringify({projectName: projectName, conjugationTemplate: template})]), fileName);
     }
 }

@@ -1,5 +1,6 @@
 import { Panel } from 'primereact/panel';
 import * as React from 'react';
+import {v4 as uuid} from 'uuid';
 import { Utils } from '../../utils/utils';
 import { DetailedConjugation, NounConjugationGroup } from '../model/detailed-conjugation';
 import { ArabicConstants } from '../model/models';
@@ -24,7 +25,7 @@ export class DetailConjugationView extends React.Component<Props, State> {
             const termType = group0.termType;
             if (group.length > 1) {
                 return (
-                    <React.Fragment>
+                    <React.Fragment key={uuid()}>
                         <div className="p-col-12 p-md-6 p-lg-6" key={termType + "-0-" + index}>
                             <NounConjugationGroupView group={group0} />
                         </div>
@@ -35,7 +36,7 @@ export class DetailConjugationView extends React.Component<Props, State> {
                 );
             } else {
                 return (
-                    <React.Fragment>
+                    <React.Fragment key={uuid()}>
                         <div className="p-col-12 p-md-6 p-lg-6" key={termType + "-0-" + index}>
                             <NounConjugationGroupView group={group0} />
                         </div>

@@ -1,8 +1,8 @@
+import {v4 as uuid} from 'uuid';
 import { ConjugationHeader } from './conjugation-header';
 import { SarfTermType } from './sarf-term-type';
 import { RootLetters } from './root-letters';
 import { NamedTemplate } from './named-template';
-import { IdGenerator } from '../../utils/id-generator';
 
 export class ConjugationLabel {
     public static of(src?: any): ConjugationLabel | undefined {
@@ -49,7 +49,7 @@ export class AbbreviatedConjugation {
         }
         const conjugationHeader = ConjugationHeader.of(src.conjugationHeader);
         return new AbbreviatedConjugation(
-            src.id || IdGenerator.nextId(),
+            src.id || uuid(),
             conjugationHeader,
             AbbreviatedConjugation.getRootLetters(conjugationHeader),
             AbbreviatedConjugation.getNamedTemplate(conjugationHeader),

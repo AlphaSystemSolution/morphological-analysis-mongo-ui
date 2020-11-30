@@ -1,62 +1,49 @@
-import * as React from 'react';
+import React, { FC, useState } from 'react';
 import { Accordion, AccordionTab } from 'primereact/accordion'
-import { MorphologicalChart } from '../model/morphological-chart';
 import { ToggleSelecter } from '../toggle-selecter';
 import { Utils } from '../../utils/utils';
 import { AbbreviatedConjugationView } from './abbreviated-conjugation-view';
-import { AbbreviatedConjugation } from '../model/abbreviated-conjugation';
-import { DetailedConjugation } from '../model/detailed-conjugation';
 import { DetailConjugationView } from './detail-conjugation-view';
+import Project from '../../store/project';
+import { observer } from 'mobx-react-lite';
 
 interface Props {
-    charts: MorphologicalChart[]
+    project: Project
 }
 
-interface State {
-    activeTabIndex: number
-    selectedChartIndex: number
-    abbreviatedConjugation?: AbbreviatedConjugation
-    detailConjugation?: DetailedConjugation
-}
+const MorphologicalChartsView: FC<Props> = ({ project }) => {
 
-export class MorphologicalChartsView extends React.Component<Props, State> {
+    const numOfColumns = 8;
+    const [activeTabIndex, setActiveTabIndex] = useState(1);
+    const [selectedChartIndex, setSelectedChartIndex] = useState(0);
 
-    private static NUM_OF_COLUMNS = 8;
+    const charts = project.charts;
+    const [abbreviatedConjugation, setAbbreviatedConjugation] = useState(charts.isEmpty() ? undefined : charts.get(0)!.abbreviatedConjugation);
+    const [detailConjugation, setDetailConjugation] = useState(charts.isEmpty() ? undefined : charts.get(0)!.detailedConjugation);
 
-    constructor(props: Props) {
-        super(props);
-
-        this.onChartSelected = this.onChartSelected.bind(this);
-
-        this.state = {
-            activeTabIndex: 0,
-            selectedChartIndex: 0
-        };
+    const renderEmpty = () => {
+        return <strong>Nothing here to display</strong>
     }
 
-    private onChartSelected(payload: any) {
+    const onChartSelected = (payload: any) => {
         const index = payload.index;
-        console.log(`CurrentIndex: ${index}`)
-        this.setState({
-            selectedChartIndex: index,
-            abbreviatedConjugation: this.props.charts[index].abbreviatedConjugation,
-            detailConjugation: this.props.charts[index].detailedConjugation,
-            activeTabIndex: 1
-        });
+        setSelectedChartIndex(index);
+        const chart = (project.charts.get(index)!);
+        setAbbreviatedConjugation(chart.abbreviatedConjugation)
+        setDetailConjugation(project.charts.get(index)!.detailedConjugation);
+        setActiveTabIndex(1);
     }
 
-
-    private renderChartTabs() {
-        const charts = this.props.charts.map((c) => c.copy());
-        const labels = Utils.chunkArray(charts.map((chart) => chart.label), MorphologicalChartsView.NUM_OF_COLUMNS);
+    const renderChartTabs = () => {
+        const labels = Utils.chunkArray(charts.toArray().map((chart) => chart.label), numOfColumns);
         const elements =
             labels.map((labelArray, parentIndex) => {
                 const labelElements = labelArray.map((label, index) => {
-                    const key = (parentIndex * MorphologicalChartsView.NUM_OF_COLUMNS) + index;
+                    const key = (parentIndex * numOfColumns) + index;
                     return (
                         <div className="p-col-12 p-md-6 p-lg-2" key={"chart-label-row-" + key}>
                             <ToggleSelecter value={label} index={key} className="chartSelector ui-button p-button-raised"
-                                userKey={label.id} checked={this.state.selectedChartIndex === key} onChange={this.onChartSelected} />
+                                userKey={label.id} checked={selectedChartIndex === key} onChange={onChartSelected} />
                         </div>
                     );
                 });
@@ -73,19 +60,23 @@ export class MorphologicalChartsView extends React.Component<Props, State> {
         );
     }
 
-    render() {
-        const abbreviatedConjugation = this.state.abbreviatedConjugation ? this.state.abbreviatedConjugation : this.props.charts[0].abbreviatedConjugation;
-        const detailConjugation = this.state.detailConjugation ? this.state.detailConjugation : this.props.charts[0].detailedConjugation;
+    const renderCharts = () => {
         return (
-            <React.Fragment>
-                <Accordion activeIndex={this.state.activeTabIndex} onTabChange={(e) => this.setState({ activeTabIndex: e.index })}>
-                    <AccordionTab header="Contents">{this.renderChartTabs()}</AccordionTab>
-                    <AccordionTab header="Conjugation">
-                        <AbbreviatedConjugationView conjugation={abbreviatedConjugation} />
-                        <DetailConjugationView conjugation={detailConjugation} />
+            <Accordion activeIndex={activeTabIndex} onTabChange={(e) => setActiveTabIndex(e.index)}>
+                <AccordionTab header="Contents">{renderChartTabs()}</AccordionTab>
+                <AccordionTab header="Conjugation">
+                        <AbbreviatedConjugationView conjugation={abbreviatedConjugation!} />
+                        <DetailConjugationView conjugation={detailConjugation!} />
                     </AccordionTab>
-                </Accordion>
-            </React.Fragment>
+            </Accordion>
         );
     }
+
+    const renderView = () => {
+        return charts.isEmpty() ? renderEmpty() : renderCharts();
+    }
+
+    return (renderView());
 }
+
+export default observer(MorphologicalChartsView);

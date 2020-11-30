@@ -1,70 +1,38 @@
-import * as React from 'react';
-
+import React, { useContext, useEffect, useState } from 'react';
+import { observer } from 'mobx-react-lite';
 import { TabView, TabPanel } from 'primereact/tabview';
-import { Project } from './model/models';
+import ProjectView from './project-view';
+import { ProjectContext } from '../store/project-store';
 import Emitter from '../services/event-emitter';
-import { ProjectView } from './project-view';
 import { EmitterConstants } from './emitter-constants';
 
-interface Props { }
+const HomeView = () => {
+    const [refreshTab, setRefreshTab] = useState(false);
+    const context = useContext(ProjectContext);
+    const { projects, activeProjectIndex, setActiveProjectIndex: selectProject } = context;
 
-interface State {
-    activeTabIndex: number,
-    projects: Project[]
-}
-
-export class HomeView extends React.Component<Props, State> {
-
-    constructor(props: Props) {
-        super(props);
-
-        this.state = {
-            activeTabIndex: 0,
-            projects: [new Project("Untitled1", "Untitled1.json")]
+    useEffect(() => {
+        // after save tab title doesn't get refreshed automatically,
+        // this is just to refresh tab title
+        Emitter.on(EmitterConstants.PROJECT_SAVED, () => setRefreshTab(!refreshTab));
+        return () => {
+            Emitter.off(EmitterConstants.PROJECT_SAVED);
         }
-    }
+    }, [refreshTab]);
 
-    componentDidMount() {
-        Emitter.on(EmitterConstants.NEW_PROJECT_ACTION, () => this.createNewProject());
-        Emitter.on(EmitterConstants.IMPORT_PROJECT_ACTION, (project) => this.importProject(project));
-    }
-
-    componentWillUnmount() {
-        Emitter.off(EmitterConstants.NEW_PROJECT_ACTION);
-        Emitter.off(EmitterConstants.IMPORT_PROJECT_ACTION);
-    }
-
-    private createNewProject() {
-        const p = this.state.projects.filter((project) => project.projectName.startsWith('Untitled'));
-        const projectName = `Untitled${p.length + 1}`;
-        this.state.projects.push(new Project(projectName, `${projectName}.json`))
-        this.setState({
-            projects: this.state.projects
-        });
-    }
-
-    private importProject(project: Project) {
-        const projects = [...this.state.projects];
-        projects.push(project);
-        this.setState({
-            projects: projects,
-            activeTabIndex: projects.length - 1
-        });
-    }
-
-    render() {
-        const panels =
-            this.state.projects.map((project, index) => {
+    return (
+        <TabView activeIndex={activeProjectIndex} onTabChange={(e) => selectProject(e.index)}>
+            {
+              projects.map((project) => {
                 return (
-                    <TabPanel header={project.projectName} key={"project-" + index}>
+                    <TabPanel header={project.projectName} key={project.id}>
                         <ProjectView project={project} />
-                    </TabPanel>);
-            });
+                    </TabPanel>
+                );
+            })  
+            }
+        </TabView>
+    );
+};
 
-        return (
-            <TabView activeIndex={this.state.activeTabIndex} onTabChange={(e) => this.setState({ activeTabIndex: e.index })}>
-                {panels}
-            </TabView>
-        );
-    }
-}
+export default observer(HomeView);

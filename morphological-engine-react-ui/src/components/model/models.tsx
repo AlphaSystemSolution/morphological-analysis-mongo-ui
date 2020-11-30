@@ -1,4 +1,4 @@
-import { IdGenerator } from '../../utils/id-generator';
+import {v4 as uuid} from 'uuid';
 import { Utils } from '../../utils/utils';
 import { ArabicLabel } from './arabic-label';
 import { ChartConfiguration } from './chart-configuration';
@@ -73,14 +73,6 @@ export class ArabicConstants {
   static AND_SPACE = new ArabicLabel('AND_SPACE', ' و ', 'AND_SPACE');
 }
 
-export class Project {
-  constructor(
-    public projectName: string,
-    public fileName: string,
-    public data: InputData[] = [],
-    public chartConfiguration: ChartConfiguration = new ChartConfiguration()) { }
-}
-
 export class InputData {
   constructor(
     public rootLetters: RootLetters = new RootLetters(),
@@ -89,7 +81,7 @@ export class InputData {
     public removePassiveLine: boolean = false,
     public skipRuleProcessing: boolean = false,
     public verbalNouns: VerbalNoun[] = [],
-    public id: string = IdGenerator.nextId()
+    public id: string = uuid()
   ) { }
 
   public toConjugationData() {
@@ -114,4 +106,8 @@ export class InputData {
       this.id
     );
   }
+}
+
+export enum ExportType {
+  BOTH, ABBREVIATED_CONJUGATION, DETAILED_CONJUGATION
 }

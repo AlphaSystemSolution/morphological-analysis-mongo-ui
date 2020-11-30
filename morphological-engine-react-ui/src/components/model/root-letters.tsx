@@ -1,9 +1,9 @@
-import { IdGenerator } from '../../utils/id-generator';
+import {v4 as uuid} from 'uuid';
 import { ArabicLetter } from './arabic-letter';
 import { RootLetters as _RootLetters } from './conjugation-header';
 
 export class RootLetters {
-  private _id: string = IdGenerator.nextId();
+  private _id: string = uuid();
 
   constructor(public firstRadical: ArabicLetter = ArabicLetter.FA, public secondRadical: ArabicLetter = ArabicLetter.AIN,
     public thirdRadical: ArabicLetter = ArabicLetter.LAM, public fourthRadical: ArabicLetter = ArabicLetter.TATWEEL) { }
@@ -13,7 +13,7 @@ export class RootLetters {
   }
 
   set id(value: string) {
-    this._id = value ? value : IdGenerator.nextId();
+    this._id = value ? value : uuid();
   }
 
   get empty(): boolean {

@@ -1,72 +1,51 @@
-import * as React from 'react';
-
-import * as path from 'path';
+import React, { useContext, useRef, useEffect, Fragment } from 'react';
+import { observer } from 'mobx-react-lite';
 import { Toolbar } from 'primereact/toolbar';
 import { Button } from 'primereact/button';
 import { FileUpload } from 'primereact/fileupload';
-// import { SplitButton } from 'primereact/splitbutton';
 import Emitter from '../services/event-emitter';
-import { ConjugationTemplate } from "./model/conjugation-template";
-import { Project } from './model/models';
 import { EmitterConstants } from './emitter-constants';
+import { ProjectContext } from '../store/project-store';
 
-interface Props { }
+const AppToolbar = () => {
+    let fileUploaderRef: any = useRef(null);
+    const context = useContext(ProjectContext);
+    const { addProject, importProject } = context;
 
-interface State { }
-
-export class AppToolbar extends React.Component<Props, State> {
-
-    fileUploaderRef: any = React.createRef();
-
-    constructor(props: Props) {
-        super(props);
-
-        this.uploadHandler = this.uploadHandler.bind(this);
-
-        this.state = {};
-    }
-
-    private emitAction(event: string, payload: any = {}) {
-        Emitter.emit(event, payload)
-    }
-
-    private uploadHandler(event: any) {
+    const uploadHandler = (event: any) => {
         if (event.files) {
-            const file = event.files[0];
-            const fileReader = new FileReader();
-            fileReader.readAsText(file);
-            fileReader.onload = () => {
-                const content = fileReader.result as string;
-                const src = JSON.parse(content);
-                const ct = ConjugationTemplate.of(src);
-                const data = ct.data.map((d) => d.toInputData())
-                const project = new Project(path.basename(file.name, ".json"), file.name, data, ct.chartConfiguration)                
-                Emitter.emit(EmitterConstants.IMPORT_PROJECT_ACTION, project)
-                this.fileUploaderRef.clear();
-            };
-            fileReader.onerror = () => {
-                console.error(`Error reading file: ${file.name}`)
-                throw new Error("Unable to read file");
-            }
+            importProject(event.files[0]);
         }
     }
 
-    render() {
-        const leftContents: any = (
-            <React.Fragment>
-                <Button label="New" icon="pi pi-plus" className="p-mr-2" onClick={() => this.emitAction(EmitterConstants.NEW_PROJECT_ACTION)} />
-                <span>&nbsp;</span>
-                <FileUpload ref={(el) => this.fileUploaderRef = el} name="import" accept="application/json" mode="basic" chooseLabel="Import" customUpload uploadHandler={this.uploadHandler}
-                    auto={true} />
-                <span>&nbsp;</span>
-                <i className="pi pi-bars p-toolbar-separator p-mr-2" />
-            </React.Fragment>
-        );
+    const handleNewProject = () => addProject();
 
-        return (
+    useEffect(() => {
+        Emitter.on(EmitterConstants.PROJECT_IMPORTED, (_) => fileUploaderRef.clear());
+
+        return () => {
+            Emitter.off(EmitterConstants.PROJECT_IMPORTED);
+        }
+    }, []);
+
+    const leftContents: any = (
+        <Fragment>
+            <Button label="New" icon="pi pi-plus" className="p-mr-2" onClick={() => handleNewProject()} />
+            <span>&nbsp;</span>
+            <FileUpload ref={(el) => fileUploaderRef = el} name="import" accept="application/json" mode="basic" chooseLabel="Import" customUpload
+                uploadHandler={(event) => uploadHandler(event)} auto />
+            <span>&nbsp;</span>
+            <i className="pi pi-bars p-toolbar-separator p-mr-2" />
+        </Fragment>
+    );
+
+    return (
+        <>
             <div className="content-section implementation">
                 <Toolbar left={leftContents} />
             </div>
-        );
-    }
+        </>
+    );
 }
+
+export default observer(AppToolbar);

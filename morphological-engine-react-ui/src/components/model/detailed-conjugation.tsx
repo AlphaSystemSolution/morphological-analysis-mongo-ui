@@ -1,4 +1,4 @@
-import { IdGenerator } from '../../utils/id-generator';
+import {v4 as uuid} from 'uuid';
 import { RootLetters } from './root-letters';
 import { NamedTemplate } from './named-template';
 import { SarfTermType } from './sarf-term-type';
@@ -128,7 +128,7 @@ export class DetailedConjugation {
         );
     }
 
-    public id: string = IdGenerator.nextId();
+    public id: string = uuid();
 
     private _rootLetters: RootLetters = new RootLetters();
     private _namedTemplate: NamedTemplate = NamedTemplate.FORM_I_CATEGORY_A_GROUP_A_TEMPLATE;
@@ -300,7 +300,7 @@ export class DetailedConjugation {
         if (this.namedTemplate && this.rootLetters) {
             this.id = this.namedTemplate.name + '_' + this.rootLetters.name;
         } else {
-            this.id = IdGenerator.nextId();
+            this.id = uuid();
         }
     }
 
