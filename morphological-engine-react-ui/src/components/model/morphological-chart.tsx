@@ -1,9 +1,9 @@
+import {v4 as uuid} from 'uuid';
 import { AbbreviatedConjugation } from './abbreviated-conjugation';
 import { DetailedConjugation } from './detailed-conjugation';
 import { RootLetters } from './root-letters';
 import { NamedTemplate } from './named-template';
 import { ArabicLabel } from './arabic-label';
-import { IdGenerator } from '../../utils/id-generator';
 
 export class MorphologicalChartLabel extends ArabicLabel {
 
@@ -33,7 +33,7 @@ export class MorphologicalChart {
     ) {
         this._rootLetters = this.abbreviatedConjugation.rootLetters;
         this._namedTemplate = this.abbreviatedConjugation.namedTemplate;
-        this._id = id ? id : IdGenerator.nextId();
+        this._id = id ? id : uuid();
         this._label = new MorphologicalChartLabel(this.rootLetters, this.namedTemplate, this.id);
     }
 

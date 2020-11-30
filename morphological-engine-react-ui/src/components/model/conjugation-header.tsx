@@ -1,10 +1,10 @@
-import { IdGenerator } from '../../utils/id-generator'
+import {v4 as uuid} from 'uuid';
 import { ArabicLetter } from './arabic-letter';
 import { RootLetters as _RootLetters } from './root-letters';
 
 export class RootLetters {
     constructor(
-        public id: string = IdGenerator.nextId(),
+        public id: string = uuid(),
         public name: string,
         public firstRadical: string,
         public secondRadical: string,

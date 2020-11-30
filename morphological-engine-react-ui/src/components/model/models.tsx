@@ -1,4 +1,4 @@
-import { IdGenerator } from '../../utils/id-generator';
+import {v4 as uuid} from 'uuid';
 import { Utils } from '../../utils/utils';
 import { ArabicLabel } from './arabic-label';
 import { ChartConfiguration } from './chart-configuration';
@@ -89,7 +89,7 @@ export class InputData {
     public removePassiveLine: boolean = false,
     public skipRuleProcessing: boolean = false,
     public verbalNouns: VerbalNoun[] = [],
-    public id: string = IdGenerator.nextId()
+    public id: string = uuid()
   ) { }
 
   public toConjugationData() {

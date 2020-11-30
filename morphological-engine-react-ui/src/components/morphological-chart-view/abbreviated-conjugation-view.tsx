@@ -1,6 +1,6 @@
 import { Panel } from 'primereact/panel';
 import * as React from 'react';
-import { IdGenerator } from '../../utils/id-generator';
+import {v4 as uuid} from 'uuid';
 import { AbbreviatedConjugation, ConjugationLabel } from '../model/abbreviated-conjugation';
 import { ArabicConstants } from '../model/models';
 import { MorphologicalChartLabel } from '../model/morphological-chart';
@@ -29,7 +29,7 @@ export class AbbreviatedConjugationView extends React.Component<Props, State> {
                 </div>
             );
         }
-        const chartLabel = new MorphologicalChartLabel(abbreviatedConjugation.rootLetters, abbreviatedConjugation.namedTemplate, IdGenerator.nextId());
+        const chartLabel = new MorphologicalChartLabel(abbreviatedConjugation.rootLetters, abbreviatedConjugation.namedTemplate, uuid());
         return (
             <div className="p-col-12 p-md-12 p-lg-12">
                 <div className="box">
