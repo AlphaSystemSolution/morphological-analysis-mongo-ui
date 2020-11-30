@@ -1,4 +1,3 @@
-import { List } from "immutable";
 import { ArabicLetter } from "../components/model/arabic-letter";
 import { InputData } from "../components/model/models";
 
@@ -11,14 +10,6 @@ export class Utils {
     public static chunkArray<T>(srcArray: T[], chunkSize: number): T[][] {
         const result = [];
         while (srcArray.length) {
-            result.push(srcArray.splice(0, chunkSize));
-        }
-        return result;
-    }
-
-    public static chunkList<T>(srcArray: List<T>, chunkSize: number): List<List<T>> {
-        const result = List();
-        while (srcArray.size) {
             result.push(srcArray.splice(0, chunkSize));
         }
         return result;
