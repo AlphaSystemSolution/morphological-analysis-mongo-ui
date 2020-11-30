@@ -20,7 +20,7 @@ export class ApplicationController {
     }
 
     public async exportToWord(body: ConjugationTemplate) {
-        const url = `${ApplicationController.MORPHOLOGICAL_ENGINE_URL}${OutputFormat[OutputFormat.STREAM]}`;
+        const url = `${ApplicationController.MORPHOLOGICAL_ENGINE_URL}/${OutputFormat[OutputFormat.STREAM]}`;
         const response = await axios.post(url, body, { responseType: 'blob' });
         if (response.status !== 200) {
             return Promise.reject(`Invalid status: ${response.status}:${response.statusText}`);
