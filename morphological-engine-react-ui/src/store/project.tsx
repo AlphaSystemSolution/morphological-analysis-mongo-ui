@@ -11,7 +11,7 @@ export default class Project {
 
     private applicationController: ApplicationController = new ApplicationController();
     id: string = uuid();
-    transient: boolean = true;
+    @observable transient: boolean = true;
     @observable projectName: string = "Untitled1"
     @observable chartConfiguration: ChartConfiguration = new ChartConfiguration();
     @observable data: List<InputData> = List([]);
@@ -62,6 +62,10 @@ export default class Project {
                     this.charts = List(charts);
                 });
         }
+    }
+
+    @action saveProject = () => {
+        this.applicationController.saveFile(this.projectName, this.data, this.chartConfiguration);
     }
 
 }

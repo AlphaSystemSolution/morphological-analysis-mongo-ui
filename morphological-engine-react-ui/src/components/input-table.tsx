@@ -1,6 +1,5 @@
 import React, { FC, useContext, useState } from 'react';
 import { observer } from 'mobx-react-lite';
-import { ProjectContext } from '../store/project-store';
 import { ArabicConstants, InputData } from './model/models';
 import { Checkbox } from 'primereact/checkbox';
 import { DataTable } from 'primereact/datatable';
@@ -13,6 +12,9 @@ import { Dialog } from 'primereact/dialog';
 import { SplitButton } from 'primereact/splitbutton';
 import { Toolbar } from 'primereact/toolbar';
 import Project from '../store/project';
+import { InputText } from 'primereact/inputtext';
+import Emitter from '../services/event-emitter';
+import { EmitterConstants } from './emitter-constants';
 
 enum ExportType {
     ALL, ABBREVIATED_CONJUGATION, DETAILED_CONJUGATION
@@ -27,8 +29,7 @@ const InputTable: FC<Props> = ({ project }) => {
     const [currentRow, setCurrentRow] = useState(new InputData());
     const [showRowEditDialog, setShowRowEditDialog] = useState(false);
     const [showDeleteRowsDialog, setShowDeleteRowsDialog] = useState(false);
-    const context = useContext(ProjectContext);
-    //const { addData, removeData } = context;
+    const [showSaveDialog, setShowSaveDialog] = useState(false);
     const data: InputData[] = project.data.toArray();
 
     const rowsSelected = (e: any) => setSelectedRows(e.value)
@@ -115,7 +116,20 @@ const InputTable: FC<Props> = ({ project }) => {
     };
 
     const saveProject = () => {
-        // TODO:
+        if (project.transient) {
+            setShowSaveDialog(true);
+        } else {
+            project.saveProject();
+        }
+    };
+
+    const handleSaveProjectDialog = (projectName?: string) => {
+        setShowSaveDialog(false);
+        if (projectName) {
+            project.updateProjectName(projectName);
+            project.saveProject();
+            Emitter.emit(EmitterConstants.PROJECT_SAVED, {});
+        }
     };
 
     const exportToWord = (exportType: ExportType = ExportType.ALL) => {
@@ -202,7 +216,47 @@ const InputTable: FC<Props> = ({ project }) => {
                     {<span>Are you sure you want to delete the selected rows?</span>}
                 </div>
             </Dialog>
+            <SaveFileDialog initialName={project.projectName} showDialog={showSaveDialog} onHide={(projectName?: string) => handleSaveProjectDialog(projectName)} />
         </>
+    );
+};
+
+interface SaveFileProps {
+    initialName: string;
+    showDialog: boolean;
+    onHide(projectName?: string): void
+}
+
+const SaveFileDialog: FC<SaveFileProps> = ({ initialName, showDialog, onHide }) => {
+
+    const [projectName, setProjectName] = useState(initialName);
+
+    const handleFormSubmit = (cancel: boolean = true) => {
+        if (cancel) {
+            onHide();
+        } else {
+            onHide(projectName);
+        }
+    }
+
+    const dialogFooter = (
+        <>
+            <Button label="Cancel" icon="pi pi-times" className="p-button-text" onClick={() => handleFormSubmit()} />
+            <Button label="OK" icon="pi pi-check" className="p-button-text" onClick={() => handleFormSubmit(false)} />
+        </>
+    );
+
+
+
+    return (
+        <Dialog visible={showDialog} style={{ width: '450px' }} header="Confirm" footer={dialogFooter} onHide={handleFormSubmit}>
+            <div className="p-field p-fluid">
+                <label htmlFor="saveproject">Username</label>
+                <InputText id="saveproject" type="saveproject" value={projectName} aria-describedby="saveproject-help"
+                    onChange={(e: any) => setProjectName(e.target.value)} />
+                <small id="saveproject-help">Please enter the name of the projct.</small>
+            </div>
+        </Dialog>
     );
 };
 

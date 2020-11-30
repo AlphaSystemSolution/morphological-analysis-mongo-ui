@@ -14,6 +14,7 @@ export class ProjectStore {
 
     @observable.shallow projects: List<Project> = List([]);
     @observable activeProjectIndex: number = 0;
+    private transientProjects = 0;
 
     constructor() {
         makeAutoObservable(this);
@@ -24,11 +25,12 @@ export class ProjectStore {
         const project = ProjectStore.createNewProject(counter);
         this.projects = this.projects.push(project);
         this.activeProjectIndex = this.projects.size - 1;
+        this.transientProjects += 1;
     }
 
     @action addProject = () => {
-        const untitledProjects = this.projects.filter((project) => project.projectName.startsWith('Untitled')).size;
-        this.initilaizeEmptyProject(untitledProjects + 1);
+        this.transientProjects += 1;
+        this.initilaizeEmptyProject(this.transientProjects);
     }
 
     @action importProject = (file: any) => {
