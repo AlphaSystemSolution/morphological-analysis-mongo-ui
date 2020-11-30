@@ -1,0 +1,7 @@
+.border {
+    -fx-background-color: transparent;
+    -fx-border-color: lightgray;
+    -fx-border-width: 1px;
+    -fx-padding: 5;
+    -fx-spacing: 4;
+}

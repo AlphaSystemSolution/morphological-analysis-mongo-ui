@@ -1,0 +1,8 @@
+dependencies {
+    compile project(':morphological-engine-ui-common')
+    compile 'commons-io:commons-io:2.8.0'
+    compile 'org.controlsfx:controlsfx:8.40.17'
+    compile 'com.alphasystem.app:asciidoctor-editor:3.0.0-SNAPSHOT'
+    compile 'org.hibernate:hibernate-validator:6.1.6.Final'
+    implementation 'org.springframework:spring-web:5.2.9.RELEASE'
+}

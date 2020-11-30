@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.Double?>
+<?import com.alphasystem.morphologicalanalysis.ui.control.ParticlesPicker?>
+<?import javafx.scene.layout.BorderPane?>
+<fx:root xmlns:fx="http://javafx.com/fxml/1" type="javafx.scene.layout.BorderPane"
+         xmlns="http://javafx.com/javafx/8.0.40" minWidth="$WIDTH" maxWidth="$WIDTH" prefWidth="$WIDTH"
+         fx:controller="com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.controller.ParticlePropertiesController">
+    <fx:define>
+        <Double fx:id="GAP" fx:value="10.0"/>
+        <Double fx:id="WIDTH" fx:value="325.0"/>
+    </fx:define>
+    <center>
+        <ParticlesPicker fx:id="particlesPicker"/>
+    </center>
+</fx:root>

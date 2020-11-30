@@ -1,0 +1,7 @@
+apply plugin: 'org.springframework.boot'
+
+dependencies {
+    compile project(':morphological-engine-ui-common')
+    compile 'org.springframework.boot:spring-boot-starter'
+    compile 'com.alphasystem.arabics:morphological-engine-docx:4.0.0-SNAPSHOT'
+}

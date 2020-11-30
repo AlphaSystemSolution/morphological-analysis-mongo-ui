@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+<?import java.lang.Double?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ComboBox?>
+<fx:root xmlns:fx="http://javafx.com/fxml/1" type="javafx.scene.layout.BorderPane"
+         xmlns="http://javafx.com/javafx/8.0.40"
+         fx:controller="com.alphasystem.morphologicalanalysis.ui.access.control.controller.QuestionTypeController">
+    <fx:define>
+        <Double fx:id="GAP" fx:value="10.0"/>
+    </fx:define>
+    <styleClass>border</styleClass>
+    <center>
+        <GridPane vgap="$GAP" hgap="$GAP">
+            <padding>
+                <Insets top="$GAP" bottom="$GAP" left="$GAP" right="$GAP"/>
+            </padding>
+            <Label text="%questionType.label" GridPane.columnIndex="0" GridPane.rowIndex="0"
+                   labelFor="$questionTypeComboBox"/>
+            <ComboBox fx:id="questionTypeComboBox" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+        </GridPane>
+    </center>
+</fx:root>

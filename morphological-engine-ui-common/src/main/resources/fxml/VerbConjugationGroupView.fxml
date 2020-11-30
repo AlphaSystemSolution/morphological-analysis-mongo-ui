@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.alphasystem.arabic.ui.*?>
+<?import javafx.scene.layout.*?>
+<?import java.lang.*?>
+<fx:root xmlns:fx="http://javafx.com/fxml/1" type="javafx.scene.layout.BorderPane"
+         xmlns="http://javafx.com/javafx/8.0.40">
+    <fx:define>
+        <Integer fx:id="NUM_OF_COLUMNS" fx:value="3"/>
+        <Integer fx:id="WIDTH" fx:value="128"/>
+        <Integer fx:id="HEIGHT" fx:value="64"/>
+        <Integer fx:id="TERM_LABEL_WIDTH" fx:value="384"/>
+        <Integer fx:id="DOUBLE_WIDTH" fx:value="256"/>
+    </fx:define>
+    <center>
+        <GridPane alignment="BASELINE_CENTER" nodeOrientation="RIGHT_TO_LEFT">
+            <ArabicLabelView fx:id="termLabel" disable="true" width="$TERM_LABEL_WIDTH" height="$HEIGHT"
+                             stroke="dodgerblue" GridPane.columnIndex="0" GridPane.rowIndex="0"
+                             GridPane.columnSpan="$NUM_OF_COLUMNS" GridPane.rowSpan="1"/>
+            <ArabicLabelView fx:id="row11" width="$WIDTH" height="$HEIGHT" disable="true" GridPane.columnIndex="0"
+                             GridPane.rowIndex="1"/>
+            <ArabicLabelView fx:id="row12" width="$WIDTH" height="$HEIGHT" disable="true" GridPane.columnIndex="1"
+                             GridPane.rowIndex="1"/>
+            <ArabicLabelView fx:id="row13" width="$WIDTH" height="$HEIGHT" disable="true" GridPane.columnIndex="2"
+                             GridPane.rowIndex="1"/>
+            <ArabicLabelView fx:id="row21" width="$WIDTH" height="$HEIGHT" disable="true" GridPane.columnIndex="0"
+                             GridPane.rowIndex="2"/>
+            <ArabicLabelView fx:id="row22" width="$WIDTH" height="$HEIGHT" disable="true" GridPane.columnIndex="1"
+                             GridPane.rowIndex="2"/>
+            <ArabicLabelView fx:id="row23" width="$WIDTH" height="$HEIGHT" disable="true" GridPane.columnIndex="2"
+                             GridPane.rowIndex="2"/>
+            <ArabicLabelView fx:id="row31" width="$WIDTH" height="$HEIGHT" disable="true" GridPane.columnIndex="0"
+                             GridPane.rowIndex="3"/>
+            <ArabicLabelView fx:id="row32" width="$WIDTH" height="$HEIGHT" disable="true" GridPane.columnIndex="1"
+                             GridPane.rowIndex="3"/>
+            <ArabicLabelView fx:id="row33" width="$WIDTH" height="$HEIGHT" disable="true" GridPane.columnIndex="2"
+                             GridPane.rowIndex="3"/>
+            <ArabicLabelView fx:id="row41" width="$WIDTH" height="$HEIGHT" disable="true" GridPane.columnIndex="0"
+                             GridPane.rowIndex="4"/>
+            <ArabicLabelView fx:id="row42" width="$WIDTH" height="$HEIGHT" disable="true" GridPane.columnIndex="1"
+                             GridPane.rowIndex="4"/>
+            <ArabicLabelView fx:id="row43" width="$WIDTH" height="$HEIGHT" disable="true" GridPane.columnIndex="2"
+                             GridPane.rowIndex="4"/>
+            <ArabicLabelView fx:id="row51" width="$WIDTH" height="$HEIGHT" disable="true" GridPane.columnIndex="0"
+                             GridPane.rowIndex="5"/>
+            <ArabicLabelView fx:id="row52" width="$DOUBLE_WIDTH" height="$HEIGHT" disable="true"
+                             GridPane.columnIndex="1" GridPane.rowIndex="5" GridPane.columnSpan="2"/>
+        </GridPane>
+    </center>
+</fx:root>

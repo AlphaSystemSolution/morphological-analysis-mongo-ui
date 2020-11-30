@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.alphasystem.arabic.ui.ArabicSupportEnumComboBox?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.*?>
+<?import java.lang.Double?>
+<?import javafx.scene.control.TextField?>
+<fx:root xmlns:fx="http://javafx.com/fxml/1" type="javafx.scene.layout.BorderPane" xmlns="http://javafx.com/javafx/8.0.40"
+         fx:controller="com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.controller.CommonPropertiesController">
+    <fx:define>
+        <Double fx:id="GAP" fx:value="10.0"/>
+    </fx:define>
+    <styleClass>border</styleClass>
+    <center>
+        <GridPane vgap="$GAP" hgap="$GAP">
+            <padding>
+                <Insets top="$GAP" bottom="$GAP" left="$GAP" right="$GAP"/>
+            </padding>
+            <Label text="%locationText.label" GridPane.columnIndex="0" GridPane.rowIndex="0"
+                   labelFor="$textField"/>
+            <TextField fx:id="textField" prefColumnCount="15" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+            <Label text="%locationDerivedText.label" GridPane.columnIndex="0" GridPane.rowIndex="1"
+                   labelFor="$derivedTextField"/>
+            <TextField fx:id="derivedTextField" disable="true" prefColumnCount="15" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+            <Label text="%translation.label" GridPane.columnIndex="0" GridPane.rowIndex="2"
+                   labelFor="$translationField"/>
+            <TextArea fx:id="translationField" prefRowCount="5" prefColumnCount="15" GridPane.columnIndex="1"
+                      GridPane.rowIndex="2"/>
+
+            <Label text="%wordType.label" GridPane.columnIndex="0" GridPane.rowIndex="3"
+                   labelFor="$wordTypeComboBox"/>
+            <ArabicSupportEnumComboBox fx:id="wordTypeComboBox" required="true" type="LABEL_AND_CODE"
+                                       clazz="com.alphasystem.morphologicalanalysis.wordbyword.model.support.WordType"
+                                       GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+
+            <Label text="%namedTag.label" GridPane.columnIndex="0" GridPane.rowIndex="4" labelFor="$namedTagComboBox"/>
+            <ArabicSupportEnumComboBox fx:id="namedTagComboBox" required="true" type="LABEL_AND_CODE"
+                                       clazz="com.alphasystem.morphologicalanalysis.wordbyword.model.support.NamedTag"
+                                       GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+        </GridPane>
+    </center>
+</fx:root>

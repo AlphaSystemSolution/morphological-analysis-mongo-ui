@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.alphasystem.arabic.ui.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import java.lang.Double?>
+<fx:root xmlns:fx="http://javafx.com/fxml/1" type="javafx.scene.layout.BorderPane"
+         fx:controller="com.alphasystem.morphologicalanalysis.ui.tokeneditor.control.controller.NounPropertiesController"
+         xmlns="http://javafx.com/javafx/8.0.40">
+    <fx:define>
+        <Double fx:id="GAP" fx:value="10.0"/>
+    </fx:define>
+    <styleClass>border</styleClass>
+    <center>
+        <GridPane vgap="$GAP" hgap="$GAP">
+            <padding>
+                <Insets top="$GAP" bottom="$GAP" left="$GAP" right="$GAP"/>
+            </padding>
+            <Label text="%partOfSpeech.label" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+            <ArabicSupportEnumComboBox fx:id="partOfSpeechComboBox" required="true" type="LABEL_AND_CODE"
+                                       clazz="com.alphasystem.morphologicalanalysis.wordbyword.model.support.NounPartOfSpeechType"
+                                       GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+            <Label text="%nounStatus.label" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+            <ArabicSupportEnumComboBox fx:id="nounStatusComboBox" required="true" type="LABEL_AND_CODE"
+                                       clazz="com.alphasystem.morphologicalanalysis.wordbyword.model.support.NounStatus"
+                                       GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+            <Label text="%numberType.label" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+            <ArabicSupportEnumComboBox fx:id="numberTypeComboBox" required="true" type="LABEL_AND_CODE"
+                                       clazz="com.alphasystem.morphologicalanalysis.wordbyword.model.support.NumberType"
+                                       GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+
+            <Label text="%genderType.label" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+            <ArabicSupportEnumComboBox fx:id="genderTypeComboBox" required="true" type="LABEL_AND_CODE"
+                                       clazz="com.alphasystem.morphologicalanalysis.wordbyword.model.support.GenderType"
+                                       GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+
+            <Label text="%nounType.label" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
+            <ArabicSupportEnumComboBox fx:id="nounTypeComboBox" required="true" type="LABEL_AND_CODE"
+                                       clazz="com.alphasystem.morphologicalanalysis.wordbyword.model.support.NounType"
+                                       GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+
+            <Label text="%nounKind.label" GridPane.columnIndex="0" GridPane.rowIndex="5"/>
+            <ArabicSupportEnumComboBox fx:id="nounKindComboBox" required="false" type="LABEL_AND_CODE"
+                                       clazz="com.alphasystem.morphologicalanalysis.wordbyword.model.support.NounKind"
+                                       GridPane.columnIndex="1" GridPane.rowIndex="5"/>
+        </GridPane>
+    </center>
+</fx:root>
