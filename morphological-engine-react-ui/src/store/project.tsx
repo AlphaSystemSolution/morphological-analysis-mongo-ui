@@ -52,16 +52,17 @@ export default class Project {
         this.data = this.data.filter((row) => !rowsToDelete.includes(row.id));
     }
 
-    @action loadConjugationData = () => {
+    @action loadConjugationData = async () => {
         const projectData = this.data;
-        if (!projectData.isEmpty) {
+        let loaded = false;
+        if (!projectData.isEmpty()) {
             const conjugationData = projectData.map((id) => id.toConjugationData()).toArray();
-            return this.applicationController
-                .getMorphologicalChart(new ConjugationTemplate(conjugationData))
-                .then((charts) => {
-                    this.charts = List(charts);
-                });
+            const charts = await this.applicationController
+                .getMorphologicalChart(new ConjugationTemplate(conjugationData));
+            this.charts = List(charts);
+            loaded = true;
         }
+        return Promise.resolve(loaded);
     }
 
     @action saveProject = () => {
