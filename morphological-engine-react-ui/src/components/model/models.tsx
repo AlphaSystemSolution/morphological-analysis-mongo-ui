@@ -73,14 +73,6 @@ export class ArabicConstants {
   static AND_SPACE = new ArabicLabel('AND_SPACE', ' و ', 'AND_SPACE');
 }
 
-export class Project {
-  constructor(
-    public projectName: string,
-    public fileName: string,
-    public data: InputData[] = [],
-    public chartConfiguration: ChartConfiguration = new ChartConfiguration()) { }
-}
-
 export class InputData {
   constructor(
     public rootLetters: RootLetters = new RootLetters(),
