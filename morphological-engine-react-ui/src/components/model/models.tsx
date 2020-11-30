@@ -115,3 +115,7 @@ export class InputData {
     );
   }
 }
+
+export enum ExportType {
+  BOTH, ABBREVIATED_CONJUGATION, DETAILED_CONJUGATION
+}

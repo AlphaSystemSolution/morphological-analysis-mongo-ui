@@ -1,6 +1,6 @@
 import React, { FC, useState } from 'react';
 import { observer } from 'mobx-react-lite';
-import { ArabicConstants, InputData } from './model/models';
+import { ArabicConstants, ExportType, InputData } from './model/models';
 import { Checkbox } from 'primereact/checkbox';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
@@ -15,10 +15,6 @@ import Project from '../store/project';
 import { InputText } from 'primereact/inputtext';
 import Emitter from '../services/event-emitter';
 import { EmitterConstants } from './emitter-constants';
-
-enum ExportType {
-    ALL, ABBREVIATED_CONJUGATION, DETAILED_CONJUGATION
-}
 
 interface Props {
     project: Project
@@ -132,8 +128,8 @@ const InputTable: FC<Props> = ({ project }) => {
         }
     };
 
-    const exportToWord = (exportType: ExportType = ExportType.ALL) => {
-        // TODO:
+    const exportToWord = (exportType: ExportType = ExportType.BOTH) => {
+        project.exportToWord(exportType, selectedRows).then(() => setSelectedRows([]))
     }
 
     const findIndexById = (id: string) => {

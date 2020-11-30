@@ -3,7 +3,7 @@ import { action, observable } from 'mobx';
 import { v4 as uuid } from 'uuid';
 import { ChartConfiguration } from '../components/model/chart-configuration';
 import { ConjugationTemplate } from '../components/model/conjugation-template';
-import { InputData } from '../components/model/models';
+import { ExportType, InputData } from '../components/model/models';
 import { MorphologicalChart } from '../components/model/morphological-chart';
 import { ApplicationController } from '../services/application-controller';
 
@@ -76,6 +76,30 @@ export default class Project {
 
     @action saveProject = () => {
         this.applicationController.saveFile(this.projectName, this.data, this.chartConfiguration);
+    }
+
+    exportToWord = (exportType: ExportType = ExportType.BOTH, selectedData: InputData[] = []) => {
+        const configuration = ChartConfiguration.of(this.chartConfiguration);
+        switch (exportType) {
+            case ExportType.ABBREVIATED_CONJUGATION:
+                configuration.omitToc = true;
+                configuration.omitHeader = true;
+                configuration.omitDetailedConjugation = true;
+                break;
+            case ExportType.DETAILED_CONJUGATION:
+                configuration.omitToc = true;
+                configuration.omitHeader = true;
+                configuration.omitAbbreviatedConjugation = true;
+                break;
+            default:
+                break;
+        }
+        const data = selectedData.length <= 0 ? this.data.toArray() : selectedData;
+        if (data.length > 0) {
+            const conjugationData = data.map((inputData) => inputData.toConjugationData());
+            return this.applicationController.exportToWord(new ConjugationTemplate(conjugationData, configuration));
+        }
+        return Promise.resolve(null);
     }
 
     private getChart = async (data: InputData) => {
