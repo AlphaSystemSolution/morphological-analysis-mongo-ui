@@ -245,7 +245,7 @@ const SaveFileDialog: FC<SaveFileProps> = ({ initialName, showDialog, onHide }) 
     return (
         <Dialog visible={showDialog} style={{ width: '450px' }} header="Confirm" footer={dialogFooter} onHide={handleFormSubmit}>
             <div className="p-field p-fluid">
-                <label htmlFor="saveproject">Username</label>
+                <label htmlFor="saveproject">Project Name</label>
                 <InputText id="saveproject" type="saveproject" value={projectName} aria-describedby="saveproject-help"
                     onChange={(e: any) => setProjectName(e.target.value)} />
                 <small id="saveproject-help">Please enter the name of the projct.</small>
