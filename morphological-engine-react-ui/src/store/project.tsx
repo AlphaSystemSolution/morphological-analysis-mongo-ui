@@ -43,13 +43,22 @@ export default class Project {
     @action addData = (index: number, data: InputData) => {
         if (index > -1) {
             this.data = this.data.set(index, data);
+            this.getChart(data)
+                .then((chart) => {
+                    this.charts = this.charts.set(index, chart);
+                });
         } else {
             this.data = this.data.push(data);
+            this.getChart(data)
+                .then((chart) => {
+                    this.charts = this.charts.push(chart);
+                });
         }
     }
 
     @action removeData = (rowsToDelete: string[]) => {
         this.data = this.data.filter((row) => !rowsToDelete.includes(row.id));
+        this.charts = this.charts.filter((row) => !rowsToDelete.includes(row.id));
     }
 
     @action loadConjugationData = async () => {
@@ -67,6 +76,12 @@ export default class Project {
 
     @action saveProject = () => {
         this.applicationController.saveFile(this.projectName, this.data, this.chartConfiguration);
+    }
+
+    private getChart = async (data: InputData) => {
+        const charts = await this.applicationController
+            .getMorphologicalChart(new ConjugationTemplate([data.toConjugationData()]));
+        return charts[0];
     }
 
 }
