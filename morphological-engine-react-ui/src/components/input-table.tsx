@@ -242,8 +242,6 @@ const SaveFileDialog: FC<SaveFileProps> = ({ initialName, showDialog, onHide }) 
         </>
     );
 
-
-
     return (
         <Dialog visible={showDialog} style={{ width: '450px' }} header="Confirm" footer={dialogFooter} onHide={handleFormSubmit}>
             <div className="p-field p-fluid">
