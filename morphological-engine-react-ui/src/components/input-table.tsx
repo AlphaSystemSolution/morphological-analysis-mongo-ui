@@ -1,4 +1,4 @@
-import React, { FC, useContext, useState } from 'react';
+import React, { FC, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { ArabicConstants, InputData } from './model/models';
 import { Checkbox } from 'primereact/checkbox';

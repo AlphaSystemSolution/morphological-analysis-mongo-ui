@@ -25,7 +25,7 @@ const HomeView = () => {
               projects.map((project) => {
                 return (
                     <TabPanel header={project.projectName} key={project.id}>
-                        <ProjectView projectId={project.id} />
+                        <ProjectView project={project} />
                     </TabPanel>
                 );
             })  

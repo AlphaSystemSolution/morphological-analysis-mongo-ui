@@ -1,19 +1,16 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { TabPanel, TabView } from 'primereact/tabview';
-import { ProjectContext } from '../store/project-store';
 import InputTable from './input-table';
+import Project from '../store/project';
 
 interface Props {
-    projectId: string
+    project: Project
 }
 
-const ProjectView: React.FC<Props> = ({ projectId }) => {
+const ProjectView: React.FC<Props> = ({ project }) => {
     const [activeTabIndex, setActiveTabIndex] = useState(0);
     const [disableConjugationTab, setDisableConjugationTab] = useState(true);
-
-    const context = useContext(ProjectContext);
-    const project = context.getProject(projectId);
 
     return (
         <>
