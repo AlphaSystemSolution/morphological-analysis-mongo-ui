@@ -174,7 +174,7 @@ export class MorphologicalInputForm extends React.Component<Props, State> {
                     <div className="p-fluid p-formgrid p-grid">
                         <div className="p-field p-col-12">
                             <label htmlFor="translation" style={{ 'fontWeight': 'bold' }}>Transalation:</label>
-                            <InputText id="translation" type="text" value={this.state.currentData.translation} className="translation"
+                            <InputText id="translation" type="text" value={this.state.currentData.translation} className="translation-small"
                                 onChange={this.updateTranslation} />
                         </div>
                     </div>

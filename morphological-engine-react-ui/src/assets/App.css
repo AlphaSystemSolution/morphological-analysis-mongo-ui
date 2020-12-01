@@ -106,12 +106,17 @@
 
 .code {
   font-family: Georgia;
-  font-size:12pt
+  font-size: 12pt
+}
+
+.translation-small {
+  font-family: Candara;
+  font-size: 12pt
 }
 
 .translation {
   font-family: Candara;
-  font-size:24pt
+  font-size: 24pt
 }
 
 table.morphological-chart {
